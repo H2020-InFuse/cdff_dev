@@ -25,7 +25,7 @@ CDFF-Dev depends on CDFF. In addition, the following packages are required:
 
 On Ubuntu 16.04 you can install them with
 
-    sudo apt-get update && apt-get -y install python3 python3-dev python3-pip python3-yaml
+    sudo apt-get install python3 python3-dev python3-pip python3-yaml
     sudo pip3 install jinja2 cython
 
 ## Installation
