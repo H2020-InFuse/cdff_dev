@@ -9,7 +9,7 @@ def main():
     args = parse_args()
     with open(args.definition, "r") as f:
         node = yaml.load(f)
-    write_dfn(node, output)
+    write_dfn(node, args.output)
 
 
 def parse_args():

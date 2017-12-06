@@ -37,7 +37,11 @@ symbolic link to the source code in your system:
 
 ## Documentation
 
-There is no documentation at the moment.
+### DFN Code Generator
+
+You can run the DFN code generator with
+
+    dfn_template_generator my_node_desc.yaml my_node_output_folder
 
 ## Testing
 
