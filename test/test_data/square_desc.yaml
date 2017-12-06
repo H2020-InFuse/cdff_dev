@@ -1,0 +1,9 @@
+name: Square
+input_ports:
+    - name: x
+      type: double
+      doc: input value
+output_ports:
+    - name: x_squared
+      type: double
+      doc: x * x
