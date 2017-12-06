@@ -41,7 +41,13 @@ There is no documentation at the moment.
 
 ## Testing
 
-There are no tests at the moment.
+You can run the tests with nosetests:
+
+    nosetests3
+
+Nosetests can be installed with pip:
+
+    sudo pip3 install nose
 
 ## Contributing
 
