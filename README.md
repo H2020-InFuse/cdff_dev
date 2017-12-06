@@ -30,7 +30,10 @@ On Ubuntu 16.04 you can install them with
 
 ## Installation
 
-There is nothing to install at the moment.
+As CDFF-Dev is under development, the most convenient way is to install a
+symbolic link to the source code in your system:
+
+    sudo pip3 install -e .
 
 ## Documentation
 
