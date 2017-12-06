@@ -40,6 +40,11 @@ There is no documentation at the moment.
 
 There are no tests at the moment.
 
+## Contributing
+
+It is not allowed to push directly to the master branch. To develop a new
+feature, please make a feature branch and open a merge request.
+
 ## Current State
 
 Only a rough scaffold is available at the moment.
