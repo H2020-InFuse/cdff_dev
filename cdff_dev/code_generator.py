@@ -34,6 +34,9 @@ class BasicTypeInfo(object):
     def python_type(self):
         return self.typename
 
+    def copy_on_assignment(self):
+        return True
+
 
 def write_dfn(node, output):
     type_registry = TypeRegistry()
@@ -59,10 +62,10 @@ def write_class(node, type_registry, template_base, file_suffix,
     definition_filename = "%s%s.cpp" % (node["name"], file_suffix)
 
     includes = set()
-    for port in node["input_ports"]:
-        includes.add(type_registry.get_info(port["type"]).include())
+    for input_port in node["input_ports"]:
+        includes.add(type_registry.get_info(input_port["type"]).include())
     for output_port in node["output_ports"]:
-        includes.add(type_registry.get_info(port["type"]).include())
+        includes.add(type_registry.get_info(output_port["type"]).include())
 
     node_base_declaration = render(
         "%s.hpp" % template_base,
@@ -107,6 +110,21 @@ def write_cython(node, type_registry, template_base,
 
 
 def render(template, **kwargs):
+    """Render Jinja2 template.
+
+    Parameters
+    ----------
+    template : str
+        name of the template, files will be searched in
+        $PYTHONPATH/cdff_dev/templates/<template>.template
+    kwargs : keyword arguments
+        arguments that will be passed to the template
+
+    Returns
+    -------
+    rendered_template : str
+        template with context filled in
+    """
     template_filename = resource_filename(
         "cdff_dev", os.path.join("templates", template + ".template"))
     if not os.path.exists(template_filename):

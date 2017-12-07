@@ -1,8 +1,6 @@
 from libcpp cimport bool
 from cython.operator cimport dereference as deref
 cimport _dfn_ci_{{ node["name"].lower() }}
-cimport _basetypes
-cimport basetypes
 
 
 cdef class {{ node["name"] }}:

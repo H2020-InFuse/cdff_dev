@@ -1,9 +1,7 @@
-# distutils: language = c++
+# distutils: language=c++
 cimport _dfn_ci_{{ node["name"].lower() }}
 cimport dfn_ci_{{ node["name"].lower() }}
 from cython.operator cimport dereference as deref
-cimport basetypes
-cimport _basetypes
 from libcpp cimport bool 
 
 
@@ -28,15 +26,24 @@ cdef class {{ node["name"] }}:
 {{ break }}
     {%- for input_port in node["input_ports"] %}
     def {{ input_port["name"] }}Input(self, {{ type_registry.get_info(input_port["type"]).python_type() }} data):
+        {%- if type_registry.get_info(input_port["type"]).copy_on_assignment() %}
+        cdef {{ type_registry.get_info(input_port["type"]).cython_type() }} cpp_data = data
+        self.thisptr.{{ input_port["name"] }}Input(cpp_data)
+        {%- else %}
         cdef {{ type_registry.get_info(input_port["type"]).cython_type() }} * cpp_data = data.thisptr
         self.thisptr.{{ input_port["name"] }}Input(deref(cpp_data))
+        {%- endif %}
 {{ break }}
     {%- endfor %}
 
     {%- for output_port in node["output_ports"] %}
     def {{ output_port["name"] }}Output(self):
+        {%- if type_registry.get_info(output_port["type"]).copy_on_assignment() %}
+        cdef {{ type_registry.get_info(output_port["type"]).python_type() }} out = self.thisptr.{{ output_port["name"] }}Output()
+        {%- else %}
         cdef {{ type_registry.get_info(output_port["type"]).python_type() }} out = {{ type_registry.get_info(output_port["type"]).python_type() }}()
         out.thisptr[0] = self.thisptr.{{ output_port["name"] }}Output()
+        {%- endif %}
         return out
 {{ break }}
     {%- endfor %}
