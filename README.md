@@ -47,7 +47,7 @@ You can run the DFN code generator with
 
 You can run the tests with nosetests:
 
-    nosetests3
+    make test
 
 Nosetests can be installed with pip:
 

@@ -80,9 +80,7 @@ def write_class(node, type_registry, template_base, file_suffix,
     target = os.path.join(target_folder, definition_filename)
     result[target] = node_base_definition
 
-    write_result(result, force_overwrite)
-
-    return result.keys()
+    return write_result(result, force_overwrite)
 
 
 def write_cython(node, type_registry, template_base,
@@ -109,9 +107,7 @@ def write_cython(node, type_registry, template_base,
     target = os.path.join(target_folder, pyx_filename)
     result[target] = pyx_file
 
-    write_result(result, True)
-
-    return result.keys()
+    return write_result(result, True)
 
 
 def render(template, **kwargs):
@@ -139,7 +135,8 @@ def render(template, **kwargs):
     return template.render(**kwargs)
 
 
-def write_result(result, force_overwrite):
+def write_result(result, force_overwrite, verbose=0):
+    written_files = []
     msg = ""
     for filename, content in result.items():
         if os.path.exists(filename):
@@ -158,6 +155,9 @@ def write_result(result, force_overwrite):
         if write:
             with open(filename, "w") as f:
                 f.write(content)
+            written_files.append(filename)
 
-    if msg:
+    if verbose >= 1 and msg:
         print(msg)
+
+    return written_files

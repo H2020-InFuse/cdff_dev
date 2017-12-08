@@ -2,8 +2,8 @@ import os
 import sys
 import shutil
 from contextlib import contextmanager
-from code_generator import render
 from functools import partial
+from .code_generator import render
 
 
 class EnsureCleanup():
@@ -68,10 +68,18 @@ hidden_stderr = partial(hidden_stream, fileno=2)
 
 
 def build_extension(folder, **kwargs):
+    if "hide_stderr" in kwargs:
+        hide_stderr = kwargs.pop("hide_stderr")
+    else:
+        hide_stderr = False
     filename = os.path.join(folder, "python", "setup.py")
     with open(filename, "w") as f:
         setup_py = render("setup.py", **kwargs)
         f.write(setup_py)
     cmd = "python3 %s build_ext --inplace" % filename
     with hidden_stdout():
-        os.system(cmd)
+        if hide_stderr:
+            with hidden_stderr():
+                os.system(cmd)
+        else:
+            os.system(cmd)
