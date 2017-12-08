@@ -6,15 +6,42 @@ from code_generator import render
 from functools import partial
 
 
+class EnsureCleanup():
+    def __init__(self, folder):
+        self.folder = folder
+        self.created_folder = False
+        self.filenames = []
+        self.folders = []
+
+    def __enter__(self):
+        if not os.path.exists(self.folder):
+            os.makedirs(self.folder)
+            self.created_folder = True
+        return self
+
+    def add_files(self, filenames):
+        self.filenames.extend(filenames)
+
+    def add_folder(self, folder):
+        self.folders.append(folder)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        for filename in self.filenames:
+            os.remove(filename)
+        for folder in self.folders:
+            shutil.rmtree(folder)
+        if self.created_folder:
+            shutil.rmtree(self.folder)
+
+
 @contextmanager
-def ensure_cleanup(folder):
-    """Create temporary folder for test data that will be deleted."""
-    if not os.path.exists(folder):
-        os.makedirs(folder)
+def modified_pythonpath(additional_folder):
+    old_path = sys.path
+    sys.path = old_path + [additional_folder]
     try:
         yield
     finally:
-        shutil.rmtree(folder)
+        sys.path = old_path
 
 
 @contextmanager
@@ -42,7 +69,6 @@ hidden_stderr = partial(hidden_stream, fileno=2)
 
 def build_extension(folder, **kwargs):
     filename = os.path.join(folder, "python", "setup.py")
-    print(filename)
     with open(filename, "w") as f:
         setup_py = render("setup.py", **kwargs)
         f.write(setup_py)

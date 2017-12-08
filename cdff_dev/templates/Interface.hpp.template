@@ -2,7 +2,9 @@
 #define {{ node["name"].upper() }}_INTERFACE_HPP
 #include "DFNCommonInterface.hpp"
 {%- for include in includes %}
+{%- if include %}
 #include <{{ include }}>
+{%- endif %}
 {%- endfor %}
 
 namespace dfn_ci {

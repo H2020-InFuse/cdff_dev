@@ -46,12 +46,14 @@ def write_dfn(node, output):
         os.makedirs(src_dir)
     if not os.path.exists(python_dir):
         os.makedirs(python_dir)
-    write_class(
+    interface_files = write_class(
         node, type_registry, "Interface", "Interface", target_folder=src_dir,
         force_overwrite=True)
-    write_class(
+    implementation_files = write_class(
         node, type_registry, "Node", "", target_folder=src_dir)
-    write_cython(node, type_registry, "Node", target_folder=python_dir)
+    cython_files = write_cython(node, type_registry, "Node",
+                                target_folder=python_dir)
+    return interface_files + implementation_files + cython_files
 
 
 def write_class(node, type_registry, template_base, file_suffix,
@@ -68,18 +70,19 @@ def write_class(node, type_registry, template_base, file_suffix,
         includes.add(type_registry.get_info(output_port["type"]).include())
 
     node_base_declaration = render(
-        "%s.hpp" % template_base,
-        node=node, includes=includes)
+        "%s.hpp" % template_base, node=node, includes=includes)
     target = os.path.join(target_folder, declaration_filename)
     result[target] = node_base_declaration
 
     node_base_definition = render(
-        "%s.cpp" % template_base,
-        declaration_filename=declaration_filename, node=node)
+        "%s.cpp" % template_base, declaration_filename=declaration_filename,
+        node=node)
     target = os.path.join(target_folder, definition_filename)
     result[target] = node_base_definition
 
     write_result(result, force_overwrite)
+
+    return result.keys()
 
 
 def write_cython(node, type_registry, template_base,
@@ -107,6 +110,8 @@ def write_cython(node, type_registry, template_base,
     result[target] = pyx_file
 
     write_result(result, True)
+
+    return result.keys()
 
 
 def render(template, **kwargs):

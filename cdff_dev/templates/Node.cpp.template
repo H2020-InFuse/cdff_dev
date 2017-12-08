@@ -2,7 +2,7 @@
 
 namespace dfn_ci {
 
-{{ node["name"] }}::{{ node["name"] }}r()
+{{ node["name"] }}::{{ node["name"] }}()
 {
 }
 
