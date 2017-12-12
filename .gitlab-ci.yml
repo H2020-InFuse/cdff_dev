@@ -1,0 +1,22 @@
+image: nexus.spaceapplications.com/repository/infuse/cdff_dev:latest
+
+stages:
+  - fetch_cdff
+  - build_cdff_dev
+
+autogeneration:
+  stage : fetch_cdff
+  script:
+      - git clone git@gitlab.spaceapplications.com:InFuse/CDFF.git
+      - cd CDFF/Tools/ASNtoCGenerator
+      - ./GeneratorScript.sh
+      - cd ../..
+      - mkdir build
+      - cd build
+      - cmake -DCMAKE_INSTALL_PREFIX=./ ..
+      - make
+
+autogeneration:
+  stage : build_cdff_dev
+  script:
+      - echo test
