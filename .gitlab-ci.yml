@@ -4,7 +4,7 @@ stages:
   - fetch_cdff
   - build_cdff_dev
 
-autogeneration:
+fetch_cdff:
   stage : fetch_cdff
   script:
       - git clone git@gitlab.spaceapplications.com:InFuse/CDFF.git
@@ -16,7 +16,7 @@ autogeneration:
       - cmake -DCMAKE_INSTALL_PREFIX=./ ..
       - make
 
-autogeneration:
+build_cdff_dev:
   stage : build_cdff_dev
   script:
       - echo test
