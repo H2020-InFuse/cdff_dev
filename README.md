@@ -5,8 +5,6 @@ https://gitlab.spaceapplications.com/InFuse/CDFF_dev)
 https://gitlab.spaceapplications.com/InFuse/CDFF_dev/badges/master/coverage.svg)](
 https://gitlab.spaceapplications.com/InFuse/CDFF_dev)
 
-https://gitlab.spaceapplications.com/InFuse/CDFF_dev/badges/master/build.svg
-
 # CDFF-Dev
 
 The CDFF-Dev provides the tools to develop, test, visualize, and perform
