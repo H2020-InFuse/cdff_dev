@@ -3,6 +3,7 @@ image: nexus.spaceapplications.com/repository/infuse/cdff_dev:latest
 stages:
   - fetch_cdff
   - build_cdff_dev
+  - test
 
 fetch_cdff:
   stage : fetch_cdff
@@ -13,4 +14,10 @@ fetch_cdff:
 build_cdff_dev:
   stage : build_cdff_dev
   script:
-      - echo test
+      - python3 setup.py build_ext -i
+
+test:
+  stage : test
+  script:
+      - pip3 install nose  # TODO remove as soon as docker image is updated
+      - make test
