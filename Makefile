@@ -1,18 +1,18 @@
 all: CDFF build_cdff
 
 
-CDFF:
-	git clone https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com:InFuse/Infuse/CDFF.git
+dependencies: CDFF CDFF/External/opencv3/README.md External/tinyxml2/readme.md
+	echo "Installed dependencies."
 
-build_cdff: autogeneration dependencies mkdir_build
+CDFF:
+	git clone --depth 1 git@gitlab.spaceapplications.com:InFuse/CDFF.git
+
+build_cdff: autogeneration mkdir_build
 	cd CDFF/build; cmake -DCMAKE_INSTALL_PREFIX=./.. ..
 	cd CDFF/build; make
 
 autogeneration:
 	cd CDFF/Tools/ASNtoC; ./GeneratorScript.sh
-
-dependencies: CDFF/External/opencv3/README.md
-	echo "Installed dependencies."
 
 mkdir_build:
 	cd CDFF; mkdir build
