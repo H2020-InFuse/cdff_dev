@@ -15,17 +15,17 @@ autogeneration:
 	cd CDFF/Tools/ASNtoC; ./GeneratorScript.sh
 
 mkdir_build:
-	cd CDFF; mkdir build
+	cd CDFF; mkdir -p build
 
 CDFF/External/opencv3/README.md:
 	cd CDFF/; git submodule init; git submodule update
-	cd CDFF/External/opencv3/; mkdir build
+	mkdir -p CDFF/External/opencv3/build
 	cd CDFF/External/opencv3/build; cmake -DBUILD_DOCS=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_PROTOBUF=OFF -DBUILD_TESTS=OFF -DWITH_CUDA=OFF -DBUILD_opencv_dnn=OFF -DCMAKE_INSTALL_PREFIX=./.. ..
 	cd CDFF/External/opencv3/build; make install
 
 External/tinyxml2/readme.md:
 	cd CDFF/; git submodule init; git submodule update
-	cd CDFF/External/opencv3/; mkdir build
+	mkdir -p CDFF/External/opencv3/build
 	cd CDFF/External/opencv3/build; cmake -DCMAKE_INSTALL_PREFIX=./.. ..
 	cd CDFF/External/opencv3/build; make install
 
