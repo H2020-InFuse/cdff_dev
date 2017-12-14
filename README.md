@@ -44,6 +44,9 @@ symbolic link to the source code in your system:
 
 ## Documentation
 
+The overall concept and conventions are described in the documentation
+of CDFF-Support [here](https://docs.google.com/document/d/1BzKnNrRw6yIFllrITiEGZXD8awtsmvNslqRuB4j29mw/edit#heading=h.lsr1bgv0ntf5).
+
 ### DFN Code Generator
 
 You can run the DFN code generator with
