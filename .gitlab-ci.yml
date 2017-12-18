@@ -19,5 +19,4 @@ build_cdff_dev:
 test:
   stage : test
   script:
-      - pip3 install nose  # TODO remove as soon as docker image is updated
       - make test
