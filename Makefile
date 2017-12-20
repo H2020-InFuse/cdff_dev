@@ -9,7 +9,7 @@ CDFF:
 
 build_cdff: autogeneration mkdir_build
 	cd CDFF/build; cmake -DCMAKE_INSTALL_PREFIX=./.. ..
-	cd CDFF/build; make
+	cd CDFF/build; make install
 
 autogeneration:
 	cd CDFF/Tools/ASNtoC; ./GeneratorScript.sh
