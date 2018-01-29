@@ -1,4 +1,4 @@
-FROM nexus.spaceapplications.com/repository/infuse/infuse:latest
+FROM nexus.spaceapplications.com/repository/infuse/infuse:1.6.3
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
 
