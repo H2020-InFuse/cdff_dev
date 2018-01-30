@@ -8,7 +8,7 @@ CDFF:
 	git clone --depth 1 git@gitlab.spaceapplications.com:InFuse/CDFF.git
 
 build_cdff: autogeneration mkdir_build
-    cp -rf /CDFF/External/install CDFF/External/install
+	cp -rf /CDFF/External/install CDFF/External/install
 	cd CDFF/build
 	cmake -DCMAKE_INSTALL_PREFIX=./.. ..
 	make install
