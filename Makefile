@@ -7,15 +7,13 @@ dependencies: CDFF CDFF/External/opencv3/README.md External/tinyxml2/readme.md
 CDFF:
 	git clone --depth 1 git@gitlab.spaceapplications.com:InFuse/CDFF.git
 
-build_cdff: autogeneration mkdir_build
-	cd CDFF/build; cmake -DCMAKE_INSTALL_PREFIX=./.. ..
-	cd CDFF/build; make install
+build_cdff: autogeneration
+	cp -rf /CDFF/External/install CDFF/External/install
+	mkdir -p CDFF/build
+	cd CDFF/build; cmake -DCMAKE_INSTALL_PREFIX=./.. .. ; make install
 
 autogeneration:
 	cd CDFF/Tools/ASNtoC; ./GeneratorScript.sh
-
-mkdir_build:
-	cd CDFF; mkdir -p build
 
 CDFF/External/opencv3/README.md:
 	cd CDFF/; git submodule init; git submodule update
@@ -30,6 +28,6 @@ External/tinyxml2/readme.md:
 	cd CDFF/External/opencv3/build; make install
 
 test:
-	/usr/bin/nosetests -sv
+	nosetests -sv
 
 .PHONY: test
