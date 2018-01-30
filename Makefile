@@ -28,6 +28,6 @@ External/tinyxml2/readme.md:
 	cd CDFF/External/opencv3/build; make install
 
 test:
-	/usr/bin/nosetests -sv
+	nosetests -sv
 
 .PHONY: test
