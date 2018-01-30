@@ -9,7 +9,7 @@ CDFF:
 
 build_cdff: autogeneration mkdir_build
     cp -rf /CDFF/External/install CDFF/External/install
-	cd CDFF/build;
+	cd CDFF/build
 	cmake -DCMAKE_INSTALL_PREFIX=./.. ..
 	make install
 
