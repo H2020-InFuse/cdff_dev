@@ -8,13 +8,9 @@ CDFF:
 	git clone --depth 1 git@gitlab.spaceapplications.com:InFuse/CDFF.git
 
 build_cdff: autogeneration
-	pwd
 	cp -rf /CDFF/External/install CDFF/External/install
-	pwd
 	mkdir -p CDFF/build
-	cd CDFF/build
-	cmake -DCMAKE_INSTALL_PREFIX=./.. ..
-	make install
+	cd CDFF/build; cmake -DCMAKE_INSTALL_PREFIX=./.. .. ; make install
 
 autogeneration:
 	cd CDFF/Tools/ASNtoC; ./GeneratorScript.sh
