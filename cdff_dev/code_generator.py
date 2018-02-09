@@ -38,7 +38,7 @@ class BasicTypeInfo(object):
         return True
 
 
-def write_dfn(node, output):
+def write_dfn(node, output, cdffpath):
     type_registry = TypeRegistry()
     src_dir = os.path.join(output, "src")
     python_dir = os.path.join(output, "python")
