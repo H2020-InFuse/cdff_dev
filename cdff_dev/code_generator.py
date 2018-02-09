@@ -38,7 +38,20 @@ class BasicTypeInfo(object):
         return True
 
 
-def write_dfn(node, output, cdffpath):
+def write_dfn(node, output, cdffpath="CDFF"):
+    """Generate code templates for a data fusion node (DFN).
+
+    Parameters
+    ----------
+    node : dict
+        Node configuration loaded from node description file
+
+    output : str
+        Path to output directory
+
+    cdffpath : str, optional (default: 'CDFF')
+        Path to CDFF
+    """
     type_registry = TypeRegistry()
     src_dir = os.path.join(output, "src")
     python_dir = os.path.join(output, "python")
