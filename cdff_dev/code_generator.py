@@ -3,26 +3,16 @@ import jinja2
 from pkg_resources import resource_filename
 
 
-class TypeRegistry(object):  # TODO global, read from config files
-    """Registry for InFuse type information."""
-    def __init__(self):
-        self.cache = {}
-
-    def get_info(self, typename):
-        if typename in BasicTypeInfo.BASICTYPES:
-            if typename not in self.cache:
-                self.cache[typename] = BasicTypeInfo(typename)
-            return self.cache[typename]
-        else:
-            raise NotImplementedError("No type info for '%s' available."
-                                      % typename)
-
-
+# TODO refactor: move type info to some other file
 class BasicTypeInfo(object):
     BASICTYPES = ["int", "double", "bool"]
     """Information about basic C++ types."""
     def __init__(self, typename):
         self.typename = typename
+
+    @classmethod
+    def handles(cls, typename):
+        return typename in cls.BASICTYPES
 
     def include(self):
         """C++ include header."""
@@ -36,6 +26,46 @@ class BasicTypeInfo(object):
 
     def copy_on_assignment(self):
         return True
+
+
+class DefaultTypeInfo(object):
+    """Handles any type."""
+    def __init__(self, typename):
+        self.typename = typename
+
+    @classmethod
+    def handles(cls, typename):
+        return True
+
+    def include(self):
+        """C++ include header."""
+        return None
+
+    def cython_type(self):
+        return self.typename
+
+    def python_type(self):
+        return self.typename
+
+    def copy_on_assignment(self):
+        return True  # TODO really?
+
+
+class TypeRegistry(object):  # TODO global, read from config files
+    TYPEINFOS = [BasicTypeInfo, DefaultTypeInfo]
+    """Registry for InFuse type information."""
+    def __init__(self):
+        self.cache = {}
+
+    def get_info(self, typename):
+        for TypeInfo in self.TYPEINFOS:
+            if TypeInfo.handles(typename):
+                if typename not in self.cache:
+                    self.cache[typename] = TypeInfo(typename)
+                return self.cache[typename]
+        else:
+            raise NotImplementedError("No type info for '%s' available."
+                                      % typename)
 
 
 def write_dfn(node, output, cdffpath="CDFF"):
@@ -52,6 +82,8 @@ def write_dfn(node, output, cdffpath="CDFF"):
     cdffpath : str, optional (default: 'CDFF')
         Path to CDFF
     """
+    node = validate(node)
+
     type_registry = TypeRegistry()
     src_dir = os.path.join(output, "src")
     python_dir = os.path.join(output, "python")
@@ -67,6 +99,50 @@ def write_dfn(node, output, cdffpath="CDFF"):
     cython_files = write_cython(node, type_registry, "Node",
                                 target_folder=python_dir)
     return interface_files + implementation_files + cython_files
+
+
+def validate(node):
+    """Validate node description.
+
+    Raises a DFNDescriptionException if validation is not
+    successful.
+
+    A validated node contains:
+    - name
+    - input_ports
+    - output_ports
+
+    Parameters
+    ----------
+    node : dict
+        Node description
+
+    Returns
+    -------
+    validated_node : dict
+        Validated node description
+    """
+    validated_node = {}
+    validated_node.update(node)
+
+    if "name" not in node:
+        raise DFNDescriptionException(
+            "DFN description has no attribute 'name'.")
+
+    if "input_ports" not in node:
+        validated_node["input_ports"] = []
+
+    if "output_ports" not in node:
+        validated_node["output_ports"] = []
+
+    # TODO validate each input and output port: name and type
+
+    return validated_node
+
+
+class DFNDescriptionException(Exception):
+    def __init__(self, msg):
+        super(Exception, self).__init__(msg)
 
 
 def write_class(node, type_registry, template_base, file_suffix,
