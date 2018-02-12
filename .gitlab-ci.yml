@@ -10,6 +10,9 @@ fetch_cdff:
   script:
       - git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com:InFuse/Infuse/CDFF.git
       - make build_cdff
+  artifacts:
+    paths:
+      - CDFF
 
 build_cdff_dev:
   stage : build_cdff_dev
