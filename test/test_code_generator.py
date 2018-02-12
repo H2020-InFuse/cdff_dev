@@ -2,7 +2,7 @@ import os
 import yaml
 from cdff_dev.code_generator import write_dfn
 from cdff_dev.testing import EnsureCleanup, build_extension
-from nose.tools import assert_true, assert_equal
+from nose.tools import assert_true, assert_equal, assert_raises_regexp
 
 
 def test_square_smoke():
@@ -31,3 +31,27 @@ def test_square_smoke():
         square.xInput(5.0)
         assert_true(square.process())
         assert_equal(25.0, square.x_squaredOutput())
+
+
+def test_unknown_type():
+    with open("test/test_data/unknowntype_desc.yaml", "r") as f:
+        node = yaml.load(f)
+    tmp_folder = "test/test_output/unknowntype"
+    with EnsureCleanup(tmp_folder) as ec:
+        filenames = write_dfn(node, tmp_folder)
+        ec.add_files(filenames)
+        ec.add_folder(os.path.join(tmp_folder, "python"))
+
+        assert_raises_regexp(
+            Exception, "Exit status",
+            build_extension,
+            tmp_folder, hide_stderr=True,
+            name="dfn_ci_" + node["name"].lower(),
+            pyx_filename=os.path.join(tmp_folder, "python", "dfn_ci_" + node["name"].lower() + ".pyx"),
+            implementation=map(lambda filename: os.path.join(tmp_folder, "src", filename),
+                               ["UnknownType.cpp", "UnknownTypeInterface.cpp"]),
+            sourcedir=os.path.join(tmp_folder, "src"), incdirs=["test/test_output/"],
+            compiler_flags=[], library_dirs=[], libraries=[],
+            includes=[]
+        )
+        # TODO shouldn't we check stderr?

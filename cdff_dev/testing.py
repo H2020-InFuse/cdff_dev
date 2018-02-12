@@ -77,9 +77,13 @@ def build_extension(folder, **kwargs):
         setup_py = render("setup.py", **kwargs)
         f.write(setup_py)
     cmd = "python3 %s build_ext --inplace" % filename
+
+    exit_status = 0
     with hidden_stdout():
         if hide_stderr:
             with hidden_stderr():
-                os.system(cmd)
+                exit_status = os.system(cmd)
         else:
-            os.system(cmd)
+            exit_status = os.system(cmd)
+    if exit_status:
+        raise Exception("Exit status '%s'" % exit_status)

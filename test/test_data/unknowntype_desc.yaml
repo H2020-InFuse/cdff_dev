@@ -1,0 +1,5 @@
+name: UnknownType
+input_ports:
+    - name: x
+      type: unknown
+      doc: input value
