@@ -1,3 +1,4 @@
+import warnings
 import os
 import jinja2
 from pkg_resources import resource_filename
@@ -32,6 +33,10 @@ class DefaultTypeInfo(object):
     """Handles any type."""
     def __init__(self, typename):
         self.typename = typename
+        warnings.warn(
+            "Typename '%s' is not known. It is probably not handled "
+            "correctly. You might have to add an include to the C++ template "
+            "and you might have to change the Python wrapper." % self.typename)
 
     @classmethod
     def handles(cls, typename):

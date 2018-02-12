@@ -1,8 +1,9 @@
 import os
 import yaml
+import warnings
 from cdff_dev.code_generator import write_dfn
 from cdff_dev.testing import EnsureCleanup, build_extension
-from nose.tools import assert_true, assert_equal, assert_raises_regexp
+from nose.tools import assert_true, assert_equal, assert_raises_regex
 
 
 def test_square_smoke():
@@ -38,11 +39,12 @@ def test_unknown_type():
         node = yaml.load(f)
     tmp_folder = "test/test_output/unknowntype"
     with EnsureCleanup(tmp_folder) as ec:
+        warnings.simplefilter("ignore", UserWarning)
         filenames = write_dfn(node, tmp_folder)
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
 
-        assert_raises_regexp(
+        assert_raises_regex(
             Exception, "Exit status",
             build_extension,
             tmp_folder, hide_stderr=True,
@@ -54,4 +56,3 @@ def test_unknown_type():
             compiler_flags=[], library_dirs=[], libraries=[],
             includes=[]
         )
-        # TODO shouldn't we check stderr?
