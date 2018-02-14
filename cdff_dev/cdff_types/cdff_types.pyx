@@ -45,3 +45,21 @@ cdef class Time:
         self.thisptr.usecPerSec = usecPerSec
 
     usec_per_sec = property(_get_usec_per_sec, _set_usec_per_sec)
+
+
+cdef class Vector2d:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_types.Vector2d()
+        self.thisptr.nCount = 2
+        self.delete_thisptr = True
+
+    def __len__(self):
+        return self.thisptr.nCount

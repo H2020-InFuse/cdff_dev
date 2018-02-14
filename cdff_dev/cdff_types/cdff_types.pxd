@@ -10,3 +10,8 @@ cimport _cdff_types
 cdef class Time:
     cdef _cdff_types.Time* thisptr
     cdef bool delete_thisptr
+
+
+cdef class Vector2d:
+    cdef _cdff_types.Vector2d* thisptr
+    cdef bool delete_thisptr

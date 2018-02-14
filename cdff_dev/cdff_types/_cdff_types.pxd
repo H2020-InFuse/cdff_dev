@@ -16,3 +16,11 @@ cdef extern from "Time.h":
         seconds
         milliseconds
         microseconds
+
+
+cdef extern from "Eigen.h":
+    cdef cppclass Vector2d:
+        Vector2d& assign "operator="(Vector2d&)
+
+        int nCount
+        double[2] arr
