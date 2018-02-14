@@ -2,7 +2,8 @@
 cimport _dfn_ci_{{ node["name"].lower() }}
 cimport dfn_ci_{{ node["name"].lower() }}
 from cython.operator cimport dereference as deref
-from libcpp cimport bool 
+from libcpp cimport bool
+from libcpp.string cimport string
 
 
 {%- for class_name in node["implementations"] %}
@@ -21,6 +22,10 @@ cdef class {{ class_name }}:
 
     def process(self):
         self.thisptr.process()
+
+    def set_configuration_file(self, str configuration_file_path):
+        cdef string path = configuration_file_path.encode()
+        self.thisptr.setConfigurationFile(path)
 
     def configure(self):
         self.thisptr.configure()

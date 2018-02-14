@@ -1,10 +1,12 @@
 from libcpp cimport bool
+from libcpp.string cimport string
 
 
 cdef extern from "{{ node["name"] }}Interface.hpp" namespace "dfn_ci":
     cdef cppclass {{ node["name"] }}Interface:
         {{ node["name"] }}Interface()
         void process()
+        void setConfigurationFile(string)
         void configure()
         {%- for input_port in node["input_ports"] %}
         void {{ input_port["name"] }}Input({{ input_port["type"] | 

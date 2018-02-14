@@ -16,12 +16,15 @@ def test_square_smoke():
         ec.add_folder(os.path.join(tmp_folder, "python"))
 
         incdirs = ["test/test_output/", "CDFF/DFNs"]
+        pyx_filename = os.path.join(
+            tmp_folder, "python", "dfn_ci_" + node["name"].lower() + ".pyx")
+        implementation = map(
+            lambda filename: os.path.join(tmp_folder, "src", filename),
+            ["Square.cpp", "SquareInterface.cpp"])
         build_extension(
             tmp_folder, hide_stderr=True,
             name="dfn_ci_" + node["name"].lower(),
-            pyx_filename=os.path.join(tmp_folder, "python", "dfn_ci_" + node["name"].lower() + ".pyx"),
-            implementation=map(lambda filename: os.path.join(tmp_folder, "src", filename),
-                               ["Square.cpp", "SquareInterface.cpp"]),
+            pyx_filename=pyx_filename, implementation=implementation,
             sourcedir=os.path.join(tmp_folder, "src"), incdirs=incdirs,
             compiler_flags=[], library_dirs=[], libraries=[],
             includes=[]
@@ -30,6 +33,7 @@ def test_square_smoke():
         import dfn_ci_square
         square = dfn_ci_square.Square()
         square.configure()
+        square.set_configuration_file("")
         square.xInput(5.0)
         square.process()
         assert_equal(25.0, square.x_squaredOutput())
