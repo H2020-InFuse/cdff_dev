@@ -1,4 +1,4 @@
-import cdff_types
+from cdff_dev import cdff_types
 from nose.tools import assert_equal, assert_greater, assert_regexp_matches
 
 

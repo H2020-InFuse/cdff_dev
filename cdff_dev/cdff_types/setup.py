@@ -14,51 +14,46 @@ def strict_prototypes_workaround():
                                  if flag != '-Wstrict-prototypes')
 
 
-if __name__ == '__main__':
-    strict_prototypes_workaround()
+def configuration(parent_package='', top_path=None):
+    from numpy.distutils.misc_util import Configuration
+    config = Configuration("cdff_types", parent_package, top_path)
 
-    cdffpath = "../../../CDFF"  # TODO
+    config.add_data_files(
+        "_cdff_types.pxd", "cdff_types.pxd", "cdff_types.pyx")
+
+    cdffpath = "CDFF"  # TODO
     check_cdffpath(cdffpath)
     ctypespath = os.path.join(cdffpath, CTYPESDIR)
 
-    extensions = [
-        Extension(
-            "cdff_types",
-            [
-                "cdff_types.pyx"
-            ],
-            include_dirs=[
-                ".",
-                numpy.get_include(),
-                ctypespath
-            ],
-            library_dirs=[
-                ctypespath
-            ],
-            libraries=[],
-            define_macros=[
-                ("NDEBUG",),
-             ],
-            extra_compile_args=[
-                "-std=c++11",
-                "-O3",
-                # disable warnings caused by Cython using the deprecated
-                # NumPy C-API
-                "-Wno-cpp", "-Wno-unused-function"
-            ],
-            language="c++"
-        )
-    ]
-    setup(
-        name="cdff_types",
-        ext_modules=cythonize(extensions),
-        description="Python bindings for CDFF types",
-        version="0.1",
-        maintainer="Alexander Fabisch",
-        maintainer_email="Alexander.Fabisch@dfki.de",
-        packages=[""],
-        package_dir={"": "."},
-        package_data={
-            "": ["_cdff_types.pxd", "cdff_types.pxd", "cdff_types.pyx"]
-        }
+    pyx_filename = os.path.join("cdff_dev", "cdff_types", "cdff_types.pyx")
+    cythonize(pyx_filename)
+
+    config.add_extension(
+        "",
+        sources=["cdff_types.cpp"],
+        include_dirs=[
+            ".",
+            numpy.get_include(),
+            ctypespath
+        ],
+        library_dirs=[
+            ctypespath
+        ],
+        libraries=[],
+        define_macros=[("NDEBUG",)],
+        extra_compile_args=[
+            "-std=c++11",
+            "-O3",
+            # disable warnings caused by Cython using the deprecated
+            # NumPy C-API
+            "-Wno-cpp", "-Wno-unused-function"
+        ]
     )
+
+    return config
+
+
+if __name__ == '__main__':
+    from numpy.distutils.core import setup
+    strict_prototypes_workaround()
+    setup(**configuration(top_path='').todict())
