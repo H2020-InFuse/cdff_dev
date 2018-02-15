@@ -211,3 +211,179 @@ def test_vector4d_fromarray():
     v2 = cdff_types.Vector4d()
     v2.fromarray(v1)
     assert_array_equal(v1, v2)
+
+
+def test_vector6d_len():
+    v = cdff_types.Vector6d()
+    assert_equal(len(v), 6)
+
+
+def test_vector6d_set_item():
+    v = cdff_types.Vector6d()
+    v[0] = 0.0
+    v[1] = 1.0
+    v[2] = 2.0
+    v[3] = 3.0
+    v[4] = 4.0
+    v[5] = 5.0
+    assert_array_equal(v, np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0]))
+
+
+def test_vector6d_str():
+    v = cdff_types.Vector6d()
+    v[0] = 0.0
+    v[1] = 1.0
+    v[2] = 2.0
+    v[3] = 3.0
+    v[4] = 4.0
+    v[5] = 5.0
+    assert_equal(
+        str(v), "{type: Vector6d, data=[0.00, 1.00, 2.00, 3.00, 4.00, 5.00]}")
+
+
+def test_vector6d_get_item():
+    v = cdff_types.Vector6d()
+    v[0] = 0.0
+    v[1] = 1.0
+    v[2] = 2.0
+    v[3] = 3.0
+    v[4] = 4.0
+    v[5] = 5.0
+    assert_equal(v[0], 0.0)
+    assert_equal(v[1], 1.0)
+    assert_equal(v[2], 2.0)
+    assert_equal(v[3], 3.0)
+    assert_equal(v[4], 4.0)
+    assert_equal(v[5], 5.0)
+
+
+def test_vector6d_assign():
+    v1 = cdff_types.Vector6d()
+    v1[0] = 0.0
+    v1[1] = 1.0
+    v1[2] = 2.0
+    v1[3] = 3.0
+    v1[4] = 4.0
+    v1[5] = 5.0
+    v2 = cdff_types.Vector6d()
+    v2.assign(v1)
+    assert_array_equal(v1, v2)
+
+
+def test_vector6d_array():
+    v = cdff_types.Vector6d()
+    v[0] = 0.0
+    v[1] = 1.0
+    v[2] = 2.0
+    v[3] = 3.0
+    v[4] = 4.0
+    v[5] = 5.0
+    assert_array_equal(v.__array__(), np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0]))
+
+
+def test_vector6d_toarray():
+    v = cdff_types.Vector6d()
+    v[0] = 0.0
+    v[1] = 1.0
+    v[2] = 2.0
+    v[3] = 3.0
+    v[4] = 4.0
+    v[5] = 5.0
+    array = v.toarray()
+    assert_array_equal(array, np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0]))
+    assert_equal(type(array), np.ndarray)
+
+
+def test_vector6d_fromarray():
+    v1 = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
+    v2 = cdff_types.Vector6d()
+    v2.fromarray(v1)
+    assert_array_equal(v1, v2)
+
+
+def test_vectorXd_len():
+    v = cdff_types.VectorXd(6)
+    assert_equal(len(v), 6)
+
+
+def test_vectorXd_set_item():
+    v = cdff_types.VectorXd(6)
+    v[0] = 0.0
+    v[1] = 1.0
+    v[2] = 2.0
+    v[3] = 3.0
+    v[4] = 4.0
+    v[5] = 5.0
+    assert_array_equal(v, np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0]))
+
+
+def test_vectorXd_str():
+    v = cdff_types.VectorXd(6)
+    v[0] = 0.0
+    v[1] = 1.0
+    v[2] = 2.0
+    v[3] = 3.0
+    v[4] = 4.0
+    v[5] = 5.0
+    assert_equal(
+        str(v), "{type: VectorXd, data=[0.00, 1.00, 2.00, 3.00, 4.00, 5.00]}")
+
+
+def test_vectorXd_get_item():
+    v = cdff_types.VectorXd(6)
+    v[0] = 0.0
+    v[1] = 1.0
+    v[2] = 2.0
+    v[3] = 3.0
+    v[4] = 4.0
+    v[5] = 5.0
+    assert_equal(v[0], 0.0)
+    assert_equal(v[1], 1.0)
+    assert_equal(v[2], 2.0)
+    assert_equal(v[3], 3.0)
+    assert_equal(v[4], 4.0)
+    assert_equal(v[5], 5.0)
+
+
+def test_vectorXd_assign():
+    v1 = cdff_types.VectorXd(6)
+    v1[0] = 0.0
+    v1[1] = 1.0
+    v1[2] = 2.0
+    v1[3] = 3.0
+    v1[4] = 4.0
+    v1[5] = 5.0
+    v2 = cdff_types.VectorXd(6)
+    v2.assign(v1)
+    assert_array_equal(v1, v2)
+
+
+def test_vectorXd_array():
+    v = cdff_types.VectorXd(6)
+    v[0] = 0.0
+    v[1] = 1.0
+    v[2] = 2.0
+    v[3] = 3.0
+    v[4] = 4.0
+    v[5] = 5.0
+    assert_array_equal(v.__array__(), np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0]))
+
+
+def test_vectorXd_toarray():
+    v = cdff_types.VectorXd(6)
+    v[0] = 0.0
+    v[1] = 1.0
+    v[2] = 2.0
+    v[3] = 3.0
+    v[4] = 4.0
+    v[5] = 5.0
+    array = v.toarray()
+    assert_array_equal(array, np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0]))
+    assert_equal(type(array), np.ndarray)
+
+
+def test_vectorXd_fromarray():
+    v1 = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
+    v2 = cdff_types.VectorXd(6)
+    v2.fromarray(v1)
+    assert_array_equal(v1, v2)
