@@ -1,3 +1,5 @@
+#!/bin/bash
+#alexander.fabisch@dfki.de
 if [ -d "$DIRECTORY" ]; then
     cp -rf /CDFF/External/install ../CDFF/External/install
 else

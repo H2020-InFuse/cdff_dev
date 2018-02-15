@@ -1,5 +1,6 @@
 #!/bin/bash
 #xma@spaceapplications.com
+#alexander.fabisch@dfki.de
 #This file fetches the latest generated files directly from the build server
 
 #exit immediately if a simple command exits with a nonzero exit value.
