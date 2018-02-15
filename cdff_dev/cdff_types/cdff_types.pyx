@@ -99,3 +99,111 @@ cdef class Vector2d:
         for i in range(2):
             self.thisptr.arr[i] = array[i]
 
+
+cdef class Vector3d:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_types.Vector3d()
+        self.thisptr.nCount = 3
+        self.delete_thisptr = True
+
+    def __len__(self):
+        return self.thisptr.nCount
+
+    def __str__(self):
+        return str("{type: Vector3d, data=[%.2f, %.2f, %.2f]}"
+                   % (self.thisptr.arr[0], self.thisptr.arr[1],
+                      self.thisptr.arr[2]))
+
+    def __array__(self, dtype=None):
+        cdef np.npy_intp shape[1]
+        shape[0] = <np.npy_intp> 3
+        return np.PyArray_SimpleNewFromData(
+            1, shape, np.NPY_DOUBLE, <void*> self.thisptr.arr)
+
+    def __getitem__(self, int i):
+        if i < 0 or i > 2:
+            raise KeyError("index must be 0, 1, or 2 but was %d" % i)
+        return self.thisptr.arr[i]
+
+    def __setitem__(self, int i, double v):
+        if i < 0 or i > 2:
+            raise KeyError("index must be 0, 1, or 2 but was %d" % i)
+        self.thisptr.arr[i] = v
+
+    def assign(self, Vector3d other):
+        self.thisptr.assign(deref(other.thisptr))
+
+    def toarray(self):
+        cdef np.ndarray[double, ndim=1] array = np.empty(3)
+        cdef int i
+        for i in range(3):
+            array[i] = self.thisptr.arr[i]
+        return array
+
+    def fromarray(self, np.ndarray[double, ndim=1] array):
+        cdef int i
+        for i in range(3):
+            self.thisptr.arr[i] = array[i]
+
+
+cdef class Vector4d:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_types.Vector4d()
+        self.thisptr.nCount = 4
+        self.delete_thisptr = True
+
+    def __len__(self):
+        return self.thisptr.nCount
+
+    def __str__(self):
+        return str("{type: Vector4d, data=[%.2f, %.2f, %.2f, %.2f]}"
+                   % (self.thisptr.arr[0], self.thisptr.arr[1],
+                      self.thisptr.arr[2], self.thisptr.arr[3]))
+
+    def __array__(self, dtype=None):
+        cdef np.npy_intp shape[1]
+        shape[0] = <np.npy_intp> 4
+        return np.PyArray_SimpleNewFromData(
+            1, shape, np.NPY_DOUBLE, <void*> self.thisptr.arr)
+
+    def __getitem__(self, int i):
+        if i < 0 or i > 3:
+            raise KeyError("index must be 0, 1, or 2 but was %d" % i)
+        return self.thisptr.arr[i]
+
+    def __setitem__(self, int i, double v):
+        if i < 0 or i > 3:
+            raise KeyError("index must be 0, 1, or 2 but was %d" % i)
+        self.thisptr.arr[i] = v
+
+    def assign(self, Vector4d other):
+        self.thisptr.assign(deref(other.thisptr))
+
+    def toarray(self):
+        cdef np.ndarray[double, ndim=1] array = np.empty(4)
+        cdef int i
+        for i in range(4):
+            array[i] = self.thisptr.arr[i]
+        return array
+
+    def fromarray(self, np.ndarray[double, ndim=1] array):
+        cdef int i
+        for i in range(4):
+            self.thisptr.arr[i] = array[i]
+

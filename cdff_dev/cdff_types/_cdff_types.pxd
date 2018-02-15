@@ -24,3 +24,117 @@ cdef extern from "Eigen.h":
 
         int nCount
         double[2] arr
+
+
+cdef extern from "Eigen.h":
+    cdef cppclass Vector3d:
+        Vector3d& assign "operator="(Vector3d&)
+
+        int nCount
+        double[3] arr
+
+
+cdef extern from "Eigen.h":
+    cdef cppclass Vector4d:
+        Vector4d& assign "operator="(Vector4d&)
+
+        int nCount
+        double[4] arr
+
+
+cdef extern from "Eigen.h":
+    cdef cppclass Vector6d:
+        Vector6d& assign "operator="(Vector6d&)
+
+        int nCount
+        double[6] arr
+
+
+cdef extern from "Eigen.h":
+    cdef cppclass VectorXd:
+        VectorXd& assign "operator="(VectorXd&)
+
+        int nCount
+        double[100] arr
+
+
+cdef extern from "Eigen.h":
+    cdef cppclass Matrix2d_elm:
+        Matrix2d_elm& assign "operator="(Matrix2d_elm&)
+
+        int nCount
+        double[2] arr
+
+
+cdef extern from "Eigen.h":
+    cdef cppclass Matrix2d:
+        Matrix2d& assign "operator="(Matrix2d&)
+
+        int nCount
+        Matrix2d_elm[2] arr
+
+
+cdef extern from "Eigen.h":
+    cdef cppclass Matrix3d_elm:
+        Matrix3d_elm& assign "operator="(Matrix3d_elm&)
+
+        int nCount
+        double[3] arr
+
+
+cdef extern from "Eigen.h":
+    cdef cppclass Matrix3d:
+        Matrix3d& assign "operator="(Matrix3d&)
+
+        int nCount
+        Matrix3d_elm[3] arr
+
+
+cdef extern from "Eigen.h":
+    cdef cppclass Matrix4d_elm:
+        Matrix4d_elm& assign "operator="(Matrix4d_elm&)
+
+        int nCount
+        double[4] arr
+
+
+cdef extern from "Eigen.h":
+    cdef cppclass Matrix4d:
+        Matrix4d& assign "operator="(Matrix4d&)
+
+        int nCount
+        Matrix4d_elm[4] arr
+
+
+cdef extern from "Eigen.h":
+    cdef cppclass Quaterniond:
+        Quaterniond& assign "operator="(Quaterniond&)
+
+        int nCount
+        double[4] arr
+
+
+cdef extern from "Eigen.h":
+    cdef cppclass AngleAxisd:
+        AngleAxisd& assign "operator="(AngleAxisd&)
+
+        int nCount
+        double[4] arr
+
+
+cdef extern from "Eigen.h":
+    cdef cppclass Transform3d_elm:
+        Transform3d_elm& assign "operator="(Transform3d_elm&)
+
+        int nCount
+        double[4] arr
+
+
+cdef extern from "Eigen.h":
+    cdef cppclass Transform3d:
+        Transform3d& assign "operator="(Transform3d&)
+
+        int nCount
+        Transform3d_elm[4] arr
+
+# TODO Matrix6d MatrixXd Isometry3d Affine3d
