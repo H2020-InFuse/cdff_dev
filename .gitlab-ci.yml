@@ -12,7 +12,7 @@ fetch_cdff:
       - make build_cdff
   artifacts:
     paths:
-      - CDFF
+      - CDFF/Common/Types/C
 
 build_cdff_dev:
   stage : build_cdff_dev
