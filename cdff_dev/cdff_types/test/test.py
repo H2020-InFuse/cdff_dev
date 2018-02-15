@@ -387,3 +387,77 @@ def test_vectorXd_fromarray():
     v2 = cdff_types.VectorXd(6)
     v2.fromarray(v1)
     assert_array_equal(v1, v2)
+
+
+def test_matrix2d_len():
+    v = cdff_types.Matrix2d()
+    assert_equal(len(v), 2)
+
+
+def test_matrix2d_set_item():
+    v = cdff_types.Matrix2d()
+    v[0, 0] = 0.0
+    v[1, 0] = 1.0
+    v[0, 1] = 2.0
+    v[1, 1] = 3.0
+    assert_array_equal(v, np.array([[0.0, 2.0], [1.0, 3.0]]))
+
+
+def test_matrix2d_str():
+    v = cdff_types.Matrix2d()
+    v[0, 0] = 0.0
+    v[1, 0] = 1.0
+    v[0, 1] = 2.0
+    v[1, 1] = 3.0
+    assert_equal(
+        str(v), "{type: Matrix2d, data=[?]}")
+
+
+def test_vectorXd_get_item():
+    v = cdff_types.Matrix2d()
+    v[0, 0] = 0.0
+    v[1, 0] = 1.0
+    v[0, 1] = 2.0
+    v[1, 1] = 3.0
+    assert_equal(v[0, 0], 0.0)
+    assert_equal(v[1, 0], 1.0)
+    assert_equal(v[0, 1], 2.0)
+    assert_equal(v[1, 1], 3.0)
+
+
+def test_vectorXd_assign():
+    v1 = cdff_types.Matrix2d()
+    v1[0, 0] = 0.0
+    v1[1, 0] = 1.0
+    v1[0, 1] = 2.0
+    v1[1, 1] = 3.0
+    v2 = cdff_types.Matrix2d()
+    v2.assign(v1)
+    assert_array_equal(v1, v2)
+
+
+def test_vectorXd_array():
+    v = cdff_types.Matrix2d()
+    v[0, 0] = 0.0
+    v[1, 0] = 1.0
+    v[0, 1] = 2.0
+    v[1, 1] = 3.0
+    assert_array_equal(v.__array__(), np.array([[0.0, 2.0], [1.0, 3.0]]))
+
+
+def test_vectorXd_toarray():
+    v = cdff_types.Matrix2d()
+    v[0, 0] = 0.0
+    v[1, 0] = 1.0
+    v[0, 1] = 2.0
+    v[1, 1] = 3.0
+    array = v.toarray()
+    assert_array_equal(array, np.array([[0.0, 2.0], [1.0, 3.0]]))
+    assert_equal(type(array), np.ndarray)
+
+
+def test_vectorXd_fromarray():
+    v1 = np.array([[0.0, 2.0], [1.0, 3.0]])
+    v2 = cdff_types.Matrix2d()
+    v2.fromarray(v1)
+    assert_array_equal(v1, v2)
