@@ -12,7 +12,7 @@ build_cdff: autogeneration
 	cd build_tools; bash get_cdff_artifacts.sh
 
 autogeneration:
-	cd CDFF/Tools/ASNtoC; ./GeneratorScript.sh
+	cd CDFF/Tools/ASNtoC; ./GeneratorScript.sh || ./FetcherScript.sh
 
 test:
 	nosetests -sv
