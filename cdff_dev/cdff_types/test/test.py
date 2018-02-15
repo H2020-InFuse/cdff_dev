@@ -574,3 +574,75 @@ def test_matrix3d_fromarray():
     v2 = cdff_types.Matrix3d()
     v2.fromarray(v1)
     assert_array_equal(v1, v2)
+
+
+def test_quaterniond_len():
+    v = cdff_types.Quaterniond()
+    assert_equal(len(v), 4)
+
+
+def test_quaterniond_set_item():
+    v = cdff_types.Quaterniond()
+    v[0] = 0.0
+    v[1] = 1.0
+    v[2] = 2.0
+    v[3] = 3.0
+    assert_array_equal(v, np.array([0.0, 1.0, 2.0, 3.0]))
+
+
+def test_quaterniond_str():
+    v = cdff_types.Quaterniond()
+    v[0] = 0.0
+    v[1] = 1.0
+    v[2] = 2.0
+    v[3] = 3.0
+    assert_equal(str(v), "{type: Quaterniond, data=[0.00, 1.00, 2.00, 3.00]}")
+
+
+def test_quaterniond_get_item():
+    v = cdff_types.Quaterniond()
+    v[0] = 0.0
+    v[1] = 1.0
+    v[2] = 2.0
+    v[3] = 3.0
+    assert_equal(v[0], 0.0)
+    assert_equal(v[1], 1.0)
+    assert_equal(v[2], 2.0)
+
+
+def test_quaterniond_assign():
+    v1 = cdff_types.Quaterniond()
+    v1[0] = 0.0
+    v1[1] = 1.0
+    v1[2] = 2.0
+    v1[3] = 3.0
+    v2 = cdff_types.Quaterniond()
+    v2.assign(v1)
+    assert_array_equal(v1, v2)
+
+
+def test_quaterniond_array():
+    v = cdff_types.Quaterniond()
+    v[0] = 0.0
+    v[1] = 1.0
+    v[2] = 2.0
+    v[3] = 3.0
+    assert_array_equal(v.__array__(), np.array([0.0, 1.0, 2.0, 3.0]))
+
+
+def test_quaterniond_toarray():
+    v = cdff_types.Quaterniond()
+    v[0] = 0.0
+    v[1] = 1.0
+    v[2] = 2.0
+    v[3] = 3.0
+    array = v.toarray()
+    assert_array_equal(array, np.array([0.0, 1.0, 2.0, 3.0]))
+    assert_equal(type(array), np.ndarray)
+
+
+def test_quaterniond_fromarray():
+    v1 = np.array([0.0, 1.0, 2.0, 3.0])
+    v2 = cdff_types.Quaterniond()
+    v2.fromarray(v1)
+    assert_array_equal(v1, v2)
