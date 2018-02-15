@@ -60,3 +60,18 @@ cdef class AngleAxisd:
 cdef class Transform3d:
     cdef _cdff_types.Transform3d* thisptr
     cdef bool delete_thisptr
+
+
+cdef class Vector3dVectorReference:
+    cdef _cdff_types.Pointcloud_points* thisptr
+    cdef bool delete_thisptr
+
+
+cdef class Vector4dVectorReference:
+    cdef _cdff_types.Pointcloud_colors* thisptr
+    cdef bool delete_thisptr
+
+
+cdef class Pointcloud:
+    cdef _cdff_types.Pointcloud* thisptr
+    cdef bool delete_thisptr

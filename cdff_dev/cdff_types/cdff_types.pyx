@@ -496,3 +496,94 @@ cdef class Quaterniond:
         cdef int i
         for i in range(4):
             self.thisptr.arr[i] = array[i]
+
+
+cdef class Vector3dVectorReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def __getitem__(self, int i):
+        cdef Vector3d v = Vector3d()
+        del v.thisptr
+        v.delete_thisptr = False
+        v.thisptr = &(self.thisptr.arr[i])
+        return v
+
+    def resize(self, int size):
+        self.thisptr.nCount = size
+
+    def size(self):
+        return self.thisptr.nCount
+
+
+cdef class Vector4dVectorReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def __getitem__(self, int i):
+        cdef Vector4d v = Vector4d()
+        del v.thisptr
+        v.delete_thisptr = False
+        v.thisptr = &(self.thisptr.arr[i])
+        return v
+
+    def resize(self, int size):
+        self.thisptr.nCount = size
+
+    def size(self):
+        return self.thisptr.nCount
+
+
+cdef class Pointcloud:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_types.Pointcloud()
+        self.thisptr.points.nCount = 0
+        self.thisptr.colors.nCount = 0
+        self.delete_thisptr = True
+
+    def __len__(self):
+        return self.thisptr.points.nCount
+
+    def __str__(self):
+        return str("{type: Pointcloud, data=[?]}")  # TODO
+
+    def assign(self, Pointcloud other):
+        self.thisptr.assign(deref(other.thisptr))
+
+    def _get_ref_time(self):
+        cdef Time time = Time()
+        del time.thisptr
+        time.thisptr = &self.thisptr.ref_time
+        time.delete_thisptr = False
+        return time
+
+    def _set_ref_time(self, Time time):
+        self.thisptr.ref_time = deref(time.thisptr)
+
+    ref_time = property(_get_ref_time, _set_ref_time)
+
+    @property
+    def points(self):
+        cdef Vector3dVectorReference points = Vector3dVectorReference()
+        points.thisptr = &self.thisptr.points
+        return points
+
+    @property
+    def colors(self):
+        cdef Vector4dVectorReference colors = Vector4dVectorReference()
+        colors.thisptr = &self.thisptr.colors
+        return colors

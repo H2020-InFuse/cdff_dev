@@ -138,3 +138,26 @@ cdef extern from "Eigen.h":
         Transform3d_elm[4] arr
 
 # TODO Matrix6d MatrixXd Isometry3d Affine3d
+
+
+cdef extern from "Pointcloud.h":
+    cdef uint32_t maxPointcloudSize
+
+    cdef cppclass Pointcloud_colors:
+        Pointcloud_colors& assign "operator="(Pointcloud_colors&)
+
+        int nCount
+        Vector4d[30000] arr
+
+    cdef cppclass Pointcloud_points:
+        Pointcloud_points& assign "operator="(Pointcloud_points&)
+
+        int nCount
+        Vector3d[30000] arr
+
+    cdef cppclass Pointcloud:
+        Pointcloud& assign "operator="(Pointcloud&)
+
+        Time ref_time
+        Pointcloud_points points
+        Pointcloud_colors colors

@@ -646,3 +646,27 @@ def test_quaterniond_fromarray():
     v2 = cdff_types.Quaterniond()
     v2.fromarray(v1)
     assert_array_equal(v1, v2)
+
+
+def test_create_pointcloud():
+    pcl = cdff_types.Pointcloud()
+
+    pcl.ref_time.microseconds = 0
+    assert_equal(pcl.ref_time.microseconds, 0)
+
+    pcl.points.resize(100)
+    point = pcl.points[0]
+    point[0] = 1.0
+    point[1] = 2.0
+    point[2] = 3.0
+    assert_equal(pcl.points.size(), 100)
+    assert_array_equal(pcl.points[0].toarray(), (1.0, 2.0, 3.0))
+
+    pcl.colors.resize(100)
+    color = pcl.colors[0]
+    color[0] = 255.0
+    color[1] = 255.0
+    color[2] = 255.0
+    color[3] = 255.0
+    assert_equal(pcl.colors.size(), 100)
+    assert_array_equal(pcl.colors[0].toarray(), (255.0, 255.0, 255.0, 255.0))
