@@ -63,3 +63,39 @@ cdef class Vector2d:
 
     def __len__(self):
         return self.thisptr.nCount
+
+    def __str__(self):
+        return str("{type: Vector2d, data=[%.2f, %.2f]}"
+                   % (self.thisptr.arr[0], self.thisptr.arr[1]))
+
+    def __array__(self, dtype=None):
+        cdef np.npy_intp shape[1]
+        shape[0] = <np.npy_intp> 2
+        return np.PyArray_SimpleNewFromData(
+            1, shape, np.NPY_DOUBLE, <void*> self.thisptr.arr)
+
+    def __getitem__(self, int i):
+        if i < 0 or i > 1:
+            raise KeyError("index must be 0 or 1 but was %d" % i)
+        return self.thisptr.arr[i]
+
+    def __setitem__(self, int i, double v):
+        if i < 0 or i > 1:
+            raise KeyError("index must be 0 or 1 but was %d" % i)
+        self.thisptr.arr[i] = v
+
+    def assign(self, Vector2d other):
+        self.thisptr.assign(deref(other.thisptr))
+
+    def toarray(self):
+        cdef np.ndarray[double, ndim=1] array = np.empty(2)
+        cdef int i
+        for i in range(2):
+            array[i] = self.thisptr.arr[i]
+        return array
+
+    def fromarray(self, np.ndarray[double, ndim=1] array):
+        cdef int i
+        for i in range(2):
+            self.thisptr.arr[i] = array[i]
+
