@@ -380,3 +380,65 @@ cdef class Matrix2d:
         for i in range(self.thisptr.nCount):
             for j in range(self.thisptr.nCount):
                 self.thisptr.arr[i].arr[j] = array[i, j]
+
+
+cdef class Matrix3d:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_types.Matrix3d()
+        self.thisptr.nCount = 3
+        cdef int i
+        for i in range(self.thisptr.nCount):
+            self.thisptr.arr[i].nCount = self.thisptr.nCount
+        self.delete_thisptr = True
+
+    def __len__(self):
+        return self.thisptr.nCount
+
+    def __str__(self):
+        return str("{type: Matrix3d, data=[?]}") # TODO print content
+
+    def __array__(self, dtype=None):
+        return self.toarray().astype(dtype)
+
+    def __getitem__(self, tuple indices):
+        cdef int i, j
+        i, j = indices
+        if i < 0 or i >= self.thisptr.nCount:
+            raise KeyError("index out of range %d" % i)
+        if j < 0 or j >= self.thisptr.nCount:
+            raise KeyError("index out of range %d" % j)
+        return self.thisptr.arr[i].arr[j]
+
+    def __setitem__(self, tuple indices, double v):
+        cdef int i, j
+        i, j = indices
+        if i < 0 or i >= self.thisptr.nCount:
+            raise KeyError("index out of range %d" % i)
+        if j < 0 or j >= self.thisptr.nCount:
+            raise KeyError("index out of range %d" % j)
+        self.thisptr.arr[i].arr[j] = v
+
+    def assign(self, Matrix3d other):
+        self.thisptr.assign(deref(other.thisptr))
+
+    def toarray(self):
+        cdef np.ndarray[double, ndim=2] array = np.empty((3, 3))
+        cdef int i, j
+        for i in range(self.thisptr.nCount):
+            for j in range(self.thisptr.nCount):
+                array[i, j] = self.thisptr.arr[i].arr[j]
+        return array
+
+    def fromarray(self, np.ndarray[double, ndim=2] array):
+        cdef int i, j
+        for i in range(self.thisptr.nCount):
+            for j in range(self.thisptr.nCount):
+                self.thisptr.arr[i].arr[j] = array[i, j]
