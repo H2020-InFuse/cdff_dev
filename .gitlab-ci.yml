@@ -13,6 +13,7 @@ fetch_cdff:
   artifacts:
     paths:
       - CDFF/Common/Types/C
+      - CDFF/DFNs/DFNCommonInterface.hpp
 
 build_cdff_dev:
   stage : build_cdff_dev
