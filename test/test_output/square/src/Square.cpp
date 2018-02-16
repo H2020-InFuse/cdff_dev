@@ -10,16 +10,14 @@ Square::~Square()
 {
 }
 
-bool Square::configure() 
+void Square::configure() 
 {
     // TODO Fill in configure functionality here
-    return true;
 }
 
 
-bool Square::process() {
+void Square::process() {
     outx_squared = inx * inx;
-    return true;
 }
 
 }

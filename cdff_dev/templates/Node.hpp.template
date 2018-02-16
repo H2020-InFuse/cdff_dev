@@ -10,8 +10,8 @@ namespace dfn_ci {
         public:
             {{ node["name"] }}();
             virtual ~{{ node["name"] }}();
-            virtual bool process();
-            virtual bool configure();
+            virtual void process();
+            virtual void configure();
     };
 }
 #endif

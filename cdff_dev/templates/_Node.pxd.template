@@ -4,8 +4,8 @@ from libcpp cimport bool
 cdef extern from "{{ node["name"] }}Interface.hpp" namespace "dfn_ci":
     cdef cppclass {{ node["name"] }}Interface:
         {{ node["name"] }}Interface()
-        bool process()
-        bool configure()
+        void process()
+        void configure()
         {%- for input_port in node["input_ports"] %}
         void {{ input_port["name"] }}Input({{ input_port["type"] | 
         replace("base::samples::","_basetypes.") }} data)

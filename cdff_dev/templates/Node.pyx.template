@@ -19,10 +19,10 @@ cdef class {{ node["name"] }}:
         self.delete_thisptr = True
 
     def process(self):
-        return self.thisptr.process()
+        self.thisptr.process()
 
     def configure(self):
-        return self.thisptr.configure()
+        self.thisptr.configure()
 {{ break }}
     {%- for input_port in node["input_ports"] %}
     def {{ input_port["name"] }}Input(self, {{ type_registry.get_info(input_port["type"]).python_type() }} data):

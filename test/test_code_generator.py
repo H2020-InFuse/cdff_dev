@@ -15,22 +15,23 @@ def test_square_smoke():
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
 
+        incdirs = ["test/test_output/", "CDFF/DFNs"]
         build_extension(
             tmp_folder, hide_stderr=True,
             name="dfn_ci_" + node["name"].lower(),
             pyx_filename=os.path.join(tmp_folder, "python", "dfn_ci_" + node["name"].lower() + ".pyx"),
             implementation=map(lambda filename: os.path.join(tmp_folder, "src", filename),
                                ["Square.cpp", "SquareInterface.cpp"]),
-            sourcedir=os.path.join(tmp_folder, "src"), incdirs=["test/test_output/"],
+            sourcedir=os.path.join(tmp_folder, "src"), incdirs=incdirs,
             compiler_flags=[], library_dirs=[], libraries=[],
             includes=[]
         )
 
         import dfn_ci_square
         square = dfn_ci_square.Square()
-        assert_true(square.configure())
+        square.configure()
         square.xInput(5.0)
-        assert_true(square.process())
+        square.process()
         assert_equal(25.0, square.x_squaredOutput())
 
 
@@ -44,6 +45,7 @@ def test_unknown_type():
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
 
+        incdirs = ["test/test_output/", "CDFF/DFNs"]
         assert_raises_regex(
             Exception, "Exit status",
             build_extension,
@@ -52,7 +54,7 @@ def test_unknown_type():
             pyx_filename=os.path.join(tmp_folder, "python", "dfn_ci_" + node["name"].lower() + ".pyx"),
             implementation=map(lambda filename: os.path.join(tmp_folder, "src", filename),
                                ["UnknownType.cpp", "UnknownTypeInterface.cpp"]),
-            sourcedir=os.path.join(tmp_folder, "src"), incdirs=["test/test_output/"],
+            sourcedir=os.path.join(tmp_folder, "src"), incdirs=incdirs,
             compiler_flags=[], library_dirs=[], libraries=[],
             includes=[]
         )

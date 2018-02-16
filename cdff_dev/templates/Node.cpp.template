@@ -10,16 +10,14 @@ namespace dfn_ci {
 {
 }
 
-bool {{ node["name"] }}::configure() 
+void {{ node["name"] }}::configure() 
 {
     // TODO Fill in configure functionality here
-    return true;
 }
 
 
-bool {{ node["name"] }}::process() {
+void {{ node["name"] }}::process() {
     // TODO Fill in process functionality here
-    return true;
 }
 
 }
