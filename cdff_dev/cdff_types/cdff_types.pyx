@@ -587,3 +587,137 @@ cdef class Pointcloud:
         cdef Vector4dVectorReference colors = Vector4dVectorReference()
         colors.thisptr = &self.thisptr.colors
         return colors
+
+
+cdef class LaserScan:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_types.LaserScan()
+        self.thisptr.ranges.nCount = 0
+        self.thisptr.remission.nCount = 0
+        self.thisptr.start_angle = 0.0
+        self.thisptr.angular_resolution = 0.0
+        self.thisptr.speed = 0.0
+        self.thisptr.minRange = 0
+        self.thisptr.maxRange = 0
+        self.delete_thisptr = True
+
+    def __len__(self):
+        return self.thisptr.ranges.nCount
+
+    def __str__(self):
+        return str("{type: LaserScan, data=[?]}")  # TODO
+
+    def assign(self, LaserScan other):
+        self.thisptr.assign(deref(other.thisptr))
+
+    def _get_ref_time(self):
+        cdef Time time = Time()
+        del time.thisptr
+        time.thisptr = &self.thisptr.ref_time
+        time.delete_thisptr = False
+        return time
+
+    def _set_ref_time(self, Time time):
+        self.thisptr.ref_time = deref(time.thisptr)
+
+    ref_time = property(_get_ref_time, _set_ref_time)
+
+    def _get_start_angle(self):
+        return self.thisptr.start_angle
+
+    def _set_start_angle(self, double start_angle):
+        self.thisptr.start_angle = start_angle
+
+    start_angle = property(_get_start_angle, _set_start_angle)
+
+    def _get_angular_resolution(self):
+        return self.thisptr.angular_resolution
+
+    def _set_angular_resolution(self, double angular_resolution):
+        self.thisptr.angular_resolution = angular_resolution
+
+    angular_resolution = property(_get_angular_resolution, _set_angular_resolution)
+
+    def _get_speed(self):
+        return self.thisptr.speed
+
+    def _set_speed(self, double speed):
+        self.thisptr.speed = speed
+
+    speed = property(_get_speed, _set_speed)
+
+    def _get_min_range(self):
+        return self.thisptr.minRange
+
+    def _set_min_range(self, uint32_t min_range):
+        self.thisptr.minRange = min_range
+
+    min_range = property(_get_min_range, _set_min_range)
+
+    def _get_max_range(self):
+        return self.thisptr.maxRange
+
+    def _set_max_range(self, uint32_t max_range):
+        self.thisptr.maxRange = max_range
+
+    max_range = property(_get_max_range, _set_max_range)
+
+    @property
+    def remission(self):
+        cdef LaserScan_remissionReference remission = LaserScan_remissionReference()
+        remission.thisptr = &self.thisptr.remission
+        return remission
+
+    @property
+    def ranges(self):
+        cdef LaserScan_rangesReference ranges = LaserScan_rangesReference()
+        ranges.thisptr = &self.thisptr.ranges
+        return ranges
+
+
+cdef class LaserScan_remissionReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def __getitem__(self, int i):
+        return self.thisptr.arr[i]
+
+    def __setitem__(self, int i, float v):
+        self.thisptr.arr[i] = v
+
+    def resize(self, int size):
+        self.thisptr.nCount = size
+
+    def size(self):
+        return self.thisptr.nCount
+
+
+cdef class LaserScan_rangesReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def __getitem__(self, int i):
+        return self.thisptr.arr[i]
+
+    def __setitem__(self, int i, uint32_t v):
+        self.thisptr.arr[i] = v
+
+    def resize(self, int size):
+        self.thisptr.nCount = size
+
+    def size(self):
+        return self.thisptr.nCount

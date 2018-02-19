@@ -670,3 +670,41 @@ def test_create_pointcloud():
     color[3] = 255.0
     assert_equal(pcl.colors.size(), 100)
     assert_array_equal(pcl.colors[0].toarray(), (255.0, 255.0, 255.0, 255.0))
+
+
+def test_create_laserscan():
+    ls = cdff_types.LaserScan()
+
+    ls.ref_time.microseconds = 0
+    assert_equal(ls.ref_time.microseconds, 0)
+
+    ls.start_angle = 1.0
+    assert_equal(ls.start_angle, 1.0)
+
+    ls.angular_resolution = 1.0
+    assert_equal(ls.angular_resolution, 1.0)
+
+    ls.speed = 1.0
+    assert_equal(ls.speed, 1.0)
+
+    ls.max_range = 1.0
+    assert_equal(ls.max_range, 1.0)
+
+    ls.min_range = 1.0
+    assert_equal(ls.min_range, 1.0)
+
+    ls.remission.resize(100)
+    ls.remission[0] = 1.0
+    ls.remission[1] = 2.0
+    ls.remission[2] = 3.0
+    assert_equal(ls.remission.size(), 100)
+    assert_array_equal(np.asarray([ls.remission[i] for i in range(3)]),
+       (1.0, 2.0, 3.0))
+
+    ls.ranges.resize(100)
+    ls.ranges[0] = 1
+    ls.ranges[1] = 2
+    ls.ranges[2] = 3
+    assert_equal(ls.ranges.size(), 100)
+    assert_array_equal(np.asarray([ls.ranges[i] for i in range(3)]),
+       (1, 2, 3))

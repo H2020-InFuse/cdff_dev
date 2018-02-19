@@ -161,3 +161,30 @@ cdef extern from "Pointcloud.h":
         Time ref_time
         Pointcloud_points points
         Pointcloud_colors colors
+
+cdef extern from "LaserScan.h":
+    cdef uint32_t maxLaserScanSize
+
+    cdef cppclass LaserScan_ranges:
+        LaserScan_ranges& assign "operator="(LaserScan_ranges&)
+
+        int nCount
+        int32_t[30000] arr
+
+    cdef cppclass LaserScan_remission:
+        LaserScan_remission& assign "operator="(LaserScan_remission&)
+
+        int nCount
+        float[30000] arr
+
+    cdef cppclass LaserScan:
+        LaserScan& assign "operator="(LaserScan&)
+
+        Time ref_time;
+        double start_angle
+        double angular_resolution
+        double speed
+        LaserScan_ranges ranges
+        uint32_t minRange
+        uint32_t maxRange
+        LaserScan_remission remission

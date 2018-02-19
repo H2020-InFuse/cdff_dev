@@ -75,3 +75,16 @@ cdef class Vector4dVectorReference:
 cdef class Pointcloud:
     cdef _cdff_types.Pointcloud* thisptr
     cdef bool delete_thisptr
+
+
+cdef class LaserScan:
+    cdef _cdff_types.LaserScan* thisptr
+    cdef bool delete_thisptr
+
+
+cdef class LaserScan_remissionReference:
+    cdef _cdff_types.LaserScan_remission* thisptr
+
+
+cdef class LaserScan_rangesReference:
+    cdef _cdff_types.LaserScan_ranges* thisptr
