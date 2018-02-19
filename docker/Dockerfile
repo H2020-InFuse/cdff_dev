@@ -1,4 +1,4 @@
-FROM nexus.spaceapplications.com/repository/infuse/infuse:1.6.3
+FROM nexus.spaceapplications.com/repository/infuse/cdff-ci:1.6.5
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
 
