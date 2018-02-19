@@ -58,3 +58,38 @@ def test_unknown_type():
             compiler_flags=[], library_dirs=[], libraries=[],
             includes=[]
         )
+
+
+def test_multiple_implementations():
+    with open("test/test_data/multiple_implementations_desc.yaml", "r") as f:
+        node = yaml.load(f)
+    tmp_folder = "test/test_output/multiple_implementations"
+    with EnsureCleanup(tmp_folder) as ec:
+        filenames = write_dfn(node, tmp_folder)
+        ec.add_files(filenames)
+        ec.add_folder(os.path.join(tmp_folder, "python"))
+
+        incdirs = ["test/test_output/", "CDFF/DFNs"]
+        build_extension(
+            tmp_folder, hide_stderr=True,
+            name="dfn_ci_" + node["name"].lower(),
+            pyx_filename=os.path.join(
+                tmp_folder, "python", "dfn_ci_" + node["name"].lower() + ".pyx"),
+            implementation=map(lambda filename: os.path.join(tmp_folder, "src", filename),
+                               ["Iterative.cpp", "Recursive.cpp",
+                                "FactorialInterface.cpp"]),
+            sourcedir=os.path.join(tmp_folder, "src"), incdirs=incdirs,
+            compiler_flags=[], library_dirs=[], libraries=[],
+            includes=[]
+        )
+
+        import dfn_ci_factorial
+        square = dfn_ci_factorial.Iterative()
+        square.configure()
+        square.xInput(5.0)
+        square.process()
+
+        square = dfn_ci_factorial.Recursive()
+        square.configure()
+        square.xInput(5.0)
+        square.process()

@@ -97,10 +97,14 @@ def write_dfn(node, output, cdffpath="CDFF"):
     if not os.path.exists(python_dir):
         os.makedirs(python_dir)
     interface_files = write_class(
-        node, type_registry, "Interface", "Interface", target_folder=src_dir,
+        node, type_registry, "Interface",
+        "%sInterface" % node["name"], target_folder=src_dir,
         force_overwrite=True)
-    implementation_files = write_class(
-        node, type_registry, "Node", "", target_folder=src_dir)
+    implementation_files = []
+    for implementation in node["implementations"]:
+        implementation_files.extend(
+            write_class(node, type_registry, "Node", implementation,
+                        target_folder=src_dir))
     cython_files = write_cython(node, type_registry, "Node",
                                 target_folder=python_dir)
     return interface_files + implementation_files + cython_files
@@ -116,6 +120,7 @@ def validate(node):
     - name
     - input_ports
     - output_ports
+    - implementations
 
     Parameters
     ----------
@@ -140,6 +145,8 @@ def validate(node):
     if "output_ports" not in node:
         validated_node["output_ports"] = []
 
+    if "implementations" not in node:
+        validated_node["implementations"] = [node["name"]]
     # TODO validate each input and output port: name and type
 
     return validated_node
@@ -150,12 +157,12 @@ class DFNDescriptionException(Exception):
         super(Exception, self).__init__(msg)
 
 
-def write_class(node, type_registry, template_base, file_suffix,
+def write_class(node, type_registry, template_base, class_name,
                 target_folder="src", force_overwrite=False):
     result = {}
 
-    declaration_filename = "%s%s.hpp" % (node["name"], file_suffix)
-    definition_filename = "%s%s.cpp" % (node["name"], file_suffix)
+    declaration_filename = "%s.hpp" % class_name
+    definition_filename = "%s.cpp" % class_name
 
     includes = set()
     for input_port in node["input_ports"]:
@@ -164,13 +171,14 @@ def write_class(node, type_registry, template_base, file_suffix,
         includes.add(type_registry.get_info(output_port["type"]).include())
 
     node_base_declaration = render(
-        "%s.hpp" % template_base, node=node, includes=includes)
+        "%s.hpp" % template_base, node=node, includes=includes,
+        class_name=class_name)
     target = os.path.join(target_folder, declaration_filename)
     result[target] = node_base_declaration
 
     node_base_definition = render(
         "%s.cpp" % template_base, declaration_filename=declaration_filename,
-        node=node)
+        node=node, class_name=class_name)
     target = os.path.join(target_folder, definition_filename)
     result[target] = node_base_definition
 

@@ -14,3 +14,17 @@ def test_validate_adds_empty_ports():
     validated_node = validate(node)
     assert_in("input_ports", validated_node)
     assert_in("output_ports", validated_node)
+
+
+def test_validate_no_implementation():
+    node = {"name": "Dummy"}
+    validated_node = validate(node)
+    assert_in("implementations", validated_node)
+    assert_in("Dummy", validated_node["implementations"])
+
+
+def test_validate_implementation():
+    node = {"name": "Dummy", "implementations": ["DummyImpl"]}
+    validated_node = validate(node)
+    assert_in("implementations", validated_node)
+    assert_in("DummyImpl", validated_node["implementations"])

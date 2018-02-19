@@ -1,0 +1,12 @@
+name: Factorial
+input_ports:
+    - name: x
+      type: int
+      doc: an integer
+output_ports:
+    - name: x_factorial
+      type: int
+      doc: factorial of an integer
+implementations:
+    - Recursive
+    - Iterative

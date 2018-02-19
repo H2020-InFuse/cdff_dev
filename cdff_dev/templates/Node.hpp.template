@@ -1,15 +1,15 @@
-#ifndef {{ node["name"].upper() }}_HPP
-#define {{ node["name"].upper() }}_HPP
+#ifndef {{ class_name.upper() }}_HPP
+#define {{ class_name.upper() }}_HPP
 #include "{{ node["name"] }}Interface.hpp"
 
 
 
 namespace dfn_ci {
-    class {{ node["name"] }} : public {{ node["name"] }}Interface
+    class {{ class_name }} : public {{ node["name"] }}Interface
     {
         public:
-            {{ node["name"] }}();
-            virtual ~{{ node["name"] }}();
+            {{ class_name }}();
+            virtual ~{{ class_name }}();
             virtual void process();
             virtual void configure();
     };

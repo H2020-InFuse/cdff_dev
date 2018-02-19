@@ -1,22 +1,22 @@
-#include "{{ node["name"] }}.hpp"
+#include "{{ class_name }}.hpp"
 
 namespace dfn_ci {
 
-{{ node["name"] }}::{{ node["name"] }}()
+{{ class_name }}::{{ class_name }}()
 {
 }
 
-{{ node["name"] }}::~{{ node["name"] }}()
+{{ class_name }}::~{{ class_name }}()
 {
 }
 
-void {{ node["name"] }}::configure() 
+void {{ class_name }}::configure() 
 {
     // TODO Fill in configure functionality here
 }
 
 
-void {{ node["name"] }}::process() {
+void {{ class_name }}::process() {
     // TODO Fill in process functionality here
 }
 
