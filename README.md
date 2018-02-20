@@ -54,7 +54,12 @@ A guide for the creation of a DFN [here](https://docs.google.com/document/d/1hFT
 
 You can run the DFN code generator with
 
-    dfn_template_generator my_node_desc.yaml my_node_output_folder
+    dfn_template_generator my_node_desc.yaml my_node_output_folder --cdffpath path/to/CDFF
+
+* `my_node_desc.yaml` is the node description file.
+* `my_node_output_folder` is the output folder of C++ code template and
+  Python bindings.
+* `path/to/CDFF` points to the main directory of the CDFF.
 
 ## Testing
 
