@@ -73,7 +73,8 @@ class TypeRegistry(object):  # TODO global, read from config files
                                       % typename)
 
 
-def write_dfn(node, output, cdffpath="CDFF"):
+def write_dfn(node, output, source_folder=".", python_folder="python",
+              cdffpath="CDFF"):
     """Generate code templates for a data fusion node (DFN).
 
     Parameters
@@ -84,14 +85,22 @@ def write_dfn(node, output, cdffpath="CDFF"):
     output : str
         Path to output directory
 
+    source_folder : str, optional (default: '.')
+        Subdirectory of the output directory that will contain the source code
+        template
+
+    python_folder : str, optional (default: 'python')
+        Subdirectory of the output directory that will contain the Python
+        bindings
+
     cdffpath : str, optional (default: 'CDFF')
         Path to CDFF
     """
     node = validate(node)
 
     type_registry = TypeRegistry()
-    src_dir = os.path.join(output, "src")
-    python_dir = os.path.join(output, "python")
+    src_dir = os.path.join(output, source_folder)
+    python_dir = os.path.join(output, python_folder)
     if not os.path.exists(src_dir):
         os.makedirs(src_dir)
     if not os.path.exists(python_dir):

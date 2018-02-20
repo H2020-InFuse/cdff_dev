@@ -11,7 +11,8 @@ def main():
     check_cdffpath(args.cdffpath)
     with open(args.definition, "r") as f:
         node = yaml.load(f)
-    write_dfn(node, args.output, args.cdffpath)
+    write_dfn(node, args.output, args.source_folder, args.python_folder,
+              args.cdffpath)
 
 
 def parse_args():
@@ -21,8 +22,16 @@ def parse_args():
     argparser.add_argument(
         "output", type=str, help="Target directory", nargs="?", default=".")
     argparser.add_argument(
+        "--source_folder", type=str,
+        help="Subdirectory of the output directory that will contain the "
+             "source code template.", nargs="?", default=".")
+    argparser.add_argument(
+        "--python_folder", type=str,
+        help="Subdirectory of the output directory that will contain the "
+             "Python bindings.", nargs="?", default="python")
+    argparser.add_argument(
         "--cdffpath", type=str, help="Path to CDFF repository.", nargs="?",
-        default=".")
+        default="CDFF")
     return argparser.parse_args()
 
 

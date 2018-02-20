@@ -19,13 +19,13 @@ def test_square_smoke():
         pyx_filename = os.path.join(
             tmp_folder, "python", "dfn_ci_" + node["name"].lower() + ".pyx")
         implementation = map(
-            lambda filename: os.path.join(tmp_folder, "src", filename),
+            lambda filename: os.path.join(tmp_folder, filename),
             ["Square.cpp", "SquareInterface.cpp"])
         build_extension(
             tmp_folder, hide_stderr=True,
             name="dfn_ci_" + node["name"].lower(),
             pyx_filename=pyx_filename, implementation=implementation,
-            sourcedir=os.path.join(tmp_folder, "src"), incdirs=incdirs,
+            sourcedir=tmp_folder, incdirs=incdirs,
             compiler_flags=[], library_dirs=[], libraries=[],
             includes=[]
         )
@@ -56,9 +56,9 @@ def test_unknown_type():
             tmp_folder, hide_stderr=True,
             name="dfn_ci_" + node["name"].lower(),
             pyx_filename=os.path.join(tmp_folder, "python", "dfn_ci_" + node["name"].lower() + ".pyx"),
-            implementation=map(lambda filename: os.path.join(tmp_folder, "src", filename),
+            implementation=map(lambda filename: os.path.join(tmp_folder, filename),
                                ["UnknownType.cpp", "UnknownTypeInterface.cpp"]),
-            sourcedir=os.path.join(tmp_folder, "src"), incdirs=incdirs,
+            sourcedir=tmp_folder, incdirs=incdirs,
             compiler_flags=[], library_dirs=[], libraries=[],
             includes=[]
         )
@@ -79,10 +79,10 @@ def test_multiple_implementations():
             name="dfn_ci_" + node["name"].lower(),
             pyx_filename=os.path.join(
                 tmp_folder, "python", "dfn_ci_" + node["name"].lower() + ".pyx"),
-            implementation=map(lambda filename: os.path.join(tmp_folder, "src", filename),
+            implementation=map(lambda filename: os.path.join(tmp_folder, filename),
                                ["Iterative.cpp", "Recursive.cpp",
                                 "FactorialInterface.cpp"]),
-            sourcedir=os.path.join(tmp_folder, "src"), incdirs=incdirs,
+            sourcedir=tmp_folder, incdirs=incdirs,
             compiler_flags=[], library_dirs=[], libraries=[],
             includes=[]
         )
