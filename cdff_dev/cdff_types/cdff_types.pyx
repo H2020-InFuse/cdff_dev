@@ -723,39 +723,6 @@ cdef class LaserScan_rangesReference:
         return self.thisptr.nCount
 
 
-"""
-cdef class T_String:
-    def __cinit__(self):
-        self.thisptr = NULL
-        self.delete_thisptr = False
-
-    def __dealloc__(self):
-        if self.thisptr != NULL and self.delete_thisptr:
-            del self.thisptr
-
-    def __init__(self):
-        self.thisptr = new _cdff_types.T_String()
-        self.thisptr.nCount = 0
-        self.delete_thisptr = True
-
-    def __len__(self):
-        return self.thisptr.nCount
-
-    def __str__(self):
-        return str("{type: T_String, data=['%s']}"
-                   % ", ".join([self.thisptr.arr[i]
-                                for i in range(self.thisptr.nCount)]))
-
-    def __getitem__(self, int i):
-        return self.thisptr.arr[i]
-
-    def __setitem__(self, int i, bytearray v):
-        if i > 256:
-            raise KeyError("index out of range %d" % i)
-        self.thisptr.arr[i] = v
-"""
-
-
 cdef class RigidBodyState:
     def __cinit__(self):
         self.thisptr = NULL
