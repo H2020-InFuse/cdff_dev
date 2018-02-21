@@ -723,7 +723,8 @@ cdef class LaserScan_rangesReference:
         return self.thisptr.nCount
 
 
-cdef class t_string:
+"""
+cdef class T_String:
     def __cinit__(self):
         self.thisptr = NULL
         self.delete_thisptr = False
@@ -741,8 +742,8 @@ cdef class t_string:
         return self.thisptr.nCount
 
     def __str__(self):
-        return str("{type: t_string, data=[%s]}"
-                   % ", ".join(["%.2f" % self.thisptr.arr[i]
+        return str("{type: T_String, data=['%s']}"
+                   % ", ".join([self.thisptr.arr[i]
                                 for i in range(self.thisptr.nCount)]))
 
     def __getitem__(self, int i):
@@ -752,8 +753,9 @@ cdef class t_string:
         if i > 256:
             raise KeyError("index out of range %d" % i)
         self.thisptr.arr[i] = v
-
 """
+
+
 cdef class RigidBodyState:
     def __cinit__(self):
         self.thisptr = NULL
@@ -768,8 +770,8 @@ cdef class RigidBodyState:
         self.delete_thisptr = True
 
     def __str__(self):
-        return str("{type: RigidBodyStateg, {%s, sourceFrame=%s, targetFrame=%s, ...}"
-                   % (self.timestamp, self.sourceFrame, self.targetFrame))
+        return str("{type: RigidBodyStateg, %s, sourceFrame=%s, targetFrame=%s, ...}"
+                   % (self.timestamp, self.source_frame, self.target_frame))
 
     def _get_timestamp(self):
         cdef Time timestamp = Time()
@@ -783,23 +785,27 @@ cdef class RigidBodyState:
 
     timestamp = property(_get_timestamp, _set_timestamp)
 
-    def _get_sourceFrame(self):
-        return self.thisptr.sourceFrame.decode()
+    def _get_source_frame(self):
+        cdef bytes source_frame = self.thisptr.sourceFrame.arr
+        return source_frame.decode()
 
-    def _set_sourceFrame(self, str sourceFrame):
+    def _set_source_frame(self, str sourceFrame):
         cdef string value = sourceFrame.encode()
-        self.thisptr.sourceFrame = value
+        self.thisptr.sourceFrame.arr = value.c_str()
+        self.thisptr.sourceFrame.nCount = len(sourceFrame)
 
-    sourceFrame = property(_get_sourceFrame, _set_sourceFrame)
+    source_frame = property(_get_source_frame, _set_source_frame)
 
-    def _get_targetFrame(self):
-        return self.thisptr.targetFrame.decode()
+    def _get_target_frame(self):
+        cdef bytes target_frame = self.thisptr.targetFrame.arr
+        return target_frame.decode()
 
-    def _set_targetFrame(self, str targetFrame):
+    def _set_target_frame(self, str targetFrame):
         cdef string value = targetFrame.encode()
-        self.thisptr.targetFrame = value
+        self.thisptr.targetFrame.arr = value.c_str()
+        self.thisptr.targetFrame.nCount = len(targetFrame)
 
-    targetFrame = property(_get_targetFrame, _set_targetFrame)
+    target_frame = property(_get_target_frame, _set_target_frame)
 
     def _get_pos(self):
         cdef Vector3d pos = Vector3d()
@@ -897,4 +903,3 @@ cdef class RigidBodyState:
 
     cov_angular_velocity = property(
         _get_cov_angular_velocity, _set_cov_angular_velocity)
-"""

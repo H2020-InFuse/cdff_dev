@@ -1,7 +1,7 @@
 import numpy as np
 from cdff_dev import cdff_types
 from nose.tools import assert_equal, assert_greater, assert_regexp_matches
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_array_almost_equal
 
 
 def test_get_set_microseconds():
@@ -708,3 +708,96 @@ def test_create_laserscan():
     assert_equal(ls.ranges.size(), 100)
     assert_array_equal(np.asarray([ls.ranges[i] for i in range(3)]),
        (1, 2, 3))
+
+
+def test_rigid_body_state_get_set_time():
+    rbs = cdff_types.RigidBodyState()
+    assert_equal(rbs.timestamp.microseconds, 0)
+    rbs.timestamp.microseconds = 500
+    assert_equal(rbs.timestamp.microseconds, 500)
+    time = cdff_types.Time()
+    time.microseconds = 1000
+    rbs.timestamp = time
+    assert_equal(rbs.timestamp.microseconds, 1000)
+
+
+def test_rigid_body_state_get_set_source_frame():
+    rbs = cdff_types.RigidBodyState()
+    assert_equal(rbs.source_frame, "")
+    rbs.source_frame = "source_frame"
+    assert_equal(rbs.source_frame, "source_frame")
+
+
+def test_rigid_body_state_get_set_target_frame():
+    rbs = cdff_types.RigidBodyState()
+    assert_equal(rbs.target_frame, "")
+    rbs.target_frame = "target_frame"
+    assert_equal(rbs.target_frame, "target_frame")
+
+
+def test_rigid_body_state_str():
+    rbs = cdff_types.RigidBodyState()
+    rbs.source_frame = "source"
+    rbs.target_frame = "target"
+    assert_equal(
+        str(rbs),
+        "{type: RigidBodyStateg, {type: Time, microseconds: 0, usec_per_sec: 0}, "
+        "sourceFrame=source, targetFrame=target, ...}")
+
+
+def test_rigid_body_state_get_set_position():
+    rbs = cdff_types.RigidBodyState()
+    rbs.pos[0] = 1.0
+    rbs.pos[1] = 2.0
+    rbs.pos[2] = 3.0
+    assert_array_almost_equal(rbs.pos.toarray(), np.array([1, 2, 3]))
+
+
+def tst_rigid_body_state_get_set_cov_position():
+    rbs = cdff_types.RigidBodyState()
+    assert_array_almost_equal(
+        rbs.cov_position.toarray(), np.ones((3, 3)) * np.nan)
+    rbs.cov_position.fromarray(np.eye(3))
+    assert_array_almost_equal(rbs.cov_position.toarray(), np.eye(3))
+
+
+def test_rigid_body_state_get_set_orientation():
+    rbs = cdff_types.RigidBodyState()
+    rbs.orient.fromarray(np.array([1.0, 2.0, 3.0, 4.0]))
+    assert_array_almost_equal(
+        rbs.orient.toarray(), np.array([1.0, 2.0, 3.0, 4.0]))
+
+
+def test_rigid_body_state_get_set_cov_orientation():
+    rbs = cdff_types.RigidBodyState()
+    rbs.cov_orientation.fromarray(np.eye(3))
+    assert_array_almost_equal(rbs.cov_orientation.toarray(), np.eye(3))
+
+
+def test_rigid_body_state_get_set_velocity():
+    rbs = cdff_types.RigidBodyState()
+    rbs.velocity[0] = 1.0
+    rbs.velocity[1] = 2.0
+    rbs.velocity[2] = 3.0
+    assert_array_almost_equal(rbs.velocity.toarray(), np.array([1, 2, 3]))
+
+
+def test_rigid_body_state_get_set_cov_velocity():
+    rbs = cdff_types.RigidBodyState()
+    rbs.cov_velocity.fromarray(np.eye(3))
+    assert_array_almost_equal(rbs.cov_velocity.toarray(), np.eye(3))
+
+
+def test_rigid_body_state_get_set_angular_velocity():
+    rbs = cdff_types.RigidBodyState()
+    rbs.angular_velocity[0] = 1.0
+    rbs.angular_velocity[1] = 2.0
+    rbs.angular_velocity[2] = 3.0
+    assert_array_almost_equal(rbs.angular_velocity.toarray(), np.array([1, 2, 3]))
+
+
+def test_rigid_body_state_get_set_cov_angular_velocity():
+    rbs = cdff_types.RigidBodyState()
+    rbs.cov_angular_velocity.fromarray(np.eye(3))
+    assert_array_almost_equal(rbs.cov_angular_velocity.toarray(), np.eye(3))
+

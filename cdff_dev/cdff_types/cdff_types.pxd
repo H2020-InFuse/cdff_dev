@@ -90,9 +90,10 @@ cdef class LaserScan_rangesReference:
     cdef _cdff_types.LaserScan_ranges* thisptr
 
 
-cdef class t_string:
+cdef class T_String:
     cdef _cdff_types.T_String* thisptr
 
 
-#cdef class RigidBodyState:
-#    cdef _cdff_types.RigidBodyState* thisptr
+cdef class RigidBodyState:
+    cdef _cdff_types.RigidBodyState* thisptr
+    cdef bool delete_thisptr

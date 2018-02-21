@@ -191,22 +191,24 @@ cdef extern from "LaserScan.h":
         uint32_t maxRange
         LaserScan_remission remission
 
+
 cdef extern from "taste-extended.h":
     cdef cppclass T_String:
-        int nCount 
+        int nCount
         const_uchar[256] arr
 
-#cdef extern from "RigidBodyState.h":
-#    cdef cppclass RigidBodyState:
-#            Time timestamp
-#            t_string sourceFrame
-#            t_string targetFrame
-#            Vector3d pos
-#            Matrix3d cov_position
-#            Quaterniond orient
-#            Matrix3d cov_orientation
-#            Vector3d velocity
-#            Matrix3d cov_velocity
-#            Vector3d angular_velocity
-#            Matrix3d cov_angular_velocity
+
+cdef extern from "RigidBodyState.h":
+    cdef cppclass RigidBodyState:
+            Time timestamp
+            T_String sourceFrame
+            T_String targetFrame
+            Vector3d pos
+            Matrix3d cov_position
+            Quaterniond orient
+            Matrix3d cov_orientation
+            Vector3d velocity
+            Matrix3d cov_velocity
+            Vector3d angular_velocity
+            Matrix3d cov_angular_velocity
 
