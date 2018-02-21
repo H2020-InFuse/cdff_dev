@@ -721,3 +721,180 @@ cdef class LaserScan_rangesReference:
 
     def size(self):
         return self.thisptr.nCount
+
+
+cdef class t_string:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_types.T_String()
+        self.thisptr.nCount = 0
+        self.delete_thisptr = True
+
+    def __len__(self):
+        return self.thisptr.nCount
+
+    def __str__(self):
+        return str("{type: t_string, data=[%s]}"
+                   % ", ".join(["%.2f" % self.thisptr.arr[i]
+                                for i in range(self.thisptr.nCount)]))
+
+    def __getitem__(self, int i):
+        return self.thisptr.arr[i]
+
+    def __setitem__(self, int i, bytearray v):
+        if i > 256:
+            raise KeyError("index out of range %d" % i)
+        self.thisptr.arr[i] = v
+
+"""
+cdef class RigidBodyState:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_types.RigidBodyState()
+        self.delete_thisptr = True
+
+    def __str__(self):
+        return str("{type: RigidBodyStateg, {%s, sourceFrame=%s, targetFrame=%s, ...}"
+                   % (self.timestamp, self.sourceFrame, self.targetFrame))
+
+    def _get_timestamp(self):
+        cdef Time timestamp = Time()
+        del timestamp.thisptr
+        timestamp.thisptr = &self.thisptr.timestamp
+        timestamp.delete_thisptr = False
+        return timestamp
+
+    def _set_timestamp(self, Time timestamp):
+        self.thisptr.timestamp = deref(timestamp.thisptr)
+
+    timestamp = property(_get_timestamp, _set_timestamp)
+
+    def _get_sourceFrame(self):
+        return self.thisptr.sourceFrame.decode()
+
+    def _set_sourceFrame(self, str sourceFrame):
+        cdef string value = sourceFrame.encode()
+        self.thisptr.sourceFrame = value
+
+    sourceFrame = property(_get_sourceFrame, _set_sourceFrame)
+
+    def _get_targetFrame(self):
+        return self.thisptr.targetFrame.decode()
+
+    def _set_targetFrame(self, str targetFrame):
+        cdef string value = targetFrame.encode()
+        self.thisptr.targetFrame = value
+
+    targetFrame = property(_get_targetFrame, _set_targetFrame)
+
+    def _get_pos(self):
+        cdef Vector3d pos = Vector3d()
+        del pos.thisptr
+        pos.delete_thisptr = False
+        pos.thisptr = &self.thisptr.pos
+        return pos
+
+    def _set_pos(self, Vector3d value):
+        self.thisptr.pos = deref(value.thisptr)
+
+    pos = property(_get_pos, _set_pos)
+
+    def _get_cov_position(self):
+        cdef Matrix3d cov_position = Matrix3d()
+        del cov_position.thisptr
+        cov_position.delete_thisptr = False
+        cov_position.thisptr = &self.thisptr.cov_position
+        return cov_position
+
+    def _set_cov_position(self, Matrix3d value):
+        self.thisptr.cov_position = deref(value.thisptr)
+
+    cov_position = property(_get_cov_position, _set_cov_position)
+
+    def _get_orient(self):
+        cdef Quaterniond orient = Quaterniond()
+        del orient.thisptr
+        orient.delete_thisptr = False
+        orient.thisptr = &self.thisptr.orient
+        return orient
+
+    def _set_orient(self, Quaterniond value):
+        self.thisptr.orient = deref(value.thisptr)
+
+    orient = property(_get_orient, _set_orient)
+
+    def _get_cov_orientation(self):
+        cdef Matrix3d cov_orientation = Matrix3d()
+        del cov_orientation.thisptr
+        cov_orientation.delete_thisptr = False
+        cov_orientation.thisptr = &self.thisptr.cov_orientation
+        return cov_orientation
+
+    def _set_cov_orientation(self, Matrix3d value):
+        self.thisptr.cov_orientation = deref(value.thisptr)
+
+    cov_orientation = property(_get_cov_orientation, _set_cov_orientation)
+
+    def _get_velocity(self):
+        cdef Vector3d velocity = Vector3d()
+        del velocity.thisptr
+        velocity.delete_thisptr = False
+        velocity.thisptr = &self.thisptr.velocity
+        return velocity
+
+    def _set_velocity(self, Vector3d value):
+        self.thisptr.velocity = deref(value.thisptr)
+
+    velocity = property(_get_velocity, _set_velocity)
+
+    def _get_cov_velocity(self):
+        cdef Matrix3d cov_velocity = Matrix3d()
+        del cov_velocity.thisptr
+        cov_velocity.delete_thisptr = False
+        cov_velocity.thisptr = &self.thisptr.cov_velocity
+        return cov_velocity
+
+    def _set_cov_velocity(self, Matrix3d value):
+        self.thisptr.cov_velocity = deref(value.thisptr)
+
+    cov_velocity = property(_get_cov_velocity, _set_cov_velocity)
+
+    def _get_angular_velocity(self):
+        cdef Vector3d angular_velocity = Vector3d()
+        del angular_velocity.thisptr
+        angular_velocity.delete_thisptr = False
+        angular_velocity.thisptr = &self.thisptr.angular_velocity
+        return angular_velocity
+
+    def _set_angular_velocity(self, Vector3d value):
+        self.thisptr.angular_velocity = deref(value.thisptr)
+
+    angular_velocity = property(_get_angular_velocity, _set_angular_velocity)
+
+    def _get_cov_angular_velocity(self):
+        cdef Matrix3d cov_angular_velocity = Matrix3d()
+        del cov_angular_velocity.thisptr
+        cov_angular_velocity.delete_thisptr = False
+        cov_angular_velocity.thisptr = &self.thisptr.cov_angular_velocity
+        return cov_angular_velocity
+
+    def _set_cov_angular_velocity(self, Matrix3d value):
+        self.thisptr.cov_angular_velocity = deref(value.thisptr)
+
+    cov_angular_velocity = property(
+        _get_cov_angular_velocity, _set_cov_angular_velocity)
+"""

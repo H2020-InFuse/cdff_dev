@@ -1,6 +1,7 @@
 # distutils: language = c++
 from libc.stdint cimport uint8_t, uint16_t, uint32_t, uint64_t
 from libc.stdint cimport int8_t, int16_t, int32_t, int64_t
+from libc.string cimport const_uchar
 
 
 cdef extern from "Time.h":
@@ -162,6 +163,7 @@ cdef extern from "Pointcloud.h":
         Pointcloud_points points
         Pointcloud_colors colors
 
+
 cdef extern from "LaserScan.h":
     cdef uint32_t maxLaserScanSize
 
@@ -188,3 +190,23 @@ cdef extern from "LaserScan.h":
         uint32_t minRange
         uint32_t maxRange
         LaserScan_remission remission
+
+cdef extern from "taste-extended.h":
+    cdef cppclass T_String:
+        int nCount 
+        const_uchar[256] arr
+
+#cdef extern from "RigidBodyState.h":
+#    cdef cppclass RigidBodyState:
+#            Time timestamp
+#            t_string sourceFrame
+#            t_string targetFrame
+#            Vector3d pos
+#            Matrix3d cov_position
+#            Quaterniond orient
+#            Matrix3d cov_orientation
+#            Vector3d velocity
+#            Matrix3d cov_velocity
+#            Vector3d angular_velocity
+#            Matrix3d cov_angular_velocity
+
