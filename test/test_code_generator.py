@@ -3,10 +3,34 @@ import yaml
 import warnings
 from cdff_dev.code_generator import write_dfn
 from cdff_dev.testing import EnsureCleanup, build_extension
-from nose.tools import assert_true, assert_equal, assert_raises_regex
+from nose.tools import assert_true, assert_equal, assert_raises_regex, \
+    assert_true
 
 
-def test_square_smoke():
+def test_generate_files():
+    with open("test/test_data/square_desc.yaml", "r") as f:
+        node = yaml.load(f)
+    tmp_folder = "test/test_output/square"
+    with EnsureCleanup(tmp_folder) as ec:
+        filenames = write_dfn(node, tmp_folder)
+        ec.add_files(filenames)
+        ec.add_folder(os.path.join(tmp_folder, "python"))
+
+        assert_true(
+            os.path.exists(os.path.join(tmp_folder, "SquareInterface.hpp")))
+        assert_true(
+            os.path.exists(os.path.join(tmp_folder, "SquareInterface.cpp")))
+        assert_true(os.path.exists(os.path.join(tmp_folder, "Square.hpp")))
+        assert_true(os.path.exists(os.path.join(tmp_folder, "Square.cpp")))
+        assert_true(os.path.exists(os.path.join(tmp_folder, "python",
+                                                "dfn_ci_square.pxd")))
+        assert_true(os.path.exists(os.path.join(tmp_folder, "python",
+                                                "dfn_ci_square.pyx")))
+        assert_true(os.path.exists(os.path.join(tmp_folder, "python",
+                                                "_dfn_ci_square.pxd")))
+
+
+def test_square():
     with open("test/test_data/square_desc.yaml", "r") as f:
         node = yaml.load(f)
     tmp_folder = "test/test_output/square"
