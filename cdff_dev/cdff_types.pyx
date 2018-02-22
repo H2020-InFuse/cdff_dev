@@ -331,11 +331,14 @@ cdef class Matrix2d:
 
     def __init__(self):
         self.thisptr = new _cdff_types.Matrix2d()
+        self.delete_thisptr = True
+        self.allocate()
+
+    def allocate(self):
         self.thisptr.nCount = 2
         cdef int i
         for i in range(self.thisptr.nCount):
             self.thisptr.arr[i].nCount = self.thisptr.nCount
-        self.delete_thisptr = True
 
     def __len__(self):
         return self.thisptr.nCount
@@ -393,11 +396,14 @@ cdef class Matrix3d:
 
     def __init__(self):
         self.thisptr = new _cdff_types.Matrix3d()
+        self.delete_thisptr = True
+        self.allocate()
+
+    def allocate(self):
         self.thisptr.nCount = 3
         cdef int i
         for i in range(self.thisptr.nCount):
             self.thisptr.arr[i].nCount = self.thisptr.nCount
-        self.delete_thisptr = True
 
     def __len__(self):
         return self.thisptr.nCount
@@ -498,7 +504,7 @@ cdef class Quaterniond:
             self.thisptr.arr[i] = array[i]
 
 
-cdef class Vector3dVectorReference:
+cdef class Pointcloud_points:
     def __cinit__(self):
         self.thisptr = NULL
 
@@ -512,6 +518,21 @@ cdef class Vector3dVectorReference:
         v.thisptr = &(self.thisptr.arr[i])
         return v
 
+    def __setitem__(self, tuple indices, double v):
+        cdef int i, j, k
+        i, j = indices
+
+        if self.thisptr.nCount <= i:
+            for k in range(self.thisptr.nCount, i + 1):
+                self.thisptr.arr[k].nCount = 3
+            self.thisptr.nCount = i + 1
+
+        if i < 0 or i >= self.thisptr.nCount:
+            raise KeyError("index out of range %d" % i)
+        if j < 0 or j >= 3:
+            raise KeyError("index out of range %d" % j)
+        self.thisptr.arr[i].arr[j] = v
+
     def resize(self, int size):
         self.thisptr.nCount = size
 
@@ -519,7 +540,7 @@ cdef class Vector3dVectorReference:
         return self.thisptr.nCount
 
 
-cdef class Vector4dVectorReference:
+cdef class Pointcloud_colors:
     def __cinit__(self):
         self.thisptr = NULL
 
@@ -532,6 +553,21 @@ cdef class Vector4dVectorReference:
         v.delete_thisptr = False
         v.thisptr = &(self.thisptr.arr[i])
         return v
+
+    def __setitem__(self, tuple indices, double v):
+        cdef int i, j, k
+        i, j = indices
+
+        if self.thisptr.nCount <= i:
+            for k in range(self.thisptr.nCount, i + 1):
+                self.thisptr.arr[k].nCount = 4
+            self.thisptr.nCount = i + 1
+
+        if i < 0 or i >= self.thisptr.nCount:
+            raise KeyError("index out of range %d" % i)
+        if j < 0 or j >= 4:
+            raise KeyError("index out of range %d" % j)
+        self.thisptr.arr[i].arr[j] = v
 
     def resize(self, int size):
         self.thisptr.nCount = size
@@ -578,13 +614,13 @@ cdef class Pointcloud:
 
     @property
     def points(self):
-        cdef Vector3dVectorReference points = Vector3dVectorReference()
+        cdef Pointcloud_points points = Pointcloud_points()
         points.thisptr = &self.thisptr.points
         return points
 
     @property
     def colors(self):
-        cdef Vector4dVectorReference colors = Vector4dVectorReference()
+        cdef Pointcloud_colors colors = Pointcloud_colors()
         colors.thisptr = &self.thisptr.colors
         return colors
 
@@ -791,6 +827,7 @@ cdef class RigidBodyState:
         del cov_position.thisptr
         cov_position.delete_thisptr = False
         cov_position.thisptr = &self.thisptr.cov_position
+        cov_position.allocate()
         return cov_position
 
     def _set_cov_position(self, Matrix3d value):
@@ -815,6 +852,7 @@ cdef class RigidBodyState:
         del cov_orientation.thisptr
         cov_orientation.delete_thisptr = False
         cov_orientation.thisptr = &self.thisptr.cov_orientation
+        cov_orientation.allocate()
         return cov_orientation
 
     def _set_cov_orientation(self, Matrix3d value):
@@ -839,6 +877,7 @@ cdef class RigidBodyState:
         del cov_velocity.thisptr
         cov_velocity.delete_thisptr = False
         cov_velocity.thisptr = &self.thisptr.cov_velocity
+        cov_velocity.allocate()
         return cov_velocity
 
     def _set_cov_velocity(self, Matrix3d value):
@@ -863,6 +902,7 @@ cdef class RigidBodyState:
         del cov_angular_velocity.thisptr
         cov_angular_velocity.delete_thisptr = False
         cov_angular_velocity.thisptr = &self.thisptr.cov_angular_velocity
+        cov_angular_velocity.allocate()
         return cov_angular_velocity
 
     def _set_cov_angular_velocity(self, Matrix3d value):

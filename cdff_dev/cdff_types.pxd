@@ -62,12 +62,12 @@ cdef class Transform3d:
     cdef bool delete_thisptr
 
 
-cdef class Vector3dVectorReference:
+cdef class Pointcloud_points:
     cdef _cdff_types.Pointcloud_points* thisptr
     cdef bool delete_thisptr
 
 
-cdef class Vector4dVectorReference:
+cdef class Pointcloud_colors:
     cdef _cdff_types.Pointcloud_colors* thisptr
     cdef bool delete_thisptr
 
