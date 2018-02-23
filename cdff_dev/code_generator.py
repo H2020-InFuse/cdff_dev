@@ -56,21 +56,54 @@ class DefaultTypeInfo(object):
         return True  # TODO really?
 
 
+class ASN1TypeInfo(object):
+    """Information about ASN1 types."""
+    def __init__(self, typename):
+        self.typename = typename
+
+    @classmethod
+    def handles(cls, typename, cdffpath):
+        return typename+'.h' in cls.search_asn1_type(cdffpath)
+
+    def include(self):
+        """C++ include header."""
+        return "Types/C/"+self.typename+".h"
+
+    def cython_type(self):
+        return self.typename
+
+    def python_type(self):
+        return self.typename
+
+    def copy_on_assignment(self):
+        return True
+
+    @classmethod
+    def search_asn1_type(cls, cdffpath):
+        """Search generated ASN1 types."""
+        types_path = os.path.join(cdffpath,"Common/Types/C/")
+        return os.listdir(types_path)
+
 class TypeRegistry(object):  # TODO global, read from config files
-    TYPEINFOS = [BasicTypeInfo, DefaultTypeInfo]
+    TYPEINFOS = [BasicTypeInfo, ASN1TypeInfo, DefaultTypeInfo]
     """Registry for InFuse type information."""
-    def __init__(self):
+    def __init__(self, cdffpath):
         self.cache = {}
+        self.cdffpath = cdffpath
 
     def get_info(self, typename):
         for TypeInfo in self.TYPEINFOS:
-            if TypeInfo.handles(typename):
+            if TypeInfo == ASN1TypeInfo:
+                type_found = TypeInfo.handles(typename, self.cdffpath)
+            else:
+                type_found = TypeInfo.handles(typename)
+            if type_found:
                 if typename not in self.cache:
                     self.cache[typename] = TypeInfo(typename)
                 return self.cache[typename]
         else:
             raise NotImplementedError("No type info for '%s' available."
-                                      % typename)
+                                      % typename) #TODO: this error would never be triggered since DefaultTypeInfo with always return true
 
 
 def write_dfn(node, output, source_folder=".", python_folder="python",
@@ -96,11 +129,13 @@ def write_dfn(node, output, source_folder=".", python_folder="python",
     cdffpath : str, optional (default: 'CDFF')
         Path to CDFF
     """
+
     node = validate(node)
 
-    type_registry = TypeRegistry()
+    type_registry = TypeRegistry(cdffpath)
     src_dir = os.path.join(output, source_folder)
     python_dir = os.path.join(output, python_folder)
+
     if not os.path.exists(src_dir):
         os.makedirs(src_dir)
     if not os.path.exists(python_dir):
