@@ -121,3 +121,23 @@ def test_multiple_implementations():
         square.configure()
         square.xInput(5.0)
         square.process()
+
+"""
+def test_asn1():
+    with open("test/test_data/dummy_asn1_desc.yaml", "r") as f:
+        node = yaml.load(f)
+    tmp_folder = "test/test_output/asn1"
+        build_extension(
+            tmp_folder, hide_stderr=False,
+            name="dfn_ci_" + node["name"].lower(),
+            pyx_filename=os.path.join(tmp_folder, "python", "dfn_ci_" + node["name"].lower() + ".pyx"),
+            implementation=map(lambda filename: os.path.join(tmp_folder, "src", filename),
+                               ["Asn1Test.cpp", "Asn1TestInterface.cpp"]),
+            sourcedir=os.path.join(tmp_folder, "src"), incdirs=["test/test_output/"],
+        import dfn_ci_asn1test
+        asn1_test = dfn_ci_asn1test.Asn1Test()
+        assert_true(asn1_test.configure())
+        asn1_test.currentTimeInput(5.0)
+        assert_true(asn1_test.process())
+        assert_equal(6.0, asn1_test.nextTimeOutput())
+"""

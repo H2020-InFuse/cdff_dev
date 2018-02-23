@@ -1,0 +1,9 @@
+name: ASN1Test
+input_ports:
+    - name: currentTime
+      type: Time
+      doc: dummy time input
+output_ports:
+    - name: nextTime
+      type: Time
+      doc: dummy time output
