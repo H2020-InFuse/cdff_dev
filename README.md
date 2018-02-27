@@ -42,6 +42,16 @@ On Ubuntu 16.04 you can install them with
 
     sudo python3 setup.py install
 
+If you want to uninstall it from the system, install it with this option
+first:
+
+    sudo python3 setup.py install --record files.txt
+
+`files.txt` will contain a list of files that have been installed in the
+system. You can remove them with
+
+    cat files.txt | xargs sudo rm -f
+
 ## Documentation
 
 The overall concept and conventions are described in the documentation
