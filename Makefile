@@ -16,6 +16,5 @@ autogeneration:
 
 test:
 	nosetests -sv
-	nosetests -sv cdff_dev/cdff_types
 
 .PHONY: test

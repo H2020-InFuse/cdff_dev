@@ -18,12 +18,14 @@ fetch_cdff:
 build_cdff_dev:
   stage : build_cdff_dev
   script:
-      - python3 setup.py build_ext -i
+      - python3 setup.py install --prefix install
   artifacts:
     paths:
-      - cdff_dev
+      - install
 
 test:
   stage : test
+  variables:
+    PYTHONPATH: install/lib/python3.5/site-packages
   script:
-      - make test
+      - mv cdff_dev cdff_dev_tests; nosetests -sv

@@ -21,9 +21,9 @@ def configuration(parent_package='', top_path=None):
     config.add_subpackage("cdff_dev")
 
     config.add_data_files(
-        (".", "cdff_dev/cdff_types/_cdff_types.pxd"),
-        (".", "cdff_dev/cdff_types/cdff_types.pxd"),
-        (".", "cdff_dev/cdff_types/cdff_types.pyx")
+        (".", "cdff_dev/_cdff_types.pxd"),
+        (".", "cdff_dev/cdff_types.pxd"),
+        (".", "cdff_dev/cdff_types.pyx")
     )
 
     return config
