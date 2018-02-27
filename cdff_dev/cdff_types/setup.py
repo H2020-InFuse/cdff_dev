@@ -18,9 +18,6 @@ def configuration(parent_package='', top_path=None):
     from numpy.distutils.misc_util import Configuration
     config = Configuration("cdff_types", parent_package, top_path)
 
-    config.add_data_files(
-        "_cdff_types.pxd", "cdff_types.pxd", "cdff_types.pyx")
-
     cdffpath = "CDFF"  # TODO
     check_cdffpath(cdffpath)
     ctypespath = os.path.join(cdffpath, CTYPESDIR)
