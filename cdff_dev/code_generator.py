@@ -70,13 +70,13 @@ class ASN1TypeInfo(object):
         return "Types/C/"+self.typename+".h"
 
     def cython_type(self):
-        return self.typename
+        return "_cdff_types." + self.typename
 
     def python_type(self):
-        return self.typename
+        return "cdff_types." + self.typename
 
     def copy_on_assignment(self):
-        return True
+        return False
 
     @classmethod
     def search_asn1_type(cls, cdffpath):
@@ -243,7 +243,7 @@ def write_cython(node, type_registry, template_base,
     result[target] = pxd_file
 
     _pxd_file = render(
-        "_%s.pxd" % template_base, node=node)
+        "_%s.pxd" % template_base, node=node, type_registry=type_registry)
     target = os.path.join(target_folder, _pxd_filename)
     result[target] = _pxd_file
 

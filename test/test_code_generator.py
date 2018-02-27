@@ -122,22 +122,33 @@ def test_multiple_implementations():
         square.xInput(5.0)
         square.process()
 
-"""
+
 def test_asn1():
-    with open("test/test_data/dummy_asn1_desc.yaml", "r") as f:
+    with open("test/test_data/asn1_desc.yaml", "r") as f:
         node = yaml.load(f)
-    tmp_folder = "test/test_output/asn1"
+    tmp_folder = "test/test_output/ASN1"
+    with EnsureCleanup(tmp_folder) as ec:
+        warnings.simplefilter("ignore", UserWarning)
+        filenames = write_dfn(node, tmp_folder)
+        ec.add_files(filenames)
+        ec.add_folder(os.path.join(tmp_folder, "python"))
+
+        incdirs = ["test/test_output/", "CDFF/DFNs"]
         build_extension(
             tmp_folder, hide_stderr=False,
             name="dfn_ci_" + node["name"].lower(),
-            pyx_filename=os.path.join(tmp_folder, "python", "dfn_ci_" + node["name"].lower() + ".pyx"),
-            implementation=map(lambda filename: os.path.join(tmp_folder, "src", filename),
-                               ["Asn1Test.cpp", "Asn1TestInterface.cpp"]),
-            sourcedir=os.path.join(tmp_folder, "src"), incdirs=["test/test_output/"],
+            pyx_filename=os.path.join(tmp_folder, "python",
+                "dfn_ci_" + node["name"].lower() + ".pyx"),
+            implementation=map(lambda filename: os.path.join(tmp_folder, "src",
+                filename),
+            ["ASN1Test.cpp", "ASN1TestInterface.cpp"]),
+            sourcedir=tmp_folder, incdirs=incdirs,
+            compiler_flags=[], library_dirs=[], libraries=[],
+            includes=[]
+        )
         import dfn_ci_asn1test
-        asn1_test = dfn_ci_asn1test.Asn1Test()
+        asn1_test = dfn_ci_asn1test.ASN1Test()
         assert_true(asn1_test.configure())
         asn1_test.currentTimeInput(5.0)
         assert_true(asn1_test.process())
         assert_equal(6.0, asn1_test.nextTimeOutput())
-"""
