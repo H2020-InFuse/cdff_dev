@@ -8,4 +8,4 @@ RUN pip3 install jinja2 cython nose nose2 numpy msgpack-python
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
 
-LABEL version="1.6.5.2"
+LABEL version="1.6.5.3"
