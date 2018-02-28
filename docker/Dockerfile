@@ -4,7 +4,7 @@ RUN apt-get update && apt-get -y install python3 python3-dev python3-pip python3
 
 RUN pip3 install --upgrade pip
 
-RUN pip3 install jinja2 cython nose nose2 numpy msgpack
+RUN pip3 install jinja2 cython nose nose2 numpy msgpack-python
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
 

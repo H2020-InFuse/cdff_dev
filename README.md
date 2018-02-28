@@ -30,7 +30,7 @@ CDFF-Dev depends on CDFF. In addition, the following packages are required:
 * Jinja 2
 * Cython
 * NumPy
-* msgpack
+* msgpack-python
 
 On Ubuntu 16.04 you can install them with
 
