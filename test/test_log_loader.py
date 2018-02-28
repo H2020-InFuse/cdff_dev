@@ -1,5 +1,5 @@
 from cdff_dev import logloader, typefromdict
-from nose.tools import assert_in
+from nose.tools import assert_in, assert_equal
 from numpy.testing import assert_array_less
 
 
@@ -20,5 +20,6 @@ def test_replay():
     for timestamp, stream_name, typename, sample in logloader.replay(
             stream_names, log, verbose=0):
         timestamps.append(timestamp)
-        typefromdict.create_from_dict(typename, sample)
+        obj = typefromdict.create_from_dict(typename, sample)
+        assert_equal(type(obj).__module__, "cdff_dev.cdff_types")
     assert_array_less(timestamps[:-1], timestamps[1:])
