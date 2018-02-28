@@ -72,6 +72,11 @@ You can run the DFN code generator with
 
 ## Testing
 
+Befor running tests, the Cython extensions have to be compiled locally
+with
+
+    python3 setup.py build_ext -i
+
 You can run the tests with nosetests:
 
     make test
