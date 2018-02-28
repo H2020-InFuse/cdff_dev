@@ -6,6 +6,7 @@ from libc.stdint cimport uint8_t, uint16_t, uint32_t, uint64_t
 from libc.stdint cimport int8_t, int16_t, int32_t, int64_t
 cimport numpy as np
 import numpy as np
+import warnings
 
 
 np.import_array()  # must be here because we use the NumPy C API
@@ -730,9 +731,15 @@ cdef class LaserScan_remissionReference:
         return self.thisptr.arr[i]
 
     def __setitem__(self, int i, float v):
+        if i >= 60:
+            warnings.warn("Maximum size of LaserScan is 60")
+            return
         self.thisptr.arr[i] = v
 
     def resize(self, int size):
+        if size >= 60:
+            warnings.warn("Maximum size of LaserScan is 60")
+            return
         self.thisptr.nCount = size
 
     def size(self):
@@ -750,9 +757,15 @@ cdef class LaserScan_rangesReference:
         return self.thisptr.arr[i]
 
     def __setitem__(self, int i, uint32_t v):
+        if i >= 60:
+            warnings.warn("Maximum size of LaserScan is 60")
+            return
         self.thisptr.arr[i] = v
 
     def resize(self, int size):
+        if size >= 60:
+            warnings.warn("Maximum size of LaserScan is 60")
+            return
         self.thisptr.nCount = size
 
     def size(self):

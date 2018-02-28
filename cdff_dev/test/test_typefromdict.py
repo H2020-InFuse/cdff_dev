@@ -69,10 +69,10 @@ def test_create_laser_scan():
         "start_angle": 0,
         "angular_resolution": 0.1,
         "speed": 5.0,
-        "ranges": [10, 20, 30],
+        "ranges": list(range(20)),
         "minRange": 15,
         "maxRange": 25,
-        "remission": [5, 5, 5]
+        "remission": list(range(20))
     }
     obj = typefromdict.create_from_dict("LaserScan", data)
     assert_equal(obj.ref_time.microseconds, 5)
@@ -80,14 +80,12 @@ def test_create_laser_scan():
     assert_equal(obj.start_angle, 0)
     assert_equal(obj.angular_resolution, 0.1)
     assert_equal(obj.speed, 5.0)
-    assert_equal(obj.ranges[0], 10)
-    assert_equal(obj.ranges[1], 20)
-    assert_equal(obj.ranges[2], 30)
+    for i in range(20):
+        assert_equal(obj.ranges[i], i)
     assert_equal(obj.min_range, 15)
     assert_equal(obj.max_range, 25)
-    assert_equal(obj.remission[0], 5)
-    assert_equal(obj.remission[1], 5)
-    assert_equal(obj.remission[2], 5)
+    for i in range(20):
+        assert_equal(obj.remission[i], i)
 
 
 def test_create_pointcloud():
