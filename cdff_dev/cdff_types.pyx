@@ -737,7 +737,7 @@ cdef class LaserScan_remissionReference:
         self.thisptr.arr[i] = v
 
     def resize(self, int size):
-        if size >= 60:
+        if size > 60:
             warnings.warn("Maximum size of LaserScan is 60")
             return
         self.thisptr.nCount = size
@@ -763,7 +763,7 @@ cdef class LaserScan_rangesReference:
         self.thisptr.arr[i] = v
 
     def resize(self, int size):
-        if size >= 60:
+        if size > 60:
             warnings.warn("Maximum size of LaserScan is 60")
             return
         self.thisptr.nCount = size
