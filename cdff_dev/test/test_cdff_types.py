@@ -693,19 +693,19 @@ def test_create_laserscan():
     ls.min_range = 1.0
     assert_equal(ls.min_range, 1.0)
 
-    ls.remission.resize(100)
+    ls.remission.resize(60)
     ls.remission[0] = 1.0
     ls.remission[1] = 2.0
     ls.remission[2] = 3.0
-    assert_equal(ls.remission.size(), 100)
+    assert_equal(ls.remission.size(), 60)
     assert_array_equal(np.asarray([ls.remission[i] for i in range(3)]),
        (1.0, 2.0, 3.0))
 
-    ls.ranges.resize(100)
+    ls.ranges.resize(60)
     ls.ranges[0] = 1
     ls.ranges[1] = 2
     ls.ranges[2] = 3
-    assert_equal(ls.ranges.size(), 100)
+    assert_equal(ls.ranges.size(), 60)
     assert_array_equal(np.asarray([ls.ranges[i] for i in range(3)]),
        (1, 2, 3))
 
