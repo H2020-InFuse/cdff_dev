@@ -18,10 +18,10 @@ fetch_cdff:
 build_cdff_dev:
   stage : build_cdff_dev
   script:
-      - python3 setup.py install --prefix install
+      - python3 setup.py build_ext -i
   artifacts:
     paths:
-      - install
+      - .
 
 test:
   stage : test
