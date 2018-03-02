@@ -1,0 +1,17 @@
+name: LidarSlam
+input_ports:
+    - name: PointCloud
+      type: <type>
+      doc: "Point cloud taken from a LIDAR sensor"
+    - name: WheelOdometry
+      type: <type>
+      doc: "Wheel odometry computed by other component"
+output_ports:
+    - name: PoseEstimate
+      type: <type>
+      doc: ""
+    - name: PoseGraph
+      type: <type>
+      doc: ""
+target:
+    - Rock

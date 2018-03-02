@@ -1,0 +1,27 @@
+#include "{{ dfpc["name"] }}Interface.hpp"
+
+
+namespace dfpc_ci {
+
+{{ dfpc["name"] }}Interface::{{ dfpc["name"] }}Interface()
+{
+}
+
+{{ dfpc["name"] }}Interface::~{{ dfpc["name"] }}Interface()
+{
+}
+{{ space }}
+{%- for input_port in dfpc["input_ports"] %}
+void {{ dfpc["name"] }}Interface::{{ input_port["name"] }}Input(const {{ input_port["type"] }}& data) {
+    in{{ input_port["name"].lower() }} = data;
+}
+{{ space }}
+{%- endfor %}
+
+{%- for output_port in dfpc["output_ports"] %}
+{{ output_port["type"] }} {{ node["name"] }}Interface::{{ output_port["name"] }}Output() {
+    return out{{ output_port["name"].lower() }};
+}
+{%- endfor %}
+
+}
