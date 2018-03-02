@@ -1,5 +1,5 @@
 import numpy as np
-from cdff_dev import cdff_types
+import cdff_types
 from nose.tools import assert_equal, assert_greater, assert_regexp_matches
 from numpy.testing import assert_array_equal, assert_array_almost_equal
 

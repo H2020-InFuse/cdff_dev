@@ -1,4 +1,4 @@
-from . import cdff_types
+import cdff_types
 
 
 def create_cpp(typename):
@@ -77,7 +77,7 @@ def _assign_element(obj, fieldname, data):
                          % (type(obj), fieldname))
 
     field = getattr(obj, fieldname)
-    if type(field).__module__ == "cdff_dev.cdff_types":
+    if type(field).__module__ == "cdff_types":
         _convert(field, data)
     else:
         setattr(obj, fieldname, data)

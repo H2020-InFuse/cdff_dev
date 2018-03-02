@@ -1,5 +1,5 @@
 from cdff_dev import typefromdict
-from cdff_dev import cdff_types
+import cdff_types
 from nose.tools import assert_raises_regex, assert_equal
 from numpy.testing import assert_array_equal
 

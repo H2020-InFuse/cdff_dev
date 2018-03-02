@@ -4,4 +4,4 @@
 .idea/
 build/
 CDFF/
-cdff_dev/cdff_types.cpp
+cdff_types.cpp

@@ -21,5 +21,5 @@ def test_replay():
             stream_names, log, verbose=0):
         timestamps.append(timestamp)
         obj = typefromdict.create_from_dict(typename, sample)
-        assert_equal(type(obj).__module__, "cdff_dev.cdff_types")
+        assert_equal(type(obj).__module__, "cdff_types")
     assert_array_less(timestamps[:-1], timestamps[1:])
