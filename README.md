@@ -37,28 +37,25 @@ On Ubuntu 16.04 you can install them with
     sudo apt-get install python3 python3-dev python3-pip
     sudo pip3 install -r requirements.txt
 
+If you don't have sudo privileges, you can use the flag `--user` of pip
+to install the dependencies in your home folder.
+
 ## Installation
 
 `CDFF_dev` should be installed in the system:
 
-    sudo python3 setup.py install
+    sudo pip3 install -e .
 
-If you want to uninstall it from the system, install it with this option
-first:
-
-    sudo python3 setup.py install --record files.txt
-
-`files.txt` will contain a list of files that have been installed in the
-system. You can remove them with
-
-    cat files.txt | xargs sudo rm -f
+If you don't have sudo privileges, you can use the flag `--user` of pip
+to install the dependencies in your home folder.
 
 ## Documentation
 
-The overall concept and conventions are described in the documentation
-of CDFF-Support [here](https://docs.google.com/document/d/1BzKnNrRw6yIFllrITiEGZXD8awtsmvNslqRuB4j29mw/edit#heading=h.lsr1bgv0ntf5).
-The link to the CDFF-dev Document [here](https://docs.google.com/document/d/1yz_w7Eut6Rtg0d4I6R4mze2G8Oip4agyqrTDlKVgC6g/edit#heading=h.1xul7efma9uy)
-A guide for the creation of a DFN [here](https://docs.google.com/document/d/1hFTRKgJNN3n_brT3aajMA03AR_jQ2eCo-ZM33ggY5cE/edit?disco=AAAABnQb9DE&ts=5a841a86)
+The overall concept and conventions are described in these documents:
+
+* [CDFF-Support](https://docs.google.com/document/d/1BzKnNrRw6yIFllrITiEGZXD8awtsmvNslqRuB4j29mw/edit#heading=h.lsr1bgv0ntf5).
+* [CDFF-dev](https://docs.google.com/document/d/1yz_w7Eut6Rtg0d4I6R4mze2G8Oip4agyqrTDlKVgC6g/edit#heading=h.1xul7efma9uy)
+* [guide for the creation of a DFN](https://docs.google.com/document/d/1hFTRKgJNN3n_brT3aajMA03AR_jQ2eCo-ZM33ggY5cE/edit?disco=AAAABnQb9DE&ts=5a841a86)
 
 ### DFN Code Generator
 
@@ -73,11 +70,6 @@ You can run the DFN code generator with
 
 ## Testing
 
-Befor running tests, the Cython extensions have to be compiled locally
-with
-
-    python3 setup.py build_ext -i
-
 You can run the tests with nosetests:
 
     make test
@@ -85,6 +77,8 @@ You can run the tests with nosetests:
 Nosetests can be installed with pip:
 
     sudo pip3 install nose
+
+Note that this version of nosetests
 
 ## Contributing
 
