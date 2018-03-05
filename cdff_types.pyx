@@ -923,3 +923,68 @@ cdef class RigidBodyState:
 
     cov_angular_velocity = property(
         _get_cov_angular_velocity, _set_cov_angular_velocity)
+
+
+cdef class JointState:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_types.JointState()
+        self.delete_thisptr = True
+
+    def __str__(self):
+        return str(
+            "{type: JointState, position: %.2f, speed: %.2f, "
+            "effort: %.2f, raw: %.2f, acceleration: %.2f}"
+            % (self.thisptr.position, self.thisptr.speed,
+               self.thisptr.effort, self.thisptr.raw,
+               self.thisptr.acceleration))
+
+    def assign(self, JointState other):
+        self.thisptr.assign(deref(other.thisptr))
+
+    def _get_position(self):
+        return self.thisptr.position
+
+    def _set_position(self, double position):
+        self.thisptr.position = position
+
+    position = property(_get_position, _set_position)
+
+    def _get_speed(self):
+        return self.thisptr.speed
+
+    def _set_speed(self, float speed):
+        self.thisptr.speed = speed
+
+    speed = property(_get_speed, _set_speed)
+
+    def _get_effort(self):
+        return self.thisptr.effort
+
+    def _set_effort(self, float effort):
+        self.thisptr.effort = effort
+
+    effort = property(_get_effort, _set_effort)
+
+    def _get_raw(self):
+        return self.thisptr.raw
+
+    def _set_raw(self, float raw):
+        self.thisptr.raw = raw
+
+    raw = property(_get_raw, _set_raw)
+
+    def _get_acceleration(self):
+        return self.thisptr.acceleration
+
+    def _set_acceleration(self, float acceleration):
+        self.thisptr.acceleration = acceleration
+
+    acceleration = property(_get_acceleration, _set_acceleration)

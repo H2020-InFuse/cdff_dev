@@ -212,3 +212,29 @@ cdef extern from "RigidBodyState.h":
             Vector3d angular_velocity
             Matrix3d cov_angular_velocity
 
+
+cdef extern from "JointState.h":
+    cdef cppclass JointState:
+        JointState& assign "operator="(JointState&)
+
+        double position
+        float speed
+        float effort
+        float raw
+        float acceleration
+
+
+cdef extern from "Joints.h":
+    cdef cppclass Joints_names:
+        int nCount
+        T_String[30] arr
+
+    cdef cppclass Joints_elements:
+        int nCount
+        JointState[30] arr
+
+    cdef cppclass Joints:
+        Time timestamp
+        Joints_names names
+        Joints_elements elements
+

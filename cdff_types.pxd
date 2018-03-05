@@ -97,3 +97,13 @@ cdef class T_String:
 cdef class RigidBodyState:
     cdef _cdff_types.RigidBodyState* thisptr
     cdef bool delete_thisptr
+
+
+cdef class JointState:
+    cdef _cdff_types.JointState* thisptr
+    cdef bool delete_thisptr
+
+
+cdef class Joints:
+    cdef _cdff_types.Joints* thisptr
+    cdef bool delete_thisptr
