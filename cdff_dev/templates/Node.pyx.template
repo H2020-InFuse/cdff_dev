@@ -8,8 +8,9 @@ from libcpp.string cimport string
 cimport cdff_types
 cimport _cdff_types
 {%- endif %}
-
-{% for class_name in node["implementations"] -%}
+{%- for class_name in node["implementations"] %}
+{{ break }}
+{{ break }}
 cdef class {{ class_name }}:
     def __cinit__(self):
         self.thisptr = NULL
@@ -54,6 +55,5 @@ cdef class {{ class_name }}:
         out.thisptr[0] = self.thisptr.{{ output_port["name"] }}Output()
         {%- endif %}
         return out
-{{ break }}
     {%- endfor %}
 {%- endfor %}
