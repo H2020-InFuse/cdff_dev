@@ -25,7 +25,5 @@ build_cdff_dev:
 
 test:
   stage : test
-  variables:
-    PYTHONPATH: install/lib/python3.5/site-packages
   script:
-      - mv cdff_dev cdff_dev_tests; nosetests -sv
+      - nosetests -sv
