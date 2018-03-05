@@ -129,7 +129,6 @@ def test_asn1():
         node = yaml.load(f)
     tmp_folder = "test/test_output/ASN1"
     with EnsureCleanup(tmp_folder) as ec:
-        warnings.simplefilter("ignore", UserWarning)
         filenames = write_dfn(node, tmp_folder, cdffpath = "CDFF/")
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
@@ -140,7 +139,7 @@ def test_asn1():
 
         incdirs = ["test/test_output/", "CDFF/DFNs", ctypespath, dfnspath]
         build_extension(
-            tmp_folder, hide_stderr=False,
+            tmp_folder, hide_stderr=True,
             name="dfn_ci_" + node["name"].lower(),
             pyx_filename=os.path.join(tmp_folder, "python",
                 "dfn_ci_" + node["name"].lower() + ".pyx"),
