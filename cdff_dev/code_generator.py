@@ -12,7 +12,7 @@ class BasicTypeInfo(object):
         self.typename = typename
 
     @classmethod
-    def handles(cls, typename):
+    def handles(cls, typename, cdffpath):
         return typename in cls.BASICTYPES
 
     def include(self):
@@ -42,7 +42,7 @@ class DefaultTypeInfo(object):
             "and you might have to change the Python wrapper." % self.typename)
 
     @classmethod
-    def handles(cls, typename):
+    def handles(cls, typename, cdffpath):
         return True
 
     def include(self):
@@ -101,17 +101,14 @@ class TypeRegistry(object):  # TODO global, read from config files
 
     def get_info(self, typename):
         for TypeInfo in self.TYPEINFOS:
-            if TypeInfo == ASN1TypeInfo:
-                type_found = TypeInfo.handles(typename, self.cdffpath)
-            else:
-                type_found = TypeInfo.handles(typename)
+            type_found = TypeInfo.handles(typename, self.cdffpath)
             if type_found:
                 if typename not in self.cache:
                     self.cache[typename] = TypeInfo(typename)
                 return self.cache[typename]
         else:
             raise NotImplementedError("No type info for '%s' available."
-                                      % typename) #TODO: this error would never be triggered since DefaultTypeInfo with always return true
+                                      % typename) # this error would never be triggered since DefaultTypeInfo with always return true
 
 
 def write_dfn(node, output, source_folder=".", python_folder="python",
@@ -137,7 +134,6 @@ def write_dfn(node, output, source_folder=".", python_folder="python",
     cdffpath : str, optional (default: 'CDFF')
         Path to CDFF
     """
-
     node = validate(node)
 
     type_registry = TypeRegistry(cdffpath)
@@ -217,10 +213,8 @@ def write_class(node, type_registry, template_base, class_name,
     definition_filename = "%s.cpp" % class_name
 
     includes = set()
-    for input_port in node["input_ports"]:
-        includes.add(type_registry.get_info(input_port["type"]).include())
-    for output_port in node["output_ports"]:
-        includes.add(type_registry.get_info(output_port["type"]).include())
+    for port in node["input_ports"] + node["output_ports"]:
+        includes.add(type_registry.get_info(port["type"]).include())
 
     node_base_declaration = render(
         "%s.hpp" % template_base, node=node, includes=includes,
@@ -246,11 +240,8 @@ def write_cython(node, type_registry, template_base,
     pyx_filename = "dfn_ci_%s.pyx" % (node["name"].lower())
 
     import_cdfftypes = False
-    for input_port in node["input_ports"]:
-        if type_registry.get_info(input_port["type"]).has_cdfftype():
-            import_cdfftypes = True
-    for output_port in node["output_ports"]:
-        if type_registry.get_info(output_port["type"]).has_cdfftype():
+    for port in node["input_ports"] + node["output_ports"]:
+        if type_registry.get_info(port["type"]).has_cdfftype():
             import_cdfftypes = True
 
     pxd_file = render(
