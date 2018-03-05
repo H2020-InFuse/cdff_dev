@@ -801,3 +801,47 @@ def test_rigid_body_state_get_set_cov_angular_velocity():
     rbs.cov_angular_velocity.fromarray(np.eye(3))
     assert_array_almost_equal(rbs.cov_angular_velocity.toarray(), np.eye(3))
 
+
+def test_joint_state_get_set_position():
+    js = cdff_types.JointState()
+    js.position = 5.0
+    assert_equal(js.position, 5.0)
+    assert_equal(
+        str(js), "{type: JointState, position: 5.00, speed: 0.00, "
+        "effort: 0.00, raw: 0.00, acceleration: 0.00}")
+
+
+def test_joint_state_get_set_speed():
+    js = cdff_types.JointState()
+    js.speed = 5.0
+    assert_equal(js.speed, 5.0)
+    assert_equal(
+        str(js), "{type: JointState, position: 0.00, speed: 5.00, "
+        "effort: 0.00, raw: 0.00, acceleration: 0.00}")
+
+
+def test_joint_state_get_set_effort():
+    js = cdff_types.JointState()
+    js.effort = 5.0
+    assert_equal(js.effort, 5.0)
+    assert_equal(
+        str(js), "{type: JointState, position: 0.00, speed: 0.00, "
+        "effort: 5.00, raw: 0.00, acceleration: 0.00}")
+
+
+def test_joint_state_get_set_raw():
+    js = cdff_types.JointState()
+    js.raw = 5.0
+    assert_equal(js.raw, 5.0)
+    assert_equal(
+        str(js), "{type: JointState, position: 0.00, speed: 0.00, "
+        "effort: 0.00, raw: 5.00, acceleration: 0.00}")
+
+
+def test_joint_state_get_set_acceleration():
+    js = cdff_types.JointState()
+    js.acceleration = 5.0
+    assert_equal(js.acceleration, 5.0)
+    assert_equal(
+        str(js), "{type: JointState, position: 0.00, speed: 0.00, "
+        "effort: 0.00, raw: 0.00, acceleration: 5.00}")
