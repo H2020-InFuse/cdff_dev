@@ -15,7 +15,8 @@ def test_load_log():
 
 def test_replay():
     log = logloader.load_log("test/test_data/logs/test_log.msg")
-    stream_names = ["/hokuyo.scans", "/dynamixel.transforms"]
+    stream_names = ["/hokuyo.scans", "/dynamixel.transforms",
+                    "/dynamixel.status_samples"]
     timestamps = []
     for timestamp, stream_name, typename, sample in logloader.replay(
             stream_names, log, verbose=0):

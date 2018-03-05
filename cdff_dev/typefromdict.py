@@ -60,6 +60,8 @@ def _assign_list(obj, data):
         if type(data[i]) == list:  # special case: matrices
             for j in range(len(data[i])):
                 obj[i, j] = data[i][j]
+        elif type(data[i]) == dict:  # nested types
+            _assign_dict(obj[i], data[i])
         else:
             obj[i] = data[i]
 
