@@ -1,6 +1,8 @@
 from libcpp cimport bool
 from libcpp.string cimport string
-cimport _cdff_types 
+{%- if import_cdfftypes %}
+cimport _cdff_types
+{%- endif %}
 
 cdef extern from "{{ node["name"] }}Interface.hpp" namespace "dfn_ci":
     cdef cppclass {{ node["name"] }}Interface:
@@ -21,4 +23,5 @@ cdef extern from "{{ node["name"] }}Interface.hpp" namespace "dfn_ci":
 cdef extern from "{{ class_name }}.hpp" namespace "dfn_ci":
     cdef cppclass {{ class_name }}({{ node["name"] }}Interface):
         pass
+{{ break }}
 {%- endfor %}

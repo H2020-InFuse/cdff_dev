@@ -3,6 +3,7 @@ import yaml
 import warnings
 from cdff_dev.code_generator import write_dfn
 from cdff_dev.testing import EnsureCleanup, build_extension
+from cdff_dev.path import check_cdffpath, CTYPESDIR
 from nose.tools import assert_true, assert_equal, assert_raises_regex, \
     assert_true
 
@@ -129,17 +130,21 @@ def test_asn1():
     tmp_folder = "test/test_output/ASN1"
     with EnsureCleanup(tmp_folder) as ec:
         warnings.simplefilter("ignore", UserWarning)
-        filenames = write_dfn(node, tmp_folder)
+        filenames = write_dfn(node, tmp_folder, cdffpath = "CDFF/")
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
+        cdffpath = "CDFF"
+        check_cdffpath(cdffpath)
+        ctypespath = os.path.join(cdffpath, CTYPESDIR)
+        dfnspath = os.path.join(cdffpath, "DFNs")
 
-        incdirs = ["test/test_output/", "CDFF/DFNs"]
+        incdirs = ["test/test_output/", "CDFF/DFNs", ctypespath, dfnspath]
         build_extension(
             tmp_folder, hide_stderr=False,
             name="dfn_ci_" + node["name"].lower(),
             pyx_filename=os.path.join(tmp_folder, "python",
                 "dfn_ci_" + node["name"].lower() + ".pyx"),
-            implementation=map(lambda filename: os.path.join(tmp_folder, "src",
+            implementation=map(lambda filename: os.path.join(tmp_folder,
                 filename),
             ["ASN1Test.cpp", "ASN1TestInterface.cpp"]),
             sourcedir=tmp_folder, incdirs=incdirs,
@@ -148,7 +153,6 @@ def test_asn1():
         )
         import dfn_ci_asn1test
         asn1_test = dfn_ci_asn1test.ASN1Test()
-        assert_true(asn1_test.configure())
-        asn1_test.currentTimeInput(5.0)
-        assert_true(asn1_test.process())
-        assert_equal(6.0, asn1_test.nextTimeOutput())
+        asn1_test.configure()
+        asn1_test.process()
+        assert_equal(1000000, asn1_test.nextTimeOutput().microseconds)

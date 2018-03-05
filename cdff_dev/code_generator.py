@@ -28,6 +28,9 @@ class BasicTypeInfo(object):
     def copy_on_assignment(self):
         return True
 
+    def has_cdfftype(self):
+        return False
+
 
 class DefaultTypeInfo(object):
     """Handles any type."""
@@ -55,6 +58,8 @@ class DefaultTypeInfo(object):
     def copy_on_assignment(self):
         return True  # TODO really?
 
+    def has_cdfftype(self):
+        return False
 
 class ASN1TypeInfo(object):
     """Information about ASN1 types."""
@@ -67,7 +72,7 @@ class ASN1TypeInfo(object):
 
     def include(self):
         """C++ include header."""
-        return "Types/C/"+self.typename+".h"
+        return self.typename+".h"
 
     def cython_type(self):
         return "_cdff_types." + self.typename
@@ -83,6 +88,9 @@ class ASN1TypeInfo(object):
         """Search generated ASN1 types."""
         types_path = os.path.join(cdffpath,"Common/Types/C/")
         return os.listdir(types_path)
+
+    def has_cdfftype(self):
+        return True
 
 class TypeRegistry(object):  # TODO global, read from config files
     TYPEINFOS = [BasicTypeInfo, ASN1TypeInfo, DefaultTypeInfo]
@@ -237,19 +245,28 @@ def write_cython(node, type_registry, template_base,
     _pxd_filename = "_dfn_ci_%s.pxd" % (node["name"].lower())
     pyx_filename = "dfn_ci_%s.pyx" % (node["name"].lower())
 
+    import_cdfftypes = False
+    for input_port in node["input_ports"]:
+        if type_registry.get_info(input_port["type"]).has_cdfftype():
+            import_cdfftypes = True
+    for output_port in node["output_ports"]:
+        if type_registry.get_info(output_port["type"]).has_cdfftype():
+            import_cdfftypes = True
+
     pxd_file = render(
         "%s.pxd" % template_base, node=node)
     target = os.path.join(target_folder, pxd_filename)
     result[target] = pxd_file
 
     _pxd_file = render(
-        "_%s.pxd" % template_base, node=node, type_registry=type_registry)
+        "_%s.pxd" % template_base, node=node, type_registry=type_registry,
+        import_cdfftypes=import_cdfftypes)
     target = os.path.join(target_folder, _pxd_filename)
     result[target] = _pxd_file
 
     pyx_file = render(
-        "%s.pyx" % template_base, node=node,
-        type_registry=type_registry)
+        "%s.pyx" % template_base, node=node, type_registry=type_registry,
+        import_cdfftypes=import_cdfftypes)
     target = os.path.join(target_folder, pyx_filename)
     result[target] = pyx_file
 
