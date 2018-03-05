@@ -78,8 +78,6 @@ Nosetests can be installed with pip:
 
     sudo pip3 install nose
 
-Note that this version of nosetests
-
 ## Contributing
 
 It is not allowed to push directly to the master branch. To develop a new
