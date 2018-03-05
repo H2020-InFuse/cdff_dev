@@ -61,6 +61,7 @@ class DefaultTypeInfo(object):
     def has_cdfftype(self):
         return False
 
+
 class ASN1TypeInfo(object):
     """Information about ASN1 types."""
     def __init__(self, typename):
@@ -86,13 +87,14 @@ class ASN1TypeInfo(object):
     @classmethod
     def search_asn1_type(cls, cdffpath):
         """Search generated ASN1 types."""
-        types_path = os.path.join(cdffpath,"Common/Types/C/")
+        types_path = os.path.join(cdffpath, "Common/Types/C/")
         return os.listdir(types_path)
 
     def has_cdfftype(self):
         return True
 
-class TypeRegistry(object):  # TODO global, read from config files
+
+class TypeRegistry(object):
     TYPEINFOS = [BasicTypeInfo, ASN1TypeInfo, DefaultTypeInfo]
     """Registry for InFuse type information."""
     def __init__(self, cdffpath):
@@ -107,8 +109,10 @@ class TypeRegistry(object):  # TODO global, read from config files
                     self.cache[typename] = TypeInfo(typename)
                 return self.cache[typename]
         else:
+            # this error would never be triggered since DefaultTypeInfo with
+            # always return true
             raise NotImplementedError("No type info for '%s' available."
-                                      % typename) # this error would never be triggered since DefaultTypeInfo with always return true
+                                      % typename)
 
 
 def write_dfn(node, output, source_folder=".", python_folder="python",

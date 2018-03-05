@@ -4,8 +4,7 @@ import warnings
 from cdff_dev.code_generator import write_dfn
 from cdff_dev.testing import EnsureCleanup, build_extension
 from cdff_dev.path import check_cdffpath, CTYPESDIR
-from nose.tools import assert_true, assert_equal, assert_raises_regex, \
-    assert_true
+from nose.tools import assert_true, assert_equal, assert_raises_regex
 
 
 def test_generate_files():
@@ -80,9 +79,11 @@ def test_unknown_type():
             build_extension,
             tmp_folder, hide_stderr=True,
             name="dfn_ci_" + node["name"].lower(),
-            pyx_filename=os.path.join(tmp_folder, "python", "dfn_ci_" + node["name"].lower() + ".pyx"),
-            implementation=map(lambda filename: os.path.join(tmp_folder, filename),
-                               ["UnknownType.cpp", "UnknownTypeInterface.cpp"]),
+            pyx_filename=os.path.join(tmp_folder, "python", "dfn_ci_" +
+                                      node["name"].lower() + ".pyx"),
+            implementation=map(
+                lambda filename: os.path.join(tmp_folder, filename),
+                ["UnknownType.cpp", "UnknownTypeInterface.cpp"]),
             sourcedir=tmp_folder, incdirs=incdirs,
             compiler_flags=[], library_dirs=[], libraries=[],
             includes=[]
@@ -103,10 +104,11 @@ def test_multiple_implementations():
             tmp_folder, hide_stderr=True,
             name="dfn_ci_" + node["name"].lower(),
             pyx_filename=os.path.join(
-                tmp_folder, "python", "dfn_ci_" + node["name"].lower() + ".pyx"),
-            implementation=map(lambda filename: os.path.join(tmp_folder, filename),
-                               ["Iterative.cpp", "Recursive.cpp",
-                                "FactorialInterface.cpp"]),
+                tmp_folder, "python", "dfn_ci_" + node["name"].lower() +
+                ".pyx"),
+            implementation=map(
+                lambda filename: os.path.join(tmp_folder, filename),
+                ["Iterative.cpp", "Recursive.cpp", "FactorialInterface.cpp"]),
             sourcedir=tmp_folder, incdirs=incdirs,
             compiler_flags=[], library_dirs=[], libraries=[],
             includes=[]
@@ -129,7 +131,7 @@ def test_asn1():
         node = yaml.load(f)
     tmp_folder = "test/test_output/ASN1"
     with EnsureCleanup(tmp_folder) as ec:
-        filenames = write_dfn(node, tmp_folder, cdffpath = "CDFF/")
+        filenames = write_dfn(node, tmp_folder, cdffpath="CDFF/")
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
         cdffpath = "CDFF"
@@ -141,11 +143,12 @@ def test_asn1():
         build_extension(
             tmp_folder, hide_stderr=True,
             name="dfn_ci_" + node["name"].lower(),
-            pyx_filename=os.path.join(tmp_folder, "python",
-                "dfn_ci_" + node["name"].lower() + ".pyx"),
-            implementation=map(lambda filename: os.path.join(tmp_folder,
-                filename),
-            ["ASN1Test.cpp", "ASN1TestInterface.cpp"]),
+            pyx_filename=os.path.join(
+                tmp_folder, "python", "dfn_ci_" + node["name"].lower() +
+                ".pyx"),
+            implementation=map(
+                lambda filename: os.path.join(tmp_folder, filename),
+                ["ASN1Test.cpp", "ASN1TestInterface.cpp"]),
             sourcedir=tmp_folder, incdirs=incdirs,
             compiler_flags=[], library_dirs=[], libraries=[],
             includes=[]
