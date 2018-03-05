@@ -234,6 +234,8 @@ cdef extern from "Joints.h":
         JointState[30] arr
 
     cdef cppclass Joints:
+        Joints& assign "operator="(Joints&)
+
         Time timestamp
         Joints_names names
         Joints_elements elements

@@ -845,3 +845,38 @@ def test_joint_state_get_set_acceleration():
     assert_equal(
         str(js), "{type: JointState, position: 0.00, speed: 0.00, "
         "effort: 0.00, raw: 0.00, acceleration: 5.00}")
+
+
+def test_joints_get_set_time():
+    joints = cdff_types.Joints()
+    assert_equal(joints.timestamp.microseconds, 0)
+    joints.timestamp.microseconds = 500
+    assert_equal(joints.timestamp.microseconds, 500)
+    time = cdff_types.Time()
+    time.microseconds = 1000
+    joints.timestamp = time
+    assert_equal(joints.timestamp.microseconds, 1000)
+
+
+def test_joints_get_set_names():
+    joints = cdff_types.Joints()
+    joints.names.resize(3)
+    joints.names[0] = "joint0"
+    joints.names[1] = "joint1"
+    joints.names[2] = "joint2"
+    assert_equal(joints.names[0], "joint0")
+    assert_equal(joints.names[1], "joint1")
+    assert_equal(joints.names[2], "joint2")
+
+
+def test_joints_get_set_elements():
+    joints = cdff_types.Joints()
+    joints.elements.resize(2)
+    js1 = cdff_types.JointState()
+    js1.position = 1.0
+    joints.elements[0] = js1
+    js2 = cdff_types.JointState()
+    js2.position = 2.0
+    joints.elements[1] = js2
+    assert_equal(joints.elements[0].position, 1.0)
+    assert_equal(joints.elements[1].position, 2.0)

@@ -107,3 +107,11 @@ cdef class JointState:
 cdef class Joints:
     cdef _cdff_types.Joints* thisptr
     cdef bool delete_thisptr
+
+
+cdef class Joints_namesReference:
+    cdef _cdff_types.Joints_names* thisptr
+
+
+cdef class Joints_elementsReference:
+    cdef _cdff_types.Joints_elements* thisptr

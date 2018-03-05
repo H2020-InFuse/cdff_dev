@@ -988,3 +988,105 @@ cdef class JointState:
         self.thisptr.acceleration = acceleration
 
     acceleration = property(_get_acceleration, _set_acceleration)
+
+
+cdef class Joints:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_types.Joints()
+        self.delete_thisptr = True
+
+    def __str__(self):
+        return str("{type: Joints, ...}") # TODO
+
+    def assign(self, Joints other):
+        self.thisptr.assign(deref(other.thisptr))
+
+    def _get_timestamp(self):
+        cdef Time timestamp = Time()
+        del timestamp.thisptr
+        timestamp.thisptr = &self.thisptr.timestamp
+        timestamp.delete_thisptr = False
+        return timestamp
+
+    def _set_timestamp(self, Time timestamp):
+        self.thisptr.timestamp = deref(timestamp.thisptr)
+
+    timestamp = property(_get_timestamp, _set_timestamp)
+
+    @property
+    def names(self):
+        cdef Joints_namesReference names = Joints_namesReference()
+        names.thisptr = &self.thisptr.names
+        return names
+
+    @property
+    def elements(self):
+        cdef Joints_elementsReference elements = Joints_elementsReference()
+        elements.thisptr = &self.thisptr.elements
+        return elements
+
+
+cdef class Joints_namesReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def __getitem__(self, int i):
+        cdef bytes name = self.thisptr.arr[i].arr
+        return name.decode()
+
+    def __setitem__(self, int i, str name):
+        if i >= 30:
+            warnings.warn("Maximum size of Joints is 30")
+            return
+        cdef string value = name.encode()
+        self.thisptr.arr[i].arr = value.c_str()
+
+    def resize(self, int size):
+        if size > 30:
+            warnings.warn("Maximum size of Joints is 30")
+            return
+        self.thisptr.nCount = size
+
+    def size(self):
+        return self.thisptr.nCount
+
+
+cdef class Joints_elementsReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def __getitem__(self, int i):
+        cdef JointState joint_state = JointState()
+        joint_state.delete_thisptr = False
+        del joint_state.thisptr
+        joint_state.thisptr = &self.thisptr.arr[i]
+        return joint_state
+
+    def __setitem__(self, int i, JointState joint_state):
+        if i >= 30:
+            warnings.warn("Maximum size of Joints is 30")
+            return
+        self.thisptr.arr[i] = deref(joint_state.thisptr)
+
+    def resize(self, int size):
+        if size > 30:
+            warnings.warn("Maximum size of Joints is 30")
+            return
+        self.thisptr.nCount = size
+
+    def size(self):
+        return self.thisptr.nCount
