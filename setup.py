@@ -38,7 +38,16 @@ def configuration(parent_package='', top_path=None):
         (".", "cdff_types.pyx")
     )
 
-    cdffpath = "CDFF"  # TODO
+    if "CDFFPATH" in os.environ:
+        cdffpath = os.environ.get("CDFFPATH")
+    elif os.path.exists("cdffpath"):
+        with open("cdffpath", "r") as f:
+            cdffpath = f.read()
+    else:
+        cdffpath = input("Please enter the path to CDFF:")
+        with open("cdffpath", "w") as f:
+            f.write(cdffpath)
+
     check_cdffpath(cdffpath)
     ctypespath = os.path.join(cdffpath, CTYPESDIR)
 
