@@ -158,48 +158,6 @@ def write_dfn(node, output, source_folder=".", python_folder="python",
     return interface_files + implementation_files + cython_files
 
 
-def validate_node(node):
-    """Validate node description.
-
-    Raises a DFNDescriptionException if validation is not
-    successful.
-
-    A validated node contains:
-    - name
-    - input_ports
-    - output_ports
-    - implementations
-
-    Parameters
-    ----------
-    node : dict
-        Node description
-
-    Returns
-    -------
-    validated_node : dict
-        Validated node description
-    """
-    validated_node = {}
-    validated_node.update(node)
-
-    if "name" not in node:
-        raise DFNDescriptionException(
-            "DFN description has no attribute 'name'.")
-
-    if "input_ports" not in node:
-        validated_node["input_ports"] = []
-
-    if "output_ports" not in node:
-        validated_node["output_ports"] = []
-
-    if "implementations" not in node:
-        validated_node["implementations"] = [node["name"]]
-    # TODO validate each input and output port: name and type
-
-    return validated_node
-
-
 class DFNDescriptionException(Exception):
     def __init__(self, msg):
         super(Exception, self).__init__(msg)
@@ -248,6 +206,43 @@ def write_dfpc(dfpc, output, source_folder=".", python_folder="python",
     return interface_files + implementation_files + cython_files
 
 
+def validate_node(node):
+    """Validate node description.
+
+    Raises a DFNDescriptionException if validation is not
+    successful.
+
+    A validated node contains:
+    - name
+    - input_ports
+    - output_ports
+    - implementations
+
+    Parameters
+    ----------
+    node : dict
+        Node description
+
+    Returns
+    -------
+    validated_node : dict
+        Validated node description
+    """
+    validated_node = {}
+    validated_node.update(node)
+
+    if "name" not in node:
+        raise DFNDescriptionException(
+            "DFN description has no attribute 'name'.")
+
+    _validate_ports(validated_node)
+
+    if "implementations" not in node:
+        validated_node["implementations"] = [node["name"]]
+
+    return validated_node
+
+
 def validate_dfpc(dfpc):
     """Validate DFPC description.
 
@@ -278,17 +273,22 @@ def validate_dfpc(dfpc):
         raise DFPCDescriptionException(
             "DFPC description has no attribute 'name'.")
 
-    if "input_ports" not in dfpc:
-        validated_dfpc["input_ports"] = []
-
-    if "output_ports" not in dfpc:
-        validated_dfpc["output_ports"] = []
+    _validate_ports(validated_dfpc)
 
     if "target" not in dfpc:
         validated_dfpc["target"] = ["Dummy"]
-    # TODO validate each input and output port: name and type
 
     return validated_dfpc
+
+
+def _validate_ports(desc):
+    if "input_ports" not in desc:
+        desc["input_ports"] = []
+
+    if "output_ports" not in desc:
+        desc["output_ports"] = []
+
+    # TODO validate each input and output port: name and type
 
 
 class DFPCDescriptionException(Exception):
