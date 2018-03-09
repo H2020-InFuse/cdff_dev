@@ -138,7 +138,7 @@ def write_dfn(node, output, source_folder=".", python_folder="python",
     cdffpath : str, optional (default: 'CDFF')
         Path to CDFF
     """
-    node = validate(node)
+    node = validate_node(node)
 
     type_registry = TypeRegistry(cdffpath)
     src_dir = os.path.join(output, source_folder)
@@ -162,7 +162,7 @@ def write_dfn(node, output, source_folder=".", python_folder="python",
     return interface_files + implementation_files + cython_files
 
 
-def validate(node):
+def validate_node(node):
     """Validate node description.
 
     Raises a DFNDescriptionException if validation is not
