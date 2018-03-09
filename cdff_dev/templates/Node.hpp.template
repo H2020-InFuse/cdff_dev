@@ -1,11 +1,11 @@
 #ifndef {{ class_name.upper() }}_HPP
 #define {{ class_name.upper() }}_HPP
-#include "{{ node["name"] }}Interface.hpp"
+#include "{{ desc["name"] }}Interface.hpp"
 
 
 
 namespace dfn_ci {
-    class {{ class_name }} : public {{ node["name"] }}Interface
+    class {{ class_name }} : public {{ desc["name"] }}Interface
     {
         public:
             {{ class_name }}();

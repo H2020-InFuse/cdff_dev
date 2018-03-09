@@ -1,25 +1,25 @@
-#include "{{ dfpc["name"] }}Interface.hpp"
+#include "{{ desc["name"] }}Interface.hpp"
 
 
 namespace dfpc_ci {
 
-{{ dfpc["name"] }}Interface::{{ dfpc["name"] }}Interface()
+{{ desc["name"] }}Interface::{{ desc["name"] }}Interface()
 {
 }
 
-{{ dfpc["name"] }}Interface::~{{ dfpc["name"] }}Interface()
+{{ desc["name"] }}Interface::~{{ desc["name"] }}Interface()
 {
 }
 {{ space }}
-{%- for input_port in dfpc["input_ports"] %}
-void {{ dfpc["name"] }}Interface::{{ input_port["name"] }}Input(const {{ input_port["type"] }}& data) {
+{%- for input_port in desc["input_ports"] %}
+void {{ desc["name"] }}Interface::{{ input_port["name"] }}Input(const {{ input_port["type"] }}& data) {
     in{{ input_port["name"].lower() }} = data;
 }
 {{ space }}
 {%- endfor %}
 
-{%- for output_port in dfpc["output_ports"] %}
-{{ output_port["type"] }} {{ node["name"] }}Interface::{{ output_port["name"] }}Output() {
+{%- for output_port in desc["output_ports"] %}
+{{ output_port["type"] }} {{ desc["name"] }}Interface::{{ output_port["name"] }}Output() {
     return out{{ output_port["name"].lower() }};
 }
 {%- endfor %}

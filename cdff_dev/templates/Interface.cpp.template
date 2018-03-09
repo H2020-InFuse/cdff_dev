@@ -1,25 +1,25 @@
-#include "{{ node["name"] }}Interface.hpp"
+#include "{{ desc["name"] }}Interface.hpp"
 
 
 namespace dfn_ci {
 
-{{ node["name"] }}Interface::{{ node["name"] }}Interface()
+{{ desc["name"] }}Interface::{{ desc["name"] }}Interface()
 {
 }
 
-{{ node["name"] }}Interface::~{{ node["name"] }}Interface()
+{{ desc["name"] }}Interface::~{{ desc["name"] }}Interface()
 {
 }
 {{ space }}
-{%- for input_port in node["input_ports"] %}
-void {{ node["name"] }}Interface::{{ input_port["name"] }}Input(const {{ input_port["type"] }}& data) {
+{%- for input_port in desc["input_ports"] %}
+void {{ desc["name"] }}Interface::{{ input_port["name"] }}Input(const {{ input_port["type"] }}& data) {
     in{{ input_port["name"].lower() }} = data;
 }
 {{ space }}
 {%- endfor %}
 
-{%- for output_port in node["output_ports"] %}
-{{ output_port["type"] }} {{ node["name"] }}Interface::{{ output_port["name"] }}Output() {
+{%- for output_port in desc["output_ports"] %}
+{{ output_port["type"] }} {{ desc["name"] }}Interface::{{ output_port["name"] }}Output() {
     return out{{ output_port["name"].lower() }};
 }
 {%- endfor %}

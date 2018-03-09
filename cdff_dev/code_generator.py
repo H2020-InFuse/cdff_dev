@@ -234,7 +234,7 @@ def write_dfpc(dfpc, output, source_folder=".", python_folder="python",
     src_dir, python_dir = _prepare_output_directory(
         output, source_folder, python_folder)
     interface_files = write_class(
-        dfpc, type_registry, "Interface",
+        dfpc, type_registry, "DFPCInterface",
         "%sInterface" % dfpc["name"], target_folder=src_dir,
         force_overwrite=True)
     implementation_files = []
@@ -306,7 +306,7 @@ def _prepare_output_directory(output, source_folder, python_folder):
     return src_dir, python_dir
 
 
-def write_class(node, type_registry, template_base, class_name,
+def write_class(desc, type_registry, template_base, class_name,
                 target_folder="src", force_overwrite=False):
     result = {}
 
@@ -317,17 +317,17 @@ def write_class(node, type_registry, template_base, class_name,
     for port in node["input_ports"] + node["output_ports"]:
         includes.add(type_registry.get_info(port["type"]).include())
 
-    node_base_declaration = render(
-        "%s.hpp" % template_base, node=node, includes=includes,
+    base_declaration = render(
+        "%s.hpp" % template_base, desc=desc, includes=includes,
         class_name=class_name)
     target = os.path.join(target_folder, declaration_filename)
-    result[target] = node_base_declaration
+    result[target] = base_declaration
 
-    node_base_definition = render(
+    base_definition = render(
         "%s.cpp" % template_base, declaration_filename=declaration_filename,
-        node=node, class_name=class_name)
+        desc=desc, class_name=class_name)
     target = os.path.join(target_folder, definition_filename)
-    result[target] = node_base_definition
+    result[target] = base_definition
 
     return write_result(result, force_overwrite)
 

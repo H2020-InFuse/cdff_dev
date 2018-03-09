@@ -1,5 +1,5 @@
-#ifndef {{ dfpc["name"].upper() }}_INTERFACE_HPP
-#define {{ dfpc["name"].upper() }}_INTERFACE_HPP
+#ifndef {{ desc["name"].upper() }}_INTERFACE_HPP
+#define {{ desc["name"].upper() }}_INTERFACE_HPP
 #include "DFPCCommonInterface.hpp"
 {%- for include in includes %}
 {%- if include %}
@@ -8,12 +8,12 @@
 {%- endfor %}
 
 namespace dfpc_ci {
-    class {{ dfpc["name"] }}Interface : public DFPCCommonInterface
+    class {{ desc["name"] }}Interface : public DFPCCommonInterface
     {
         public:
-            {{ dfpc["name"] }}Interface();
-            virtual ~{{ dfpc["name"] }}Interface();
-            {%- for input_port in dfpc["input_ports"] %}
+            {{ desc["name"] }}Interface();
+            virtual ~{{ desc["name"] }}Interface();
+            {%- for input_port in desc["input_ports"] %}
             /**
             * Send value to input port {{ input_port["name"] }}
             * @param {{ input_port["name"] }}, {{ input_port["doc"] }}
@@ -21,7 +21,7 @@ namespace dfpc_ci {
             virtual void {{ input_port["name"] }}Input(const {{ input_port["type"] }}& data);
             {%- endfor %}
 {{ space }}
-            {%- for output_port in dfpc["output_ports"] %}
+            {%- for output_port in desc["output_ports"] %}
             /**
             * Receive value from output port {{ output_port["name"] }}
             * @return {{ output_port["name"] }}, {{ output_port["doc"] }}
@@ -30,10 +30,10 @@ namespace dfpc_ci {
             {%- endfor %}
 
         protected:
-        {%- for input_port in dfpc["input_ports"] %}
+        {%- for input_port in desc["input_ports"] %}
             {{ input_port["type"] }} in{{ input_port["name"].lower() }};
         {%- endfor %}
-        {%- for output_port in dfpc["output_ports"] %}
+        {%- for output_port in desc["output_ports"] %}
             {{ output_port["type"] }} out{{ output_port["name"].lower() }};
         {%- endfor %}
     };
