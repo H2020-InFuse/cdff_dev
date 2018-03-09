@@ -115,6 +115,7 @@ class TypeRegistry(object):
                                       % typename)
 
 
+# TODO refactor write_dfn / write_dfpc
 def write_dfn(node, output, source_folder=".", python_folder="python",
               cdffpath="CDFF"):
     """Generate code templates for a data fusion node (DFN).
@@ -141,13 +142,8 @@ def write_dfn(node, output, source_folder=".", python_folder="python",
     node = validate_node(node)
 
     type_registry = TypeRegistry(cdffpath)
-    src_dir = os.path.join(output, source_folder)
-    python_dir = os.path.join(output, python_folder)
-
-    if not os.path.exists(src_dir):
-        os.makedirs(src_dir)
-    if not os.path.exists(python_dir):
-        os.makedirs(python_dir)
+    src_dir, python_dir = _prepare_output_directory(
+        output, source_folder, python_folder)
     interface_files = write_class(
         node, type_registry, "Interface",
         "%sInterface" % node["name"], target_folder=src_dir,
@@ -235,12 +231,8 @@ def write_dfpc(dfpc, output, source_folder=".", python_folder="python",
     dfpc = validate_dfpc(dfpc)
 
     type_registry = TypeRegistry()
-    src_dir = os.path.join(output, source_folder)
-    python_dir = os.path.join(output, python_folder)
-    if not os.path.exists(src_dir):
-        os.makedirs(src_dir)
-    if not os.path.exists(python_dir):
-        os.makedirs(python_dir)
+    src_dir, python_dir = _prepare_output_directory(
+        output, source_folder, python_folder)
     interface_files = write_class(
         dfpc, type_registry, "Interface",
         "%sInterface" % dfpc["name"], target_folder=src_dir,
@@ -302,6 +294,16 @@ def validate_dfpc(dfpc):
 class DFPCDescriptionException(Exception):
     def __init__(self, msg):
         super(Exception, self).__init__(msg)
+
+
+def _prepare_output_directory(output, source_folder, python_folder):
+    src_dir = os.path.join(output, source_folder)
+    python_dir = os.path.join(output, python_folder)
+    if not os.path.exists(src_dir):
+        os.makedirs(src_dir)
+    if not os.path.exists(python_dir):
+        os.makedirs(python_dir)
+    return src_dir, python_dir
 
 
 def write_class(node, type_registry, template_base, class_name,
