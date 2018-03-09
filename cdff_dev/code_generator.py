@@ -209,6 +209,100 @@ class DFNDescriptionException(Exception):
         super(Exception, self).__init__(msg)
 
 
+def write_dfpc(dfpc, output, source_folder=".", python_folder="python",
+               cdffpath="CDFF"):
+    """Generate code templates for a data fusion processing compound (DFPC).
+
+    Parameters
+    ----------
+    dfpc : dict
+        DFPC configuration loaded from DFPC description file
+
+    output : str
+        Path to output directory
+
+    source_folder : str, optional (default: '.')
+        Subdirectory of the output directory that will contain the source code
+        template
+
+    python_folder : str, optional (default: 'python')
+        Subdirectory of the output directory that will contain the Python
+        bindings
+
+    cdffpath : str, optional (default: 'CDFF')
+        Path to CDFF
+    """
+    dfpc = validate_dfpc(dfpc)
+
+    type_registry = TypeRegistry()
+    src_dir = os.path.join(output, source_folder)
+    python_dir = os.path.join(output, python_folder)
+    if not os.path.exists(src_dir):
+        os.makedirs(src_dir)
+    if not os.path.exists(python_dir):
+        os.makedirs(python_dir)
+    interface_files = write_class(
+        dfpc, type_registry, "Interface",
+        "%sInterface" % dfpc["name"], target_folder=src_dir,
+        force_overwrite=True)
+    implementation_files = []
+    for implementation in dfpc["implementations"]:
+        implementation_files.extend(
+            write_class(dfpc, type_registry, "Node", implementation,
+                        target_folder=src_dir))
+    cython_files = write_cython(dfpc, type_registry, "Node",
+                                target_folder=python_dir)
+    return interface_files + implementation_files + cython_files
+
+
+def validate_dfpc(dfpc):
+    """Validate DFPC description.
+
+    Raises a DFNDescriptionException if validation is not
+    successful.
+
+    A validated DFPC contains:
+    - name
+    - input_ports
+    - output_ports
+    - ...
+
+    Parameters
+    ----------
+    dfpc : dict
+        DFPC description
+
+    Returns
+    -------
+    validated_dfpc : dict
+        Validated DFPC description
+    """
+    validated_dfpc = {}
+    validated_dfpc.update(dfpc)
+
+    # TODO refactor with DFN
+    if "name" not in dfpc:
+        raise DFPCDescriptionException(
+            "DFPC description has no attribute 'name'.")
+
+    if "input_ports" not in dfpc:
+        validated_dfpc["input_ports"] = []
+
+    if "output_ports" not in dfpc:
+        validated_dfpc["output_ports"] = []
+
+    if "target" not in dfpc:
+        validated_dfpc["target"] = ["Dummy"]
+    # TODO validate each input and output port: name and type
+
+    return validated_dfpc
+
+
+class DFPCDescriptionException(Exception):
+    def __init__(self, msg):
+        super(Exception, self).__init__(msg)
+
+
 def write_class(node, type_registry, template_base, class_name,
                 target_folder="src", force_overwrite=False):
     result = {}
