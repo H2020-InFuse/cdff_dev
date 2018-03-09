@@ -246,12 +246,13 @@ def write_dfpc(dfpc, output, source_folder=".", python_folder="python",
         "%sInterface" % dfpc["name"], target_folder=src_dir,
         force_overwrite=True)
     implementation_files = []
-    for implementation in dfpc["implementations"]:
+    for implementation in dfpc["target"]:
         implementation_files.extend(
-            write_class(dfpc, type_registry, "Node", implementation,
-                        target_folder=src_dir))
+            write_class(
+                dfpc, type_registry, "Node", dfpc["name"] + implementation,
+                target_folder=src_dir))
     cython_files = write_cython(dfpc, type_registry, "Node",
-                                target_folder=python_dir)
+                                target_folder=python_dir, file_prefix="dfpc_ci")
     return interface_files + implementation_files + cython_files
 
 
@@ -330,12 +331,12 @@ def write_class(node, type_registry, template_base, class_name,
 
 
 def write_cython(node, type_registry, template_base,
-                 target_folder="python_binding"):
+                 target_folder="python_binding", file_prefix="dfn_ci"):
     result = {}
 
-    pxd_filename = "dfn_ci_%s.pxd" % (node["name"].lower())
-    _pxd_filename = "_dfn_ci_%s.pxd" % (node["name"].lower())
-    pyx_filename = "dfn_ci_%s.pyx" % (node["name"].lower())
+    pxd_filename = "%s_%s.pxd" % (file_prefix, node["name"].lower())
+    _pxd_filename = "_%s_%s.pxd" % (file_prefix, node["name"].lower())
+    pyx_filename = "%s_%s.pyx" % (file_prefix, node["name"].lower())
 
     import_cdfftypes = False
     for port in node["input_ports"] + node["output_ports"]:
