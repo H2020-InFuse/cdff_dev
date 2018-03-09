@@ -115,6 +115,16 @@ class TypeRegistry(object):
                                       % typename)
 
 
+class DFNDescriptionException(Exception):
+    def __init__(self, msg):
+        super(Exception, self).__init__(msg)
+
+
+class DFPCDescriptionException(Exception):
+    def __init__(self, msg):
+        super(Exception, self).__init__(msg)
+
+
 # TODO refactor write_dfn / write_dfpc
 def write_dfn(node, output, source_folder=".", python_folder="python",
               cdffpath="CDFF"):
@@ -156,11 +166,6 @@ def write_dfn(node, output, source_folder=".", python_folder="python",
     cython_files = write_cython(node, type_registry, "Node",
                                 target_folder=python_dir)
     return interface_files + implementation_files + cython_files
-
-
-class DFNDescriptionException(Exception):
-    def __init__(self, msg):
-        super(Exception, self).__init__(msg)
 
 
 def write_dfpc(dfpc, output, source_folder=".", python_folder="python",
@@ -289,11 +294,6 @@ def _validate_ports(desc):
         desc["output_ports"] = []
 
     # TODO validate each input and output port: name and type
-
-
-class DFPCDescriptionException(Exception):
-    def __init__(self, msg):
-        super(Exception, self).__init__(msg)
 
 
 def _prepare_output_directory(output, source_folder, python_folder):
