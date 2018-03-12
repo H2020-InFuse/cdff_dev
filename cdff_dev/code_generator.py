@@ -200,12 +200,9 @@ def write_dfpc(dfpc, output, source_folder=".", python_folder="python",
         dfpc, type_registry, "DFPCInterface",
         "%sInterface" % dfpc["name"], target_folder=src_dir,
         force_overwrite=True)
-    implementation_files = []
-    for implementation in dfpc["target"]:
-        implementation_files.extend(
-            write_class(
-                dfpc, type_registry, "Node", dfpc["name"] + implementation,
-                target_folder=src_dir))
+    implementation_files = write_class(
+        dfpc, type_registry, "Node", dfpc["name"],
+        target_folder=src_dir)
     cython_files = write_cython(dfpc, type_registry, "Node",
                                 target_folder=python_dir, file_prefix="dfpc_ci")
     return interface_files + implementation_files + cython_files
@@ -278,9 +275,6 @@ def validate_dfpc(dfpc):
             "DFPC description has no attribute 'name'.")
 
     _validate_ports(validated_dfpc)
-
-    if "target" not in dfpc:
-        validated_dfpc["target"] = ["Dummy"]
 
     return validated_dfpc
 
