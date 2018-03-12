@@ -193,7 +193,7 @@ def write_dfpc(dfpc, output, source_folder=".", python_folder="python",
     """
     dfpc = validate_dfpc(dfpc)
 
-    type_registry = TypeRegistry()
+    type_registry = TypeRegistry(cdffpath)
     src_dir, python_dir = _prepare_output_directory(
         output, source_folder, python_folder)
     interface_files = write_class(
@@ -340,7 +340,7 @@ def write_class(desc, type_registry, template_base, class_name,
     definition_filename = "%s.cpp" % class_name
 
     includes = set()
-    for port in node["input_ports"] + node["output_ports"]:
+    for port in desc["input_ports"] + desc["output_ports"]:
         includes.add(type_registry.get_info(port["type"]).include())
 
     base_declaration = render(
