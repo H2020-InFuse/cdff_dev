@@ -1,0 +1,13 @@
+name: TiltScan
+input_ports:
+    - name: Lidar2D
+      type: LaserScan
+      doc: "Point cloud taken from a 2D LIDAR sensor"
+    - name: Laser2BodyTf
+      type: RigidBodyState
+      doc: "Dynamic transformation between body and 2D laser frame"
+output_ports:
+    - name: pointcloud
+      type: Pointcloud
+      doc: "Merged pointcloud based on the input 2D scanns"
+
