@@ -460,16 +460,14 @@ def write_result(result, force_overwrite, verbose=0):
         Names of the files that have been written
     """
     written_files = []
-    msg = ""
+    msg_lines = []
     for filename, content in result.items():
         if os.path.exists(filename):
-            if msg:
-                msg += os.linesep
-            msg += "File '%s' exists already." % filename
+            msg_lines.append("File '%s' exists already." % filename)
             if force_overwrite:
-                msg += " Overwriting."
+                msg_lines[-1] += " Overwriting."
             else:
-                msg += " Not written."
+                msg_lines[-1] += " Not written."
 
             write = force_overwrite
         else:
@@ -481,6 +479,6 @@ def write_result(result, force_overwrite, verbose=0):
             written_files.append(filename)
 
     if verbose >= 1 and msg:
-        print(msg)
+        print(os.linesep.join(msg))
 
     return written_files
