@@ -1,0 +1,16 @@
+#ifndef {{ class_name.upper() }}_HPP
+#define {{ class_name.upper() }}_HPP
+#include "{{ desc["name"] }}Interface.hpp"
+
+
+
+namespace dfpc_ci {
+    class {{ class_name }} : public {{ desc["name"] }}Interface
+    {
+        public:
+            {{ class_name }}();
+            virtual ~{{ class_name }}();
+            // TODO
+    };
+}
+#endif

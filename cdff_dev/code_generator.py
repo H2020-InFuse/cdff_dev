@@ -201,7 +201,7 @@ def write_dfpc(dfpc, output, source_folder=".", python_folder="python",
         "%sInterface" % dfpc["name"], target_folder=src_dir,
         force_overwrite=True)
     implementation_files = write_class(
-        dfpc, type_registry, "Node", dfpc["name"],
+        dfpc, type_registry, "DFPCImplementation", dfpc["name"],
         target_folder=src_dir)
     cython_files = write_cython(dfpc, type_registry, "Node",
                                 target_folder=python_dir, file_prefix="dfpc_ci")

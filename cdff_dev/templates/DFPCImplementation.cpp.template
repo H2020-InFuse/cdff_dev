@@ -1,0 +1,15 @@
+#include "{{ class_name }}.hpp"
+
+namespace dfpc_ci {
+
+{{ class_name }}::{{ class_name }}()
+{
+}
+
+{{ class_name }}::~{{ class_name }}()
+{
+}
+
+// TODO
+
+}
