@@ -273,7 +273,6 @@ def validate_dfpc(dfpc):
     validated_dfpc = {}
     validated_dfpc.update(dfpc)
 
-    # TODO refactor with DFN
     if "name" not in dfpc:
         raise DFPCDescriptionException(
             "DFPC description has no attribute 'name'.")
@@ -308,6 +307,33 @@ def _prepare_output_directory(output, source_folder, python_folder):
 
 def write_class(desc, type_registry, template_base, class_name,
                 target_folder="src", force_overwrite=False):
+    """Write a C++ class.
+
+    Parameters
+    ----------
+    desc : dict
+        Description of the object that should be generated
+
+    type_registry : TypeRegistry
+        Registry for type information
+
+    template_base : str
+        Base name of the template that should be used, e.g., 'Node'
+
+    class_name : str
+        Name of the class
+
+    target_folder : str, optional (default: 'src')
+        Folder where the output should be written
+
+    force_overwrite : bool, optional (default: False)
+        Overwrite existing file
+
+    Returns
+    -------
+    written_files : list
+        Names of the files that have been written
+    """
     result = {}
 
     declaration_filename = "%s.hpp" % class_name
@@ -333,7 +359,31 @@ def write_class(desc, type_registry, template_base, class_name,
 
 
 def write_cython(node, type_registry, template_base,
-                 target_folder="python_binding", file_prefix="dfn_ci"):
+                 target_folder="python", file_prefix="dfn_ci"):
+    """Write Python binding based on Cython.
+
+    Parameters
+    ----------
+    node : dict
+        Node description
+
+    type_registry : TypeRegistry
+        Registry for type information
+
+    template_base : str
+        Base name of the template that should be used, e.g., 'Node'
+
+    target_folder : str, optional (default: 'python')
+        Folder where the output should be written
+
+    file_prefix : str, optional (default: 'dfn_ci')
+        Prefix of filenames of the output
+
+    Returns
+    -------
+    written_files : list
+        Names of the files that have been written
+    """
     result = {}
 
     pxd_filename = "%s_%s.pxd" % (file_prefix, node["name"].lower())
@@ -391,6 +441,24 @@ def render(template, **kwargs):
 
 
 def write_result(result, force_overwrite, verbose=0):
+    """Write files.
+
+    Parameters
+    ----------
+    result : dict
+        Contains file names as keys and content as values
+
+    force_overwrite : bool, optional (default: False)
+        Overwrite existing file
+
+    verbose : int, optional (default: 0)
+        Verbosity level
+
+    Returns
+    -------
+    written_files : list
+        Names of the files that have been written
+    """
     written_files = []
     msg = ""
     for filename, content in result.items():
