@@ -352,14 +352,15 @@ def write_class(desc, type_registry, template_base, class_name,
     return write_result(result, force_overwrite)
 
 
-def write_cython(node, type_registry, template_base,
-                 target_folder="python", file_prefix="dfn_ci"):
+def write_cython(desc, type_registry, template_base,
+                 target_folder="python", file_prefix="dfn_ci",
+                 namespace_prefix="dfn_ci"):
     """Write Python binding based on Cython.
 
     Parameters
     ----------
-    node : dict
-        Node description
+    desc : dict
+        Component description
 
     type_registry : TypeRegistry
         Registry for type information
@@ -373,6 +374,9 @@ def write_cython(node, type_registry, template_base,
     file_prefix : str, optional (default: 'dfn_ci')
         Prefix of filenames of the output
 
+    namespace_prefix : str, optional (default: 'dfn_ci')
+        Prefix of namespace
+
     Returns
     -------
     written_files : list
@@ -380,28 +384,29 @@ def write_cython(node, type_registry, template_base,
     """
     result = {}
 
-    pxd_filename = "%s_%s.pxd" % (file_prefix, node["name"].lower())
-    _pxd_filename = "_%s_%s.pxd" % (file_prefix, node["name"].lower())
-    pyx_filename = "%s_%s.pyx" % (file_prefix, node["name"].lower())
+    pxd_filename = "%s_%s.pxd" % (file_prefix, desc["name"].lower())
+    _pxd_filename = "_%s_%s.pxd" % (file_prefix, desc["name"].lower())
+    pyx_filename = "%s_%s.pyx" % (file_prefix, desc["name"].lower())
 
     import_cdfftypes = False
-    for port in node["input_ports"] + node["output_ports"]:
+    for port in desc["input_ports"] + desc["output_ports"]:
         if type_registry.get_info(port["type"]).has_cdfftype():
             import_cdfftypes = True
 
     pxd_file = render(
-        "%s.pxd" % template_base, node=node)
+        "Declaration.pxd", desc=desc,
+        namespace_prefix=namespace_prefix)
     target = os.path.join(target_folder, pxd_filename)
     result[target] = pxd_file
 
     _pxd_file = render(
-        "_%s.pxd" % template_base, node=node, type_registry=type_registry,
+        "_%s.pxd" % template_base, node=desc, type_registry=type_registry,
         import_cdfftypes=import_cdfftypes)
     target = os.path.join(target_folder, _pxd_filename)
     result[target] = _pxd_file
 
     pyx_file = render(
-        "%s.pyx" % template_base, node=node, type_registry=type_registry,
+        "%s.pyx" % template_base, node=desc, type_registry=type_registry,
         import_cdfftypes=import_cdfftypes)
     target = os.path.join(target_folder, pyx_filename)
     result[target] = pyx_file
@@ -431,7 +436,13 @@ def render(template, **kwargs):
         raise IOError("No template for '%s' found." % template)
     with open(template_filename, "r") as template_file:
         template = jinja2.Template(template_file.read())
-    return template.render(**kwargs)
+
+    try:
+        rendered_template = template.render(**kwargs)
+    except Exception as e:
+        raise Exception("Template '%s' failed: %s"
+                        % (template_filename, e))
+    return rendered_template
 
 
 def write_result(result, force_overwrite, verbose=0):
