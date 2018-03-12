@@ -1,13 +1,39 @@
 name: TiltScan
+dfns:
+    - name: TiltScan
+    - name: LaserFilter
 input_ports:
-    - name: Lidar2D
+    - name: lidar2D
       type: LaserScan
       doc: "Point cloud taken from a 2D LIDAR sensor"
-    - name: Laser2BodyTf
-      type: RigidBodyState
+      connections:
+        - dfn: LaserFilter
+          port: scanSamples
+    - name: dyamixelDynamicTf
+      type: Eigen::Affine3d
       doc: "Dynamic transformation between body and 2D laser frame"
+      connections: 
+        - dfn: LaserFilter
+          port: laser2BodyTf
+        - dfn: TiltScan
+          port: laser2Body
 output_ports:
     - name: pointcloud
       type: Pointcloud
       doc: "Merged pointcloud based on the input 2D scanns"
+    - connections:
+        dfn: TiltScan
+        port: pointcloud
+operations:
+    - name: "getPointcloud"
+      output: 
+        - Type: Pointcloud
+      doc : "Delivers the current pointcloud even if not finished the complete sweep"
+internal_connections:
+    - from:
+        dfn: LaserFilter
+        port: scanSamples
+    - to:
+        dfn: TiltScan
+        port: laserScan
 
