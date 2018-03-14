@@ -35,7 +35,7 @@ internal_connections:
     - from:
         dfn: LaserFilter
         port: scanSamples
-    - to:
+      to:
         dfn: TiltScan
         port: laserScan
 

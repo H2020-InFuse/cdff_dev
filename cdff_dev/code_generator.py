@@ -282,6 +282,7 @@ def validate_dfpc(dfpc):
     _validate_ports(validated_dfpc)
     _validate_dfpc_port_connections(validated_dfpc)
     _validate_dfpc_operations(validated_dfpc)
+    _validate_dfpc_internal_connections(validated_dfpc)
 
     return validated_dfpc
 
@@ -328,6 +329,25 @@ def _validate_dfpc_operations(desc):
                 raise DFPCDescriptionException(
                     "Input '%s' of operation '%s' has no type"
                     % (inp["name"], op["name"]))
+
+
+def _validate_dfpc_internal_connections(desc):
+    if "internal_connections" not in desc:
+        desc["internal_connections"] = []
+
+    for conn in desc["internal_connections"]:
+        if "from" not in conn:
+            raise DFPCDescriptionException("No 'from' in connection: %s" % conn)
+        if "to" not in conn:
+            raise DFPCDescriptionException("No 'to' in connection: %s" % conn)
+
+        for port in [conn["from"], conn["to"]]:
+            if "dfn" not in port:
+                raise DFPCDescriptionException(
+                    "No DFN is specified in connection: %s" % conn)
+            if "port" not in port:
+                raise DFPCDescriptionException(
+                    "No port is specified in connection: %s" % conn)
 
 
 def _prepare_output_directory(output, source_folder, python_folder):

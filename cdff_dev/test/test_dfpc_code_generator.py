@@ -102,3 +102,45 @@ def test_validate_missing_input_type():
     assert_raises_regex(
         DFPCDescriptionException,
         "Input 'bla' of operation 'dummy' has no type", validate_dfpc, dfpc)
+
+
+def test_validate_connection_missing_from():
+    dfpc = {"name": "Dummy",
+            "internal_connections": [
+                {"to": {"dfn": "MyDFN", "port": "my_port"}}
+            ]}
+    assert_raises_regex(
+        DFPCDescriptionException,
+        "No 'from' in connection", validate_dfpc, dfpc)
+
+
+def test_validate_connection_missing_to():
+    dfpc = {"name": "Dummy",
+            "internal_connections": [
+                {"from": {"dfn": "MyDFN", "port": "my_port"}}
+            ]}
+    assert_raises_regex(
+        DFPCDescriptionException,
+        "No 'to' in connection", validate_dfpc, dfpc)
+
+
+def test_validate_connection_missing_dfn():
+    dfpc = {"name": "Dummy",
+            "internal_connections": [
+                {"from": {"port": "my_port1"},
+                 "to": {"dfn": "MyDFN2", "port": "my_port2"}}
+            ]}
+    assert_raises_regex(
+        DFPCDescriptionException,
+        "No DFN is specified in connection", validate_dfpc, dfpc)
+
+
+def test_validate_connection_missing_port():
+    dfpc = {"name": "Dummy",
+            "internal_connections": [
+                {"from": {"dfn": "MyDFN1"},
+                 "to": {"dfn": "MyDFN2", "port": "my_port2"}}
+            ]}
+    assert_raises_regex(
+        DFPCDescriptionException,
+        "No port is specified in connection", validate_dfpc, dfpc)
