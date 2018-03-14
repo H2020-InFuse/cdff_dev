@@ -280,6 +280,10 @@ def validate_dfpc(dfpc):
             "DFPC description has no attribute 'name'.")
 
     _validate_ports(validated_dfpc)
+    _validate_port_connections(validated_dfpc)
+
+    if "operations" not in dfpc:
+        validated_dfpc["operations"] = []
 
     return validated_dfpc
 
@@ -296,6 +300,12 @@ def _validate_ports(desc):
             raise PortDescriptionException("Port has no name: %s" % port)
         if "type" not in port:
             raise PortDescriptionException("Port has no type: %s" % port)
+
+
+def _validate_port_connections(desc):
+    for port in desc["input_ports"] + desc["output_ports"]:
+        if "connections" not in port or len(port["connections"]) == 0:
+            raise PortDescriptionException("Port has no connections: %s" % port)
 
 
 def _prepare_output_directory(output, source_folder, python_folder):
