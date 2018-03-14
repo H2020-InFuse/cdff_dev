@@ -10,7 +10,7 @@ input_ports:
         - dfn: LaserFilter
           port: scanSamples
     - name: dyamixelDynamicTf
-      type: Eigen::Affine3d
+      type: Affine3d
       doc: "Dynamic transformation between body and 2D laser frame"
       connections: 
         - dfn: LaserFilter
@@ -20,14 +20,16 @@ input_ports:
 output_ports:
     - name: pointcloud
       type: Pointcloud
-      doc: "Merged pointcloud based on the input 2D scanns"
-    - connections:
+      doc: "Merged pointcloud based on the input 2D scans"
+      connections:
         dfn: TiltScan
         port: pointcloud
 operations:
     - name: "getPointcloud"
-      output: 
-        - Type: Pointcloud
+      inputs:
+        - name: maxPoints
+          type: int
+      output_type: Pointcloud
       doc : "Delivers the current pointcloud even if not finished the complete sweep"
 internal_connections:
     - from:
