@@ -125,6 +125,11 @@ class DFPCDescriptionException(Exception):
         super(Exception, self).__init__(msg)
 
 
+class PortDescriptionException(Exception):
+    def __init__(self, msg):
+        super(Exception, self).__init__(msg)
+
+
 # TODO refactor write_dfn / write_dfpc
 def write_dfn(node, output, source_folder=".", python_folder="python",
               cdffpath="CDFF"):
@@ -286,7 +291,11 @@ def _validate_ports(desc):
     if "output_ports" not in desc:
         desc["output_ports"] = []
 
-    # TODO validate each input and output port: name and type
+    for port in desc["input_ports"] + desc["output_ports"]:
+        if "name" not in port:
+            raise PortDescriptionException("Port has no name: %s" % port)
+        if "type" not in port:
+            raise PortDescriptionException("Port has no type: %s" % port)
 
 
 def _prepare_output_directory(output, source_folder, python_folder):
