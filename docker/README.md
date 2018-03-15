@@ -37,11 +37,11 @@ image. You just have to add `--no-cache` in this case.
 
 Once you built the docker image, it can be exported with
 
-    docker save repository/infuse/cdff_dev:latest > cdff_dev.latest.tar
+    docker save repository/infuse/cdff-dev:latest > cdff_dev.latest.tar
 
 and someone else can import it with
 
-    docker load -i cdff_dev.latest.tar
+    docker load -i cdff-dev.latest.tar
 
 ## Create Container
 
@@ -49,12 +49,12 @@ You can create a container (runtime environment) from the image.
 
 Without GUI:
 
-    docker run -it repository/infuse/cdff_dev:latest bash
+    docker run -it repository/infuse/cdff-dev:latest bash
 
 With GUI:
 
     xhost local:root
-    docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix --privileged repository/infuse/cdff_dev:latest
+    docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix --privileged repository/infuse/cdff-dev:latest
 
 If you have a custom DNS server you can set it for the docker container with
 
@@ -74,7 +74,7 @@ Full example:
 
     xhost local:root
     export HOSTWORKDIR=...
-    docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOSTWORKDIR:/external --privileged --name dev repository/infuse/cdff_dev:latest bash
+    docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOSTWORKDIR:/external --privileged --name dev repository/infuse/cdff-dev:latest bash
 
 ## Setup GPU
 
