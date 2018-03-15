@@ -4,6 +4,7 @@ import warnings
 from cdff_dev.code_generator import write_dfn
 from cdff_dev.testing import EnsureCleanup, build_extension
 from cdff_dev.path import check_cdffpath, CTYPESDIR
+import cdff_types
 from nose.tools import assert_true, assert_equal, assert_raises_regex
 
 
@@ -156,5 +157,8 @@ def test_asn1():
         import dfn_ci_asn1test
         asn1_test = dfn_ci_asn1test.ASN1Test()
         asn1_test.configure()
+        current_time = cdff_types.Time()
+        current_time.microseconds = 999999
+        asn1_test.currentTimeInput(current_time)
         asn1_test.process()
         assert_equal(1000000, asn1_test.nextTimeOutput().microseconds)

@@ -19,7 +19,7 @@ void ASN1Test::configure()
 
 void ASN1Test::process() {
     Time sometime;
-    sometime.microseconds = 1000000;
+    sometime.microseconds = incurrenttime.microseconds + 1;
     sometime.usecPerSec = 1000000;
     outnexttime = sometime;
 }
