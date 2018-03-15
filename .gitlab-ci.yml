@@ -8,12 +8,10 @@ stages:
 fetch_cdff:
   stage : fetch_cdff
   script:
-      - git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com:InFuse/Infuse/CDFF.git
-      - make build_cdff
+      - ln -s /infuse/CDFF CDFF
   artifacts:
     paths:
-      - CDFF/Common/Types/C
-      - CDFF/DFNs/DFNCommonInterface.hpp
+      - CDFF
 
 build_cdff_dev:
   stage : build_cdff_dev
