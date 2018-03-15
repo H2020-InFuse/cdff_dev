@@ -5,7 +5,7 @@ RUN git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spac
 WORKDIR /builds/InFuse/CDFF_dev
 RUN echo -n "CDFF" > cdffpath
 RUN ln -s /builds/InFuse/CDFF CDFF
-RUN python3 setup.py build_ext -i
+RUN pip3 install -e .
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
 
