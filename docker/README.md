@@ -1,4 +1,4 @@
-# CDFF-Dev Dockerfile
+# CDFF-Dev Dockerfile instructions for CDFF_Dev
 
 ## Install Docker
 
@@ -9,12 +9,26 @@ For Ubuntu:
 Installation instructions for other systems are available at the
 [official documentation](https://docs.docker.com/engine/installation/).
 
+## Clone the cdff_dev if you haven't yet
+
+    ~/infuse/ $git clone git@gitlab.spaceapplications.com:InFuse/CDFF_dev.git
+
+## Log in SpaceApps docker server
+
+XXX The instructions should have been made available for you via E-Mail
+
 ## Build Image
 
 Note: The average user does not have to build an image. Usually the image will
 be distributed to the users.
 
-    docker build -t cdff_dev:latest .
+### Option 1: Version for users
+
+    docker build -t repository/infuse/cdff-dev:latest -f Dockerfile_user .
+
+### Option 1: Version for CI
+
+    docker build -t repository/infuse/cdff-dev-ci:latest .
 
 Sometimes it is necessary to clean the docker cache if you want to rebuild the
 image. You just have to add `--no-cache` in this case.
@@ -23,7 +37,7 @@ image. You just have to add `--no-cache` in this case.
 
 Once you built the docker image, it can be exported with
 
-    docker save cdff_dev:latest > cdff_dev.latest.tar
+    docker save repository/infuse/cdff_dev:latest > cdff_dev.latest.tar
 
 and someone else can import it with
 
@@ -35,12 +49,12 @@ You can create a container (runtime environment) from the image.
 
 Without GUI:
 
-    docker run -it cdff_dev:latest bash
+    docker run -it repository/infuse/cdff_dev:latest bash
 
 With GUI:
 
     xhost local:root
-    docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix --privileged cdff_dev:latest
+    docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix --privileged repository/infuse/cdff_dev:latest
 
 If you have a custom DNS server you can set it for the docker container with
 
@@ -60,7 +74,7 @@ Full example:
 
     xhost local:root
     export HOSTWORKDIR=...
-    docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOSTWORKDIR:/external --privileged --name dev cdff_dev:latest bash
+    docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOSTWORKDIR:/external --privileged --name dev repository/infuse/cdff_dev:latest bash
 
 ## Setup GPU
 
