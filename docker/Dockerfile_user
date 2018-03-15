@@ -1,0 +1,7 @@
+FROM repository/infuse/cdff-dev-ci:1.6.5.4
+
+
+
+LABEL maintainer="Alexander.Fabisch@dfki.de"
+
+LABEL version="1.6.5.4"
