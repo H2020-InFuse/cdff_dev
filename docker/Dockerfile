@@ -18,6 +18,8 @@ RUN /bin/bash get_cdff_artifacts.sh
 RUN cp -rf /CDFF/External/install/ /builds/InFuse/CDFF/External/install/
 WORKDIR /builds/InFuse/CDFF/Tools/ASNtoC
 RUN ./FetcherScript.sh
+WORKDIR /builds/InFuse/CDFF/build/
+RUN cmake -DCMAKE_INSTALL_PREFIX=./ ..
 WORKDIR /builds/InFuse
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
