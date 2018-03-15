@@ -24,9 +24,3 @@ def test_generate_files():
             tmp_folder, "TiltScan.hpp")))
         assert_true(os.path.exists(os.path.join(
             tmp_folder, "TiltScan.cpp")))
-        assert_true(os.path.exists(os.path.join(
-            tmp_folder, "python", "dfpc_ci_tiltscan.pxd")))
-        assert_true(os.path.exists(os.path.join(
-            tmp_folder, "python", "dfpc_ci_tiltscan.pyx")))
-        assert_true(os.path.exists(os.path.join(
-            tmp_folder, "python", "_dfpc_ci_tiltscan.pxd")))
