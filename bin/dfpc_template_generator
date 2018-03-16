@@ -20,7 +20,9 @@ def parse_args():
     argparser.add_argument(
         "definition", type=str, help="DFPC definition")
     argparser.add_argument(
-        "output", type=str, help="Target directory", nargs="?", default=".")
+        "output", type=str,
+        help="Target directory, will be by CDFF/DFPCs/<node name> by default",
+        nargs="?", default=None)
     argparser.add_argument(
         "--source_folder", type=str,
         help="Subdirectory of the output directory that will contain the "

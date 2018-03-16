@@ -183,7 +183,8 @@ def write_dfpc(dfpc, output, source_folder=".", python_folder="python",
         DFPC configuration loaded from DFPC description file
 
     output : str
-        Path to output directory
+        Path to output directory, will be cdffpath + '/DFPCs/' + <node name>
+        by default
 
     source_folder : str, optional (default: '.')
         Subdirectory of the output directory that will contain the source code
@@ -197,6 +198,9 @@ def write_dfpc(dfpc, output, source_folder=".", python_folder="python",
         Path to CDFF
     """
     dfpc = validate_dfpc(dfpc)
+
+    if output is None:
+        output = os.path.join(cdffpath, "DFPCs", dfpc["name"])
 
     type_registry = TypeRegistry(cdffpath)
     src_dir, python_dir = _prepare_output_directory(
