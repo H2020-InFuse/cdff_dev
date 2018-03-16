@@ -9,6 +9,16 @@ namespace dfpc_ci {
 {{ class_name }}::~{{ class_name }}()
 {
 }
+
+void {{ class_name }}::run()
+{
+    // TODO Fill in process functionality here
+}
+
+void {{ class_name }}::setup()
+{
+    // TODO Fill in process functionality here
+}
 {{ break }}
 {%- for operation in desc["operations"] %}
 {{ operation["output_type"] }} {{ class_name }}::{{ operation["name"] }}(

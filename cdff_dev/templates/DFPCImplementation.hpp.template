@@ -11,6 +11,9 @@ namespace dfpc_ci {
             {{ class_name }}();
             virtual ~{{ class_name }}();
 
+            virtual void run();
+            virtual void setup();
+
             {%- for operation in desc["operations"] %}
             /**
              * Perform operation {{ operation["name"] }}
