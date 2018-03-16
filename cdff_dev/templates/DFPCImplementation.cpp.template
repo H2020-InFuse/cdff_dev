@@ -9,7 +9,17 @@ namespace dfpc_ci {
 {{ class_name }}::~{{ class_name }}()
 {
 }
+{{ break }}
+{%- for operation in desc["operations"] %}
+{{ class_name }}::{{ operation["output_type"] }} {{ operation["name"] }}(
+    {%- for arg in operation["inputs"] %}{{ arg["type"] }} {{ arg["name"] }}{{ ", " if not loop.last }}{%- endfor %})
+{
+    {{ operation["output_type"] }} result;
 
-// TODO
+    // TODO Fill in process functionality here
+
+    return result;
+}
+{%- endfor %}
 
 }

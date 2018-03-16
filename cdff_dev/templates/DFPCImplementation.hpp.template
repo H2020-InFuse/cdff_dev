@@ -10,7 +10,18 @@ namespace dfpc_ci {
         public:
             {{ class_name }}();
             virtual ~{{ class_name }}();
-            // TODO
+
+            {%- for operation in desc["operations"] %}
+            /**
+             * Perform operation {{ operation["name"] }}
+            {%- for arg in operation["inputs"] %}
+             * @param {{ arg["name"] }}
+            {%- endfor %}
+             * @return {{ operation["output_type"] }}
+             */
+            virtual {{ operation["output_type"] }} {{ operation["name"] }}(
+                {%- for arg in operation["inputs"] %}{{ arg["type"] }} {{ arg["name"] }}{{ ", " if not loop.last }}{%- endfor %});
+            {%- endfor %}
     };
 }
 #endif
