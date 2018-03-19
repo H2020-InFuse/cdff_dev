@@ -1,4 +1,4 @@
-FROM repository/infuse/cdff-dev-ci:1.6.5.4
+FROM nexus.spaceapplications.com/repository/infuse/cdff-dev-ci:1.6.5.5
 
 WORKDIR /builds/InFuse
 RUN git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com:InFuse/Infuse/CDFF_dev.git
@@ -7,5 +7,4 @@ RUN echo -n "/builds/InFuse/CDFF" > cdffpath
 RUN pip3 install -e .
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
-
-LABEL version="1.6.5.4"
+LABEL version="1.6.5.5"
