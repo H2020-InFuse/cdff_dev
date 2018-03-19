@@ -31,7 +31,7 @@ function unzip_function(){
     fi
 
     echo "Unzipping to $OUTPUT_DIR"
-    unzip -joq generatedFiles.gz -d $OUTPUT_DIR
+    unzip -oq generatedFiles.gz -d $OUTPUT_DIR
     rm generatedFiles.gz
     echo "Done."
 }
