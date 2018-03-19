@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+import argparse
+from cdff_dev import data_export
+
+
+def main():
+    args = parse_args()
+    export(args)
+
+
+def parse_args():
+    argparser = argparse.ArgumentParser(description="pySPACE data export")
+    argparser.add_argument(
+        "logfile", type=str, help="Logfile to be converted")
+    argparser.add_argument(
+        "output", type=str, help="Filename of the output")
+    argparser.add_argument(
+        "port", type=str,
+        help="Name of port that should be exported, leave it blank to see "
+             "available options",
+        nargs="?", default=None)
+    argparser.add_argument(
+        "--fields", type=str,
+        help="Fields that should be exported, all by default", nargs="*",
+        default=None)
+    argparser.add_argument(
+        "--whitelist", type=str,
+        help="Names of vector fields that should be unraveled", nargs="*",
+        default=None)
+    return argparser.parse_args()
+
+
+def export(args):
+    print("[pyspace_export] Exporting '%s' to '%s'..."
+          % (args.logfile, args.output))
+    print("[pyspace_export] Exporting ports '%s'" % args.port)
+
+    if args.port is None:
+        port_names = data_export.get_port_names(args.logfile)
+        print("[pyspace_export] Available ports: %s" % (" ".join(port_names)))
+    else:
+        data_export.object2csv(args.logfile, args.output, args.port,
+                               args.fields, args.whitelist)
+
+
+if __name__ == "__main__":
+    main()

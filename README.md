@@ -77,13 +77,13 @@ user@computer:~$ docker cdff-dev
 Found CDFF-core and CDFF-support: /opt/cdff/
 Found compiled ASN.1 data types:  /opt/cdff/Common/Types/C/
 Found CDFF-dev: /opt/cdff-dev/
-Setting up CDFF-dev... 
+Setting up CDFF-dev...
 Obtaining file:///opt/cdff-dev
 Installing collected packages: cdff-dev
   Running setup.py develop for cdff-dev
 Successfully installed cdff-dev
 Setting up CDFF-dev: done
-user@cdff-dev:/$ 
+user@cdff-dev:/$
 ```
 
 Unit testing CDFF-Dev requires additional Python packages, see further.
