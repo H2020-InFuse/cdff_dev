@@ -1,19 +1,10 @@
-image: nexus.spaceapplications.com/repository/infuse/cdff-dev-ci:1.6.5.4
+image: nexus.spaceapplications.com/repository/infuse/cdff-dev-ci:1.6.5.5
 
 stages:
-  - fetch_cdff
   - build_cdff_dev
   - test
 
 fetch_cdff:
-  stage : fetch_cdff
-  script:
-      - ln -s /infuse/CDFF CDFF
-  artifacts:
-    paths:
-      - CDFF
-
-build_cdff_dev:
   stage : build_cdff_dev
   script:
       - echo -n "CDFF" > cdffpath
