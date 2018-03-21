@@ -46,10 +46,15 @@ to install the dependencies in your home folder.
 
     sudo pip3 install -e .
 
-**During the installation you have to set the path to CDFF.** You can
-do this by defining the environment variable `CDFFPATH`, you can write
-it to the file `cdffpath` or you can enter it manually when the `pip3`
-freezes during the installation process.
+**During the installation you have to set the path to CDFF.** There are
+several ways to do this:
+* You can define the environment variable `CDFFPATH`. Note that this
+  does not work if you use `sudo`.
+* You can write it to the file `cdffpath`.
+* You can enter it manually when `pip3` stops during the installation
+  process. Note that pip suppresses the output and you cannot see a
+  message that asks to you to provide the input. Type it in as soon
+  as the installation process stops for several seconds.
 If you don't have sudo privileges, you can use the flag `--user` of pip
 to install the dependencies in your home folder. 
 
