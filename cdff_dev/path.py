@@ -5,6 +5,24 @@ TYPESDIR = os.path.join("Common", "Types")
 CTYPESDIR = os.path.join(TYPESDIR, "C")
 
 
+def load_cdffpath():
+    if "CDFFPATH" in os.environ:
+        cdffpath = os.environ.get("CDFFPATH")
+    elif os.path.exists("cdffpath"):
+        with open("cdffpath", "r") as f:
+            cdffpath = f.read()
+    else:
+        cdffpath = input("Please enter the path to CDFF:")
+        with open("cdffpath", "w") as f:
+            f.write(cdffpath)
+
+    cdffpath = cdffpath.strip()
+
+    check_cdffpath(cdffpath)
+
+    return cdffpath
+
+
 def check_cdffpath(cdffpath="CDFF"):
     """Check if the provided path to CDFF is correct.
 

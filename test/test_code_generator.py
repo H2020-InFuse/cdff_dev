@@ -3,7 +3,7 @@ import yaml
 import warnings
 from cdff_dev.code_generator import write_dfn
 from cdff_dev.testing import EnsureCleanup, build_extension
-from cdff_dev.path import check_cdffpath, CTYPESDIR
+from cdff_dev.path import load_cdffpath, CTYPESDIR
 import cdff_types
 from nose.tools import assert_true, assert_equal, assert_raises_regex
 
@@ -135,8 +135,7 @@ def test_asn1():
         filenames = write_dfn(node, tmp_folder, cdffpath="CDFF/")
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
-        cdffpath = "CDFF"
-        check_cdffpath(cdffpath)
+        cdffpath = load_cdffpath()
         ctypespath = os.path.join(cdffpath, CTYPESDIR)
         dfnspath = os.path.join(cdffpath, "DFNs")
 

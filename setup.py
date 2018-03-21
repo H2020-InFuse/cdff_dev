@@ -5,7 +5,7 @@ from Cython.Build import cythonize
 import numpy
 import os
 import cdff_dev
-from cdff_dev.path import check_cdffpath, CTYPESDIR
+from cdff_dev.path import load_cdffpath, CTYPESDIR
 
 
 def strict_prototypes_workaround():
@@ -38,17 +38,7 @@ def configuration(parent_package='', top_path=None):
         (".", "cdff_types.pyx")
     )
 
-    if "CDFFPATH" in os.environ:
-        cdffpath = os.environ.get("CDFFPATH")
-    elif os.path.exists("cdffpath"):
-        with open("cdffpath", "r") as f:
-            cdffpath = f.read()
-    else:
-        cdffpath = input("Please enter the path to CDFF:")
-        with open("cdffpath", "w") as f:
-            f.write(cdffpath)
-
-    check_cdffpath(cdffpath)
+    cdffpath = load_cdffpath()
     ctypespath = os.path.join(cdffpath, CTYPESDIR)
 
     pyx_filename = os.path.join("cdff_types.pyx")
