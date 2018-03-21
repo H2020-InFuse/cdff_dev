@@ -17,3 +17,6 @@ test:
   stage : test
   script:
       - nosetests -sv
+  artifacts:
+    paths:
+      - CDFF
