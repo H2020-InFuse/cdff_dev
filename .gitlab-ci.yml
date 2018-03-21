@@ -18,7 +18,8 @@ fetch_cdff:
 build_cdff_dev:
   stage : build_cdff_dev
   script:
-      - CDFFPATH=CDFF python3 setup.py build_ext -i
+      - echo -n "CDFF" > cdffpath
+      - python3 setup.py build_ext -i
   artifacts:
     paths:
       - .
