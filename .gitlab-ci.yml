@@ -1,10 +1,21 @@
 image: nexus.spaceapplications.com/repository/infuse/cdff-dev-ci:1.6.5.5
 
 stages:
+  - fetch_dependencies
   - build_cdff_dev
   - test
 
-fetch_cdff:
+fetch_dependencies:
+  stage : fetch_dependencies
+  script:
+      - git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com:InFuse/Infuse/CDFF.git
+      - cd /InFuse/build_tools && ./get_cdff_artifacts.sh
+      - ln -sf /CDFF/External/install /InFuse/CDFF/External/install
+  artifacts:
+    - paths:
+      - .
+
+build_cdff_dev:
   stage : build_cdff_dev
   script:
       - echo -n "CDFF" > cdffpath

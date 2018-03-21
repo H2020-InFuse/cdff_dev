@@ -1,9 +1,19 @@
-FROM nexus.spaceapplications.com/repository/infuse/cdff-dev-ci:1.6.5.5
+FROM repository/infuse/cdff-dev-ci:latest
 
-WORKDIR /builds/InFuse
+WORKDIR /InFuse
+RUN git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com:InFuse/Infuse/CDFF.git
+# fetch artifacts
+WORKDIR /InFuse/build_tools
+RUN /bin/bash get_cdff_artifacts.sh
+WORKDIR /InFuse
 RUN git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com:InFuse/Infuse/CDFF_dev.git
-WORKDIR /builds/InFuse/CDFF_dev
-RUN echo -n "/builds/InFuse/CDFF" > cdffpath
+RUN ln -sf /CDFF/External/install /InFuse/CDFF/External/install
+RUN mkdir -p /builds/InFuse/
+RUN ln -sf /InFuse/CDFF /builds/InFuse/CDFF
+WORKDIR /builds/InFuse/CDFF/build
+RUN cmake -DCMAKE_INSTALL_PREFIX=./ ..
+WORKDIR /InFuse/CDFF_dev
+RUN echo -n "/InFuse/CDFF" > cdffpath
 RUN pip3 install -e .
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
