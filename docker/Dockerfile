@@ -21,4 +21,4 @@ COPY get_cdff_artifacts.sh /InFuse/build_tools
 WORKDIR /InFuse
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
-LABEL version="1.6.5.5"
+LABEL version="1.6.5.6"
