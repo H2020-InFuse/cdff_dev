@@ -9,11 +9,12 @@ fetch_dependencies:
   stage : fetch_dependencies
   script:
       - git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com:InFuse/Infuse/CDFF.git
-      - cd /InFuse/build_tools && ./get_cdff_artifacts.sh
-      - ln -sf /CDFF/External/install /InFuse/CDFF/External/install
+      - ls -la /CDFF/External/install
+      - ln -s /CDFF/External/install CDFF/External/install
+      - cd build_tools && ./get_cdff_artifacts.sh
   artifacts:
-    - paths:
-      - .
+    paths:
+      - CDFF
 
 build_cdff_dev:
   stage : build_cdff_dev
@@ -28,6 +29,3 @@ test:
   stage : test
   script:
       - nosetests -sv
-  artifacts:
-    paths:
-      - CDFF
