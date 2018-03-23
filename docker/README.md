@@ -24,11 +24,11 @@ be distributed to the users.
 
 ### Option 1: Version for users
 
-    docker build -t repository/infuse/cdff-dev:latest -f Dockerfile_user .
+    docker build -t repository/infuse/cdff-dev:<version> -f Dockerfile_user .
 
 ### Option 1: Version for CI
 
-    docker build -t repository/infuse/cdff-dev-ci:latest .
+    docker build -t repository/infuse/cdff-dev-ci:<version> .
 
 Sometimes it is necessary to clean the docker cache if you want to rebuild the
 image. You just have to add `--no-cache` in this case.

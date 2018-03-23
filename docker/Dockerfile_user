@@ -1,12 +1,13 @@
 FROM nexus.spaceapplications.com/repository/infuse/cdff-dev-ci:latest
 
+RUN mkdir -p /InFuse/build_tools
 WORKDIR /InFuse
 RUN git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com:InFuse/Infuse/CDFF.git
+RUN git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com:InFuse/Infuse/CDFF_dev.git
 # fetch artifacts
+RUN cp /InFuse/CDFF_dev/build_tools/get_cdff_artifacts.sh /InFuse/build_tools
 WORKDIR /InFuse/build_tools
 RUN /bin/bash get_cdff_artifacts.sh
-WORKDIR /InFuse
-RUN git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com:InFuse/Infuse/CDFF_dev.git
 RUN ln -sf /CDFF/External/install /InFuse/CDFF/External/install
 RUN mkdir -p /builds/InFuse/
 RUN ln -sf /InFuse/CDFF /builds/InFuse/CDFF
