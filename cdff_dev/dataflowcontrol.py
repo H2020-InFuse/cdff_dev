@@ -128,14 +128,15 @@ class DataFlowControl:
     def _pull_output(self, node_name, timestamp):
         outputs = dict()
         for port_name, getter in self.output_ports[node_name].items():
-            if port_name not in self.output_port_buffers:
-                print("[DataFlowControl] type for port %s not defined"
-                      % port_name)
-                continue
+            # TODO
+            #if port_name not in self.output_port_buffers:
+            #    print("[DataFlowControl] type for port %s not defined"
+            #          % port_name)
+            #    continue
             if self.verbose >= 1:
                 print("[DataFlowControl] getting %s" % port_name)
             sample = getter()
-            self._update_envire_item(sample, port_name, timestamp)
+            self.visualization.report_node_output(node_name, port_name, sample, timestamp)
             outputs[port_name] = sample
         return outputs
 
@@ -159,3 +160,13 @@ class TextVisualization:
     """
     def __init__(self):
         pass
+
+    def report_node_output(self, node_name, port_name, sample, timestamp):
+        print("Timestamp: %s" % timestamp)
+        print("Node: %s" % node_name)
+        print("Port: %s" % port_name)
+        print("Sample: %s" % sample)
+
+
+# TODO envire visualizer
+#self._update_envire_item(sample, port_name, timestamp)
