@@ -29,6 +29,10 @@ class DataFlowControl:
         self.visualization = visualization
         self.verbose = verbose
 
+        self.output_ports = None
+        self.input_ports = None
+        self.log_ports = None
+
     def setup(self):
         self._configure_nodes()
         self._cache_ports()
@@ -41,13 +45,22 @@ class DataFlowControl:
     def _cache_ports(self):
         self.output_ports = dict(
             (node_name, dict()) for node_name in self.nodes.keys())
-        self.input_ports = dict()
+        self.input_ports = dict(
+            (node_name, dict()) for node_name in self.nodes.keys())
+        self.log_ports = dict()
         for output_port, input_port in self.connections:
             node_name, port_name, port = self._check_port(output_port, "Output")
-            if node_name is not None:
+            if port is None:
+                if node_name not in self.log_ports:
+                    self.log_ports[node_name] = list()
+                self.log_ports[node_name].append(port_name)
+            else:
                 self.output_ports[node_name][port_name] = port
-            _, _, port = self._check_port(input_port, "Input")
-            self.input_ports[input_port] = port
+            node_name, port_name, port = self._check_port(input_port, "Input")
+            if port is None:
+                raise ValueError("There is no input port '%s'" % input_port)
+            else:
+                self.input_ports[node_name][port_name] = port
 
     def _check_port(self, port, port_type):
         if port_type not in ["Input", "Output"]:
@@ -59,7 +72,7 @@ class DataFlowControl:
                 raise ValueError("Unknown node '%s' from port name '%s'."
                                  % (node_name, port))
             else:
-                return None, None, None
+                return node_name, port_name, None
 
         node = self.nodes[node_name]
         method_name = port_name + port_type
@@ -98,7 +111,8 @@ class DataFlowControl:
                 try:
                     node.set_time(timestamp_before_process)  # TODO how do we pass the current time to the node?
                 except:
-                    print(current_node + ".set_time(time) not implemented")
+                    if self.verbose >= 1:
+                        print(current_node + ".set_time(time) not implemented")
                 node.process()
                 outputs = self._pull_output(
                     current_node, timestamp_before_process)
@@ -136,7 +150,8 @@ class DataFlowControl:
             if self.verbose >= 1:
                 print("[DataFlowControl] getting %s" % port_name)
             sample = getter()
-            self.visualization.report_node_output(node_name, port_name, sample, timestamp)
+            self.visualization.report_node_output(
+                node_name, port_name, sample, timestamp)
             outputs[port_name] = sample
         return outputs
 
@@ -152,6 +167,13 @@ class DataFlowControl:
             print("[DataFlowControl] port '%s' is not connected"
                   % output_port)
 
+    def ports(self):
+        """TODO document me"""
+        return self.input_ports, self.output_ports, self.log_ports
+
+
+from . import diagrams
+
 
 class TextVisualization:
     """Text "visualization".
@@ -161,11 +183,15 @@ class TextVisualization:
     def __init__(self):
         pass
 
+    def report_dfc_network(self, dfc, network_visualization_filename):
+        diagrams.save_graph_png(dfc, network_visualization_filename)
+
     def report_node_output(self, node_name, port_name, sample, timestamp):
-        print("Timestamp: %s" % timestamp)
-        print("Node: %s" % node_name)
-        print("Port: %s" % port_name)
-        print("Sample: %s" % sample)
+        print("Visualizing sample:")
+        print("  Timestamp: %s" % timestamp)
+        print("  Node: %s" % node_name)
+        print("  Port: %s" % port_name)
+        print("  Sample: %s" % sample)
 
 
 # TODO envire visualizer

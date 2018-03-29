@@ -44,8 +44,8 @@ def main():
         "square": SquareDFN()
     }
     periods = {
-        "linear": 10,
-        "square": 10
+        "linear": 1000,
+        "square": 1000
     }
     connections = (
         ("log.x", "linear.x"),
@@ -53,7 +53,8 @@ def main():
     )
     dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods, vis)
     dfc.setup()
-    for i in range(100):
+    vis.report_dfc_network(dfc, "network.png")
+    for i in range(10000):
         dfc.process_sample(timestamp=i, stream_name="log.x", sample=i)
 
 
