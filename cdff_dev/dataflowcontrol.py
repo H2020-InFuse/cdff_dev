@@ -1,3 +1,6 @@
+from collections import defaultdict
+
+
 class DataFlowControl:
     """Data flow control for replaying logfiles.
 
@@ -21,6 +24,30 @@ class DataFlowControl:
 
     verbose : int, optional (default: 0)
         Verbosity level
+
+    Attributes
+    ----------
+    output_ports_ : dict
+        A dictionary with node names as keys and dictionaries as values. The
+        values represent a dictionary that maps from port names (without
+        node prefix) to the corresponding function of the node implementation.
+
+    input_ports_ : dict
+        A dictionary with node names as keys and dictionaries as values. The
+        values represent a dictionary that maps from port names (without
+        node prefix) to the corresponding function of the node implementation.
+
+    log_ports_ : dict
+        A dictionary with node names as keys and port names (without
+        node prefix) as values.
+
+    result_ports_ : dict
+        A dictionary with node names as keys and port names (without
+        node prefix) as values.
+
+    connection_map : list
+        A list of pairs of output node and connected input node. Full names
+        of the form 'node_name.port_name' are used here.
     """
     def __init__(self, nodes, connections, periods, visualization=None, verbose=0):
         self.nodes = nodes
@@ -29,38 +56,42 @@ class DataFlowControl:
         self.visualization = visualization
         self.verbose = verbose
 
-        self.output_ports = None
-        self.input_ports = None
-        self.log_ports = None
+        self.output_ports_ = None
+        self.input_ports_ = None
+        self.log_ports_ = None
+        self.result_ports_ = None
+        self.connection_map = None
 
     def setup(self):
         self._configure_nodes()
         self._cache_ports()
         self._configure_periods()
+        self._configure_connections()
 
     def _configure_nodes(self):
         for node in self.nodes.values():
             node.configure()
 
     def _cache_ports(self):
-        self.output_ports = dict(
+        self.output_ports_ = dict(
             (node_name, dict()) for node_name in self.nodes.keys())
-        self.input_ports = dict(
+        self.input_ports_ = dict(
             (node_name, dict()) for node_name in self.nodes.keys())
-        self.log_ports = dict()
+        self.log_ports_ = defaultdict(list)
+        self.result_ports_ = defaultdict(list)
+
         for output_port, input_port in self.connections:
             node_name, port_name, port = self._check_port(output_port, "Output")
             if port is None:
-                if node_name not in self.log_ports:
-                    self.log_ports[node_name] = list()
-                self.log_ports[node_name].append(port_name)
+                self.log_ports_[node_name].append(port_name)
             else:
-                self.output_ports[node_name][port_name] = port
+                self.output_ports_[node_name][port_name] = port
+
             node_name, port_name, port = self._check_port(input_port, "Input")
             if port is None:
-                raise ValueError("There is no input port '%s'" % input_port)
+                self.result_ports_[node_name].append(port_name)
             else:
-                self.input_ports[node_name][port_name] = port
+                self.input_ports_[node_name][port_name] = port
 
     def _check_port(self, port, port_type):
         if port_type not in ["Input", "Output"]:
@@ -68,11 +99,7 @@ class DataFlowControl:
 
         node_name, port_name = port.split(".")
         if node_name not in self.nodes:
-            if port_type == "Input":
-                raise ValueError("Unknown node '%s' from port name '%s'."
-                                 % (node_name, port))
-            else:
-                return node_name, port_name, None
+            return node_name, port_name, None
 
         node = self.nodes[node_name]
         method_name = port_name + port_type
@@ -92,12 +119,19 @@ class DataFlowControl:
 
         self.last_processed = {node: -1 for node in self.nodes.keys()}
 
+    def _configure_connections(self):
+        self.connection_map = defaultdict(list)
+        for output_port, input_port in self.connections:
+            self.connection_map[output_port].append(input_port)
+
     def process_sample(self, timestamp, stream_name, sample):
         """TODO document me
 
         Note that timestamps must be greater than or equal 0.
         """
         self._run_all_nodes_before(timestamp)
+        node, port = stream_name.split(".")
+        self._push_input(node, port, sample)
 
     def _run_all_nodes_before(self, timestamp):
         changed = True
@@ -108,26 +142,33 @@ class DataFlowControl:
                 changed = True
                 self.last_processed[current_node] = timestamp_before_process
                 node = self.nodes[current_node]
+
                 try:
-                    node.set_time(timestamp_before_process)  # TODO how do we pass the current time to the node?
+                    # TODO how do we pass the current time to the node?
+                    node.set_time(timestamp_before_process)
                 except:
                     if self.verbose >= 1:
                         print(current_node + ".set_time(time) not implemented")
+
                 node.process()
+
                 outputs = self._pull_output(
                     current_node, timestamp_before_process)
-                for port_name, sample in outputs.items():
-                    self._push_input(port_name, sample)
 
-                # TODO use output_ports to implement port trigger
-                # output_ports = self.output_ports[current_node].keys()
+                for port_name, sample in outputs.items():
+                    self._push_input(current_node, port_name, sample)
+
+                # TODO use output_ports_ to implement port trigger
+                # output_ports = self.output_ports_[current_node].keys()
             else:
                 changed = False
 
     def _get_next_node(self, timestamp):
         timestamp_before_process = float("inf")
         current_node = None
-        for node_name in self.last_processed.keys():
+        # Nodes will be sorted alphabetically to ensure reproducibility
+        all_nodes = sorted(self.last_processed.keys())
+        for node_name in all_nodes:
             if self.last_processed[node_name] < 0:
                 self.last_processed[node_name] = timestamp
 
@@ -141,12 +182,7 @@ class DataFlowControl:
 
     def _pull_output(self, node_name, timestamp):
         outputs = dict()
-        for port_name, getter in self.output_ports[node_name].items():
-            # TODO
-            #if port_name not in self.output_port_buffers:
-            #    print("[DataFlowControl] type for port %s not defined"
-            #          % port_name)
-            #    continue
+        for port_name, getter in self.output_ports_[node_name].items():
             if self.verbose >= 1:
                 print("[DataFlowControl] getting %s" % port_name)
             sample = getter()
@@ -155,21 +191,28 @@ class DataFlowControl:
             outputs[port_name] = sample
         return outputs
 
-    def _push_input(self, output_port, sample):
-        if output_port in self.connections:
-            input_port = self.connections[output_port]
-            if self.verbose >= 1:
-                print("[DataFlowControl] setting %s" % input_port)
-            node_name, _ = input_port.split(".")
-            setter = self.input_ports[node_name][input_port]
-            setter(sample)
+    def _push_input(self, node_name, port_name, sample):
+        output_port = node_name + "." + port_name
+        if output_port in self.connection_map:
+            for input_port in self.connection_map[output_port]:
+                if self.verbose >= 1:
+                    print("[DataFlowControl] setting %s" % input_port)
+                input_node_name, input_port_name = input_port.split(".")
+                if input_node_name in self.input_ports_:
+                    setter = self.input_ports_[input_node_name][input_port_name]
+                    setter(sample)
+                elif input_node_name in self.result_ports_:
+                    pass  # TODO how should we handle result ports?
+                else:
+                    raise ValueError("Unknown node: '%s'" % input_node_name)
         elif self.verbose >= 2:
             print("[DataFlowControl] port '%s' is not connected"
                   % output_port)
 
     def ports(self):
         """TODO document me"""
-        return self.input_ports, self.output_ports, self.log_ports
+        return (self.input_ports_, self.output_ports_, self.log_ports_,
+                self.result_ports_)
 
 
 from . import diagrams
@@ -184,6 +227,7 @@ class TextVisualization:
         pass
 
     def report_dfc_network(self, dfc, network_visualization_filename):
+        """TODO seems out of place here..."""
         diagrams.save_graph_png(dfc, network_visualization_filename)
 
     def report_node_output(self, node_name, port_name, sample, timestamp):

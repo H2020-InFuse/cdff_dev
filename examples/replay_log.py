@@ -49,7 +49,8 @@ def main():
     }
     connections = (
         ("log.x", "linear.x"),
-        ("linear.y", "square.x")
+        ("linear.y", "square.x"),
+        ("square.y", "result.y")
     )
     dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods, vis)
     dfc.setup()

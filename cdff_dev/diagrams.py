@@ -7,8 +7,9 @@ except ImportError:
 
 
 def save_graph_png(dfc, filename):
+    """TODO document me"""
     graph = pydot.Dot(graph_type="digraph")
-    input_ports, output_ports, log_ports = dfc.ports()
+    input_ports, output_ports, log_ports, result_ports = dfc.ports()
 
     fillcolor = "#555555"
     for node_name in dfc.nodes.keys():
@@ -28,11 +29,20 @@ def save_graph_png(dfc, filename):
 
     fillcolor = "#bb5555"
     for node_name in log_ports.keys():
-        cluster = pydot.Cluster(__display_name(node_name), label=label)
+        cluster = pydot.Cluster(__display_name(node_name), label="")
         component_node = pydot.Node(
             __display_name(node_name), style="filled", fillcolor=fillcolor)
         cluster.add_node(component_node)
         _add_ports_to_cluster(node_name, log_ports[node_name], cluster)
+        graph.add_subgraph(cluster)
+
+    for node_name in result_ports.keys():
+        cluster = pydot.Cluster(__display_name(node_name), label="")
+        component_node = pydot.Node(
+            __display_name(node_name), style="filled", fillcolor=fillcolor)
+        cluster.add_node(component_node)
+        _add_ports_to_cluster(node_name, result_ports[node_name], cluster,
+                              output=False)
         graph.add_subgraph(cluster)
 
     for output_port, input_port in dfc.connections:
