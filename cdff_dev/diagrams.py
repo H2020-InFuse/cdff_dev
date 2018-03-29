@@ -7,9 +7,17 @@ except ImportError:
 
 
 def save_graph_png(dfc, filename):
-    """TODO document me"""
+    """Creates a graph visualization of the managed processing network.
+
+    Parameters
+    ----------
+    dfc : DataFlowControl
+        Fully initialized data flow control
+
+    filename : str
+        Name of the output file (should have a '.png' ending)
+    """
     graph = pydot.Dot(graph_type="digraph")
-    input_ports, output_ports, log_ports, result_ports = dfc.ports()
 
     fillcolor = "#555555"
     for node_name in dfc.nodes.keys():
@@ -22,26 +30,26 @@ def save_graph_png(dfc, filename):
         component_node = pydot.Node(
             __display_name(node_name), style="filled", fillcolor=fillcolor)
         cluster.add_node(component_node)
-        _add_ports_to_cluster(node_name, input_ports[node_name], cluster,
+        _add_ports_to_cluster(node_name, dfc.input_ports_[node_name], cluster,
                               output=False)
-        _add_ports_to_cluster(node_name, output_ports[node_name], cluster)
+        _add_ports_to_cluster(node_name, dfc.output_ports_[node_name], cluster)
         graph.add_subgraph(cluster)
 
     fillcolor = "#bb5555"
-    for node_name in log_ports.keys():
+    for node_name in dfc.log_ports_.keys():
         cluster = pydot.Cluster(__display_name(node_name), label="")
         component_node = pydot.Node(
             __display_name(node_name), style="filled", fillcolor=fillcolor)
         cluster.add_node(component_node)
-        _add_ports_to_cluster(node_name, log_ports[node_name], cluster)
+        _add_ports_to_cluster(node_name, dfc.log_ports_[node_name], cluster)
         graph.add_subgraph(cluster)
 
-    for node_name in result_ports.keys():
+    for node_name in dfc.result_ports_.keys():
         cluster = pydot.Cluster(__display_name(node_name), label="")
         component_node = pydot.Node(
             __display_name(node_name), style="filled", fillcolor=fillcolor)
         cluster.add_node(component_node)
-        _add_ports_to_cluster(node_name, result_ports[node_name], cluster,
+        _add_ports_to_cluster(node_name, dfc.result_ports_[node_name], cluster,
                               output=False)
         graph.add_subgraph(cluster)
 

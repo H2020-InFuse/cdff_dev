@@ -61,7 +61,7 @@ class DataFlowControl:
         self.visualization = visualization
         self.verbose = verbose
 
-        self.node_statistics_ = NodeStatistics()
+        self.node_statistics_ = None
         self.output_ports_ = None
         self.input_ports_ = None
         self.log_ports_ = None
@@ -69,6 +69,12 @@ class DataFlowControl:
         self.connection_map = None
 
     def setup(self):
+        """Setup network.
+
+        This function must be called before any log data can be fed into this
+        class. Initializes internal data structures and configures nodes.
+        """
+        self.node_statistics_ = NodeStatistics()
         self._configure_nodes()
         self._cache_ports()
         self._configure_periods()
@@ -131,9 +137,20 @@ class DataFlowControl:
             self.connection_map[output_port].append(input_port)
 
     def process_sample(self, timestamp, stream_name, sample):
-        """TODO document me
+        """Makes a new sample available to the network and runs nodes.
 
-        Note that timestamps must be greater than or equal 0.
+        Parameters
+        ----------
+        timestamp : int
+            Current time from the log data. Note that timestamps must be
+            greater than or equal 0.
+
+        stream_name : str
+            Name of the stream in the form 'node.port'.
+
+        sample : anything
+            Current sample. The type must correspond to the connected input
+            port.
         """
         self._run_all_nodes_before(timestamp)
         node, port = stream_name.split(".")
@@ -220,11 +237,6 @@ class DataFlowControl:
         elif self.verbose >= 2:
             print("[DataFlowControl] port '%s' is not connected"
                   % output_port)
-
-    def ports(self):
-        """TODO document me"""
-        return (self.input_ports_, self.output_ports_, self.log_ports_,
-                self.result_ports_)
 
 
 class NodeStatistics:
