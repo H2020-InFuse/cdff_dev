@@ -57,6 +57,7 @@ def main():
     vis.report_dfc_network(dfc, "network.png")
     for i in range(10000):
         dfc.process_sample(timestamp=i, stream_name="log.x", sample=i)
+    dfc.node_statistics_.print_statistics()
 
 
 if __name__ == "__main__":

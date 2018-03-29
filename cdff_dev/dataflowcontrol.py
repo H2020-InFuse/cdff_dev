@@ -1,4 +1,5 @@
 from collections import defaultdict
+import time
 
 
 class DataFlowControl:
@@ -27,6 +28,10 @@ class DataFlowControl:
 
     Attributes
     ----------
+    node_statistics_ : NodeStatistics
+        Store runtime data about nodes that can be used for analysis of the
+        network.
+
     output_ports_ : dict
         A dictionary with node names as keys and dictionaries as values. The
         values represent a dictionary that maps from port names (without
@@ -56,6 +61,7 @@ class DataFlowControl:
         self.visualization = visualization
         self.verbose = verbose
 
+        self.node_statistics_ = NodeStatistics()
         self.output_ports_ = None
         self.input_ports_ = None
         self.log_ports_ = None
@@ -150,7 +156,13 @@ class DataFlowControl:
                     if self.verbose >= 1:
                         print(current_node + ".set_time(time) not implemented")
 
+                start_time = time.process_time()
+
                 node.process()
+
+                end_time = time.process_time()
+                self.node_statistics_.report_processing_duration(
+                    current_node, end_time - start_time)
 
                 outputs = self._pull_output(
                     current_node, timestamp_before_process)
@@ -213,6 +225,35 @@ class DataFlowControl:
         """TODO document me"""
         return (self.input_ports_, self.output_ports_, self.log_ports_,
                 self.result_ports_)
+
+
+class NodeStatistics:
+    """Collects statistics about nodes.
+
+    Attributes
+    ----------
+    processing_durations_ : dict
+        Contains processing times for each node that has been executed.
+        Only the time in this process is measured.
+    """
+    def __init__(self):
+        self.processing_durations_ = defaultdict(list)
+
+    def report_processing_duration(self, node_name, duration):
+        self.processing_durations_[node_name].append(duration)
+
+    def print_statistics(self):
+        average_processing_durations = dict(
+            (node_name, sum(self.processing_durations_[node_name]) /
+                       len(self.processing_durations_[node_name]))
+            for node_name in self.processing_durations_.keys()
+        )
+
+        print("Processing times:")
+        for node_name, average_processing_duration in \
+                self.processing_durations_.items():
+            print("  " + node_name + ": %g s"
+                  % average_processing_durations[node_name])
 
 
 from . import diagrams
