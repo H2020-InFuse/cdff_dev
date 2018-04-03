@@ -154,8 +154,12 @@ class DataFlowControl:
                 self.node_facade.process(current_node)
 
                 end_time = time.process_time()
+                processing_time = end_time - start_time
                 self.node_statistics_.report_processing_duration(
-                    current_node, end_time - start_time)
+                    current_node, processing_time)
+                if self.verbose >= 1:
+                    print("[DataFlowControl] Processed node '%s' in %g seconds"
+                          % (current_node, processing_time))
 
                 outputs = self._pull_output(current_node)
 
