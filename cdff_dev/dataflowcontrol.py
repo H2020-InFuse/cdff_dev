@@ -75,61 +75,44 @@ class DataFlowControl:
         class. Initializes internal data structures and configures nodes.
         """
         self.node_statistics_ = NodeStatistics()
-        self._configure_nodes()
+        self.node_bridge = NodeBridge(self.nodes, self.verbose)
+        self.node_bridge.configure_all()
         self._cache_ports()
         self._configure_periods()
         self._configure_connections()
 
-    def _configure_nodes(self):
-        for node in self.nodes.values():
-            node.configure()
-
     def _cache_ports(self):
         self.output_ports_ = dict(
-            (node_name, dict()) for node_name in self.nodes.keys())
+            (node_name, dict()) for node_name in self.node_bridge.node_names())
         self.input_ports_ = dict(
-            (node_name, dict()) for node_name in self.nodes.keys())
+            (node_name, dict()) for node_name in self.node_bridge.node_names())
         self.log_ports_ = defaultdict(list)
         self.result_ports_ = defaultdict(list)
 
         for output_port, input_port in self.connections:
-            node_name, port_name, port = self._check_port(output_port, "Output")
+            node_name, port_name, port = self.node_bridge.check_port(
+                output_port, "Output")
             if port is None:
                 self.log_ports_[node_name].append(port_name)
             else:
                 self.output_ports_[node_name][port_name] = port
 
-            node_name, port_name, port = self._check_port(input_port, "Input")
+            node_name, port_name, port = self.node_bridge.check_port(
+                input_port, "Input")
             if port is None:
                 self.result_ports_[node_name].append(port_name)
             else:
                 self.input_ports_[node_name][port_name] = port
 
-    def _check_port(self, port, port_type):
-        if port_type not in ["Input", "Output"]:
-            raise ValueError("port_type must be either 'Input' or 'Output'")
-
-        node_name, port_name = port.split(".")
-        if node_name not in self.nodes:
-            return node_name, port_name, None
-
-        node = self.nodes[node_name]
-        method_name = port_name + port_type
-
-        if port_type == "Input" and not hasattr(node, method_name):
-            raise AttributeError(
-                "Could not find %s.%s(...) corresponding to port %s"
-                % (type(node), method_name, port_name))
-
-        return node_name, port_name, getattr(node, method_name)
-
     def _configure_periods(self):
-        if set(self.nodes.keys()) != set(self.periods.keys()):
+        if set(self.node_bridge.node_names()) != set(self.periods.keys()):
             raise ValueError(
                 "Mismatch between nodes and periods. Nodes: %s, periods: %s"
-                % (sorted(self.nodes.keys()), sorted(self.periods.keys())))
+                % (sorted(self.node_bridge.node_names()),
+                   sorted(self.periods.keys())))
 
-        self.last_processed = {node: -1 for node in self.nodes.keys()}
+        self.last_processed = {
+            node: -1 for node in self.node_bridge.node_names()}
 
     def _configure_connections(self):
         self.connection_map = defaultdict(list)
@@ -164,18 +147,13 @@ class DataFlowControl:
             if timestamp_before_process <= timestamp:
                 changed = True
                 self.last_processed[current_node] = timestamp_before_process
-                node = self.nodes[current_node]
 
-                try:
-                    # TODO how do we pass the current time to the node?
-                    node.set_time(timestamp_before_process)
-                except:
-                    if self.verbose >= 1:
-                        print(current_node + ".set_time(time) not implemented")
+                self.node_bridge.set_time(
+                    current_node, timestamp_before_process)
 
                 start_time = time.process_time()
 
-                node.process()
+                self.node_bridge.process(current_node)
 
                 end_time = time.process_time()
                 self.node_statistics_.report_processing_duration(
@@ -237,6 +215,62 @@ class DataFlowControl:
         elif self.verbose >= 2:
             print("[DataFlowControl] port '%s' is not connected"
                   % output_port)
+
+
+class NodeBridge:
+    """Decouples the node interface from data flow control.
+
+    Parameters
+    ----------
+    nodes : list
+        Node instances
+
+    verbose : int, optional (default: 0)
+        Verbosity level
+    """
+    def __init__(self, nodes, verbose=0):
+        self.nodes = nodes
+        self.verbose = verbose
+
+    def configure_all(self):
+        for node in self.nodes.values():
+            node.configure()
+
+    def node_names(self):
+        return self.nodes.keys()
+
+    def exists(self, node_name):
+        return node_name in self.nodes
+
+    def process(self, node_name):
+        self.nodes[node_name].process()
+
+    def set_time(self, node_name, time):
+        node = self.nodes[node_name]
+        try:
+            # TODO how do we pass the current time to the node?
+            node.set_time(time)
+        except:
+            if self.verbose >= 1:
+                print(node_name + ".set_time(time) not implemented")
+
+    def check_port(self, port, port_type):
+        if port_type not in ["Input", "Output"]:
+            raise ValueError("port_type must be either 'Input' or 'Output'")
+
+        node_name, port_name = port.split(".")
+        if not self.exists(node_name):
+            return node_name, port_name, None
+
+        node = self.nodes[node_name]
+        method_name = port_name + port_type
+
+        if port_type == "Input" and not hasattr(node, method_name):
+            raise AttributeError(
+                "Could not find %s.%s(...) corresponding to port %s"
+                % (type(node), method_name, port_name))
+
+        return node_name, port_name, getattr(node, method_name)
 
 
 class NodeStatistics:
