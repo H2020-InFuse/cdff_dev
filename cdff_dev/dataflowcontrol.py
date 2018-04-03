@@ -50,7 +50,7 @@ class DataFlowControl:
         A dictionary with node names as keys and port names (without
         node prefix) as values.
 
-    connection_map : list
+    connection_map_ : list
         A list of pairs of output node and connected input node. Full names
         of the form 'node_name.port_name' are used here.
     """
@@ -66,7 +66,7 @@ class DataFlowControl:
         self.input_ports_ = None
         self.log_ports_ = None
         self.result_ports_ = None
-        self.connection_map = None
+        self.connection_map_ = None
 
     def setup(self):
         """Setup network.
@@ -115,9 +115,9 @@ class DataFlowControl:
             node: -1 for node in self.node_facade.node_names()}
 
     def _configure_connections(self):
-        self.connection_map = defaultdict(list)
+        self.connection_map_ = defaultdict(list)
         for output_port, input_port in self.connections:
-            self.connection_map[output_port].append(input_port)
+            self.connection_map_[output_port].append(input_port)
 
     def process_sample(self, timestamp, stream_name, sample):
         """Makes a new sample available to the network and runs nodes.
@@ -200,8 +200,8 @@ class DataFlowControl:
 
     def _push_input(self, node_name, port_name, sample):
         output_port = node_name + "." + port_name
-        if output_port in self.connection_map:
-            for input_port in self.connection_map[output_port]:
+        if output_port in self.connection_map_:
+            for input_port in self.connection_map_[output_port]:
                 if self.verbose >= 1:
                     print("[DataFlowControl] setting %s" % input_port)
                 input_node_name, input_port_name = input_port.split(".")
