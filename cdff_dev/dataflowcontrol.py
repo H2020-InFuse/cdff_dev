@@ -158,8 +158,12 @@ class DataFlowControl:
                 self.node_statistics_.report_processing_duration(
                     current_node, end_time - start_time)
 
-                outputs = self._pull_output(
-                    current_node, timestamp_before_process)
+                outputs = self._pull_output(current_node)
+
+                for port_name, sample in outputs.items():
+                    # TODO should we add the processing time?
+                    self.visualization.report_node_output(
+                        port_name, sample, timestamp_before_process)
 
                 for port_name, sample in outputs.items():
                     self._push_input(port_name, sample)
@@ -186,14 +190,12 @@ class DataFlowControl:
 
         return current_node, timestamp_before_process
 
-    def _pull_output(self, node_name, timestamp):
+    def _pull_output(self, node_name):
         outputs = dict()
         for port_name, getter in self.output_ports_[node_name].items():
             if self.verbose >= 1:
                 print("[DataFlowControl] getting %s" % port_name)
             sample = getter()
-            self.visualization.report_node_output(
-                node_name, port_name, sample, timestamp)
             outputs[node_name + "." + port_name] = sample
         return outputs
 
@@ -315,10 +317,9 @@ class TextVisualization:
         """TODO seems out of place here..."""
         diagrams.save_graph_png(dfc, network_visualization_filename)
 
-    def report_node_output(self, node_name, port_name, sample, timestamp):
+    def report_node_output(self, port_name, sample, timestamp):
         print("Visualizing sample:")
         print("  Timestamp: %s" % timestamp)
-        print("  Node: %s" % node_name)
         print("  Port: %s" % port_name)
         print("  Sample: %s" % sample)
 
