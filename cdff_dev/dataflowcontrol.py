@@ -75,29 +75,29 @@ class DataFlowControl:
         class. Initializes internal data structures and configures nodes.
         """
         self.node_statistics_ = NodeStatistics()
-        self.node_bridge = NodeBridge(self.nodes, self.verbose)
-        self.node_bridge.configure_all()
+        self.node_facade = NodeFacade(self.nodes, self.verbose)
+        self.node_facade.configure_all()
         self._cache_ports()
         self._configure_periods()
         self._configure_connections()
 
     def _cache_ports(self):
         self.output_ports_ = dict(
-            (node_name, dict()) for node_name in self.node_bridge.node_names())
+            (node_name, dict()) for node_name in self.node_facade.node_names())
         self.input_ports_ = dict(
-            (node_name, dict()) for node_name in self.node_bridge.node_names())
+            (node_name, dict()) for node_name in self.node_facade.node_names())
         self.log_ports_ = defaultdict(list)
         self.result_ports_ = defaultdict(list)
 
         for output_port, input_port in self.connections:
-            node_name, port_name, port = self.node_bridge.check_port(
+            node_name, port_name, port = self.node_facade.check_port(
                 output_port, "Output")
             if port is None:
                 self.log_ports_[node_name].append(port_name)
             else:
                 self.output_ports_[node_name][port_name] = port
 
-            node_name, port_name, port = self.node_bridge.check_port(
+            node_name, port_name, port = self.node_facade.check_port(
                 input_port, "Input")
             if port is None:
                 self.result_ports_[node_name].append(port_name)
@@ -105,14 +105,14 @@ class DataFlowControl:
                 self.input_ports_[node_name][port_name] = port
 
     def _configure_periods(self):
-        if set(self.node_bridge.node_names()) != set(self.periods.keys()):
+        if set(self.node_facade.node_names()) != set(self.periods.keys()):
             raise ValueError(
                 "Mismatch between nodes and periods. Nodes: %s, periods: %s"
-                % (sorted(self.node_bridge.node_names()),
+                % (sorted(self.node_facade.node_names()),
                    sorted(self.periods.keys())))
 
         self.last_processed = {
-            node: -1 for node in self.node_bridge.node_names()}
+            node: -1 for node in self.node_facade.node_names()}
 
     def _configure_connections(self):
         self.connection_map = defaultdict(list)
@@ -148,12 +148,12 @@ class DataFlowControl:
                 changed = True
                 self.last_processed[current_node] = timestamp_before_process
 
-                self.node_bridge.set_time(
+                self.node_facade.set_time(
                     current_node, timestamp_before_process)
 
                 start_time = time.process_time()
 
-                self.node_bridge.process(current_node)
+                self.node_facade.process(current_node)
 
                 end_time = time.process_time()
                 self.node_statistics_.report_processing_duration(
@@ -217,7 +217,7 @@ class DataFlowControl:
                   % output_port)
 
 
-class NodeBridge:
+class NodeFacade:
     """Decouples the node interface from data flow control.
 
     Parameters
