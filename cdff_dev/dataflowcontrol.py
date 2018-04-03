@@ -82,27 +82,25 @@ class DataFlowControl:
         self._configure_connections()
 
     def _cache_ports(self):
-        self.output_ports_ = dict(
-            (node_name, dict()) for node_name in self.node_facade.node_names())
-        self.input_ports_ = dict(
-            (node_name, dict()) for node_name in self.node_facade.node_names())
+        self.output_ports_ = defaultdict(list)
+        self.input_ports_ = defaultdict(list)
         self.log_ports_ = defaultdict(list)
         self.result_ports_ = defaultdict(list)
 
         for output_port, input_port in self.connections:
-            node_name, port_name, port = self.node_facade.check_port(
+            node_name, port_name, port_exists = self.node_facade.check_port(
                 output_port, "Output")
-            if port is None:
+            if port_exists:
+                self.output_ports_[node_name].append(port_name)
+            else:
                 self.log_ports_[node_name].append(port_name)
-            else:
-                self.output_ports_[node_name][port_name] = port
 
-            node_name, port_name, port = self.node_facade.check_port(
+            node_name, port_name, port_exists = self.node_facade.check_port(
                 input_port, "Input")
-            if port is None:
-                self.result_ports_[node_name].append(port_name)
+            if port_exists:
+                self.input_ports_[node_name].append(port_name)
             else:
-                self.input_ports_[node_name][port_name] = port
+                self.result_ports_[node_name].append(port_name)
 
     def _configure_periods(self):
         if set(self.node_facade.node_names()) != set(self.periods.keys()):
@@ -141,7 +139,8 @@ class DataFlowControl:
     def _run_all_nodes_before(self, timestamp):
         changed = True
         while changed:
-            current_node, timestamp_before_process = self._get_next_node(timestamp)
+            current_node, timestamp_before_process = self._get_next_node(
+                timestamp)
 
             if timestamp_before_process <= timestamp:
                 changed = True
@@ -192,10 +191,10 @@ class DataFlowControl:
 
     def _pull_output(self, node_name):
         outputs = dict()
-        for port_name, getter in self.output_ports_[node_name].items():
+        for port_name in self.output_ports_[node_name]:
             if self.verbose >= 1:
                 print("[DataFlowControl] getting %s" % port_name)
-            sample = getter()
+            sample = self.node_facade.read_output_port(node_name, port_name)
             outputs[node_name + "." + port_name] = sample
         return outputs
 
@@ -206,8 +205,8 @@ class DataFlowControl:
                     print("[DataFlowControl] setting %s" % input_port)
                 input_node_name, input_port_name = input_port.split(".")
                 if input_node_name in self.input_ports_:
-                    setter = self.input_ports_[input_node_name][input_port_name]
-                    setter(sample)
+                    self.node_facade.write_input_port(
+                        input_node_name, input_port_name, sample)
                 elif input_node_name in self.result_ports_:
                     pass  # TODO how should we handle result ports?
                 else:
@@ -260,7 +259,7 @@ class NodeFacade:
 
         node_name, port_name = port.split(".")
         if not self.exists(node_name):
-            return node_name, port_name, None
+            return node_name, port_name, False
 
         node = self.nodes[node_name]
         method_name = port_name + port_type
@@ -270,7 +269,19 @@ class NodeFacade:
                 "Could not find %s.%s(...) corresponding to port %s"
                 % (type(node), method_name, port_name))
 
-        return node_name, port_name, getattr(node, method_name)
+        return node_name, port_name, True
+
+    def read_output_port(self, node_name, port_name):
+        node = self.nodes[node_name]
+        method_name = port_name + "Output"
+        getter = getattr(node, method_name)
+        return getter()
+
+    def write_input_port(self, node_name, port_name, sample):
+        node = self.nodes[node_name]
+        method_name = port_name + "Input"
+        setter = getattr(node, method_name)
+        return setter(sample)
 
 
 class NodeStatistics:
