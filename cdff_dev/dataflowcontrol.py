@@ -136,8 +136,7 @@ class DataFlowControl:
             port.
         """
         self._run_all_nodes_before(timestamp)
-        node, port = stream_name.split(".")
-        self._push_input(node, port, sample)
+        self._push_input(stream_name, sample)
 
     def _run_all_nodes_before(self, timestamp):
         changed = True
@@ -163,7 +162,7 @@ class DataFlowControl:
                     current_node, timestamp_before_process)
 
                 for port_name, sample in outputs.items():
-                    self._push_input(current_node, port_name, sample)
+                    self._push_input(port_name, sample)
 
                 # TODO use output_ports_ to implement port trigger
                 # output_ports = self.output_ports_[current_node].keys()
@@ -195,11 +194,10 @@ class DataFlowControl:
             sample = getter()
             self.visualization.report_node_output(
                 node_name, port_name, sample, timestamp)
-            outputs[port_name] = sample
+            outputs[node_name + "." + port_name] = sample
         return outputs
 
-    def _push_input(self, node_name, port_name, sample):
-        output_port = node_name + "." + port_name
+    def _push_input(self, output_port, sample):
         if output_port in self.connection_map_:
             for input_port in self.connection_map_[output_port]:
                 if self.verbose >= 1:
