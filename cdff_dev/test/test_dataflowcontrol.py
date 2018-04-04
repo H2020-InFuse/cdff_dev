@@ -1,5 +1,5 @@
 from cdff_dev import dataflowcontrol
-from cdff_dev import diagrams
+from nose.tools import assert_in, assert_equal
 
 
 class LinearDFN:
@@ -38,15 +38,15 @@ class SquareDFN:
         return self.y
 
 
-def main():
-    vis = dataflowcontrol.TextVisualization()
+def test_dfc():
+    vis = dataflowcontrol.NoVisualization()
     nodes = {
         "linear": LinearDFN(),
         "square": SquareDFN()
     }
     periods = {
-        "linear": 1000,
-        "square": 1000
+        "linear": 1,
+        "square": 1
     }
     connections = (
         ("log.x", "linear.x"),
@@ -55,11 +55,10 @@ def main():
     )
     dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods, vis)
     dfc.setup()
-    diagrams.save_graph_png(dfc, network_visualization_filename)
-    for i in range(10000):
+    for i in range(101):
         dfc.process_sample(timestamp=i, stream_name="log.x", sample=i)
-    dfc.node_statistics_.print_statistics()
-
-
-if __name__ == "__main__":
-    main()
+    dfc.process(timestamp=102)
+    assert_in("linear.y", vis.data)
+    assert_equal(vis.data["linear.y"][0], 201.0)
+    assert_in("square.y", vis.data)
+    assert_equal(vis.data["square.y"][0], 40401.0)

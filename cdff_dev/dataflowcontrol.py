@@ -136,6 +136,17 @@ class DataFlowControl:
         self._run_all_nodes_before(timestamp)
         self._push_input(stream_name, sample)
 
+    def process(self, timestamp):
+        """Runs all nodes until a specific timestamp.
+
+        Parameters
+        ----------
+        timestamp : int
+            Current time from the log data. Note that timestamps must be
+            greater than or equal 0.
+        """
+        self._run_all_nodes_before(timestamp)
+
     def _run_all_nodes_before(self, timestamp):
         changed = True
         while changed:
@@ -317,7 +328,16 @@ class NodeStatistics:
                   % average_processing_durations[node_name])
 
 
-from . import diagrams
+class NoVisualization:
+    """No visualization.
+
+    This is just for testing purposes.
+    """
+    def __init__(self):
+        self.data = dict()
+
+    def report_node_output(self, port_name, sample, timestamp):
+        self.data[port_name] = (sample, timestamp)
 
 
 class TextVisualization:
@@ -327,10 +347,6 @@ class TextVisualization:
     """
     def __init__(self):
         pass
-
-    def report_dfc_network(self, dfc, network_visualization_filename):
-        """TODO seems out of place here..."""
-        diagrams.save_graph_png(dfc, network_visualization_filename)
 
     def report_node_output(self, port_name, sample, timestamp):
         print("Visualizing sample:")
