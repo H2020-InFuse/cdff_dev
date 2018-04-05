@@ -15,7 +15,10 @@ Installation instructions for other systems are available at the
 
 ## Log in SpaceApps docker server
 
-XXX The instructions should have been made available for you via E-Mail
+The login step are explained for security reason in this document [https://owncloud.spaceapplications.com/owncloud/index.php/apps/files/ajax/download.php?dir=%2F%2BInFuse-SHARED%2F%2BWP9%20-%20CDFF%20Software%20Infrastructure%20and%20Supporting%20Tools&files=docker-server-logging.txt]
+
+If you don't have access to the Owncloud of Space Applications, contact someone from Space Applications to get access.
+
 
 ## Build Image
 
