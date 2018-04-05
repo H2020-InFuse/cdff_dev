@@ -650,7 +650,12 @@ cdef class LaserScan:
         return self.thisptr.ranges.nCount
 
     def __str__(self):
-        return str("{type: LaserScan, data=[?]}")  # TODO
+        return str(
+            "{type: LaserScan, start_angle=%g, angular_resolution=%g, "
+            "speed=%g, min_range=%g, max_range=%g, ranges=%s, remission=%s}"
+            % (self.thisptr.start_angle, self.thisptr.angular_resolution,
+               self.thisptr.speed, self.thisptr.minRange, self.thisptr.maxRange,
+               self.ranges, self.remission))
 
     def assign(self, LaserScan other):
         self.thisptr.assign(deref(other.thisptr))
@@ -735,6 +740,8 @@ cdef class LaserScan_remissionReference:
             warnings.warn("Maximum size of LaserScan is 60")
             return
         self.thisptr.arr[i] = v
+        if self.thisptr.nCount <= i:
+            self.thisptr.nCount = i + 1
 
     def resize(self, int size):
         if size > 60:
@@ -744,6 +751,10 @@ cdef class LaserScan_remissionReference:
 
     def size(self):
         return self.thisptr.nCount
+
+    def __str__(self):
+        return str("[%s]" % (", ".join(str(self.thisptr.arr[i])
+                                       for i in range(self.size()))))
 
 
 cdef class LaserScan_rangesReference:
@@ -761,6 +772,8 @@ cdef class LaserScan_rangesReference:
             warnings.warn("Maximum size of LaserScan is 60")
             return
         self.thisptr.arr[i] = v
+        if self.thisptr.nCount <= i:
+            self.thisptr.nCount = i + 1
 
     def resize(self, int size):
         if size > 60:
@@ -770,6 +783,10 @@ cdef class LaserScan_rangesReference:
 
     def size(self):
         return self.thisptr.nCount
+
+    def __str__(self):
+        return str("[%s]" % (", ".join(str(self.thisptr.arr[i])
+                                       for i in range(self.size()))))
 
 
 cdef class RigidBodyState:
@@ -786,8 +803,11 @@ cdef class RigidBodyState:
         self.delete_thisptr = True
 
     def __str__(self):
-        return str("{type: RigidBodyStateg, %s, sourceFrame=%s, targetFrame=%s, ...}"
-                   % (self.timestamp, self.source_frame, self.target_frame))
+        return str(
+            "{type: RigidBodyState, timestamp=%s, sourceFrame=%s, "
+            "targetFrame=%s, pos=%s, orient=%s}"
+            % (self.timestamp, self.source_frame, self.target_frame, self.pos,
+               self.orient))
 
     def _get_timestamp(self):
         cdef Time timestamp = Time()
