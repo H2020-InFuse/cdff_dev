@@ -1,16 +1,6 @@
 from cdff_dev import logloader, typefromdict
-from nose.tools import assert_in, assert_equal
+from nose.tools import assert_equal
 from numpy.testing import assert_array_less
-
-
-def test_load_log():
-    log = logloader.load_log("test/test_data/logs/test_log.msg")
-    assert_in("/dynamixel.status_samples", log)
-    assert_in("/dynamixel.status_samples.meta", log)
-    assert_in("/dynamixel.transforms", log)
-    assert_in("/dynamixel.transforms.meta", log)
-    assert_in("/hokuyo.scans", log)
-    assert_in("/hokuyo.scans.meta", log)
 
 
 def test_replay():
