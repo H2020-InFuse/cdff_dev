@@ -805,7 +805,7 @@ cdef class RigidBodyState:
     def __str__(self):
         return str(
             "{type: RigidBodyState, timestamp=%s, sourceFrame=%s, "
-            "targetFrame=%s, pos=%s, orient=%s}"
+            "targetFrame=%s, pos=%s, orient=%s, ...}"
             % (self.timestamp, self.source_frame, self.target_frame, self.pos,
                self.orient))
 

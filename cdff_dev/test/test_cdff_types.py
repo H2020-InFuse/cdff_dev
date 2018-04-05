@@ -739,10 +739,13 @@ def test_rigid_body_state_str():
     rbs = cdff_types.RigidBodyState()
     rbs.source_frame = "source"
     rbs.target_frame = "target"
+    assert_equal.__self__.maxDiff = None
     assert_equal(
         str(rbs),
-        "{type: RigidBodyStateg, {type: Time, microseconds: 0, usec_per_sec: 0}, "
-        "sourceFrame=source, targetFrame=target, ...}")
+        "{type: RigidBodyState, timestamp={type: Time, microseconds: 0, "
+        "usec_per_sec: 0}, sourceFrame=source, targetFrame=target, "
+        "pos={type: Vector3d, data=[0.00, 0.00, 0.00]}, orient={type: "
+        "Quaterniond, data=[0.00, 0.00, 0.00, 0.00]}, ...}")
 
 
 def test_rigid_body_state_get_set_position():
