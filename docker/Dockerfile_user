@@ -14,7 +14,8 @@ RUN ln -sf /InFuse/CDFF /builds/InFuse/CDFF
 WORKDIR /builds/InFuse/CDFF/build
 RUN cmake -DCMAKE_INSTALL_PREFIX=./ ..
 WORKDIR /InFuse/CDFF_dev
-RUN echo -n "/InFuse/CDFF" > cdffpath
+RUN echo -n "CDFF" > cdffpath
+RUN ln -s "/InFuse/CDFF" "CDFF"
 RUN pip3 install -e .
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
