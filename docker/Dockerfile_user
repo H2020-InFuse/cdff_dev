@@ -1,4 +1,4 @@
-FROM nexus.spaceapplications.com/repository/infuse/cdff-dev-ci:latest
+FROM cdff-dev-ci:latest
 
 RUN mkdir -p /InFuse/build_tools
 WORKDIR /InFuse

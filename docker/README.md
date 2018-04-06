@@ -9,42 +9,45 @@ For Ubuntu:
 Installation instructions for other systems are available at the
 [official documentation](https://docs.docker.com/engine/installation/).
 
-## Clone the cdff_dev if you haven't yet
+## Use Image from Docker Registry
 
-    ~/infuse/ $git clone git@gitlab.spaceapplications.com:InFuse/CDFF_dev.git
-
-## Log in SpaceApps docker server
-
-The login step are explained for security reason in this [document](https://owncloud.spaceapplications.com/owncloud/index.php/apps/files/ajax/download.php?dir=%2F%2BInFuse-SHARED%2F%2BWP9%20-%20CDFF%20Software%20Infrastructure%20and%20Supporting%20Tools&files=docker-server-logging.txt).
-
-If you don't have access to the Owncloud of Space Applications, contact someone from Space Applications to get access.
-
+* Log in SpaceApps docker server.
+  The login step are explained for security reason in this
+  [document](https://owncloud.spaceapplications.com/owncloud/index.php/apps/files/ajax/download.php?dir=%2F%2BInFuse-SHARED%2F%2BWP9%20-%20CDFF%20Software%20Infrastructure%20and%20Supporting%20Tools&files=docker-server-logging.txt).
+  If you don't have access to the Owncloud of Space Applications, contact
+  someone from Space Applications to get access.
+* Select the docker image that you want to use from the registry, for example,
+  `nexus.spaceapplications.com/repository/infuse/cdff_dev:1.6.4`. You can
+  browse available images at [this website](https://nexus.spaceapplications.com)
+  if you login with the same account.
+* Create a container from the image. See Section 'Create Container' for details.
 
 ## Build Image
 
 Note: The average user does not have to build an image. Usually the image will
-be distributed to the users.
+be distributed to the users through a docker registry.
 
-### Option 1: Version for users
+* Clone the cdff_dev if you haven't yet
 
-    docker build -t repository/infuse/cdff-dev:<version> -f Dockerfile_user .
+    git clone git@gitlab.spaceapplications.com:InFuse/CDFF_dev.git
 
-### Option 1: Version for CI
+* Go to the directory `docker`.
+* Log in SpaceApps docker server.
+  The login step are explained for security reason in this
+  [document](https://owncloud.spaceapplications.com/owncloud/index.php/apps/files/ajax/download.php?dir=%2F%2BInFuse-SHARED%2F%2BWP9%20-%20CDFF%20Software%20Infrastructure%20and%20Supporting%20Tools&files=docker-server-logging.txt).
+  If you don't have access to the Owncloud of Space Applications, contact
+  someone from Space Applications to get access.
 
-    docker build -t repository/infuse/cdff-dev-ci:<version> .
+* Build base image with dependencies (cdff-dev-ci):
+
+    docker build -t cdff-dev-ci:latest .
+
+* Build version for users (cdff-dev):
+
+    docker build -t cdff-dev:latest -f Dockerfile_user .
 
 Sometimes it is necessary to clean the docker cache if you want to rebuild the
 image. You just have to add `--no-cache` in this case.
-
-## Export / Import Image
-
-Once you built the docker image, it can be exported with
-
-    docker save repository/infuse/cdff-dev:latest > cdff_dev.latest.tar
-
-and someone else can import it with
-
-    docker load -i cdff-dev.latest.tar
 
 ## Create Container
 
@@ -52,12 +55,12 @@ You can create a container (runtime environment) from the image.
 
 Without GUI:
 
-    docker run -it repository/infuse/cdff-dev:latest bash
+    docker run -it <docker image>
 
 With GUI:
 
     xhost local:root
-    docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix --privileged repository/infuse/cdff-dev:latest
+    docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix --privileged <docker image>
 
 If you have a custom DNS server you can set it for the docker container with
 
@@ -77,7 +80,7 @@ Full example:
 
     xhost local:root
     export HOSTWORKDIR=...
-    docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOSTWORKDIR:/external --privileged --name dev repository/infuse/cdff-dev:latest bash
+    docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOSTWORKDIR:/external --privileged --name dev <docker image> bash
 
 ## Setup GPU
 
