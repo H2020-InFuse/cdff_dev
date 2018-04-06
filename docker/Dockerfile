@@ -1,4 +1,4 @@
-FROM nexus.spaceapplications.com/repository/infuse/cdff-ci:1.6.5.2
+FROM nexus.spaceapplications.com/repository/infuse/cdff-ci:1.7
 
 RUN apt-get update && apt-get -y install python3 python3-dev python3-pip python3-yaml curl
 
