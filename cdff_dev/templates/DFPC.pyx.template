@@ -33,8 +33,6 @@ cdef class {{ class_name }}:
 
     def setup(self):
         self.thisptr.setup()
+    {{ input_ports }}{{ output_ports }}
 {{ break }}
-    {{ input_ports }}
-
-    {{ output_ports }}
 {%- endfor %}

@@ -212,6 +212,7 @@ def write_dfpc(dfpc, output, source_folder=".", python_folder="python",
     implementation_files = write_class(
         dfpc, type_registry, "DFPCImplementation", dfpc["name"],
         target_folder=src_dir)
+    dfpc["implementations"] = [dfpc["name"]]
     cython_files = write_cython(dfpc, type_registry, "DFPC",
                                 target_folder=python_dir)
     return interface_files + implementation_files + cython_files

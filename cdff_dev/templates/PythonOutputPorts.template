@@ -7,4 +7,5 @@
         out.thisptr[0] = self.thisptr.{{ output_port["name"] }}Output()
         {%- endif %}
         return out
+{{ break }}
     {%- endfor %}
