@@ -24,12 +24,12 @@ def test_generate_files():
             os.path.exists(os.path.join(tmp_folder, "SquareInterface.cpp")))
         assert_true(os.path.exists(os.path.join(tmp_folder, "Square.hpp")))
         assert_true(os.path.exists(os.path.join(tmp_folder, "Square.cpp")))
-        assert_true(os.path.exists(os.path.join(tmp_folder, "python",
-                                                "dfn_ci_square.pxd")))
-        assert_true(os.path.exists(os.path.join(tmp_folder, "python",
-                                                "dfn_ci_square.pyx")))
-        assert_true(os.path.exists(os.path.join(tmp_folder, "python",
-                                                "_dfn_ci_square.pxd")))
+        assert_true(
+            os.path.exists(os.path.join(tmp_folder, "python", "square.pxd")))
+        assert_true(
+            os.path.exists(os.path.join(tmp_folder, "python", "square.pyx")))
+        assert_true(
+            os.path.exists(os.path.join(tmp_folder, "python", "_square.pxd")))
 
 
 def test_square():
@@ -44,21 +44,21 @@ def test_square():
 
         incdirs = ["test/test_output/", "CDFF/DFNs"]
         pyx_filename = os.path.join(
-            tmp_folder, "python", "dfn_ci_" + node["name"].lower() + ".pyx")
+            tmp_folder, "python", node["name"].lower() + ".pyx")
         implementation = map(
             lambda filename: os.path.join(tmp_folder, filename),
             ["Square.cpp", "SquareInterface.cpp"])
         build_extension(
             tmp_folder, hide_stderr=True,
-            name="dfn_ci_" + node["name"].lower(),
+            name=node["name"].lower(),
             pyx_filename=pyx_filename, implementation=implementation,
             sourcedir=tmp_folder, incdirs=incdirs,
             compiler_flags=[], library_dirs=[], libraries=[],
             includes=[]
         )
 
-        import dfn_ci_square
-        square = dfn_ci_square.Square()
+        import square
+        square = square.Square()
         square.configure()
         square.set_configuration_file("")
         square.xInput(5.0)
@@ -82,9 +82,9 @@ def test_unknown_type():
             Exception, "Exit status",
             build_extension,
             tmp_folder, hide_stderr=True,
-            name="dfn_ci_" + node["name"].lower(),
-            pyx_filename=os.path.join(tmp_folder, "python", "dfn_ci_" +
-                                      node["name"].lower() + ".pyx"),
+            name=node["name"].lower(),
+            pyx_filename=os.path.join(
+                tmp_folder, "python", node["name"].lower() + ".pyx"),
             implementation=map(
                 lambda filename: os.path.join(tmp_folder, filename),
                 ["UnknownType.cpp", "UnknownTypeInterface.cpp"]),
@@ -107,10 +107,9 @@ def test_multiple_implementations():
         incdirs = ["test/test_output/", "CDFF/DFNs"]
         build_extension(
             tmp_folder, hide_stderr=True,
-            name="dfn_ci_" + node["name"].lower(),
+            name=node["name"].lower(),
             pyx_filename=os.path.join(
-                tmp_folder, "python", "dfn_ci_" + node["name"].lower() +
-                ".pyx"),
+                tmp_folder, "python", node["name"].lower() + ".pyx"),
             implementation=map(
                 lambda filename: os.path.join(tmp_folder, filename),
                 ["Iterative.cpp", "Recursive.cpp", "FactorialInterface.cpp"]),
@@ -119,13 +118,13 @@ def test_multiple_implementations():
             includes=[]
         )
 
-        import dfn_ci_factorial
-        square = dfn_ci_factorial.Iterative()
+        import factorial
+        square = factorial.Iterative()
         square.configure()
         square.xInput(5.0)
         square.process()
 
-        square = dfn_ci_factorial.Recursive()
+        square = factorial.Recursive()
         square.configure()
         square.xInput(5.0)
         square.process()
@@ -146,10 +145,9 @@ def test_asn1():
         incdirs = ["test/test_output/", "CDFF/DFNs", ctypespath, dfnspath]
         build_extension(
             tmp_folder, hide_stderr=True,
-            name="dfn_ci_" + node["name"].lower(),
+            name=node["name"].lower(),
             pyx_filename=os.path.join(
-                tmp_folder, "python", "dfn_ci_" + node["name"].lower() +
-                ".pyx"),
+                tmp_folder, "python", node["name"].lower() + ".pyx"),
             implementation=map(
                 lambda filename: os.path.join(tmp_folder, filename),
                 ["ASN1Test.cpp", "ASN1TestInterface.cpp"]),
@@ -157,8 +155,8 @@ def test_asn1():
             compiler_flags=[], library_dirs=[], libraries=[],
             includes=[]
         )
-        import dfn_ci_asn1test
-        asn1_test = dfn_ci_asn1test.ASN1Test()
+        import asn1test
+        asn1_test = asn1test.ASN1Test()
         asn1_test.configure()
         current_time = cdff_types.Time()
         current_time.microseconds = 999999

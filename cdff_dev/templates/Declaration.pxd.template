@@ -1,10 +1,10 @@
 from libcpp cimport bool
 from cython.operator cimport dereference as deref
-cimport _{{ namespace_prefix }}_{{ desc["name"].lower() }}
+cimport _{{ desc["name"].lower() }}
 
 
 {%- for class_name in desc["implementations"] %}
 cdef class {{ class_name }}:
-    cdef _{{ namespace_prefix }}_{{ desc["name"].lower() }}.{{ class_name }}* thisptr
+    cdef _{{ desc["name"].lower() }}.{{ class_name }}* thisptr
     cdef bool delete_thisptr
 {%- endfor %}

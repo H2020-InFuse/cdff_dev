@@ -418,8 +418,7 @@ def write_class(desc, type_registry, template_base, class_name,
 
 
 def write_cython(desc, type_registry, template_base,
-                 target_folder="python", file_prefix="dfn_ci",
-                 namespace_prefix="dfn_ci"):
+                 target_folder="python", namespace_prefix="dfn_ci"):
     """Write Python binding based on Cython.
 
     Parameters
@@ -436,9 +435,6 @@ def write_cython(desc, type_registry, template_base,
     target_folder : str, optional (default: 'python')
         Folder where the output should be written
 
-    file_prefix : str, optional (default: 'dfn_ci')
-        Prefix of filenames of the output
-
     namespace_prefix : str, optional (default: 'dfn_ci')
         Prefix of namespace
 
@@ -449,9 +445,9 @@ def write_cython(desc, type_registry, template_base,
     """
     result = {}
 
-    pxd_filename = "%s_%s.pxd" % (file_prefix, desc["name"].lower())
-    _pxd_filename = "_%s_%s.pxd" % (file_prefix, desc["name"].lower())
-    pyx_filename = "%s_%s.pyx" % (file_prefix, desc["name"].lower())
+    pxd_filename = "%s.pxd" % desc["name"].lower()
+    _pxd_filename = "_%s.pxd" % desc["name"].lower()
+    pyx_filename = "%s.pyx" % desc["name"].lower()
 
     import_cdfftypes = False
     for port in desc["input_ports"] + desc["output_ports"]:
@@ -470,9 +466,17 @@ def write_cython(desc, type_registry, template_base,
     target = os.path.join(target_folder, _pxd_filename)
     result[target] = _pxd_file
 
-    pyx_file = render(
-        "%s.pyx" % template_base, desc=desc, type_registry=type_registry,
+    input_ports = render(
+        "PythonInputPorts", desc=desc, type_registry=type_registry,
         import_cdfftypes=import_cdfftypes)
+    output_ports = render(
+        "PythonOutputPorts", desc=desc, type_registry=type_registry,
+        import_cdfftypes=import_cdfftypes)
+
+    pyx_file = render(
+        "%s.pyx" % template_base, desc=desc, import_cdfftypes=import_cdfftypes,
+        input_ports=input_ports, output_ports=output_ports)
+
     target = os.path.join(target_folder, pyx_filename)
     result[target] = pyx_file
 

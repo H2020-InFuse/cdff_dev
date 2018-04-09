@@ -1,6 +1,6 @@
 # distutils: language=c++
-cimport _dfn_ci_{{ desc["name"].lower() }}
-cimport dfn_ci_{{ desc["name"].lower() }}
+cimport _{{ desc["name"].lower() }}
+cimport {{ desc["name"].lower() }}
 from cython.operator cimport dereference as deref
 from libcpp cimport bool
 from libcpp.string cimport string
@@ -21,7 +21,7 @@ cdef class {{ class_name }}:
             del self.thisptr
 
     def __init__(self):
-        self.thisptr = new _dfn_ci_{{ desc["name"].lower() }}.{{ class_name }}()
+        self.thisptr = new _{{ desc["name"].lower() }}.{{ class_name }}()
         self.delete_thisptr = True
 
     def process(self):
@@ -34,26 +34,7 @@ cdef class {{ class_name }}:
     def configure(self):
         self.thisptr.configure()
 {{ break }}
-    {%- for input_port in desc["input_ports"] %}
-    def {{ input_port["name"] }}Input(self, {{ type_registry.get_info(input_port["type"]).python_type() }} data):
-        {%- if type_registry.get_info(input_port["type"]).copy_on_assignment() %}
-        cdef {{ type_registry.get_info(input_port["type"]).cython_type() }} cpp_data = data
-        self.thisptr.{{ input_port["name"] }}Input(cpp_data)
-        {%- else %}
-        cdef {{ type_registry.get_info(input_port["type"]).cython_type() }} * cpp_data = data.thisptr
-        self.thisptr.{{ input_port["name"] }}Input(deref(cpp_data))
-        {%- endif %}
-{{ break }}
-    {%- endfor %}
+    {{ input_ports }}
 
-    {%- for output_port in desc["output_ports"] %}
-    def {{ output_port["name"] }}Output(self):
-        {%- if type_registry.get_info(output_port["type"]).copy_on_assignment() %}
-        cdef {{ type_registry.get_info(output_port["type"]).python_type() }} out = self.thisptr.{{ output_port["name"] }}Output()
-        {%- else %}
-        cdef {{ type_registry.get_info(output_port["type"]).python_type() }} out = {{ type_registry.get_info(output_port["type"]).python_type() }}()
-        out.thisptr[0] = self.thisptr.{{ output_port["name"] }}Output()
-        {%- endif %}
-        return out
-    {%- endfor %}
+    {{ output_ports }}
 {%- endfor %}
