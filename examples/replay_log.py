@@ -55,7 +55,7 @@ def main():
     )
     dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods, vis)
     dfc.setup()
-    diagrams.save_graph_png(dfc, network_visualization_filename)
+    diagrams.save_graph_png(dfc, "network.png")
     for i in range(10000):
         dfc.process_sample(timestamp=i, stream_name="log.x", sample=i)
     dfc.node_statistics_.print_statistics()
