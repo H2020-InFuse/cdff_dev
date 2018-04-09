@@ -74,7 +74,6 @@ def _add_ports_to_cluster(node_name, ports, cluster, output=True):
         else:
             edge = pydot.Edge(b, a)
         cluster.add_edge(edge)
-    
 
 
 def __display_name(element):
@@ -83,4 +82,3 @@ def __display_name(element):
 
 def _microseconds_to_seconds(microseconds):
     return float(microseconds) / 1000000.0
-

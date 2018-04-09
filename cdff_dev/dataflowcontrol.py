@@ -54,7 +54,8 @@ class DataFlowControl:
         A list of pairs of output node and connected input node. Full names
         of the form 'node_name.port_name' are used here.
     """
-    def __init__(self, nodes, connections, periods, visualization=None, verbose=0):
+    def __init__(self, nodes, connections, periods, visualization=None,
+                 verbose=0):
         self.nodes = nodes
         self.connections = connections
         self.periods = periods
