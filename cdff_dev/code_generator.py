@@ -212,7 +212,9 @@ def write_dfpc(dfpc, output, source_folder=".", python_folder="python",
     implementation_files = write_class(
         dfpc, type_registry, "DFPCImplementation", dfpc["name"],
         target_folder=src_dir)
-    return interface_files + implementation_files
+    cython_files = write_cython(dfpc, type_registry, "DFPC",
+                                target_folder=python_dir)
+    return interface_files + implementation_files + cython_files
 
 
 def validate_node(node):
@@ -463,13 +465,13 @@ def write_cython(desc, type_registry, template_base,
     result[target] = pxd_file
 
     _pxd_file = render(
-        "_%s.pxd" % template_base, node=desc, type_registry=type_registry,
+        "_%s.pxd" % template_base, desc=desc, type_registry=type_registry,
         import_cdfftypes=import_cdfftypes)
     target = os.path.join(target_folder, _pxd_filename)
     result[target] = _pxd_file
 
     pyx_file = render(
-        "%s.pyx" % template_base, node=desc, type_registry=type_registry,
+        "%s.pyx" % template_base, desc=desc, type_registry=type_registry,
         import_cdfftypes=import_cdfftypes)
     target = os.path.join(target_folder, pyx_filename)
     result[target] = pyx_file

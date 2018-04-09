@@ -1,6 +1,6 @@
 # distutils: language=c++
-cimport _dfn_ci_{{ desc["name"].lower() }}
-cimport dfn_ci_{{ desc["name"].lower() }}
+cimport _dfpc_ci_{{ desc["name"].lower() }}
+cimport dfpc_ci_{{ desc["name"].lower() }}
 from cython.operator cimport dereference as deref
 from libcpp cimport bool
 from libcpp.string cimport string
@@ -21,18 +21,18 @@ cdef class {{ class_name }}:
             del self.thisptr
 
     def __init__(self):
-        self.thisptr = new _dfn_ci_{{ desc["name"].lower() }}.{{ class_name }}()
+        self.thisptr = new _dfpc_ci_{{ desc["name"].lower() }}.{{ class_name }}()
         self.delete_thisptr = True
 
-    def process(self):
-        self.thisptr.process()
+    def run(self):
+        self.thisptr.run()
 
     def set_configuration_file(self, str configuration_file_path):
         cdef string path = configuration_file_path.encode()
         self.thisptr.setConfigurationFile(path)
 
-    def configure(self):
-        self.thisptr.configure()
+    def setup(self):
+        self.thisptr.setup()
 {{ break }}
     {%- for input_port in desc["input_ports"] %}
     def {{ input_port["name"] }}Input(self, {{ type_registry.get_info(input_port["type"]).python_type() }} data):

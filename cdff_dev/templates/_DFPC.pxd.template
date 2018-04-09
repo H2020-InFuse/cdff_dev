@@ -4,12 +4,12 @@ from libcpp.string cimport string
 cimport _cdff_types
 {%- endif %}
 
-cdef extern from "{{ desc["name"] }}Interface.hpp" namespace "dfn_ci":
+cdef extern from "{{ desc["name"] }}Interface.hpp" namespace "dfpc_ci":
     cdef cppclass {{ desc["name"] }}Interface:
         {{ desc["name"] }}Interface()
-        void process()
+        void run()
         void setConfigurationFile(string)
-        void configure()
+        void setup()
         {%- for input_port in desc["input_ports"] %}
         void {{ input_port["name"] }}Input({{ type_registry.get_info(input_port["type"]).cython_type() }} data)
         {%- endfor %}
@@ -20,7 +20,7 @@ cdef extern from "{{ desc["name"] }}Interface.hpp" namespace "dfn_ci":
 
 
 {% for class_name in desc["implementations"] -%}
-cdef extern from "{{ class_name }}.hpp" namespace "dfn_ci":
+cdef extern from "{{ class_name }}.hpp" namespace "dfpc_ci":
     cdef cppclass {{ class_name }}({{ desc["name"] }}Interface):
         pass
 {{ break }}
