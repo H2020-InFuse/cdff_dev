@@ -112,7 +112,7 @@ class DataFlowControl:
                    sorted(self.periods.keys())))
 
         self.periods_microseconds = {
-            node_name: max(int(10e5 * period), 1)
+            node_name: max(int(1e6 * period), 1)
             for node_name, period in self.periods.items()}
         self.last_processed = {
             node: -1 for node in self.node_facade.node_names()}
