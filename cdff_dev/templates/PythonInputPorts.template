@@ -1,0 +1,11 @@
+    {%- for input_port in desc["input_ports"] %}
+    def {{ input_port["name"] }}Input(self, {{ type_registry.get_info(input_port["type"]).python_type() }} data):
+        {%- if type_registry.get_info(input_port["type"]).copy_on_assignment() %}
+        cdef {{ type_registry.get_info(input_port["type"]).cython_type() }} cpp_data = data
+        self.thisptr.{{ input_port["name"] }}Input(cpp_data)
+        {%- else %}
+        cdef {{ type_registry.get_info(input_port["type"]).cython_type() }} * cpp_data = data.thisptr
+        self.thisptr.{{ input_port["name"] }}Input(deref(cpp_data))
+        {%- endif %}
+{{ break }}
+    {%- endfor %}
