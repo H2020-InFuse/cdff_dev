@@ -1,6 +1,7 @@
 import warnings
 import os
 import jinja2
+import glob
 from pkg_resources import resource_filename
 
 
@@ -64,16 +65,19 @@ class DefaultTypeInfo(object):
 
 class ASN1TypeInfo(object):
     """Information about ASN1 types."""
+    asn1_types = {}
     def __init__(self, typename):
         self.typename = typename
 
     @classmethod
     def handles(cls, typename, cdffpath):
-        return typename+'.h' in cls.search_asn1_type(cdffpath)
+        return typename in cls._search_asn1_type(cdffpath)
 
     def include(self):
         """C++ include header."""
-        return self.typename+".h"
+        for key in self.asn1_types.keys():
+            if self.typename in self.asn1_types[key]:
+                return key.split('.')[0] + ".h"
 
     def cython_type(self):
         return "_cdff_types." + self.typename
@@ -85,10 +89,26 @@ class ASN1TypeInfo(object):
         return False
 
     @classmethod
-    def search_asn1_type(cls, cdffpath):
+    def _search_asn1_type(cls, cdffpath):
         """Search generated ASN1 types."""
-        types_path = os.path.join(cdffpath, "Common/Types/C/")
-        return os.listdir(types_path)
+        ASN1_paths = glob.glob(os.path.join(
+            cdffpath, "Common/Types/ASN.1/ESROCOS/*/*.asn")) + glob.glob(
+            os.path.join(cdffpath, "Common/Types/ASN.1/Infuse/*.asn"))
+        asn1_types = {}
+        asn1_list = []
+        for asn1_path in ASN1_paths:
+            with open(asn1_path, 'r') as f:
+                file_read = f.read()
+            splitted_file = file_read.replace('\n', ' ').split('::=')[:-1]
+            types_in_file = []
+            for i,f in enumerate(splitted_file):
+                asn1_type = list(filter(lambda a: a != '', f.split(' ')))[-1]
+                if asn1_type != "DEFINITIONS" and asn1_type not in asn1_list:
+                    asn1_list.append(asn1_type)
+                    types_in_file.append(asn1_type)
+            asn1_types[asn1_path.split('/')[-1]] = types_in_file
+        cls.asn1_types = asn1_types
+        return asn1_list
 
     def has_cdfftype(self):
         return True
