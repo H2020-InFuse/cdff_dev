@@ -1,4 +1,4 @@
-image: nexus.spaceapplications.com/repository/infuse/cdff-dev-ci:1.6.5.6
+image: nexus.spaceapplications.com/repository/infuse/cdff-dev-ci:1.7
 
 stages:
   - fetch_test
