@@ -45,8 +45,8 @@ def test_dfc():
         "square": SquareDFN()
     }
     periods = {
-        "linear": 1,
-        "square": 1
+        "linear": 0.000001,
+        "square": 0.000001
     }
     connections = (
         ("log.x", "linear.x"),

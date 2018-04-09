@@ -68,8 +68,8 @@ def test_feed_data_flow_control():
         "pointcloud_builder": PointcloudBuilderDummyDFN()
     }
     periods = {
-        "laser_filter": 25000,
-        "pointcloud_builder": 100000
+        "laser_filter": 0.025,
+        "pointcloud_builder": 0.1
     }
     connections = (
         ("/hokuyo.scans", "laser_filter.scanSample"),

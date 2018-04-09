@@ -18,7 +18,8 @@ class DataFlowControl:
         also be port identifiers.
 
     periods : dict
-        Temporal periods after which the processing steps of nodes are triggered
+        Temporal interval after which the processing steps of nodes are
+        triggered. The time interval must be given in seconds.
 
     visualization : Visualization, optional (default: None)
         Visualization
@@ -110,6 +111,9 @@ class DataFlowControl:
                 % (sorted(self.node_facade.node_names()),
                    sorted(self.periods.keys())))
 
+        self.periods_microseconds = {
+            node_name: max(int(10e5 * period), 1)
+            for node_name, period in self.periods.items()}
         self.last_processed = {
             node: -1 for node in self.node_facade.node_names()}
 
@@ -198,7 +202,7 @@ class DataFlowControl:
                 self.last_processed[node_name] = timestamp
 
             next_timestamp = (self.last_processed[node_name] +
-                              self.periods[node_name])
+                              self.periods_microseconds[node_name])
             if next_timestamp < timestamp_before_process:
                 timestamp_before_process = next_timestamp
                 current_node = node_name

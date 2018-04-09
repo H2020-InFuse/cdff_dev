@@ -45,8 +45,8 @@ def main():
         "square": SquareDFN()
     }
     periods = {
-        "linear": 1000,
-        "square": 1000
+        "linear": 0.001,
+        "square": 0.001
     }
     connections = (
         ("log.x", "linear.x"),
