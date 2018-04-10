@@ -10,7 +10,7 @@ input_ports:
         - dfn: LaserFilter
           port: scanSamples
     - name: dyamixelDynamicTf
-      type: Affine3d
+      type: RigidBodyState
       doc: "Dynamic transformation between body and 2D laser frame"
       connections: 
         - dfn: LaserFilter
