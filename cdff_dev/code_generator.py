@@ -474,9 +474,17 @@ def write_cython(desc, type_registry, template_base,
         "PythonOutputPorts", desc=desc, type_registry=type_registry,
         import_cdfftypes=import_cdfftypes)
 
+    if "operations" in desc:
+        operations = render(
+            "PythonOperations", desc=desc, type_registry=type_registry,
+            import_cdfftypes=import_cdfftypes)
+    else:
+        operations = ""
+
     pyx_file = render(
         "%s.pyx" % template_base, desc=desc, import_cdfftypes=import_cdfftypes,
-        input_ports=input_ports, output_ports=output_ports)
+        input_ports=input_ports, output_ports=output_ports,
+        operations=operations)
 
     target = os.path.join(target_folder, pyx_filename)
     result[target] = pyx_file

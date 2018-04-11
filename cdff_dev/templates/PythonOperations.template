@@ -1,0 +1,19 @@
+    {%- for operation in desc["operations"] %}
+    def {{ operation["name"] }}(self, {% for arg in operation["inputs"] %}{{ arg["type"] }} {{ arg["name"] }}{{ ", " if not loop.last }}{% endfor %}):
+        {%- if type_registry.get_info(operation["output_type"]).copy_on_assignment() %}
+        cdef {{ type_registry.get_info(operation["output_type"]).python_type() }} out = self.thisptr.{{ operation["name"] }}(
+        {%- else %}
+        cdef {{ type_registry.get_info(operation["output_type"]).python_type() }} out = {{ type_registry.get_info(operation["output_type"]).python_type() }}()
+        out.thisptr[0] = self.thisptr.{{ operation["name"] }}(
+        {%- endif %}
+        {%- for arg in operation["inputs"] -%}
+            {%- if type_registry.get_info(arg["type"]).copy_on_assignment() -%}
+                {{ arg["name"] }}{{ ", " if not loop.last }}
+            {%- else -%}
+                {{ arg["name"].thisptr[0] }}{{ ", " if not loop.last }}
+            {%- endif -%}
+        {%- endfor -%}
+        )
+        return out
+{{ break }}
+    {%- endfor %}
