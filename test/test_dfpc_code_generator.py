@@ -69,4 +69,4 @@ def test_compile():
 
         t.run()
 
-        # p = t.pointcloudOutput() TODO
+        p = t.pointcloudOutput()
