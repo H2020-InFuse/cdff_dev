@@ -7,4 +7,4 @@ RUN pip3 install --upgrade pip
 RUN pip3 install jinja2 cython nose nose2 numpy msgpack-python pydot
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
-LABEL version="1.6.5.6"
+LABEL version="1.7"

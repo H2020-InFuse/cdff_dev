@@ -1,4 +1,4 @@
-FROM cdff-dev-ci:latest
+FROM nexus.spaceapplications.com/repository/infuse/cdff-dev-ci:1.7
 
 RUN mkdir -p /InFuse/build_tools
 WORKDIR /InFuse
@@ -19,4 +19,4 @@ RUN ln -s "/InFuse/CDFF" "CDFF"
 RUN pip3 install -e .
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
-LABEL version="1.6.5.5"
+LABEL version="1.7"
