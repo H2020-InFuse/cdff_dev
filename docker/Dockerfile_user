@@ -8,7 +8,6 @@ RUN git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spac
 RUN cp /InFuse/CDFF_dev/build_tools/get_cdff_artifacts.sh /InFuse/build_tools
 WORKDIR /InFuse/build_tools
 RUN /bin/bash get_cdff_artifacts.sh
-RUN ln -sf /CDFF/External/install /InFuse/CDFF/External/install
 RUN mkdir -p /builds/InFuse/
 RUN ln -sf /InFuse/CDFF /builds/InFuse/CDFF
 WORKDIR /builds/InFuse/CDFF/build
@@ -19,4 +18,4 @@ RUN ln -s "/InFuse/CDFF" "CDFF"
 RUN pip3 install -e .
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
-LABEL version="1.7"
+LABEL version="1.7.1"
