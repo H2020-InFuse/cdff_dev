@@ -1,0 +1,14 @@
+<package>
+  <description brief="CDFF development tools">
+    Code generator for DFNs and DFPCs, log replay tool, ...
+  </description>
+  <maintainer>Alexander Fabisch/Alexander.Fabisch@dfki.de</maintainer>
+  <license>none yet</license>
+
+  <depend package="pyyaml"/>
+  <depend package="jinja2"/>
+  <depend package="cython"/>
+  <depend package="numpy"/>
+  <depend package="msgpack-python"/>
+  <depend package="pydot"/>
+</package>
