@@ -13,7 +13,8 @@ def test_generate_files():
         node = yaml.load(f)
     tmp_folder = "test/test_output/square"
     with EnsureCleanup(tmp_folder) as ec:
-        filenames = write_dfn(node, tmp_folder)
+        cdffpath = load_cdffpath()
+        filenames = write_dfn(node, tmp_folder, cdffpath=cdffpath)
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
 
@@ -36,7 +37,8 @@ def test_square():
         node = yaml.load(f)
     tmp_folder = "test/test_output/square"
     with EnsureCleanup(tmp_folder) as ec:
-        filenames = write_dfn(node, tmp_folder)
+        cdffpath = load_cdffpath()
+        filenames = write_dfn(node, tmp_folder, cdffpath=cdffpath)
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
 
@@ -70,7 +72,8 @@ def test_unknown_type():
     tmp_folder = "test/test_output/unknowntype"
     with EnsureCleanup(tmp_folder) as ec:
         warnings.simplefilter("ignore", UserWarning)
-        filenames = write_dfn(node, tmp_folder)
+        cdffpath = load_cdffpath()
+        filenames = write_dfn(node, tmp_folder, cdffpath=cdffpath)
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
 
@@ -96,7 +99,8 @@ def test_multiple_implementations():
         node = yaml.load(f)
     tmp_folder = "test/test_output/multiple_implementations"
     with EnsureCleanup(tmp_folder) as ec:
-        filenames = write_dfn(node, tmp_folder)
+        cdffpath = load_cdffpath()
+        filenames = write_dfn(node, tmp_folder, cdffpath=cdffpath)
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
 
@@ -132,10 +136,10 @@ def test_asn1():
         node = yaml.load(f)
     tmp_folder = "test/test_output/ASN1"
     with EnsureCleanup(tmp_folder) as ec:
-        filenames = write_dfn(node, tmp_folder, cdffpath="CDFF/")
+        cdffpath = load_cdffpath()
+        filenames = write_dfn(node, tmp_folder, cdffpath=cdffpath)
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
-        cdffpath = load_cdffpath()
         ctypespath = os.path.join(cdffpath, CTYPESDIR)
         dfnspath = os.path.join(cdffpath, "DFNs")
 

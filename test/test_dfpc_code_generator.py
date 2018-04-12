@@ -3,6 +3,7 @@ import yaml
 import warnings
 from cdff_dev.code_generator import write_dfpc
 from cdff_dev.testing import EnsureCleanup, build_extension
+from cdff_dev.path import load_cdffpath
 from nose.tools import assert_true, assert_equal, assert_raises_regex, \
     assert_true
 
@@ -12,7 +13,8 @@ def test_generate_files():
         node = yaml.load(f)
     tmp_folder = "test/test_output/dfpc_ci_TiltScan"
     with EnsureCleanup(tmp_folder) as ec:
-        filenames = write_dfpc(node, tmp_folder)
+        cdffpath = load_cdffpath()
+        filenames = write_dfpc(node, tmp_folder, cdffpath=cdffpath)
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
 
