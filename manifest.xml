@@ -5,6 +5,9 @@
   <maintainer>Alexander Fabisch/Alexander.Fabisch@dfki.de</maintainer>
   <license>none yet</license>
 
+  <depend package="python3"/>
+  <depend package="python3-dev"/>
+  <depend package="python3-pip"/>
   <depend package="pyyaml"/>
   <depend package="jinja2"/>
   <depend package="cython"/>
