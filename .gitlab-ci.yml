@@ -12,5 +12,4 @@ fetch_test:
       - echo -n "CDFF" > cdffpath
       - python3 setup.py build_ext -i
       - CDFFPATH=CDFF python3 setup.py build_ext -i
-      - ulimit -s 31600048
       - nosetests -sv

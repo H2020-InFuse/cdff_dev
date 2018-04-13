@@ -1,4 +1,5 @@
 name: PointcloudGeneration
+use_pointers: True
 dfns:
     - name: TiltScan
     - name: LaserFilter

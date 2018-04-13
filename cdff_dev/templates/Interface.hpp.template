@@ -26,7 +26,7 @@ namespace dfn_ci {
             * Receive value from output port {{ output_port["name"] }}
             * @return {{ output_port["name"] }}, {{ output_port["doc"] }}
             */
-            virtual {{ output_port["type"] }} {{ output_port["name"] }}Output();
+            virtual {{ output_port["type"] }}{%- if desc["use_pointers"] %}*{%- endif %} {{ output_port["name"] }}Output();
             {%- endfor %}
 
         protected:
