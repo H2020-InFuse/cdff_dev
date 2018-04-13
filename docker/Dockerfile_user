@@ -4,8 +4,8 @@ RUN mkdir -p /InFuse/build_tools
 
 # Clone CDFF and CDFF_dev repositories
 WORKDIR /InFuse
-RUN git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com:InFuse/Infuse/CDFF.git
-RUN git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com:InFuse/Infuse/CDFF_dev.git
+RUN git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com/InFuse/CDFF.git
+RUN git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com/InFuse/CDFF_dev.git
 
 # Download compiled ASN.1 data types
 RUN cp /InFuse/CDFF_dev/build_tools/get_cdff_artifacts.sh /InFuse/build_tools
