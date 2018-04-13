@@ -37,7 +37,7 @@ def test_compile():
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
         ctypespath = os.path.join(cdffpath, CTYPESDIR)
-        dfpcspath = os.path.join(cdffpath, "DFNs")
+        dfpcspath = os.path.join(cdffpath, "DFPCs")
 
         incdirs = ["test/test_output/", "CDFF/DFPCs", ctypespath, dfpcspath]
         build_extension(
