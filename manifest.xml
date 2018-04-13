@@ -8,11 +8,11 @@
   <depend package="python3"/>
   <depend package="python3-dev"/>
   <depend package="python3-pip"/>
+  <depend package="graphviz"/>
   <depend package="pyyaml"/>
   <depend package="jinja2"/>
   <depend package="cython"/>
   <depend package="numpy"/>
   <depend package="msgpack-python"/>
-  <depend package="graphviz"/>
   <depend package="pydot"/>
 </package>
