@@ -8,11 +8,11 @@ https://gitlab.spaceapplications.com/InFuse/CDFF_dev)
 # CDFF-Dev
 
 The CDFF-Dev provides the tools to develop, test, visualize, and perform
-analysis on data fusion products. The CDFF-Dev include tools such as data
-log replay, visualization tools, and data analysis tools. None of the
-components of the CDFF-Dev are deployed on the target system.
+analysis on data fusion products. The CDFF-Dev includes tools such as data
+log replay, visualization tools, and data analysis tools. No component of
+the CDFF-Dev is deployed on the target system.
 
-CDFF-Dev was initiated and is currently developed by the InFUSE constortium:
+CDFF-Dev was initiated and is currently developed by the InFuse consortium:
 * [Robotics Innovation Center](http://robotik.dfki-bremen.de/en/startpage.html)
   of the [German Research Center for Artificial Intelligence (DFKI)](http://www.dfki.de)
   in Bremen
@@ -20,82 +20,111 @@ CDFF-Dev was initiated and is currently developed by the InFUSE constortium:
 
 ![DFKI RIC](https://www.dfki.de/web/presse/bildmaterial/dfki-logo-e-schrift.jpg)
 
-# Dependencies
+## Dependencies of CDFF-Dev
 
-CDFF-Dev depends on CDFF. In addition, the following packages are required:
+The CDFF's Dev component, available in this `CDFF_dev` repository, depends on the CDFF's Core and Support components, available in the [`CDFF`](https://gitlab.spaceapplications.com/InFuse/CDFF_dev) repository. It also requires the Python 3 interpreter, the Python 3 headers, and the following Python packages:
 
-* Python 3 + headers
 * pip
-* Python YAML
-* Jinja 2
+* PyYAML
+* Jinja2
 * Cython
 * NumPy
 * msgpack-python
+* Graphviz
 * pydot
 
-On Ubuntu 16.04 you can install them with
+On Ubuntu 16.04 you can install them as follow:
 
-    sudo apt-get install python3 python3-dev python3-pip
-    sudo pip3 install -r requirements.txt
+```
+# Python interpreter, headers, and package manager
+$ sudo apt-get install python3 python3-dev python3-pip
 
-If you don't have sudo privileges, you can use the flag `--user` of pip
-to install the dependencies in your home folder.
+# Install Python packages and newer version of package manager
+# in /usr/local/{bin,lib/python3.X/dist-packages} for all users
+$ sudo pip3 install --upgrade pip
+$ sudo pip3 install -r requirements.txt
 
-## Installation
+# Or install Python packages and newer version of package manager
+# in $HOME/.local/{bin,lib/python3.X/site-packages} for the current user
+$ pip3 install --user --upgrade pip
+$ pip3 install --user -r requirements.txt
+```
 
-`CDFF_dev` should be installed in the system:
+Unit testing CDFF-Dev require additional Python packages, see further.
 
-    sudo pip3 install -e .
+## Compiling and installing CDFF-Dev
 
-**During the installation you have to set the path to CDFF.** There are
-several ways to do this:
-* You can define the environment variable `CDFFPATH`. Note that this
-  does not work if you use `sudo`.
-* You can write it to the file `cdffpath`.
-* You can enter it manually when `pip3` stops during the installation
-  process. Note that pip suppresses the output and you cannot see a
-  message that asks to you to provide the input. Type it in as soon
-  as the installation process stops for several seconds.
-If you don't have sudo privileges, you can use the flag `--user` of pip
-to install the dependencies in your home folder. 
+After you have built (and optionally installed) the CDFF's Core and Support components, you can compile and install the CDFF's Dev component as a Python package:
 
-## Documentation
+```
+# Install CDFF-Dev in /usr/local/{bin,lib/python3.X/dist-packages} for all users
+$ sudo CDFFPATH=/path/to/CDFF pip3 install --editable /path/to/CDFF_dev
+
+# Or install it in $HOME/.local/{bin,lib/python3.X/site-packages} for the current user
+$ CDFFPATH=/path/to/CDFF pip3 install --user --editable /path/to/CDFF_dev
+```
+
+## Documentation about CDFF-Dev
 
 The overall concept and conventions are described in these documents:
 
-* [CDFF-Support](https://docs.google.com/document/d/1BzKnNrRw6yIFllrITiEGZXD8awtsmvNslqRuB4j29mw/edit#heading=h.lsr1bgv0ntf5).
-* [CDFF-dev](https://docs.google.com/document/d/1yz_w7Eut6Rtg0d4I6R4mze2G8Oip4agyqrTDlKVgC6g/edit#heading=h.1xul7efma9uy)
-* [guide for the creation of a DFN](https://docs.google.com/document/d/1hFTRKgJNN3n_brT3aajMA03AR_jQ2eCo-ZM33ggY5cE/edit?disco=AAAABnQb9DE&ts=5a841a86)
+* [CDFF-Support](https://drive.google.com/open?id=1BzKnNrRw6yIFllrITiEGZXD8awtsmvNslqRuB4j29mw)
+* [CDFF-Dev](https://drive.google.com/open?id=1yz_w7Eut6Rtg0d4I6R4mze2G8Oip4agyqrTDlKVgC6g)
+* [Guide for creating a DFN](https://drive.google.com/open?id=1hFTRKgJNN3n_brT3aajMA03AR_jQ2eCo-ZM33ggY5cE)
 
-### DFN Code Generator
+## Using CDFF-Dev's DFN code generator
 
-You can run the DFN code generator with
+Once CDFF-Dev is compiled and installed, you can run the DFN code generator as follow:
 
-    dfn_template_generator my_node_desc.yaml my_node_output_folder --cdffpath path/to/CDFF
+```
+$ dfn_template_generator my_node_desc.yaml my_node_output_dir --cdffpath path/to/CDFF/
+```
 
-* `my_node_desc.yaml` is the node description file.
-* `my_node_output_folder` is the output folder of C++ code template and
-  Python bindings.
-* `path/to/CDFF` points to the main directory of the CDFF.
+where:
 
-## Testing
+* `my_node_desc.yaml` is the node description file
+* `my_node_output_dir` is the directory where the generated C++ files and the generated Python bindings will be written (it will be created if it doesn't exist)
+* `path/to/CDFF/` is the directory which contains your local clone of the `CDFF` repository
 
-You can run the tests with nosetests:
+## Testing CDFF-Dev
 
-    make test
+Unit testing CDFF-Dev requires the following additional Python packages:
 
-Nosetests can be installed with pip:
+* nose
+* nose2
 
-    sudo pip3 install nose
+You can install them as follow:
 
-## Contributing
+```
+# Install nose and nose2 in /usr/local/{bin,lib/python3.X/dist-packages} for all users
+$ sudo pip3 install nose nose2
 
-It is not allowed to push directly to the master branch. To develop a new
+# Or install them in $HOME/.local/{bin,lib/python3.X/site-packages} for the current user
+$ pip3 install --user nose nose2
+```
+
+Then to run the unit tests:
+
+```
+# Either
+nosetests -sv
+
+# Or
+make test
+```
+
+## Contributing to CDFF-Dev
+
+It is not allowed to push directly to the `master` branch. To develop a new
 feature, please make a feature branch and open a merge request.
 
-## Current State
+## Status
 
-Only a rough scaffold is available at the moment.
+The following features work:
+
+1. Generating a DFN template in C++
+2. Generating Python bindings for a DFN
+3. Generating a DFPC template in C++
 
 ## License
 
