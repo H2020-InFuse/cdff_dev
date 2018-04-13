@@ -3,4 +3,5 @@ jinja2
 cython
 numpy
 msgpack-python
+graphviz
 pydot

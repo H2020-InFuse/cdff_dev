@@ -1,21 +1,28 @@
-FROM nexus.spaceapplications.com/repository/infuse/cdff-dev-ci:1.7
+FROM nexus.spaceapplications.com/repository/infuse/cdff-dev-ci:1.7.2
 
 RUN mkdir -p /InFuse/build_tools
+
+# Clone CDFF and CDFF_dev repositories
 WORKDIR /InFuse
 RUN git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com:InFuse/Infuse/CDFF.git
 RUN git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com:InFuse/Infuse/CDFF_dev.git
-# fetch artifacts
+
+# Download compiled ASN.1 data types
 RUN cp /InFuse/CDFF_dev/build_tools/get_cdff_artifacts.sh /InFuse/build_tools
 WORKDIR /InFuse/build_tools
 RUN /bin/bash get_cdff_artifacts.sh
+
+# Hack
 RUN mkdir -p /builds/InFuse/
 RUN ln -sf /InFuse/CDFF /builds/InFuse/CDFF
+
+# Refresh CDFF makefiles
 WORKDIR /builds/InFuse/CDFF/build
 RUN cmake -DCMAKE_INSTALL_PREFIX=./ ..
+
+# Build and install CDFF_dev
 WORKDIR /InFuse/CDFF_dev
-RUN echo -n "CDFF" > cdffpath
-RUN ln -s "/InFuse/CDFF" "CDFF"
-RUN pip3 install -e .
+RUN CDFFPATH=/InFuse/CDFF pip3 install -e .
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
-LABEL version="1.7.1"
+LABEL version="1.7.2"

@@ -13,5 +13,6 @@
   <depend package="cython"/>
   <depend package="numpy"/>
   <depend package="msgpack-python"/>
+  <depend package="graphviz"/>
   <depend package="pydot"/>
 </package>
