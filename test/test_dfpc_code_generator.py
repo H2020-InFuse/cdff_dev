@@ -1,13 +1,10 @@
 import os
 import yaml
-import warnings
 from cdff_dev.code_generator import write_dfpc
 from cdff_dev.path import load_cdffpath, CTYPESDIR
 import cdff_types
 from cdff_dev.testing import EnsureCleanup, build_extension
-from cdff_dev.path import load_cdffpath
-from nose.tools import assert_true, assert_equal, assert_raises_regex, \
-    assert_true
+from nose.tools import assert_true
 
 
 def test_generate_files():
@@ -50,7 +47,8 @@ def test_compile():
                 tmp_folder, "python", node["name"].lower() + ".pyx"),
             implementation=map(
                 lambda filename: os.path.join(tmp_folder, filename),
-                ["PointcloudGeneration.cpp", "PointcloudGenerationInterface.cpp"]),
+                ["PointcloudGeneration.cpp",
+                 "PointcloudGenerationInterface.cpp"]),
             sourcedir=tmp_folder, incdirs=incdirs,
             compiler_flags=[], library_dirs=[], libraries=[],
             includes=[]
