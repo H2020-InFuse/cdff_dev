@@ -309,7 +309,8 @@ def _validate_ports(desc):
 def _validate_dfpc_port_connections(desc):
     for port in desc["input_ports"] + desc["output_ports"]:
         if "connections" not in port or len(port["connections"]) == 0:
-            raise PortDescriptionException("Port has no connections: %s" % port)
+            raise PortDescriptionException(
+                "Port has no connections: %s" % port)
 
 
 def _validate_dfpc_operations(desc):
@@ -342,7 +343,8 @@ def _validate_dfpc_internal_connections(desc):
 
     for conn in desc["internal_connections"]:
         if "from" not in conn:
-            raise DFPCDescriptionException("No 'from' in connection: %s" % conn)
+            raise DFPCDescriptionException(
+                "No 'from' in connection: %s" % conn)
         if "to" not in conn:
             raise DFPCDescriptionException("No 'to' in connection: %s" % conn)
 
@@ -561,7 +563,7 @@ def write_result(result, force_overwrite, verbose=0):
                 f.write(content)
             written_files.append(filename)
 
-    if verbose >= 1 and msg:
-        print(os.linesep.join(msg))
+    if verbose >= 1 and msg_lines:
+        print(os.linesep.join(msg_lines))
 
     return written_files
