@@ -11,7 +11,7 @@ from nose.tools import assert_true, assert_equal, assert_raises_regex, \
 
 
 def test_generate_files():
-    with open("test/test_data/TiltScan_dfpc_desc.yaml", "r") as f:
+    with open("test/test_data/pointcloud_generation_dfpc_desc.yml", "r") as f:
         node = yaml.load(f)
     tmp_folder = "test/test_output/dfpc_ci_TiltScan"
     with EnsureCleanup(tmp_folder) as ec:
@@ -21,17 +21,17 @@ def test_generate_files():
         ec.add_folder(os.path.join(tmp_folder, "python"))
 
         assert_true(os.path.exists(os.path.join(
-            tmp_folder, "TiltScanInterface.hpp")))
+            tmp_folder, "PointcloudGenerationInterface.hpp")))
         assert_true(os.path.exists(os.path.join(
-            tmp_folder, "TiltScanInterface.cpp")))
+            tmp_folder, "PointcloudGenerationInterface.cpp")))
         assert_true(os.path.exists(os.path.join(
-            tmp_folder, "TiltScan.hpp")))
+            tmp_folder, "PointcloudGeneration.hpp")))
         assert_true(os.path.exists(os.path.join(
-            tmp_folder, "TiltScan.cpp")))
+            tmp_folder, "PointcloudGeneration.cpp")))
 
 
 def test_compile():
-    with open("test/test_data/TiltScan_dfpc_desc.yaml", "r") as f:
+    with open("test/test_data/pointcloud_generation_dfpc_desc.yml", "r") as f:
         node = yaml.load(f)
     tmp_folder = "test/test_output/dfpc_ci_TiltScan"
     with EnsureCleanup(tmp_folder) as ec:
@@ -50,24 +50,24 @@ def test_compile():
                 tmp_folder, "python", node["name"].lower() + ".pyx"),
             implementation=map(
                 lambda filename: os.path.join(tmp_folder, filename),
-                ["TiltScan.cpp", "TiltScanInterface.cpp"]),
+                ["PointcloudGeneration.cpp", "PointcloudGenerationInterface.cpp"]),
             sourcedir=tmp_folder, incdirs=incdirs,
             compiler_flags=[], library_dirs=[], libraries=[],
             includes=[]
         )
 
-        import tiltscan
+        from pointcloudgeneration import PointcloudGeneration
 
-        t = tiltscan.TiltScan()
+        pg = PointcloudGeneration()
 
-        t.setup()
+        pg.setup()
 
         l = cdff_types.LaserScan()
-        t.lidar2DInput(l)
+        pg.lidar2DInput(l)
         r = cdff_types.RigidBodyState()
-        t.dyamixelDynamicTfInput(r)
+        pg.dyamixelDynamicTfInput(r)
 
-        t.run()
+        pg.run()
 
-        p = t.pointcloudOutput()
-        p = t.getPointcloud(30)
+        p = pg.pointcloudOutput()
+        p = pg.getPointcloud(30)

@@ -1,4 +1,4 @@
-name: TiltScan
+name: PointcloudGeneration
 dfns:
     - name: TiltScan
     - name: LaserFilter
