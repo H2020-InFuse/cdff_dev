@@ -267,7 +267,6 @@ def validate_node(node):
         raise DFNDescriptionException(
             "DFN description has no attribute 'name'.")
 
-    _validate_use_pointers(validated_node)
     _validate_ports(validated_node)
 
     if "implementations" not in node:
@@ -305,18 +304,12 @@ def validate_dfpc(dfpc):
         raise DFPCDescriptionException(
             "DFPC description has no attribute 'name'.")
 
-    _validate_use_pointers(validated_dfpc)
     _validate_ports(validated_dfpc)
     _validate_dfpc_port_connections(validated_dfpc)
     _validate_dfpc_operations(validated_dfpc)
     _validate_dfpc_internal_connections(validated_dfpc)
 
     return validated_dfpc
-
-
-def _validate_use_pointers(desc):
-    if "use_pointers" not in desc:
-        desc["use_pointers"] = False
 
 
 def _validate_ports(desc):

@@ -1,5 +1,4 @@
 name: Square
-use_pointers: True
 input_ports:
     - name: x
       type: double

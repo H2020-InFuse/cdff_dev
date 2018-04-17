@@ -1,5 +1,4 @@
 name: ASN1Test
-use_pointers: True
 input_ports:
     - name: currentTime
       type: Time

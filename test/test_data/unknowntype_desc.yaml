@@ -1,5 +1,4 @@
 name: UnknownType
-use_pointers: True
 input_ports:
     - name: x
       type: unknown
