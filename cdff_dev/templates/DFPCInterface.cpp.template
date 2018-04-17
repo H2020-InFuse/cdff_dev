@@ -19,7 +19,7 @@ void {{ desc["name"] }}Interface::{{ input_port["name"] }}Input(const {{ input_p
 {%- endfor %}
 
 {%- for output_port in desc["output_ports"] %}
-{{ output_port["type"] }} {{ desc["name"] }}Interface::{{ output_port["name"] }}Output() {
+const {{ output_port["type"] }}& {{ desc["name"] }}Interface::{{ output_port["name"] }}Output() {
     return out{{ output_port["name"].lower() }};
 }
 {%- endfor %}
