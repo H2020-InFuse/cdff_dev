@@ -26,7 +26,7 @@ void {{ class_name }}::setup()
 {
     {{ operation["output_type"] }} result;
 
-    // TODO Fill in process functionality here
+    // TODO Fill in operation functionality here
 
     return result;
 }
