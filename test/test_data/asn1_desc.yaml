@@ -4,6 +4,6 @@ input_ports:
       type: Time
       doc: dummy time input
 output_ports:
-    - name: nextTime
-      type: Time
-      doc: dummy time output
+    - name: someVector
+      type: Vector3d
+      doc: dummy Vector3d output

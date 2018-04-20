@@ -1,5 +1,6 @@
 #include "ASN1Test.hpp"
 #include <Time.h>
+#include <Eigen.h>
 
 namespace dfn_ci {
 
@@ -18,10 +19,12 @@ void ASN1Test::configure()
 
 
 void ASN1Test::process() {
-    Time sometime;
-    sometime.microseconds = incurrenttime.microseconds + 1;
-    sometime.usecPerSec = 1000000;
-    outnexttime = sometime;
+    Vector3d someVector;
+    someVector.nCount = 3;
+    someVector.arr[0] = incurrenttime.microseconds + 1;
+    someVector.arr[1] = incurrenttime.microseconds + 2;
+    someVector.arr[2] = incurrenttime.microseconds + 3;
+    outsomevector = someVector;
 }
 
 }

@@ -162,4 +162,7 @@ def test_asn1():
         current_time.microseconds = 999999
         asn1_test.currentTimeInput(current_time)
         asn1_test.process()
-        assert_equal(1000000, asn1_test.nextTimeOutput().microseconds)
+        assert_equal(asn1_test.someVectorOutput().__len__(), 3)
+        test_out = [1000000,1000001,1000002]
+        for i, out in enumerate(asn1_test.someVectorOutput().toarray()):
+            assert_equal(test_out[i], out)
