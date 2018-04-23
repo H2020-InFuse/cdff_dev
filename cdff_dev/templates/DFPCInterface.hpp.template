@@ -36,7 +36,7 @@ namespace dfpc_ci {
             {%- endfor %}
              * @return {{ operation["output_type"] }}
              */
-            virtual {{ operation["output_type"] }} {{ operation["name"] }}(
+            virtual const {{ operation["output_type"] }}& {{ operation["name"] }}(
                 {%- for arg in operation["inputs"] %}{{ arg["type"] }} {{ arg["name"] }}{{ ", " if not loop.last }}{%- endfor %}) = 0;
             {%- endfor %}
 
@@ -46,6 +46,9 @@ namespace dfpc_ci {
         {%- endfor %}
         {%- for output_port in desc["output_ports"] %}
             {{ output_port["type"] }} out{{ output_port["name"].lower() }};
+        {%- endfor %}
+        {%- for operation in desc["operations"] %}
+            {{ operation["output_type"] }} op{{ operation["name"].lower() }};
         {%- endfor %}
     };
 }

@@ -21,14 +21,10 @@ void {{ class_name }}::setup()
 }
 {{ break }}
 {%- for operation in desc["operations"] %}
-{{ operation["output_type"] }} {{ class_name }}::{{ operation["name"] }}(
+const {{ operation["output_type"] }}& {{ class_name }}::{{ operation["name"] }}(
     {%- for arg in operation["inputs"] %}{{ arg["type"] }} {{ arg["name"] }}{{ ", " if not loop.last }}{%- endfor %})
 {
-    {{ operation["output_type"] }} result;
-
-    // TODO Fill in operation functionality here
-
-    return result;
+    return op{{ operation["name"].lower() }};
 }
 {%- endfor %}
 
