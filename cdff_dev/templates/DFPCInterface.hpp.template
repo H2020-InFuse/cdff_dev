@@ -48,7 +48,7 @@ namespace dfpc_ci {
             {{ output_port["type"] }} out{{ output_port["name"].lower() }};
         {%- endfor %}
         {%- for operation in desc["operations"] %}
-            {{ operation["output_type"] }} op{{ operation["name"].lower() }};
+            {{ operation["output_type"] }} {{ operation["name"] }}Result;
         {%- endfor %}
     };
 }

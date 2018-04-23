@@ -24,7 +24,7 @@ void {{ class_name }}::setup()
 const {{ operation["output_type"] }}& {{ class_name }}::{{ operation["name"] }}(
     {%- for arg in operation["inputs"] %}{{ arg["type"] }} {{ arg["name"] }}{{ ", " if not loop.last }}{%- endfor %})
 {
-    return op{{ operation["name"].lower() }};
+    return {{ operation["name"] }}Result;
 }
 {%- endfor %}
 
