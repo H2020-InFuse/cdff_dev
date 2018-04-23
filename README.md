@@ -22,7 +22,11 @@ CDFF-Dev was initiated and is currently developed by the InFuse consortium:
 
 ### Dependencies of CDFF-Dev
 
-The CDFF's Dev component, available in this `CDFF_dev` repository, depends on the CDFF's Core and Support components, available in the [`CDFF`](https://gitlab.spaceapplications.com/InFuse/CDFF) repository. It also requires the Python 3 interpreter, the Python 3 headers, the Python 3 package manager, Graphviz, and the following Python packages:
+The CDFF's Dev component, available in this `CDFF_dev` repository, depends
+on the CDFF's Core and Support components, available in the
+[`CDFF`](https://gitlab.spaceapplications.com/InFuse/CDFF) repository.
+It also requires the Python 3 interpreter, the Python 3 headers, the Python
+3 package manager, Graphviz, and the following Python packages:
 
 * PyYAML
 * Jinja2
@@ -30,12 +34,13 @@ The CDFF's Dev component, available in this `CDFF_dev` repository, depends on th
 * NumPy
 * msgpack-python
 * pydot
+* pyqt 4
 
 On Ubuntu 16.04 you can install those requirements as follow:
 
 ```
-# Python interpreter, headers, package manager, and Graphviz
-$ sudo apt-get install python3 python3-dev python3-pip graphviz
+# Python interpreter, headers, package manager, Qt, and Graphviz
+$ sudo apt-get install python3 python3-dev python3-pip python3-pyqt4 graphviz
 
 # Install Python packages and a newer version of the package manager
 # in /usr/local/{bin,lib/python3.X/dist-packages} for all users
