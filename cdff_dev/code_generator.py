@@ -97,7 +97,7 @@ class ASN1TypeInfo(object):
         asn1_types = {}
         asn1_list = []
         for asn1_path in ASN1_paths:
-            with open(asn1_path, 'r') as f:
+            with open(asn1_path, "r", encoding="utf8") as f:
                 file_read = f.read()
             splitted_file = file_read.replace('\n', ' ').split('::=')[:-1]
             types_in_file = []
@@ -534,7 +534,7 @@ def render(template, **kwargs):
         "cdff_dev", os.path.join("templates", template + ".template"))
     if not os.path.exists(template_filename):
         raise IOError("No template for '%s' found." % template)
-    with open(template_filename, "r") as template_file:
+    with open(template_filename, "r", encoding="utf8") as template_file:
         template = jinja2.Template(template_file.read())
 
     try:
