@@ -10,7 +10,7 @@ from nose.tools import assert_true
 def test_generate_files():
     with open("test/test_data/pointcloud_generation_dfpc_desc.yml", "r") as f:
         node = yaml.load(f)
-    tmp_folder = "test/test_output/dfpc_ci_TiltScan"
+    tmp_folder = "test/test_output/dfpc_ci_PointcloudGeneration"
     with EnsureCleanup(tmp_folder) as ec:
         cdffpath = load_cdffpath()
         filenames = write_dfpc(node, tmp_folder, cdffpath=cdffpath)
@@ -30,7 +30,7 @@ def test_generate_files():
 def test_compile():
     with open("test/test_data/pointcloud_generation_dfpc_desc.yml", "r") as f:
         node = yaml.load(f)
-    tmp_folder = "test/test_output/dfpc_ci_TiltScan"
+    tmp_folder = "test/test_output/dfpc_ci_PointcloudGeneration"
     with EnsureCleanup(tmp_folder) as ec:
         cdffpath = load_cdffpath()
         filenames = write_dfpc(node, tmp_folder, cdffpath=cdffpath)
