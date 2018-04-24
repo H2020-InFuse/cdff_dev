@@ -20,7 +20,7 @@ def load_cdffpath():
 
     check_cdffpath(cdffpath)
 
-    return cdffpath
+    return os.path.abspath(cdffpath)
 
 
 def check_cdffpath(cdffpath="CDFF"):

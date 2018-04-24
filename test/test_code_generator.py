@@ -42,7 +42,7 @@ def test_square():
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
 
-        incdirs = ["test/test_output/", "CDFF/DFNs"]
+        incdirs = ["test/test_output/", os.path.join(cdffpath, "DFNs")]
         pyx_filename = os.path.join(
             tmp_folder, "python", node["name"].lower() + ".pyx")
         implementation = map(
@@ -77,7 +77,7 @@ def test_unknown_type():
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
 
-        incdirs = ["test/test_output/", "CDFF/DFNs"]
+        incdirs = ["test/test_output/", os.path.join(cdffpath, "DFNs")]
         assert_raises_regex(
             Exception, "Exit status",
             build_extension,
@@ -104,7 +104,7 @@ def test_multiple_implementations():
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
 
-        incdirs = ["test/test_output/", "CDFF/DFNs"]
+        incdirs = ["test/test_output/", os.path.join(cdffpath, "DFNs")]
         build_extension(
             tmp_folder, hide_stderr=True,
             name=node["name"].lower(),
@@ -142,7 +142,7 @@ def test_asn1():
         ctypespath = os.path.join(cdffpath, CTYPESDIR)
         dfnspath = os.path.join(cdffpath, "DFNs")
 
-        incdirs = ["test/test_output/", "CDFF/DFNs", ctypespath, dfnspath]
+        incdirs = ["test/test_output/", ctypespath, dfnspath]
         build_extension(
             tmp_folder, hide_stderr=True,
             name=node["name"].lower(),
