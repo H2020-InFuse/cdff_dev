@@ -224,4 +224,50 @@ cdef class Quaterniond:
         return array
 
     def fromarray(self, np.ndarray[double, ndim=1] array):
-        self.thisptr[0] = _cdff_envire.Quaterniond(array[0], array[1], array[2], array[3])
+        self.thisptr[0] = _cdff_envire.Quaterniond(
+            array[0], array[1], array[2], array[3])
+
+
+cdef class TransformWithCovariance:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_envire.TransformWithCovariance()
+        self.delete_thisptr = True
+
+    def __str__(self):
+        return str("(translation=%s, orientation=%s)" % (self.translation,
+                                                         self.orientation))
+
+    def assign(self, TransformWithCovariance other):
+        self.thisptr.assign(deref(other.thisptr))
+
+    def _get_translation(self):
+        cdef Vector3d translation = Vector3d()
+        del translation.thisptr
+        translation.delete_thisptr = False
+        translation.thisptr = &self.thisptr.translation
+        return translation
+
+    def _set_translation(self, Vector3d translation):
+        self.thisptr.translation = deref(translation.thisptr)
+
+    translation = property(_get_translation, _set_translation)
+
+    def _get_orientation(self):
+        cdef Quaterniond orientation = Quaterniond()
+        del orientation.thisptr
+        orientation.delete_thisptr = False
+        orientation.thisptr = &self.thisptr.orientation
+        return orientation
+
+    def _set_orientation(self, Quaterniond orientation):
+        self.thisptr.orientation = deref(orientation.thisptr)
+
+    orientation = property(_get_orientation, _set_orientation)

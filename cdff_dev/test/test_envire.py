@@ -132,3 +132,21 @@ def test_norms():
 def test_quaterniond_ctor():
     q = cdff_envire.Quaterniond(1.0, 0.0, 0.0, 0.0)
     assert_equal(str(q), "[im=1.00, real=(0.00, 0.00, 0.00)]")
+
+
+def test_transform_with_cov_ctor():
+    cdff_envire.TransformWithCovariance()
+
+
+def test_transform_set_get_translation():
+    p = cdff_envire.TransformWithCovariance()
+    t = cdff_envire.Vector3d(1.0, 2.0, 3.0)
+    p.translation = t
+    assert_equal(str(p.translation), "[1.00, 2.00, 3.00]")
+
+
+def test_transform_set_get_orientation():
+    p = cdff_envire.TransformWithCovariance()
+    o = cdff_envire.Quaterniond(1.0, 0.0, 0.0, 0.0)
+    p.orientation = o
+    assert_equal(str(p.orientation), "[im=1.00, real=(0.00, 0.00, 0.00)]")
