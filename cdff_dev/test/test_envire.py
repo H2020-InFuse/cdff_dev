@@ -150,3 +150,20 @@ def test_transform_set_get_orientation():
     o = cdff_envire.Quaterniond(1.0, 0.0, 0.0, 0.0)
     p.orientation = o
     assert_equal(str(p.orientation), "[im=1.00, real=(0.00, 0.00, 0.00)]")
+
+
+def test_default_transform_ctor():
+    cdff_envire.Transform()
+
+
+def test_transform_time_transform_with_covariance_ctor():
+    t = cdff_envire.Time()
+
+    p = cdff_envire.TransformWithCovariance()
+    p.translation = cdff_envire.Vector3d(1.0, 2.0, 3.0)
+    p.orientation = cdff_envire.Quaterniond(1.0, 0.0, 0.0, 0.0)
+
+    transform = cdff_envire.Transform(time=t, transform_with_covariance=p)
+    assert_equal(
+        str(transform),
+        "19700101-01:00:00\nt: (1.00 2.00 3.00)\nr: (1.00 0.00 0.00 0.00)")

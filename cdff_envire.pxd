@@ -20,3 +20,13 @@ cdef class Vector3d:
 cdef class TransformWithCovariance:
     cdef _cdff_envire.TransformWithCovariance* thisptr
     cdef bool delete_thisptr
+
+
+cdef class Transform:
+    cdef _cdff_envire.Transform* thisptr
+    cdef bool delete_thisptr
+
+
+cdef class EnvireGraph:
+    cdef _cdff_envire.EnvireGraph* thisptr
+    cdef bool delete_thisptr

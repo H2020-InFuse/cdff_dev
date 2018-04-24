@@ -271,3 +271,52 @@ cdef class TransformWithCovariance:
         self.thisptr.orientation = deref(orientation.thisptr)
 
     orientation = property(_get_orientation, _set_orientation)
+
+
+cdef class Transform:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.delete_thisptr and self.thisptr != NULL:
+            del self.thisptr
+
+    def __init__(
+            self, Time time=None,
+            TransformWithCovariance transform_with_covariance=None,
+            Vector3d translation=None, Quaterniond orientation=None):
+        if time is not None:
+            if transform_with_covariance is not None:
+                self.thisptr = new _cdff_envire.Transform(
+                    deref(time.thisptr), deref(transform_with_covariance.thisptr))
+            else:
+                self.thisptr = new _cdff_envire.Transform(deref(time.thisptr))
+        elif transform_with_covariance is not None:
+            self.thisptr = new _cdff_envire.Transform(
+                    deref(transform_with_covariance.thisptr))
+        elif translation is not None and orientation is not None:
+            self.thisptr = new _cdff_envire.Transform(
+                    deref(translation.thisptr), deref(orientation.thisptr))
+        elif translation is not None:
+            raise ValueError("Orientation is missing")
+        elif orientation is not None:
+            raise ValueError("Translation is missing")
+        else:
+            self.thisptr = new _cdff_envire.Transform()
+        self.delete_thisptr = True
+
+    def _get_transform(self):
+        cdef TransformWithCovariance transform = TransformWithCovariance()
+        del transform.thisptr
+        transform.thisptr = &self.thisptr.transform
+        transform.delete_thisptr = False
+        return transform
+
+    def _set_transform(self, TransformWithCovariance transform):
+        self.thisptr.transform = deref(transform.thisptr)
+
+    transform = property(_get_transform, _set_transform)
+
+    def __str__(self):
+        return self.thisptr.toString().decode()
