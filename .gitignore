@@ -1,8 +1,14 @@
+# Configuration files
+cdffpath
+# Build artifacts
 *.so
 *.pyc
 *.egg-info
-.idea/
 build/
-CDFF/
 cdff_types.cpp
+# Temporary files
 *~
+# CDFF
+CDFF/
+# Editor files
+.idea/
