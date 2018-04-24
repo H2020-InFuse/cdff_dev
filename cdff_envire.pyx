@@ -194,3 +194,34 @@ cdef class Vector3d:
             raise NotImplementedError(">=")
         else:
             raise ValueError("Unknown comparison operation %d" % op)
+
+
+cdef class Quaterniond:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self, double w=1.0, double x=0.0, double y=0.0, double z=0.0):
+        self.thisptr = new _cdff_envire.Quaterniond(w, x, y, z)
+        self.delete_thisptr = True
+
+    def __str__(self):
+        return str("[im=%.2f, real=(%.2f, %.2f, %.2f)]" % (
+            self.thisptr.w(), self.thisptr.x(), self.thisptr.y(),
+            self.thisptr.z()))
+
+    def assign(self, Quaterniond other):
+        self.thisptr.assign(deref(other.thisptr))
+
+    def toarray(self):
+        cdef np.ndarray[double, ndim=1] array = np.array([
+            self.thisptr.w(), self.thisptr.x(), self.thisptr.y(),
+            self.thisptr.z()])
+        return array
+
+    def fromarray(self, np.ndarray[double, ndim=1] array):
+        self.thisptr[0] = _cdff_envire.Quaterniond(array[0], array[1], array[2], array[3])

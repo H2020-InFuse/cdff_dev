@@ -127,3 +127,8 @@ def test_norms():
     v = cdff_envire.Vector3d(1.0, 2.0, 3.0)
     assert_almost_equal(v.norm(), 3.741657387)
     assert_equal(v.squared_norm(), 14.0)
+
+
+def test_quaterniond_ctor():
+    q = cdff_envire.Quaterniond(1.0, 0.0, 0.0, 0.0)
+    assert_equal(str(q), "[im=1.00, real=(0.00, 0.00, 0.00)]")
