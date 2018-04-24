@@ -1,3 +1,4 @@
+from libcpp.string cimport string
 from libcpp cimport bool
 cimport _cdff_envire
 

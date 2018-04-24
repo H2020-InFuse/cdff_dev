@@ -320,3 +320,141 @@ cdef class Transform:
 
     def __str__(self):
         return self.thisptr.toString().decode()
+
+
+cdef class EnvireGraph:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.delete_thisptr and self.thisptr != NULL:
+            del self.thisptr
+
+    def __init__(self, EnvireGraph other=None):
+        if other is None:
+            self.thisptr = new _cdff_envire.EnvireGraph()
+        else:
+            self.thisptr = new _cdff_envire.EnvireGraph(deref(other.thisptr))
+        self.delete_thisptr = True
+
+    def add_frame(self, str name):
+        self.thisptr.addFrame(name.encode())
+
+    def remove_frame(self, str name):
+        self.thisptr.removeFrame(name.encode())
+
+    def contains_frame(self, str name):
+        return self.thisptr.containsFrame(name.encode())
+
+    def contains_edge(self, str origin, str target):
+        return self.thisptr.containsEdge(origin.encode(), target.encode())
+
+    def add_transform(self, str origin, str target, Transform tf):
+        self.thisptr.addTransform(origin.encode(), target.encode(),
+                                  deref(tf.thisptr))
+
+    def update_transform(self, str origin, str target, Transform tf):
+        self.thisptr.updateTransform(origin.encode(), target.encode(),
+                                     deref(tf.thisptr))
+
+    def get_transform(self, str origin, str target):
+        """Return a copy of the transform computed from the graph."""
+        cdef Transform transform = Transform()
+        transform.thisptr[0] = self.thisptr.getTransform(
+            origin.encode(), target.encode())
+        return transform
+
+    def remove_transform(self, str origin, str target):
+        self.thisptr.removeTransform(origin.encode(), target.encode())
+
+    def num_vertices(self):
+        return self.thisptr.num_vertices()
+
+    def num_edges(self):
+        return self.thisptr.num_edges()
+
+    def save_to_file(self, str filename):
+        self.thisptr.saveToFile(filename.encode())
+
+    def load_from_file(self, str filename):
+        self.thisptr.loadFromFile(filename.encode())
+
+    def clear_frame(self, str name):
+        self.thisptr.clearFrame(name.encode())
+
+    def get_total_item_count(self, str name):
+        return self.thisptr.getTotalItemCount(name.encode())
+
+    def add_string_item_to_frame(self, str frame, str string_item):
+        # TODO: this has to be done for each type that will be used!
+        cdef _cdff_envire.shared_ptr[_cdff_envire.Item[string]] item = \
+            _cdff_envire.shared_ptr[_cdff_envire.Item[string]](
+                new _cdff_envire.Item[string](string_item.encode()))
+        self.thisptr.addItemToFrame(frame.encode(), item)
+
+    def get_string_item(self, str frame, i=0):
+        cdef _cdff_envire.Item[string] item = deref(
+            self.thisptr.getItem[_cdff_envire.Item[string]](frame.encode(), i))
+        return item.getData().decode()
+
+    def contains_string_items(self, str frame):
+        return self.thisptr.containsItems[_cdff_envire.Item[string]](frame.encode())
+
+    """def add_item_to_frame(self, str frame, item):  # TODO test
+        if isinstance(item, basetypes.LaserScan):
+            envire_item = LaserScanItem(item)
+            self.thisptr.addItemToFrame(
+                frame.encode(), (<LaserScanItem> envire_item).thisptr)
+        elif isinstance(item, basetypes.Joints):
+            envire_item = JointsItem(item)
+            self.thisptr.addItemToFrame(
+                frame.encode(), (<JointsItem> envire_item).thisptr)
+        elif isinstance(item, basetypes.RigidBodyState):
+            envire_item = RigidBodyStateItem(item)
+            self.thisptr.addItemToFrame(
+                frame.encode(), (<RigidBodyStateItem> envire_item).thisptr)
+        elif isinstance(item, basetypes.Pointcloud):
+            envire_item = PointcloudItem(item)
+            self.thisptr.addItemToFrame(
+                frame.encode(), (<PointcloudItem> envire_item).thisptr)
+        else:
+            raise NotImplementedError(
+                "Cannot add element of type '%s' to graph." % type(item))
+        return envire_item"""
+
+    """def remove_item_from_frame(self, item):
+        if isinstance(item, LaserScanItem):
+            self.thisptr.removeItemFromFrame((<LaserScanItem> item).thisptr)
+        elif isinstance(item, JointsItem):
+            self.thisptr.removeItemFromFrame((<JointsItem> item).thisptr)
+        elif isinstance(item, RigidBodyStateItem):
+            self.thisptr.removeItemFromFrame((<RigidBodyStateItem> item).thisptr)
+        elif isinstance(item, PointcloudItem):
+            self.thisptr.removeItemFromFrame((<PointcloudItem> item).thisptr)
+        else:
+            raise NotImplementedError(
+                "Cannot remove element of type '%s'." % type(item))"""
+
+    """
+    def get_item(self, str frame, item, i=0):
+        if isinstance(item, basetypes.LaserScan):
+            (<basetypes.LaserScan> item).thisptr[0] = deref(
+                self.thisptr.getItem[_cdff_envire.Item[_basetypes.LaserScan]](
+                    frame.encode(), i)).getData()
+        elif isinstance(item, basetypes.Joints):
+            (<basetypes.Joints> item).thisptr[0] = deref(
+                self.thisptr.getItem[_cdff_envire.Item[_basetypes.Joints]](
+                    frame.encode(), i)).getData()
+        elif isinstance(item, basetypes.RigidBodyState):
+            (<basetypes.RigidBodyState> item).thisptr[0] = deref(
+                self.thisptr.getItem[_cdff_envire.Item[_basetypes.RigidBodyState]](
+                    frame.encode(), i)).getData()
+        elif isinstance(item, basetypes.Pointcloud):
+            (<basetypes.Pointcloud> item).thisptr[0] = deref(
+                self.thisptr.getItem[_cdff_envire.Item[_basetypes.Pointcloud]](
+                    frame.encode(), i)).getData()
+        else:
+            raise NotImplementedError(
+                "Cannot add element of type '%s' to graph." % type(item))
+        return item"""

@@ -89,7 +89,7 @@ def configuration(parent_package='', top_path=None):
         library_dirs=[
             os.path.join(install_dir, "lib")
         ],
-        libraries=["base-types"],
+        libraries=["base-types", "envire_core"],
         define_macros=[("NDEBUG",)],
         extra_compile_args=[
             "-std=c++11",
