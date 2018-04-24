@@ -6,6 +6,7 @@ cdffpath
 *.egg-info
 build/
 cdff_types.cpp
+cdff_envire.cpp
 # Temporary files
 *~
 # CDFF

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from distutils.extension import Extension
 from distutils.sysconfig import get_config_vars
 from Cython.Build import cythonize
 import numpy
@@ -35,7 +34,10 @@ def configuration(parent_package='', top_path=None):
     config.add_data_files(
         (".", "_cdff_types.pxd"),
         (".", "cdff_types.pxd"),
-        (".", "cdff_types.pyx")
+        (".", "cdff_types.pyx"),
+        (".", "_cdff_envire.pxd"),
+        (".", "cdff_envire.pxd"),
+        (".", "cdff_envire.pyx")
     )
 
     cdffpath = load_cdffpath()
@@ -66,6 +68,38 @@ def configuration(parent_package='', top_path=None):
         ]
     )
 
+    pyx_filename = os.path.join("cdff_envire.pyx")
+    cythonize(pyx_filename)
+    autoproj_current_root = os.environ.get("AUTOPROJ_CURRENT_ROOT", None)
+    if autoproj_current_root is None:
+        # TODO might be changed to warning?
+        raise IOError("Environment variable $AUTOPROJ_CURRENT_ROOT is not "
+                      "defined. Cannot build EnviRe bindings.")
+    install_dir = os.path.join(autoproj_current_root, "install")
+
+    config.add_extension(
+        "cdff_envire",
+        sources=["cdff_envire.cpp"],
+        include_dirs=[
+            ".",
+            numpy.get_include(),
+            os.path.join(install_dir, "include"),
+            os.path.join(install_dir, "include", "eigen3")
+        ],
+        library_dirs=[
+            os.path.join(install_dir, "lib")
+        ],
+        libraries=["base-types"],
+        define_macros=[("NDEBUG",)],
+        extra_compile_args=[
+            "-std=c++11",
+            "-O3",
+            # disable warnings caused by Cython using the deprecated
+            # NumPy C-API
+            "-Wno-cpp", "-Wno-unused-function"
+        ]
+    )
+
     return config
 
 
@@ -82,7 +116,7 @@ if __name__ == "__main__":
                  "bin" + os.sep + "dfpc_template_generator"],
         packages=['cdff_dev'],
         package_data={'cdff_dev': ['templates/*.template']},
-        requires=['pyyaml', 'cython', 'Jinja2'],
+        requires=['pyyaml', 'cython', 'Jinja2', 'numpy', 'pydot'],
         configuration=configuration
     )
     setup(**metadata)
