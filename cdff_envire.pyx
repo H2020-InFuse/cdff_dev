@@ -4,6 +4,8 @@ from libc.stdint cimport int64_t
 cimport numpy as np
 import numpy as np
 cimport cdff_envire
+cimport cdff_types
+cimport _cdff_types
 
 
 np.import_array()  # must be here because we use the NumPy C API
@@ -322,6 +324,14 @@ cdef class Transform:
         return self.thisptr.toString().decode()
 
 
+ctypedef fused GenericType:
+    cdff_types.LaserScan
+    cdff_types.Pointcloud
+    cdff_types.RigidBodyState
+    cdff_types.JointState
+    cdff_types.Joints
+
+
 cdef class EnvireGraph:
     def __cinit__(self):
         self.thisptr = NULL
@@ -386,20 +396,13 @@ cdef class EnvireGraph:
     def get_total_item_count(self, str name):
         return self.thisptr.getTotalItemCount(name.encode())
 
-    def add_string_item_to_frame(self, str frame, str string_item):
-        # TODO: this has to be done for each type that will be used!
-        cdef _cdff_envire.shared_ptr[_cdff_envire.Item[string]] item = \
-            _cdff_envire.shared_ptr[_cdff_envire.Item[string]](
-                new _cdff_envire.Item[string](string_item.encode()))
-        self.thisptr.addItemToFrame(frame.encode(), item)
+    def add_item_to_frame(self, str frame, GenericType item):
+        _cdff_envire.addItemToFrame(
+            deref(self.thisptr), frame.encode(), item.thisptr)
 
-    def get_string_item(self, str frame, i=0):
-        cdef _cdff_envire.Item[string] item = deref(
-            self.thisptr.getItem[_cdff_envire.Item[string]](frame.encode(), i))
-        return item.getData().decode()
-
-    def contains_string_items(self, str frame):
-        return self.thisptr.containsItems[_cdff_envire.Item[string]](frame.encode())
+    def get_item_count(self, str frame, GenericType item):
+        return _cdff_envire.getItemCount(
+            deref(self.thisptr), frame.encode(), item.thisptr)
 
     """def add_item_to_frame(self, str frame, item):  # TODO test
         if isinstance(item, basetypes.LaserScan):

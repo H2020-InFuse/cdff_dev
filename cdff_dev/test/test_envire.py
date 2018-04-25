@@ -1,4 +1,5 @@
 import cdff_envire
+import cdff_types
 import os
 import numpy as np
 from nose.tools import assert_equal, assert_not_equal, \
@@ -305,34 +306,18 @@ def test_envire_graph_save_load():
             os.remove(filename)
 
 
-def test_envire_graph_add_get_string_item():
-    g = cdff_envire.EnvireGraph()
-    g.add_frame("test")
-    g.add_string_item_to_frame("test", "description of this frame")
-    assert_equal(g.get_string_item("test"), "description of this frame")
-
-
-def test_envire_graph_clear_frame():
-    g = cdff_envire.EnvireGraph()
-    g.add_frame("test")
-    g.add_string_item_to_frame("test", "description of this frame")
-    assert_true(g.contains_string_items("test"))
-    assert_equal(g.get_total_item_count("test"), 1)
-    g.clear_frame("test")
-    assert_false(g.contains_string_items("test"))
-    assert_equal(g.get_total_item_count("test"), 0)
-
-
-def test_envire_graph_get_nothing():
-    g = cdff_envire.EnvireGraph()
-    g.add_frame("test")
-    assert_raises_regexp(RuntimeError, "There are no items .*",
-                         g.get_string_item, "test")
-
-
 def test_envire_graph_add_remove_frame():
     g = cdff_envire.EnvireGraph()
     g.add_frame("test")
     assert_true(g.contains_frame("test"))
     g.remove_frame("test")
     assert_false(g.contains_frame("test"))
+
+
+def test_envire_graph_add_item():
+    g = cdff_envire.EnvireGraph()
+    g.add_frame("test")
+    item = cdff_types.RigidBodyState()
+    g.add_item_to_frame("test", item)
+    assert_equal(g.get_item_count("test", item), 1)
+    assert_equal(g.get_total_item_count("test"), 1)

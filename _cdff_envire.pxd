@@ -141,9 +141,17 @@ cdef extern from "envire_core/graph/EnvireGraph.hpp" namespace "envire::core":
 
         void clearFrame(string)
         bool containsItems[T](string)
+        unsigned getItemCount[T](string)
         unsigned getTotalItemCount(string)
         #unsigned getItemCount(string)
 
         void addItemToFrame[T](string, T) except +
         void removeItemFromFrame[T](T) except +
         ItemIterator[T] getItem[T](string, int) except +
+
+
+cdef extern from "envire_helper.hpp":
+    void addItemToFrame[_ItemData](
+        EnvireGraph& graph, const string& frame, _ItemData* contentPtr) except +
+    unsigned getItemCount[_ItemData](
+        EnvireGraph& graph, const string& frame, _ItemData* contentPtr) except +

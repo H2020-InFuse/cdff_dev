@@ -55,7 +55,6 @@ def configuration(parent_package='', top_path=None):
             ctypespath
         ],
         library_dirs=[
-            ctypespath
         ],
         libraries=[],
         define_macros=[("NDEBUG",)],
@@ -82,9 +81,11 @@ def configuration(parent_package='', top_path=None):
         sources=["cdff_envire.cpp"],
         include_dirs=[
             ".",
+            "envire",
             numpy.get_include(),
             os.path.join(install_dir, "include"),
-            os.path.join(install_dir, "include", "eigen3")
+            os.path.join(install_dir, "include", "eigen3"),
+            ctypespath
         ],
         library_dirs=[
             os.path.join(install_dir, "lib")
