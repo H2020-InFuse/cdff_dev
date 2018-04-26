@@ -72,6 +72,8 @@ class DataFlowControl:
         self.result_ports_ = None
         self.connection_map_ = None
 
+        self.node_facade = None
+
     def setup(self):
         """Setup network.
 
@@ -324,7 +326,7 @@ class NodeStatistics:
     def print_statistics(self):
         average_processing_durations = dict(
             (node_name, sum(self.processing_durations_[node_name]) /
-                       len(self.processing_durations_[node_name]))
+             len(self.processing_durations_[node_name]))
             for node_name in self.processing_durations_.keys()
         )
 
@@ -370,32 +372,61 @@ class EnvireVisualization:
     frames : dict
         Mapping from port names to frame names
     """
-    def __init__(self, frames=dict()):
-        self.frames = frames
-        self.world_state_ = WorldState()
-        self.items = dict()
+    def __init__(self, frames):
+        self.world_state_ = WorldState(frames)
 
     def report_node_output(self, port_name, sample, timestamp):
-        # TODO refactor with world state
-        if port_name not in self.items:
-            item = cdff_envire.GenericItem()
-            # TODO set time stamp
-            self.items[port_name] = item
-            if port_name not in self.frames:
-                warnings.warn("No frame registered for port '%s'" % port_name)
-                return
-            self.world_state_.graph.add_item_to_frame(
-                self.frames[port_name], item, sample)
-        else:
-            item = self.items[port_name]
-            # TODO update item
+        self.world_state_.report_node_output(port_name, sample, timestamp)
 
 
 class WorldState:
-    """Represents the estimated world state of the system based on log data."""
-    def __init__(self):
+    """Represents the estimated world state of the system based on log data.
+
+    Parameters
+    ----------
+    frames : dict
+        Mapping from port names to frame names
+    """
+    def __init__(self, frames):
+        self.frames = frames
+        self.items = dict()
+        self.samples = dict()
         self.graph = cdff_envire.EnvireGraph()
+        for frame in self.frames.values():
+            if not self.graph.contains_frame(frame):
+                self.graph.add_frame(frame)
 
+    def __del__(self):
+        for port_name in self.items.keys():
+            self.graph.remove_item_from_frame(
+                self.items[port_name], self.samples[port_name])
 
-# TODO envire visualizer
-#self._update_envire_item(sample, port_name, timestamp)
+    def report_node_output(self, port_name, sample, timestamp):
+        if port_name not in self.frames:
+            warnings.warn("No frame registered for port '%s'" % port_name)
+            return
+
+        self.samples[port_name] = sample
+
+        # TODO refactor with world state
+        # TODO set time stamp
+        if port_name not in self.items:
+            item = cdff_envire.GenericItem()
+            self.items[port_name] = item
+            try:
+                self.graph.add_item_to_frame(
+                    self.frames[port_name], item, sample)
+            except TypeError:
+                warnings.warn("Cannot store type '%s' in EnviRe graph."
+                              % type(sample))
+        else:
+            item = self.items[port_name]
+            # TODO update item
+            try:
+                self.graph.remove_item_from_frame(
+                    self.frames[port_name], item, sample)
+                self.graph.add_item_to_frame(
+                    self.frames[port_name], item, sample)
+            except TypeError:
+                warnings.warn("Cannot store type '%s' in EnviRe graph."
+                              % type(sample))

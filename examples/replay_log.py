@@ -1,63 +1,83 @@
-from cdff_dev import dataflowcontrol
-from cdff_dev import diagrams
+import numpy as np
+from cdff_dev import logloader, typefromdict, dataflowcontrol
+import cdff_types
 
 
-class LinearDFN:
+class LaserFilterDummyDFN:
     def __init__(self):
-        self.w = 2.0
-        self.b = 1.0
-        self.x = 0.0
+        self.scanSample = cdff_types.LaserScan()
 
     def configure(self):
         pass
 
-    def xInput(self, x):
-        self.x = x
+    def scanSampleInput(self, scanSample):
+        self.scanSample = scanSample
 
     def process(self):
-        self.y = self.w * self.x + self.b
+        # filter all values that are too far away from the median
+        ranges = np.array([self.scanSample.ranges[i]
+                           for i in range(self.scanSample.ranges.size())])
+        med = np.median(ranges)
+        for i in range(len(ranges)):
+            if abs(ranges[i] - med) > 100:
+                self.scanSample.ranges[i] = med
 
-    def yOutput(self):
-        return self.y
+    def filteredScanOutput(self):
+        return self.scanSample
 
 
-class SquareDFN:
+class PointcloudBuilderDummyDFN:
     def __init__(self):
-        self.x = 0.0
+        self.pointcloud = cdff_types.Pointcloud()
 
     def configure(self):
         pass
 
-    def xInput(self, x):
-        self.x = x
+    def scanInput(self, scan):
+        self.scan = scan
+
+    def transformInput(self, transform):
+        self.transform = transform
 
     def process(self):
-        self.y = self.x ** 2
+        pass
 
-    def yOutput(self):
-        return self.y
+    def pointcloudOutput(self):
+        return self.pointcloud
 
 
 def main():
-    vis = dataflowcontrol.EnvireVisualization()
     nodes = {
-        "linear": LinearDFN(),
-        "square": SquareDFN()
+        "laser_filter": LaserFilterDummyDFN(),
+        "pointcloud_builder": PointcloudBuilderDummyDFN()
     }
     periods = {
-        "linear": 0.001,
-        "square": 0.001
+        "laser_filter": 0.025,
+        "pointcloud_builder": 0.1
     }
     connections = (
-        ("log.x", "linear.x"),
-        ("linear.y", "square.x"),
-        ("square.y", "result.y")
+        ("/hokuyo.scans", "laser_filter.scanSample"),
+        ("laser_filter.filteredScan", "pointcloud_builder.scan"),
+        ("/dynamixel.transforms", "pointcloud_builder.transform"),
+        ("pointcloud_builder.pointcloud", "result.pointcloud")
     )
+    frames = {
+        "/hokuyo.scans": "upper_dynamixel",
+        "laser_filter.filteredScan": "upper_dynamixel",
+        "/dynamixel.transforms": "lower_dynamixel",
+        "pointcloud_builder.pointcloud": "body"
+    }
+    vis = dataflowcontrol.EnvireVisualization(frames)
     dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods, vis)
     dfc.setup()
-    diagrams.save_graph_png(dfc, "network.png")
-    for i in range(10000):
-        dfc.process_sample(timestamp=i, stream_name="log.x", sample=i)
+
+    log = logloader.load_log("test/test_data/logs/test_log.msg")
+    stream_names = ["/hokuyo.scans", "/dynamixel.transforms"]
+    for timestamp, stream_name, typename, sample in logloader.replay(
+            stream_names, log, verbose=0):
+        obj = typefromdict.create_from_dict(typename, sample)
+        dfc.process_sample(
+            timestamp=timestamp, stream_name=stream_name, sample=obj)
     dfc.node_statistics_.print_statistics()
 
 
