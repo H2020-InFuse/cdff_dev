@@ -243,8 +243,8 @@ class NodeFacade:
 
     Parameters
     ----------
-    nodes : list
-        Node instances
+    nodes : dict
+        Mapping from node names to node instances
 
     verbose : int, optional (default: 0)
         Verbosity level
