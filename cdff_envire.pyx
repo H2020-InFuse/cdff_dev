@@ -332,6 +332,34 @@ ctypedef fused GenericType:
     cdff_types.Joints
 
 
+cdef class GenericItem:
+    def __cinit__(self):
+        self.thisptr = new _cdff_envire.GenericItem()
+
+    def __dealloc__(self):
+        if self.filled:
+            raise RuntimeError("Item content must be deleted explicitely.")
+        del self.thisptr
+
+    def __init__(self):
+        self.filled = False
+
+    def save_item(self, GenericType content):
+        if self.filled:
+            raise RuntimeError("Item already contains data.")
+        self.thisptr.saveItem(content.thisptr)
+        self.filled = True
+
+    def get_content(self, GenericType content):
+        if not self.filled:
+            raise RuntimeError("Item does not have any content.")
+        content.thisptr[0] = self.thisptr.getItem(content.thisptr).get().getData()
+
+    def delete_item(self, GenericType content):
+        self.thisptr.deleteItem(content.thisptr)
+        self.filled = False
+
+
 cdef class EnvireGraph:
     def __cinit__(self):
         self.thisptr = NULL
@@ -396,35 +424,13 @@ cdef class EnvireGraph:
     def get_total_item_count(self, str name):
         return self.thisptr.getTotalItemCount(name.encode())
 
-    def add_item_to_frame(self, str frame, GenericType item):
-        _cdff_envire.addItemToFrame(
-            deref(self.thisptr), frame.encode(), item.thisptr)
+    def add_item_to_frame(self, str frame, GenericItem item, GenericType content):
+        item.save_item(content)
+        self.thisptr.addItemToFrame(frame.encode(), item.thisptr.getItem(content.thisptr))
 
     def get_item_count(self, str frame, GenericType item):
         return _cdff_envire.getItemCount(
             deref(self.thisptr), frame.encode(), item.thisptr)
-
-    """def add_item_to_frame(self, str frame, item):  # TODO test
-        if isinstance(item, basetypes.LaserScan):
-            envire_item = LaserScanItem(item)
-            self.thisptr.addItemToFrame(
-                frame.encode(), (<LaserScanItem> envire_item).thisptr)
-        elif isinstance(item, basetypes.Joints):
-            envire_item = JointsItem(item)
-            self.thisptr.addItemToFrame(
-                frame.encode(), (<JointsItem> envire_item).thisptr)
-        elif isinstance(item, basetypes.RigidBodyState):
-            envire_item = RigidBodyStateItem(item)
-            self.thisptr.addItemToFrame(
-                frame.encode(), (<RigidBodyStateItem> envire_item).thisptr)
-        elif isinstance(item, basetypes.Pointcloud):
-            envire_item = PointcloudItem(item)
-            self.thisptr.addItemToFrame(
-                frame.encode(), (<PointcloudItem> envire_item).thisptr)
-        else:
-            raise NotImplementedError(
-                "Cannot add element of type '%s' to graph." % type(item))
-        return envire_item"""
 
     """def remove_item_from_frame(self, item):
         if isinstance(item, LaserScanItem):

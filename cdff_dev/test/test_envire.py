@@ -306,6 +306,19 @@ def test_envire_graph_save_load():
             os.remove(filename)
 
 
+def test_make_item():
+    item = cdff_envire.GenericItem()
+    content = cdff_types.RigidBodyState()
+    content.source_frame = "A"
+    content.target_frame = "B"
+    item.save_item(content)
+    content2 = cdff_types.RigidBodyState()
+    item.get_content(content2)
+    assert_equal(content2.source_frame, "A")
+    assert_equal(content2.target_frame, "B")
+    item.delete_item(content)
+
+
 def test_envire_graph_add_remove_frame():
     g = cdff_envire.EnvireGraph()
     g.add_frame("test")
@@ -317,7 +330,9 @@ def test_envire_graph_add_remove_frame():
 def test_envire_graph_add_item():
     g = cdff_envire.EnvireGraph()
     g.add_frame("test")
-    item = cdff_types.RigidBodyState()
-    g.add_item_to_frame("test", item)
-    assert_equal(g.get_item_count("test", item), 1)
+    item = cdff_envire.GenericItem()
+    content = cdff_types.RigidBodyState()
+    g.add_item_to_frame("test", item, content)
+    assert_equal(g.get_item_count("test", content), 1)
     assert_equal(g.get_total_item_count("test"), 1)
+    item.delete_item(content)

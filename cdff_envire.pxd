@@ -28,6 +28,11 @@ cdef class Transform:
     cdef bool delete_thisptr
 
 
+cdef class GenericItem:
+    cdef _cdff_envire.GenericItem* thisptr
+    cdef bool filled
+
+
 cdef class EnvireGraph:
     cdef _cdff_envire.EnvireGraph* thisptr
     cdef bool delete_thisptr

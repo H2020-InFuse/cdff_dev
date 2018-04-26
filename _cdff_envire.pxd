@@ -151,6 +151,11 @@ cdef extern from "envire_core/graph/EnvireGraph.hpp" namespace "envire::core":
 
 
 cdef extern from "envire_helper.hpp":
+    cdef cppclass GenericItem:
+        GenericItem()
+        void saveItem[_ItemData](_ItemData* content)
+        shared_ptr[Item[_ItemData]] getItem[_ItemData](_ItemData* content)
+        void deleteItem[_ItemData](_ItemData* content)
     void addItemToFrame[_ItemData](
         EnvireGraph& graph, const string& frame, _ItemData* contentPtr) except +
     unsigned getItemCount[_ItemData](
