@@ -426,44 +426,13 @@ cdef class EnvireGraph:
 
     def add_item_to_frame(self, str frame, GenericItem item, GenericType content):
         item.save_item(content)
-        self.thisptr.addItemToFrame(frame.encode(), item.thisptr.getItem(content.thisptr))
+        self.thisptr.addItemToFrame(
+            frame.encode(), item.thisptr.getItem(content.thisptr))
+
+    def remove_item_from_frame(self, GenericItem item, GenericType content):
+        self.thisptr.removeItemFromFrame(item.thisptr.getItem(content.thisptr))
+        item.delete_item(content)
 
     def get_item_count(self, str frame, GenericType item):
         return _cdff_envire.getItemCount(
             deref(self.thisptr), frame.encode(), item.thisptr)
-
-    """def remove_item_from_frame(self, item):
-        if isinstance(item, LaserScanItem):
-            self.thisptr.removeItemFromFrame((<LaserScanItem> item).thisptr)
-        elif isinstance(item, JointsItem):
-            self.thisptr.removeItemFromFrame((<JointsItem> item).thisptr)
-        elif isinstance(item, RigidBodyStateItem):
-            self.thisptr.removeItemFromFrame((<RigidBodyStateItem> item).thisptr)
-        elif isinstance(item, PointcloudItem):
-            self.thisptr.removeItemFromFrame((<PointcloudItem> item).thisptr)
-        else:
-            raise NotImplementedError(
-                "Cannot remove element of type '%s'." % type(item))"""
-
-    """
-    def get_item(self, str frame, item, i=0):
-        if isinstance(item, basetypes.LaserScan):
-            (<basetypes.LaserScan> item).thisptr[0] = deref(
-                self.thisptr.getItem[_cdff_envire.Item[_basetypes.LaserScan]](
-                    frame.encode(), i)).getData()
-        elif isinstance(item, basetypes.Joints):
-            (<basetypes.Joints> item).thisptr[0] = deref(
-                self.thisptr.getItem[_cdff_envire.Item[_basetypes.Joints]](
-                    frame.encode(), i)).getData()
-        elif isinstance(item, basetypes.RigidBodyState):
-            (<basetypes.RigidBodyState> item).thisptr[0] = deref(
-                self.thisptr.getItem[_cdff_envire.Item[_basetypes.RigidBodyState]](
-                    frame.encode(), i)).getData()
-        elif isinstance(item, basetypes.Pointcloud):
-            (<basetypes.Pointcloud> item).thisptr[0] = deref(
-                self.thisptr.getItem[_cdff_envire.Item[_basetypes.Pointcloud]](
-                    frame.encode(), i)).getData()
-        else:
-            raise NotImplementedError(
-                "Cannot add element of type '%s' to graph." % type(item))
-        return item"""

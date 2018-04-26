@@ -335,4 +335,4 @@ def test_envire_graph_add_item():
     g.add_item_to_frame("test", item, content)
     assert_equal(g.get_item_count("test", content), 1)
     assert_equal(g.get_total_item_count("test"), 1)
-    item.delete_item(content)
+    g.remove_item_from_frame(item, content)
