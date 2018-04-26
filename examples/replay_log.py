@@ -39,7 +39,7 @@ class SquareDFN:
 
 
 def main():
-    vis = dataflowcontrol.TextVisualization()
+    vis = dataflowcontrol.EnvireVisualization()
     nodes = {
         "linear": LinearDFN(),
         "square": SquareDFN()

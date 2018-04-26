@@ -1,3 +1,5 @@
+import cdff_envire
+import warnings
 from collections import defaultdict
 import time
 
@@ -358,6 +360,41 @@ class TextVisualization:
         print("  Timestamp: %s" % timestamp)
         print("  Port: %s" % port_name)
         print("  Sample: %s" % sample)
+
+
+class EnvireVisualization:
+    """EnviRe visualization.
+
+    Parameters
+    ----------
+    frames : dict
+        Mapping from port names to frame names
+    """
+    def __init__(self, frames=dict()):
+        self.frames = frames
+        self.world_state_ = WorldState()
+        self.items = dict()
+
+    def report_node_output(self, port_name, sample, timestamp):
+        # TODO refactor with world state
+        if port_name not in self.items:
+            item = cdff_envire.GenericItem()
+            # TODO set time stamp
+            self.items[port_name] = item
+            if port_name not in self.frames:
+                warnings.warn("No frame registered for port '%s'" % port_name)
+                return
+            self.world_state_.graph.add_item_to_frame(
+                self.frames[port_name], item, sample)
+        else:
+            item = self.items[port_name]
+            # TODO update item
+
+
+class WorldState:
+    """Represents the estimated world state of the system based on log data."""
+    def __init__(self):
+        self.graph = cdff_envire.EnvireGraph()
 
 
 # TODO envire visualizer
