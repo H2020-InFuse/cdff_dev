@@ -5,6 +5,7 @@
   <maintainer>Alexander Fabisch/Alexander.Fabisch@dfki.de</maintainer>
   <license>none yet</license>
 
+  <depend package="cdff/CDFF"/>
   <depend package="python3"/>
   <depend package="python3-dev"/>
   <depend package="python3-pip"/>
