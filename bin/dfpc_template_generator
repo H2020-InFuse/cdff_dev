@@ -3,6 +3,7 @@ import os
 import argparse
 import yaml
 from cdff_dev.code_generator import write_dfpc
+from cdff_dev.path import load_cdffpath
 from cdff_dev.path import check_cdffpath
 
 
@@ -32,9 +33,11 @@ def parse_args():
         help="Subdirectory of the output directory that will contain the "
              "Python bindings.", nargs="?", default="python")
     argparser.add_argument(
-        "--cdffpath", type=str, help="Path to CDFF repository.", nargs="?",
-        default="CDFF")
-    return argparser.parse_args()
+        "--cdffpath", type=str, help="Path to CDFF repository.", nargs="?")
+    args = argparser.parse_args()
+    if args.cdffpath is None:
+        args.cdffpath = load_cdffpath()
+    return args
 
 
 if __name__ == "__main__":
