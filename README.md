@@ -5,12 +5,9 @@ https://gitlab.spaceapplications.com/InFuse/CDFF_dev)
 https://gitlab.spaceapplications.com/InFuse/CDFF_dev/badges/master/coverage.svg)](
 https://gitlab.spaceapplications.com/InFuse/CDFF_dev)
 
-# CDFF-Dev
+## CDFF-Dev
 
-The CDFF-Dev provides the tools to develop, test, visualize, and perform
-analysis on data fusion products. The CDFF-Dev includes tools such as data
-log replay, visualization tools, and data analysis tools. No component of
-the CDFF-Dev is deployed on the target system.
+CDFF-Dev provides tools to develop, test, visualize, and perform analysis on data fusion products. It includes tools such as data log replay, visualization tools, and data analysis tools. None of it is deployed on the target system.
 
 CDFF-Dev was initiated and is currently developed by the InFuse consortium:
 * [Robotics Innovation Center](http://robotik.dfki-bremen.de/en/startpage.html)
@@ -18,11 +15,11 @@ CDFF-Dev was initiated and is currently developed by the InFuse consortium:
   in Bremen
 * ...
 
-![DFKI RIC](https://www.dfki.de/web/presse/bildmaterial/dfki-logo-e-schrift.jpg)
+<img src="https://www.dfki.de/web/presse/bildmaterial/dfki-logo-e-schrift.jpg" alt="DFKI RIC" height="75px" />
 
-## Dependencies of CDFF-Dev
+### Dependencies of CDFF-Dev
 
-The CDFF's Dev component, available in this `CDFF_dev` repository, depends on the CDFF's Core and Support components, available in the [`CDFF`](https://gitlab.spaceapplications.com/InFuse/CDFF_dev) repository. It also requires the Python 3 interpreter, the Python 3 headers, the Python 3 package manager, Graphviz, and the following Python packages:
+The CDFF's Dev component, available in this `CDFF_dev` repository, depends on the CDFF's Core and Support components, available in the [`CDFF`](https://gitlab.spaceapplications.com/InFuse/CDFF) repository. It also requires the Python 3 interpreter, the Python 3 headers, the Python 3 package manager, Graphviz, and the following Python packages:
 
 * PyYAML
 * Jinja2
@@ -37,20 +34,36 @@ On Ubuntu 16.04 you can install those requirements as follow:
 # Python interpreter, headers, package manager, and Graphviz
 $ sudo apt-get install python3 python3-dev python3-pip graphviz
 
-# Install Python packages and newer version of package manager
+# Install Python packages and a newer version of package manager
 # in /usr/local/{bin,lib/python3.X/dist-packages} for all users
 $ sudo pip3 install --upgrade pip
 $ sudo pip3 install -r requirements.txt
 
-# Or install Python packages and newer version of package manager
+# Or install Python packages and a newer version of package manager
 # in $HOME/.local/{bin,lib/python3.X/site-packages} for the current user
 $ pip3 install --user --upgrade pip
 $ pip3 install --user -r requirements.txt
 ```
 
+Or you can not install anything and instead use CDFF-Dev inside a Docker container started from the InFuse Docker image. It is the same image as for CDFF-Core and CDFF-Support, and comes with all the necessary dependencies. You only need to provide your local clones of the `CDFF` and `CDFF_dev` repositories. Have a look at [this section](https://gitlab.spaceapplications.com/InFuse/CDFF/blob/master/External/Readme.md#usage) in the documentation on the `CDFF` repository. With an adequately-defined alias, you can start a container as follow:
+
+```
+user@computer:~$ docker cdff-dev
+Found CDFF-core and CDFF-support: /opt/cdff/
+Found compiled ASN.1 data types:  /opt/cdff/Common/Types/C/
+Found CDFF-dev: /opt/cdff-dev/
+Setting up CDFF-dev... 
+Obtaining file:///opt/cdff-dev
+Installing collected packages: cdff-dev
+  Running setup.py develop for cdff-dev
+Successfully installed cdff-dev
+Setting up CDFF-dev: done
+user@cdff-dev:/$ 
+```
+
 Unit testing CDFF-Dev requires additional Python packages, see further.
 
-## Compiling and installing CDFF-Dev
+### Compiling and installing CDFF-Dev
 
 After you have built (and optionally installed) the CDFF's Core and Support components, you can compile and install the CDFF's Dev component as a Python package:
 
@@ -62,7 +75,9 @@ $ sudo CDFFPATH=/path/to/CDFF pip3 install --editable /path/to/CDFF_dev
 $ CDFFPATH=/path/to/CDFF pip3 install --user --editable /path/to/CDFF_dev
 ```
 
-## Documentation about CDFF-Dev
+When using the InFuse Docker image, this is performed automatically at container startup, and CDFF-Dev is of course installed inside the container, not on your hard disk.
+
+### Documentation about CDFF-Dev
 
 The overall concept and conventions are described in these documents:
 
@@ -70,28 +85,46 @@ The overall concept and conventions are described in these documents:
 * [CDFF-Dev](https://drive.google.com/open?id=1yz_w7Eut6Rtg0d4I6R4mze2G8Oip4agyqrTDlKVgC6g)
 * [Guide for creating a DFN](https://drive.google.com/open?id=1hFTRKgJNN3n_brT3aajMA03AR_jQ2eCo-ZM33ggY5cE)
 
-## Using CDFF-Dev's DFN code generator
+### Using CDFF-Dev's DFN code generator
 
 Once CDFF-Dev is compiled and installed, you can run the DFN code generator as follow:
 
 ```
-$ dfn_template_generator my_node_desc.yaml my_node_output_dir --cdffpath path/to/CDFF/
+# Provide the path to the CDFF on the command line
+$ dfn_template_generator --cdffpath=/path/to/CDFF/ dfn_desc.yaml [output_dir]
+
+# Or through an environment variable
+$ export CDFFPATH=/path/to/CDFF/
+$ dfn_template_generator dfn_desc.yaml [output_dir]
+
+# Or through a hint file in the current directory
+$ echo -n /path/to/CDFF/ > cdffpath
+$ dfn_template_generator dfn_desc.yaml [output_dir]
+
+# If you don't do either of those things, you will be asked for the path
+# and it will be written to a hint file in the current directory
+$ dfn_template_generator dfn_desc.yaml
+Please enter the path to CDFF:
 ```
 
-where:
+In these commands:
 
-* `my_node_desc.yaml` is the node description file
-* `my_node_output_dir` is the directory where the generated C++ files and the generated Python bindings will be written (it will be created if it doesn't exist)
-* `path/to/CDFF/` is the directory which contains your local clone of the `CDFF` repository
+* `dfn_desc.yaml` is the DFN description file.
 
-## Testing CDFF-Dev
+* `output_dir` is the directory where the generated C++ files and the generated Python bindings are written. It will be created if it doesn't exist, and the default value is the current directory.
+
+    Existing DFN implementation files (`dfnname.{hpp,cpp}`) are not overwritten. Existing DFN interface files (`dfnnameInterface.{hpp,cpp}`) and existing Python bindings (`dfnname.{pxd,pyx}` and `_dfnname.pxd`) are overwritten.
+
+* `/path/to/CDFF/` is the directory that contains your local clone of the `CDFF` repository (CDFF-Core and CDFF-Support). It is looked for on the command line, in the `CDFFPATH` environment variable, and in the hint file `cdffpath` in the current directory, in this order of precedence.
+
+### Testing CDFF-Dev
 
 Unit testing CDFF-Dev requires the following additional Python packages:
 
 * nose
 * nose2
 
-You can install them as follow:
+You can install them as follow (already installed in the InFuse Docker image):
 
 ```
 # Install nose and nose2 in /usr/local/{bin,lib/python3.X/dist-packages} for all users
@@ -111,12 +144,11 @@ nosetests -sv
 make test
 ```
 
-## Contributing to CDFF-Dev
+### Contributing to CDFF-Dev
 
-It is not allowed to push directly to the `master` branch. To develop a new
-feature, please make a feature branch and open a merge request.
+It is not allowed to push to the `master` branch. To contribute a new feature, please develop it in a feature branch, push the feature branch, and open a merge request.
 
-## Status
+### Status
 
 The following features work:
 
@@ -124,10 +156,10 @@ The following features work:
 2. Generating Python bindings for a DFN
 3. Generating a DFPC template in C++
 
-## License
+### License
 
 There is no license at the moment.
 
-## Copyright
+### Copyright
 
 Copyright 2017, DFKI GmbH / Robotics Innovation Center, ...
