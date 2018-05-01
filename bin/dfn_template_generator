@@ -3,8 +3,7 @@ import os
 import argparse
 import yaml
 from cdff_dev.code_generator import write_dfn
-from cdff_dev.path import load_cdffpath
-from cdff_dev.path import check_cdffpath
+from cdff_dev.path import load_cdffpath, check_cdffpath
 
 
 def main():
