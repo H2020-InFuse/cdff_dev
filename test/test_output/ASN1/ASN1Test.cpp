@@ -21,10 +21,10 @@ void ASN1Test::configure()
 void ASN1Test::process() {
     Vector3d someVector;
     someVector.nCount = 3;
-    someVector.arr[0] = incurrentTime.microseconds + 1;
-    someVector.arr[1] = incurrentTime.microseconds + 2;
-    someVector.arr[2] = incurrentTime.microseconds + 3;
-    outsomeVector = someVector;
+    someVector.arr[0] = inCurrentTime.microseconds + 1;
+    someVector.arr[1] = inCurrentTime.microseconds + 2;
+    someVector.arr[2] = inCurrentTime.microseconds + 3;
+    outSomeVector = someVector;
 }
 
 }

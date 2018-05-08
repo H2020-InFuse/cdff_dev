@@ -17,7 +17,7 @@ void Square::configure()
 
 
 void Square::process() {
-    outx_squared = inx * inx;
+    outX_squared = inX * inX;
 }
 
 }
