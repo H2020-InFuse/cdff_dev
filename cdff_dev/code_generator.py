@@ -532,6 +532,7 @@ def render(template_name, **kwargs):
     env = jinja2.Environment(
         loader=jinja2.PackageLoader("cdff_dev", "templates")
     )
+    env.filters['capfirst'] = capfirst
 
     try:
         template = env.get_template(template_name + ".template")
@@ -546,6 +547,11 @@ def render(template_name, **kwargs):
     except Exception as e:
         raise Exception("Template for '%s' failed: %s" % (template_name, e))
     return rendered_template
+
+
+def capfirst(value):
+    """Capitalize the first character of the value."""
+    return value and value[0].upper() + value[1:]
 
 
 def write_result(result, force_overwrite, verbose=0):
