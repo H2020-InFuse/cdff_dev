@@ -1,5 +1,11 @@
-#ifndef {{ desc["name"].upper() }}_INTERFACE_HPP
-#define {{ desc["name"].upper() }}_INTERFACE_HPP
+/**
+ * @addtogroup DFPCs
+ * @{
+ */
+
+#ifndef {{ desc["name"]|upper }}_INTERFACE_HPP
+#define {{ desc["name"]|upper }}_INTERFACE_HPP
+
 #include "DFPCCommonInterface.hpp"
 {%- for include in includes %}
 {%- if include %}
@@ -7,15 +13,21 @@
 {%- endif %}
 {%- endfor %}
 
-namespace dfpc_ci {
+namespace dfpc_ci
+{
+    /**
+     * TODO Common interface for all DFPCs that ...
+     */
     class {{ desc["name"] }}Interface : public DFPCCommonInterface
     {
         public:
+{{ space }}
             {{ desc["name"] }}Interface();
             virtual ~{{ desc["name"] }}Interface();
+{{ space }}
             {%- for input_port in desc["input_ports"] %}
             /**
-             * Send value to input port {{ input_port["name"] }}
+             * Send value to input port "{{ input_port["name"] }}"
              * @param {{ input_port["name"] }}, {{ input_port["doc"] }}
              */
             virtual void {{ input_port["name"] }}Input(const {{ input_port["type"] }}& data);
@@ -23,14 +35,15 @@ namespace dfpc_ci {
 {{ space }}
             {%- for output_port in desc["output_ports"] %}
             /**
-             * Receive value from output port {{ output_port["name"] }}
+             * Query value from output port "{{ output_port["name"] }}"
              * @return {{ output_port["name"] }}, {{ output_port["doc"] }}
              */
-            virtual const {{ output_port["type"] }}& {{ output_port["name"] }}Output();
+            virtual const {{ output_port["type"] }}& {{ output_port["name"] }}Output() const;
             {%- endfor %}
+{{ space }}
             {%- for operation in desc["operations"] %}
             /**
-             * Perform operation {{ operation["name"] }}
+             * Perform operation "{{ operation["name"] }}"
             {%- for arg in operation["inputs"] %}
              * @param {{ arg["name"] }}
             {%- endfor %}
@@ -41,15 +54,20 @@ namespace dfpc_ci {
             {%- endfor %}
 
         protected:
-        {%- for input_port in desc["input_ports"] %}
-            {{ input_port["type"] }} in{{ input_port["name"].lower() }};
-        {%- endfor %}
-        {%- for output_port in desc["output_ports"] %}
-            {{ output_port["type"] }} out{{ output_port["name"].lower() }};
-        {%- endfor %}
-        {%- for operation in desc["operations"] %}
+{{ space }}
+            {%- for input_port in desc["input_ports"] %}
+            {{ input_port["type"] }} in{{ input_port["name"] }};
+            {%- endfor %}
+            {%- for output_port in desc["output_ports"] %}
+            {{ output_port["type"] }} out{{ output_port["name"] }};
+            {%- endfor %}
+{{ space }}
+            {%- for operation in desc["operations"] %}
             {{ operation["output_type"] }} {{ operation["name"] }}Result;
-        {%- endfor %}
+            {%- endfor %}
     };
 }
-#endif
+
+#endif //  {{ desc["name"]|upper }}_INTERFACE_HPP
+
+/** @} */

@@ -1,7 +1,12 @@
+/**
+ * @addtogroup DFPCs
+ * @{
+ */
+
 #include "{{ desc["name"] }}Interface.hpp"
 
-
-namespace dfpc_ci {
+namespace dfpc_ci
+{
 
 {{ desc["name"] }}Interface::{{ desc["name"] }}Interface()
 {
@@ -12,16 +17,20 @@ namespace dfpc_ci {
 }
 {{ space }}
 {%- for input_port in desc["input_ports"] %}
-void {{ desc["name"] }}Interface::{{ input_port["name"] }}Input(const {{ input_port["type"] }}& data) {
-    in{{ input_port["name"].lower() }} = data;
+void {{ desc["name"] }}Interface::{{ input_port["name"] }}Input(const {{ input_port["type"] }}& data)
+{
+    in{{ input_port["name"] }} = data;
 }
 {{ space }}
 {%- endfor %}
 
 {%- for output_port in desc["output_ports"] %}
-const {{ output_port["type"] }}& {{ desc["name"] }}Interface::{{ output_port["name"] }}Output() {
-    return out{{ output_port["name"].lower() }};
+const {{ output_port["type"] }}& {{ desc["name"] }}Interface::{{ output_port["name"] }}Output() const
+{
+    return out{{ output_port["name"] }};
 }
+{{ space }}
 {%- endfor %}
-
 }
+
+/** @} */
