@@ -1,5 +1,11 @@
-#ifndef {{ desc["name"].upper() }}_INTERFACE_HPP
-#define {{ desc["name"].upper() }}_INTERFACE_HPP
+/**
+ * @addtogroup DFNs
+ * @{
+ */
+
+#ifndef {{ desc["name"]|upper }}_INTERFACE_HPP
+#define {{ desc["name"]|upper }}_INTERFACE_HPP
+
 #include "DFNCommonInterface.hpp"
 {%- for include in includes %}
 {%- if include %}
@@ -7,35 +13,45 @@
 {%- endif %}
 {%- endfor %}
 
-namespace dfn_ci {
+namespace dfn_ci
+{
+    /**
+     * TODO Common interface for all DFNs that ...
+     */
     class {{ desc["name"] }}Interface : public DFNCommonInterface
     {
         public:
+{{ space }}
             {{ desc["name"] }}Interface();
             virtual ~{{ desc["name"] }}Interface();
+{{ space }}
             {%- for input_port in desc["input_ports"] %}
             /**
-            * Send value to input port {{ input_port["name"] }}
-            * @param {{ input_port["name"] }}, {{ input_port["doc"] }}
-            */
+             * Send value to input port "{{ input_port["name"] }}"
+             * @param {{ input_port["name"] }}, {{ input_port["doc"] }}
+             */
             virtual void {{ input_port["name"] }}Input(const {{ input_port["type"] }}& data);
             {%- endfor %}
 {{ space }}
             {%- for output_port in desc["output_ports"] %}
             /**
-            * Receive value from output port {{ output_port["name"] }}
-            * @return {{ output_port["name"] }}, {{ output_port["doc"] }}
-            */
-            virtual const {{ output_port["type"] }}& {{ output_port["name"] }}Output();
+             * Query value from output port "{{ output_port["name"] }}"
+             * @return {{ output_port["name"] }}, {{ output_port["doc"] }}
+             */
+            virtual const {{ output_port["type"] }}& {{ output_port["name"] }}Output() const;
             {%- endfor %}
 
         protected:
-        {%- for input_port in desc["input_ports"] %}
-            {{ input_port["type"] }} in{{ input_port["name"].lower() }};
-        {%- endfor %}
-        {%- for output_port in desc["output_ports"] %}
-            {{ output_port["type"] }} out{{ output_port["name"].lower() }};
-        {%- endfor %}
+{{ space }}
+            {%- for input_port in desc["input_ports"] %}
+            {{ input_port["type"] }} in{{ input_port["name"] }};
+            {%- endfor %}
+            {%- for output_port in desc["output_ports"] %}
+            {{ output_port["type"] }} out{{ output_port["name"] }};
+            {%- endfor %}
     };
 }
-#endif
+
+#endif // {{ desc["name"]|upper }}_INTERFACE_HPP
+
+/** @} */
