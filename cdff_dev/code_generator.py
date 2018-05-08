@@ -2,7 +2,6 @@ import warnings
 import os
 import jinja2
 import glob
-from pkg_resources import resource_filename
 
 
 # TODO refactor: move type info to some other file
@@ -514,14 +513,14 @@ def write_cython(desc, type_registry, template_base,
     return write_result(result, True)
 
 
-def render(template, **kwargs):
+def render(template_name, **kwargs):
     """Render Jinja2 template.
 
     Parameters
     ----------
-    template : str
+    template_name : str
         name of the template, files will be searched in
-        $PYTHONPATH/cdff_dev/templates/<template>.template
+        $PYTHONPATH/cdff_dev/templates/<template_name>.template
     kwargs : keyword arguments
         arguments that will be passed to the template
 
@@ -530,18 +529,22 @@ def render(template, **kwargs):
     rendered_template : str
         template with context filled in
     """
-    template_filename = resource_filename(
-        "cdff_dev", os.path.join("templates", template + ".template"))
-    if not os.path.exists(template_filename):
-        raise IOError("No template for '%s' found." % template)
-    with open(template_filename, "r", encoding="utf8") as template_file:
-        template = jinja2.Template(template_file.read())
+    env = jinja2.Environment(
+        loader=jinja2.PackageLoader("cdff_dev", "templates")
+    )
+
+    try:
+        template = env.get_template(template_name + ".template")
+    except jinja2.TemplateNotFound:
+        raise IOError("Found no template for '%s'." % template_name)
+    except Exception as e:
+        raise Exception("Could not read template for '%s': %s"
+                        % (template_name, e))
 
     try:
         rendered_template = template.render(**kwargs)
     except Exception as e:
-        raise Exception("Template '%s' failed: %s"
-                        % (template_filename, e))
+        raise Exception("Template for '%s' failed: %s" % (template_name, e))
     return rendered_template
 
 
