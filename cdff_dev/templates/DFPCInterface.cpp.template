@@ -19,7 +19,7 @@ namespace dfpc_ci
 {%- for input_port in desc["input_ports"] %}
 void {{ desc["name"] }}Interface::{{ input_port["name"] }}Input(const {{ input_port["type"] }}& data)
 {
-    in{{ input_port["name"] }} = data;
+    in{{ input_port["name"]|capfirst }} = data;
 }
 {{ space }}
 {%- endfor %}
@@ -27,7 +27,7 @@ void {{ desc["name"] }}Interface::{{ input_port["name"] }}Input(const {{ input_p
 {%- for output_port in desc["output_ports"] %}
 const {{ output_port["type"] }}& {{ desc["name"] }}Interface::{{ output_port["name"] }}Output() const
 {
-    return out{{ output_port["name"] }};
+    return out{{ output_port["name"]|capfirst }};
 }
 {{ space }}
 {%- endfor %}

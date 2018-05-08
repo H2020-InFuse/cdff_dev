@@ -56,10 +56,10 @@ namespace dfpc_ci
         protected:
 {{ space }}
             {%- for input_port in desc["input_ports"] %}
-            {{ input_port["type"] }} in{{ input_port["name"] }};
+            {{ input_port["type"] }} in{{ input_port["name"]|capfirst }};
             {%- endfor %}
             {%- for output_port in desc["output_ports"] %}
-            {{ output_port["type"] }} out{{ output_port["name"] }};
+            {{ output_port["type"] }} out{{ output_port["name"]|capfirst }};
             {%- endfor %}
 {{ space }}
             {%- for operation in desc["operations"] %}
