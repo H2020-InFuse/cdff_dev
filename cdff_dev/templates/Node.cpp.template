@@ -1,6 +1,12 @@
+/**
+ * @addtogroup DFNs
+ * @{
+ */
+
 #include "{{ class_name }}.hpp"
 
-namespace dfn_ci {
+namespace dfn_ci
+{
 
 {{ class_name }}::{{ class_name }}()
 {
@@ -12,12 +18,15 @@ namespace dfn_ci {
 
 void {{ class_name }}::configure() 
 {
-    // TODO Fill in configure functionality here
+    // TODO DFN configuration steps
 }
 
 
-void {{ class_name }}::process() {
-    // TODO Fill in process functionality here
+void {{ class_name }}::process()
+{
+    // TODO DFN processing steps
 }
 
 }
+
+/** @} */

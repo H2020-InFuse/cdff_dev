@@ -1,17 +1,29 @@
+/**
+ * @addtogroup DFNs
+ * @{
+ */
+
 #ifndef {{ class_name.upper() }}_HPP
 #define {{ class_name.upper() }}_HPP
+
 #include "{{ desc["name"] }}Interface.hpp"
 
-
-
-namespace dfn_ci {
+namespace dfn_ci
+{
+    /**
+     * TODO Class documentation
+     */
     class {{ class_name }} : public {{ desc["name"] }}Interface
     {
         public:
             {{ class_name }}();
             virtual ~{{ class_name }}();
-            virtual void process();
+
             virtual void configure();
+            virtual void process();
     };
 }
-#endif
+
+#endif // {{ class_name.upper() }}_HPP
+
+/** @} */

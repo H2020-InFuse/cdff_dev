@@ -1,6 +1,12 @@
+/**
+ * @addtogroup DFPCs
+ * @{
+ */
+
 #include "{{ class_name }}.hpp"
 
-namespace dfpc_ci {
+namespace dfpc_ci
+{
 
 {{ class_name }}::{{ class_name }}()
 {
@@ -10,16 +16,16 @@ namespace dfpc_ci {
 {
 }
 
-void {{ class_name }}::run()
-{
-    // TODO Fill in process functionality here
-}
-
 void {{ class_name }}::setup()
 {
-    // TODO Fill in process functionality here
+    // TODO DFPC setup steps
 }
-{{ break }}
+
+void {{ class_name }}::run()
+{
+    // TODO DFPC running steps
+}
+{{ space }}
 {%- for operation in desc["operations"] %}
 const {{ operation["output_type"] }}& {{ class_name }}::{{ operation["name"] }}(
     {%- for arg in operation["inputs"] %}{{ arg["type"] }} {{ arg["name"] }}{{ ", " if not loop.last }}{%- endfor %})
@@ -29,3 +35,5 @@ const {{ operation["output_type"] }}& {{ class_name }}::{{ operation["name"] }}(
 {%- endfor %}
 
 }
+
+/** @} */

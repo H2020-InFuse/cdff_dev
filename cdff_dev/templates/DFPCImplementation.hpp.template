@@ -1,22 +1,30 @@
+/**
+ * @addtogroup DFPCs
+ * @{
+ */
+
 #ifndef {{ class_name.upper() }}_HPP
 #define {{ class_name.upper() }}_HPP
+
 #include "{{ desc["name"] }}Interface.hpp"
 
-
-
-namespace dfpc_ci {
+namespace dfpc_ci
+{
+    /**
+     * TODO Class documentation
+     */
     class {{ class_name }} : public {{ desc["name"] }}Interface
     {
         public:
             {{ class_name }}();
             virtual ~{{ class_name }}();
 
-            virtual void run();
             virtual void setup();
-
+            virtual void run();
+{{ space }}
             {%- for operation in desc["operations"] %}
             /**
-             * Perform operation {{ operation["name"] }}
+             * Perform operation "{{ operation["name"] }}"
             {%- for arg in operation["inputs"] %}
              * @param {{ arg["name"] }}
             {%- endfor %}
@@ -27,4 +35,7 @@ namespace dfpc_ci {
             {%- endfor %}
     };
 }
-#endif
+
+#endif // {{ class_name.upper() }}_HPP
+
+/** @} */
