@@ -537,7 +537,8 @@ def render(template_name, **kwargs):
     try:
         template = env.get_template(template_name + ".template")
     except jinja2.TemplateNotFound:
-        raise IOError("Found no template for '%s'." % template_name)
+        raise jinja2.TemplateNotFound(name=template_name,
+            message="Found no template for '%s'." % template_name)
     except Exception as e:
         raise Exception("Could not read template for '%s': %s"
                         % (template_name, e))
