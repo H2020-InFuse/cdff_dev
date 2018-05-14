@@ -6,10 +6,9 @@ stages:
 fetch_test:
   stage : fetch_test
   script:
-      - git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com:InFuse/Infuse/CDFF.git
-      - ln -s /CDFF/External/install CDFF/External/install
-      - cd build_tools && ./get_cdff_artifacts.sh && cd ..
-      - echo -n "CDFF" > cdffpath
-      - python3 setup.py build_ext -i
-      - CDFFPATH=CDFF python3 setup.py build_ext -i
-      - nosetests -sv
+      - repositories=${PWD}
+      - git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com/InFuse/CDFF.git
+      - git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com/InFuse/CDFF_dev.git
+      - cd CDFF_dev && build_tools/get_cdff_artifacts.sh
+      - CDFFPATH=${repositories}/CDFF python3 setup.py build_ext -i
+      - CDFFPATH=${repositories}/CDFF nosetests -sv
