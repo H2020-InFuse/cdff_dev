@@ -42,10 +42,6 @@ be distributed to the users through a docker registry.
 
     docker build -t cdff-dev-ci:latest .
 
-* Build version for users (cdff-dev):
-
-    docker build -t cdff-dev:latest -f Dockerfile_user .
-
 Sometimes it is necessary to clean the docker cache if you want to rebuild the
 image. You just have to add `--no-cache` in this case.
 
