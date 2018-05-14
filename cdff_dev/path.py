@@ -23,14 +23,15 @@ def load_cdffpath():
     return os.path.abspath(cdffpath)
 
 
-def check_cdffpath(cdffpath="CDFF"):
+def check_cdffpath(cdffpath):
     """Check if the provided path to CDFF is correct.
 
-    If the path is not correct, an IOError is raised.
+    If the path is empty, does not exist, or does not contain the required
+    data type subdirectories, an IOError is raised.
 
     Parameters
     ----------
-    cdffpath : str, optional (default: 'CDFF')
+    cdffpath : str
         Path to CDFF
     """
     if not os.path.exists(cdffpath):

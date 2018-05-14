@@ -11,8 +11,8 @@ def main():
     check_cdffpath(args.cdffpath)
     with open(args.definition, "r") as f:
         node = yaml.load(f)
-    write_dfpc(node, args.output, args.source_folder, args.python_folder,
-               args.cdffpath)
+    write_dfpc(node, args.cdffpath,
+               args.output, args.source_folder, args.python_folder)
 
 
 def parse_args():

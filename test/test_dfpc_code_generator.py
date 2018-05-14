@@ -13,7 +13,7 @@ def test_generate_files():
     tmp_folder = "test/test_output/dfpc_ci_PointcloudGeneration"
     with EnsureCleanup(tmp_folder) as ec:
         cdffpath = load_cdffpath()
-        filenames = write_dfpc(node, tmp_folder, cdffpath=cdffpath)
+        filenames = write_dfpc(node, cdffpath, tmp_folder)
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
 
@@ -33,7 +33,7 @@ def test_compile():
     tmp_folder = "test/test_output/dfpc_ci_PointcloudGeneration"
     with EnsureCleanup(tmp_folder) as ec:
         cdffpath = load_cdffpath()
-        filenames = write_dfpc(node, tmp_folder, cdffpath=cdffpath)
+        filenames = write_dfpc(node, cdffpath, tmp_folder)
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
         ctypespath = os.path.join(cdffpath, CTYPESDIR)

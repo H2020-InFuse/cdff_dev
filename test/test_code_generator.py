@@ -14,7 +14,7 @@ def test_generate_files():
     tmp_folder = "test/test_output/square"
     with EnsureCleanup(tmp_folder) as ec:
         cdffpath = load_cdffpath()
-        filenames = write_dfn(node, tmp_folder, cdffpath=cdffpath)
+        filenames = write_dfn(node, cdffpath, tmp_folder)
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
 
@@ -38,7 +38,7 @@ def test_square():
     tmp_folder = "test/test_output/square"
     with EnsureCleanup(tmp_folder) as ec:
         cdffpath = load_cdffpath()
-        filenames = write_dfn(node, tmp_folder, cdffpath=cdffpath)
+        filenames = write_dfn(node, cdffpath, tmp_folder)
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
 
@@ -73,7 +73,7 @@ def test_unknown_type():
     with EnsureCleanup(tmp_folder) as ec:
         warnings.simplefilter("ignore", UserWarning)
         cdffpath = load_cdffpath()
-        filenames = write_dfn(node, tmp_folder, cdffpath=cdffpath)
+        filenames = write_dfn(node, cdffpath, tmp_folder)
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
 
@@ -100,7 +100,7 @@ def test_multiple_implementations():
     tmp_folder = "test/test_output/multiple_implementations"
     with EnsureCleanup(tmp_folder) as ec:
         cdffpath = load_cdffpath()
-        filenames = write_dfn(node, tmp_folder, cdffpath=cdffpath)
+        filenames = write_dfn(node, cdffpath, tmp_folder)
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
 
@@ -136,7 +136,7 @@ def test_asn1():
     tmp_folder = "test/test_output/ASN1"
     with EnsureCleanup(tmp_folder) as ec:
         cdffpath = load_cdffpath()
-        filenames = write_dfn(node, tmp_folder, cdffpath=cdffpath)
+        filenames = write_dfn(node, cdffpath, tmp_folder)
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
         ctypespath = os.path.join(cdffpath, CTYPESDIR)

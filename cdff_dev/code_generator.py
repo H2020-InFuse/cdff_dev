@@ -150,14 +150,17 @@ class PortDescriptionException(Exception):
 
 
 # TODO refactor write_dfn / write_dfpc
-def write_dfn(node, output, source_folder=".", python_folder="python",
-              cdffpath="CDFF"):
+def write_dfn(node, cdffpath,
+              output, source_folder=".", python_folder="python"):
     """Generate code templates for a data fusion node (DFN).
 
     Parameters
     ----------
     node : dict
         Node configuration loaded from node description file
+
+    cdffpath : str
+        Path to CDFF
 
     output : str
         Path to output directory
@@ -169,9 +172,6 @@ def write_dfn(node, output, source_folder=".", python_folder="python",
     python_folder : str, optional (default: 'python')
         Subdirectory of the output directory that will contain the Python
         bindings
-
-    cdffpath : str, optional (default: 'CDFF')
-        Path to CDFF
     """
     node = validate_node(node)
 
@@ -192,14 +192,17 @@ def write_dfn(node, output, source_folder=".", python_folder="python",
     return interface_files + implementation_files + cython_files
 
 
-def write_dfpc(dfpc, output, source_folder=".", python_folder="python",
-               cdffpath="CDFF"):
+def write_dfpc(dfpc, cdffpath,
+               output, source_folder=".", python_folder="python"):
     """Generate code templates for a data fusion processing compound (DFPC).
 
     Parameters
     ----------
     dfpc : dict
         DFPC configuration loaded from DFPC description file
+
+    cdffpath : str
+        Path to CDFF
 
     output : str
         Path to output directory, will be cdffpath + '/DFPCs/' + <node name>
@@ -212,9 +215,6 @@ def write_dfpc(dfpc, output, source_folder=".", python_folder="python",
     python_folder : str, optional (default: 'python')
         Subdirectory of the output directory that will contain the Python
         bindings
-
-    cdffpath : str, optional (default: 'CDFF')
-        Path to CDFF
     """
     dfpc = validate_dfpc(dfpc)
 
