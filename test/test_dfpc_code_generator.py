@@ -36,10 +36,9 @@ def test_compile():
         filenames = write_dfpc(node, cdffpath, tmp_folder)
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
-        ctypespath = os.path.join(cdffpath, CTYPESDIR)
-        dfpcspath = os.path.join(cdffpath, "DFPCs")
 
-        incdirs = ["test/test_output/", "CDFF/DFPCs", ctypespath, dfpcspath]
+        incdirs = ["test/test_output/", os.path.join(cdffpath, "DFPCs"),
+                   os.path.join(cdffpath, CTYPESDIR)]
         build_extension(
             tmp_folder, hide_stderr=True,
             name=node["name"].lower(),

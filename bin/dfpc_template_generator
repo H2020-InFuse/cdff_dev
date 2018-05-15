@@ -21,7 +21,7 @@ def parse_args():
         "definition", type=str, help="DFPC definition")
     argparser.add_argument(
         "output", type=str,
-        help="Target directory, will be by CDFF/DFPCs/<node name> by default",
+        help="Target directory, default is /path/to/CDFF/DFPCs/<node name>",
         nargs="?", default=None)
     argparser.add_argument(
         "--source_folder", type=str,
