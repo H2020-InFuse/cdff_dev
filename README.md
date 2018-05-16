@@ -16,8 +16,9 @@ CDFF-Dev was initiated and is currently developed by the InFuse consortium:
 * [Space Mechatronics Systems Technology Laboratory](https://www.strath.ac.uk/engineering/designmanufactureengineeringmanagement/thespacemechatronicsystemstechnologylaboratory/) of the [University of Strathclyde](https://www.strath.ac.uk/) in Glasgow
 * ...
 
-<img src="https://www.dfki.de/web/presse/bildmaterial/dfki-logo-e-schrift.jpg" alt="DFKI RIC" height="75px" />
-<img src="https://www.strath.ac.uk/media/1newwebsite/webteam/logos/xUoS_Logo_Tab.png.pagespeed.ic.LkNMQldh_5.png" alt="Strathclyde SMeSTech" height="75px" />
+<img src="https://www.dfki.de/web/presse/bildmaterial/dfki-logo-e-schrift.jpg" alt="DFKI RIC" height="50px" />&emsp;&emsp;
+<img src="doc/static/strathclyde.jpg" alt="Strathclyde SMeSTech" height="70px" />&emsp;&emsp;
+...
 
 ### Dependencies of CDFF-Dev
 
