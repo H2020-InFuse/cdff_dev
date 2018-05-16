@@ -57,4 +57,3 @@ namespace dfn_ci
 #endif // {{ desc["name"]|upper }}_INTERFACE_HPP
 
 /** @} */
-{{ break }}
