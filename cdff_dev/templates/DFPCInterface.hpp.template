@@ -16,7 +16,11 @@
 namespace dfpc_ci
 {
     /**
-     * TODO Common interface for all DFPCs that ...
+     {%- if "doc" in desc %}
+     * {{ desc["doc"] }}
+     {%- else %}
+     * TODO Common interface for all DFNs that ...
+     {%- endif %}
      */
     class {{ desc["name"] }}Interface : public DFPCCommonInterface
     {

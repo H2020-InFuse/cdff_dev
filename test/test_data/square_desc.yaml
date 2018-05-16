@@ -1,4 +1,5 @@
 name: Square
+doc: Compute the square of a number.
 input_ports:
     - name: x
       type: double

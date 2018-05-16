@@ -1,4 +1,5 @@
 name: PointcloudGeneration
+doc: Generate a pointcloud.
 dfns:
     - name: TiltScan
     - name: LaserFilter
