@@ -19,7 +19,7 @@ namespace dfpc_ci
      {%- if "doc" in desc %}
      * {{ desc["doc"] }}
      {%- else %}
-     * TODO Common interface for all DFNs that ...
+     * TODO Interface of a DFPC that ...
      {%- endif %}
      */
     class {{ desc["name"] }}Interface : public DFPCCommonInterface
