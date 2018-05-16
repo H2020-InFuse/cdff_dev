@@ -15,11 +15,11 @@
 
 namespace dfn_ci
 {
-    /**
      {%- if "doc" in desc %}
+    /**
      * {{ desc["doc"] }}
-     {%- endif %}
      */
+     {%- endif %}
     class {{ desc["name"] }}Interface : public DFNCommonInterface
     {
         public:
