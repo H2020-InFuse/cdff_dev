@@ -378,6 +378,8 @@ class EnvireVisualization:
     def report_node_output(self, port_name, sample, timestamp):
         self.world_state_.report_node_output(port_name, sample, timestamp)
 
+    # TODO visualization thread (make sure to put all Qt-related code to another file)
+
 
 class WorldState:
     """Represents the estimated world state of the system based on log data.
@@ -408,25 +410,27 @@ class WorldState:
 
         self.samples[port_name] = sample
 
-        # TODO refactor with world state
         # TODO set time stamp
-        if port_name not in self.items:
+        if port_name in self.items:
+            item = self.items[port_name]
+            # TODO update item instead of removing and adding it
+            try:
+                self.graph.remove_item_from_frame(item, sample)
+            except TypeError as e:
+                warnings.warn("Cannot remove type '%s' from EnviRe graph. "
+                              "Reason: %s" % (type(sample), e))
+            try:
+                self.graph.add_item_to_frame(
+                    self.frames[port_name], item, sample)
+            except TypeError as e:
+                warnings.warn("Cannot store type '%s' in EnviRe graph. "
+                              "Reason: %s" % (type(sample), e))
+        else:
             item = cdff_envire.GenericItem()
             self.items[port_name] = item
             try:
                 self.graph.add_item_to_frame(
                     self.frames[port_name], item, sample)
-            except TypeError:
-                warnings.warn("Cannot store type '%s' in EnviRe graph."
-                              % type(sample))
-        else:
-            item = self.items[port_name]
-            # TODO update item
-            try:
-                self.graph.remove_item_from_frame(
-                    self.frames[port_name], item, sample)
-                self.graph.add_item_to_frame(
-                    self.frames[port_name], item, sample)
-            except TypeError:
-                warnings.warn("Cannot store type '%s' in EnviRe graph."
-                              % type(sample))
+            except TypeError as e:
+                warnings.warn("Cannot store type '%s' in EnviRe graph. "
+                              "Reason: %s" % (type(sample), e))
