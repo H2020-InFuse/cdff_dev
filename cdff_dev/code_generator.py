@@ -70,19 +70,20 @@ class ASN1TypeInfo(object):
 
     @classmethod
     def handles(cls, typename, cdffpath):
-        return typename in cls._search_asn1_type(cdffpath)
+        if typename[:7] == 'asn1Scc':
+            return typename[7:] in cls._search_asn1_type(cdffpath)
 
     def include(self):
         """C++ include header."""
         for key in self.asn1_types.keys():
-            if self.typename in self.asn1_types[key]:
+            if self.typename[7:] in self.asn1_types[key]:
                 return key.split('.')[0] + ".h"
 
     def cython_type(self):
         return "_cdff_types." + self.typename
 
     def python_type(self):
-        return "cdff_types." + self.typename
+        return "cdff_types." + self.typename[7:]
 
     def copy_on_assignment(self):
         return False
