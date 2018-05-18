@@ -22,7 +22,7 @@ cdef class Time:
             del self.thisptr
 
     def __init__(self):
-        self.thisptr = new _cdff_types.Time()
+        self.thisptr = new _cdff_types.asn1SccTime()
         self.delete_thisptr = True
 
     def __str__(self):
@@ -58,7 +58,7 @@ cdef class Vector2d:
             del self.thisptr
 
     def __init__(self):
-        self.thisptr = new _cdff_types.Vector2d()
+        self.thisptr = new _cdff_types.asn1SccVector2d()
         self.thisptr.nCount = 2
         self.delete_thisptr = True
 
@@ -111,7 +111,7 @@ cdef class Vector3d:
             del self.thisptr
 
     def __init__(self):
-        self.thisptr = new _cdff_types.Vector3d()
+        self.thisptr = new _cdff_types.asn1SccVector3d()
         self.thisptr.nCount = 3
         self.delete_thisptr = True
 
@@ -165,7 +165,7 @@ cdef class Vector4d:
             del self.thisptr
 
     def __init__(self):
-        self.thisptr = new _cdff_types.Vector4d()
+        self.thisptr = new _cdff_types.asn1SccVector4d()
         self.thisptr.nCount = 4
         self.delete_thisptr = True
 
@@ -219,7 +219,7 @@ cdef class Vector6d:
             del self.thisptr
 
     def __init__(self):
-        self.thisptr = new _cdff_types.Vector6d()
+        self.thisptr = new _cdff_types.asn1SccVector6d()
         self.thisptr.nCount = 6
         self.delete_thisptr = True
 
@@ -274,7 +274,7 @@ cdef class VectorXd:
             del self.thisptr
 
     def __init__(self, int n_count=1):
-        self.thisptr = new _cdff_types.VectorXd()
+        self.thisptr = new _cdff_types.asn1SccVectorXd()
         self.thisptr.nCount = n_count
         self.delete_thisptr = True
 
@@ -331,7 +331,7 @@ cdef class Matrix2d:
             del self.thisptr
 
     def __init__(self):
-        self.thisptr = new _cdff_types.Matrix2d()
+        self.thisptr = new _cdff_types.asn1SccMatrix2d()
         self.delete_thisptr = True
         self.allocate()
 
@@ -396,7 +396,7 @@ cdef class Matrix3d:
             del self.thisptr
 
     def __init__(self):
-        self.thisptr = new _cdff_types.Matrix3d()
+        self.thisptr = new _cdff_types.asn1SccMatrix3d()
         self.delete_thisptr = True
         self.allocate()
 
@@ -461,7 +461,7 @@ cdef class Quaterniond:
             del self.thisptr
 
     def __init__(self):
-        self.thisptr = new _cdff_types.Quaterniond()
+        self.thisptr = new _cdff_types.asn1SccQuaterniond()
         self.thisptr.nCount = 4
         self.delete_thisptr = True
 
@@ -587,7 +587,7 @@ cdef class Pointcloud:
             del self.thisptr
 
     def __init__(self):
-        self.thisptr = new _cdff_types.Pointcloud()
+        self.thisptr = new _cdff_types.asn1SccPointcloud()
         self.thisptr.points.nCount = 0
         self.thisptr.colors.nCount = 0
         self.delete_thisptr = True
@@ -636,7 +636,7 @@ cdef class LaserScan:
             del self.thisptr
 
     def __init__(self):
-        self.thisptr = new _cdff_types.LaserScan()
+        self.thisptr = new _cdff_types.asn1SccLaserScan()
         self.thisptr.ranges.nCount = 0
         self.thisptr.remission.nCount = 0
         self.thisptr.start_angle = 0.0
@@ -799,7 +799,7 @@ cdef class RigidBodyState:
             del self.thisptr
 
     def __init__(self):
-        self.thisptr = new _cdff_types.RigidBodyState()
+        self.thisptr = new _cdff_types.asn1SccRigidBodyState()
         self.delete_thisptr = True
 
     def __str__(self):
@@ -955,7 +955,7 @@ cdef class JointState:
             del self.thisptr
 
     def __init__(self):
-        self.thisptr = new _cdff_types.JointState()
+        self.thisptr = new _cdff_types.asn1SccJointState()
         self.delete_thisptr = True
 
     def __str__(self):
@@ -1020,7 +1020,7 @@ cdef class Joints:
             del self.thisptr
 
     def __init__(self):
-        self.thisptr = new _cdff_types.Joints()
+        self.thisptr = new _cdff_types.asn1SccJoints()
         self.delete_thisptr = True
 
     def __str__(self):

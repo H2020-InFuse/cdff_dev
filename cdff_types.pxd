@@ -8,110 +8,110 @@ cimport _cdff_types
 
 
 cdef class Time:
-    cdef _cdff_types.Time* thisptr
+    cdef _cdff_types.asn1SccTime* thisptr
     cdef bool delete_thisptr
 
 
 cdef class Vector2d:
-    cdef _cdff_types.Vector2d* thisptr
+    cdef _cdff_types.asn1SccVector2d* thisptr
     cdef bool delete_thisptr
 
 
 cdef class Vector3d:
-    cdef _cdff_types.Vector3d* thisptr
+    cdef _cdff_types.asn1SccVector3d* thisptr
     cdef bool delete_thisptr
 
 
 cdef class Vector4d:
-    cdef _cdff_types.Vector4d* thisptr
+    cdef _cdff_types.asn1SccVector4d* thisptr
     cdef bool delete_thisptr
 
 
 cdef class Vector6d:
-    cdef _cdff_types.Vector6d* thisptr
+    cdef _cdff_types.asn1SccVector6d* thisptr
     cdef bool delete_thisptr
 
 
 cdef class VectorXd:
-    cdef _cdff_types.VectorXd* thisptr
+    cdef _cdff_types.asn1SccVectorXd* thisptr
     cdef bool delete_thisptr
 
 
 cdef class Matrix2d:
-    cdef _cdff_types.Matrix2d* thisptr
+    cdef _cdff_types.asn1SccMatrix2d* thisptr
     cdef bool delete_thisptr
 
 
 cdef class Matrix3d:
-    cdef _cdff_types.Matrix3d* thisptr
+    cdef _cdff_types.asn1SccMatrix3d* thisptr
     cdef bool delete_thisptr
 
 
 cdef class Quaterniond:
-    cdef _cdff_types.Quaterniond* thisptr
+    cdef _cdff_types.asn1SccQuaterniond* thisptr
     cdef bool delete_thisptr
 
 
 cdef class AngleAxisd:
-    cdef _cdff_types.AngleAxisd* thisptr
+    cdef _cdff_types.asn1SccAngleAxisd* thisptr
     cdef bool delete_thisptr
 
 
 cdef class Transform3d:
-    cdef _cdff_types.Transform3d* thisptr
+    cdef _cdff_types.asn1SccTransform3d* thisptr
     cdef bool delete_thisptr
 
 
 cdef class Pointcloud_points:
-    cdef _cdff_types.Pointcloud_points* thisptr
+    cdef _cdff_types.asn1SccPointcloud_points* thisptr
     cdef bool delete_thisptr
 
 
 cdef class Pointcloud_colors:
-    cdef _cdff_types.Pointcloud_colors* thisptr
+    cdef _cdff_types.asn1SccPointcloud_colors* thisptr
     cdef bool delete_thisptr
 
 
 cdef class Pointcloud:
-    cdef _cdff_types.Pointcloud* thisptr
+    cdef _cdff_types.asn1SccPointcloud* thisptr
     cdef bool delete_thisptr
 
 
 cdef class LaserScan:
-    cdef _cdff_types.LaserScan* thisptr
+    cdef _cdff_types.asn1SccLaserScan* thisptr
     cdef bool delete_thisptr
 
 
 cdef class LaserScan_remissionReference:
-    cdef _cdff_types.LaserScan_remission* thisptr
+    cdef _cdff_types.asn1SccLaserScan_remission* thisptr
 
 
 cdef class LaserScan_rangesReference:
-    cdef _cdff_types.LaserScan_ranges* thisptr
+    cdef _cdff_types.asn1SccLaserScan_ranges* thisptr
 
 
 cdef class T_String:
-    cdef _cdff_types.T_String* thisptr
+    cdef _cdff_types.asn1SccT_String* thisptr
 
 
 cdef class RigidBodyState:
-    cdef _cdff_types.RigidBodyState* thisptr
+    cdef _cdff_types.asn1SccRigidBodyState* thisptr
     cdef bool delete_thisptr
 
 
 cdef class JointState:
-    cdef _cdff_types.JointState* thisptr
+    cdef _cdff_types.asn1SccJointState* thisptr
     cdef bool delete_thisptr
 
 
 cdef class Joints:
-    cdef _cdff_types.Joints* thisptr
+    cdef _cdff_types.asn1SccJoints* thisptr
     cdef bool delete_thisptr
 
 
 cdef class Joints_namesReference:
-    cdef _cdff_types.Joints_names* thisptr
+    cdef _cdff_types.asn1SccJoints_names* thisptr
 
 
 cdef class Joints_elementsReference:
-    cdef _cdff_types.Joints_elements* thisptr
+    cdef _cdff_types.asn1SccJoints_elements* thisptr

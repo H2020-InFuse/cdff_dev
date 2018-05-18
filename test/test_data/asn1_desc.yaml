@@ -1,9 +1,9 @@
 name: ASN1Test
 input_ports:
     - name: currentTime
-      type: Time
+      type: asn1SccTime
       doc: dummy time input
 output_ports:
     - name: someVector
-      type: Vector3d
+      type: asn1SccVector3d
       doc: dummy Vector3d output

@@ -5,138 +5,138 @@ from libc.string cimport const_uchar
 
 
 cdef extern from "Time.h":
-    cdef cppclass Time:
-        Time& assign "operator="(Time&)
+    cdef cppclass asn1SccTime:
+        asn1SccTime& assign "operator="(asn1SccTime&)
 
         int64_t microseconds
         int32_t usecPerSec
 
 
 cdef extern from "Time.h":
-    cdef enum Resolution:
-        seconds
-        milliseconds
-        microseconds
+    cdef enum asn1SccResolution:
+        asn1Sccseconds
+        asn1Sccmilliseconds
+        asn1Sccmicroseconds
 
 
 cdef extern from "Eigen.h":
-    cdef cppclass Vector2d:
-        Vector2d& assign "operator="(Vector2d&)
+    cdef cppclass asn1SccVector2d:
+        asn1SccVector2d& assign "operator="(asn1SccVector2d&)
 
         int nCount
         double[2] arr
 
 
 cdef extern from "Eigen.h":
-    cdef cppclass Vector3d:
-        Vector3d& assign "operator="(Vector3d&)
+    cdef cppclass asn1SccVector3d:
+        asn1SccVector3d& assign "operator="(asn1SccVector3d&)
 
         int nCount
         double[3] arr
 
 
 cdef extern from "Eigen.h":
-    cdef cppclass Vector4d:
-        Vector4d& assign "operator="(Vector4d&)
+    cdef cppclass asn1SccVector4d:
+        asn1SccVector4d& assign "operator="(asn1SccVector4d&)
 
         int nCount
         double[4] arr
 
 
 cdef extern from "Eigen.h":
-    cdef cppclass Vector6d:
-        Vector6d& assign "operator="(Vector6d&)
+    cdef cppclass asn1SccVector6d:
+        asn1SccVector6d& assign "operator="(asn1SccVector6d&)
 
         int nCount
         double[6] arr
 
 
 cdef extern from "Eigen.h":
-    cdef cppclass VectorXd:
-        VectorXd& assign "operator="(VectorXd&)
+    cdef cppclass asn1SccVectorXd:
+        asn1SccVectorXd& assign "operator="(asn1SccVectorXd&)
 
         int nCount
         double[100] arr
 
 
 cdef extern from "Eigen.h":
-    cdef cppclass Matrix2d_elm:
-        Matrix2d_elm& assign "operator="(Matrix2d_elm&)
+    cdef cppclass asn1SccMatrix2d_elm:
+        asn1SccMatrix2d_elm& assign "operator="(asn1SccMatrix2d_elm&)
 
         int nCount
         double[2] arr
 
 
 cdef extern from "Eigen.h":
-    cdef cppclass Matrix2d:
-        Matrix2d& assign "operator="(Matrix2d&)
+    cdef cppclass asn1SccMatrix2d:
+        asn1SccMatrix2d& assign "operator="(asn1SccMatrix2d&)
 
         int nCount
-        Matrix2d_elm[2] arr
+        asn1SccMatrix2d_elm[2] arr
 
 
 cdef extern from "Eigen.h":
-    cdef cppclass Matrix3d_elm:
-        Matrix3d_elm& assign "operator="(Matrix3d_elm&)
+    cdef cppclass asn1SccMatrix3d_elm:
+        asn1SccMatrix3d_elm& assign "operator="(asn1SccMatrix3d_elm&)
 
         int nCount
         double[3] arr
 
 
 cdef extern from "Eigen.h":
-    cdef cppclass Matrix3d:
-        Matrix3d& assign "operator="(Matrix3d&)
+    cdef cppclass asn1SccMatrix3d:
+        asn1SccMatrix3d& assign "operator="(asn1SccMatrix3d&)
 
         int nCount
-        Matrix3d_elm[3] arr
+        asn1SccMatrix3d_elm[3] arr
 
 
 cdef extern from "Eigen.h":
-    cdef cppclass Matrix4d_elm:
-        Matrix4d_elm& assign "operator="(Matrix4d_elm&)
+    cdef cppclass asn1SccMatrix4d_elm:
+        asn1SccMatrix4d_elm& assign "operator="(asn1SccMatrix4d_elm&)
 
         int nCount
         double[4] arr
 
 
 cdef extern from "Eigen.h":
-    cdef cppclass Matrix4d:
-        Matrix4d& assign "operator="(Matrix4d&)
+    cdef cppclass asn1SccMatrix4d:
+        asn1SccMatrix4d& assign "operator="(asn1SccMatrix4d&)
 
         int nCount
-        Matrix4d_elm[4] arr
+        asn1SccMatrix4d_elm[4] arr
 
 
 cdef extern from "Eigen.h":
-    cdef cppclass Quaterniond:
-        Quaterniond& assign "operator="(Quaterniond&)
+    cdef cppclass asn1SccQuaterniond:
+        asn1SccQuaterniond& assign "operator="(asn1SccQuaterniond&)
 
         int nCount
         double[4] arr
 
 
 cdef extern from "Eigen.h":
-    cdef cppclass AngleAxisd:
-        AngleAxisd& assign "operator="(AngleAxisd&)
+    cdef cppclass asn1SccAngleAxisd:
+        asn1SccAngleAxisd& assign "operator="(asn1SccAngleAxisd&)
 
         int nCount
         double[4] arr
 
 
 cdef extern from "Eigen.h":
-    cdef cppclass Transform3d_elm:
-        Transform3d_elm& assign "operator="(Transform3d_elm&)
+    cdef cppclass asn1SccTransform3d_elm:
+        asn1SccTransform3d_elm& assign "operator="(asn1SccTransform3d_elm&)
 
         int nCount
         double[4] arr
 
 
 cdef extern from "Eigen.h":
-    cdef cppclass Transform3d:
-        Transform3d& assign "operator="(Transform3d&)
+    cdef cppclass asn1SccTransform3d:
+        asn1SccTransform3d& assign "operator="(asn1SccTransform3d&)
 
         int nCount
-        Transform3d_elm[4] arr
+        asn1SccTransform3d_elm[4] arr
 
 # TODO Matrix6d MatrixXd Isometry3d Affine3d
 
@@ -144,78 +144,78 @@ cdef extern from "Eigen.h":
 cdef extern from "Pointcloud.h":
     cdef uint32_t maxPointcloudSize
 
-    cdef cppclass Pointcloud_colors:
-        Pointcloud_colors& assign "operator="(Pointcloud_colors&)
+    cdef cppclass asn1SccPointcloud_colors:
+        asn1SccPointcloud_colors& assign "operator="(asn1SccPointcloud_colors&)
 
         int nCount
-        Vector4d[30000] arr
+        asn1SccVector4d[300000] arr
 
-    cdef cppclass Pointcloud_points:
-        Pointcloud_points& assign "operator="(Pointcloud_points&)
+    cdef cppclass asn1SccPointcloud_points:
+        asn1SccPointcloud_points& assign "operator="(asn1SccPointcloud_points&)
 
         int nCount
-        Vector3d[30000] arr
+        asn1SccVector3d[300000] arr
 
-    cdef cppclass Pointcloud:
-        Pointcloud& assign "operator="(Pointcloud&)
+    cdef cppclass asn1SccPointcloud:
+        asn1SccPointcloud& assign "operator="(asn1SccPointcloud&)
 
-        Time ref_time
-        Pointcloud_points points
-        Pointcloud_colors colors
+        asn1SccTime ref_time
+        asn1SccPointcloud_points points
+        asn1SccPointcloud_colors colors
 
 
 cdef extern from "LaserScan.h":
     cdef uint32_t maxLaserScanSize
 
-    cdef cppclass LaserScan_ranges:
-        LaserScan_ranges& assign "operator="(LaserScan_ranges&)
+    cdef cppclass asn1SccLaserScan_ranges:
+        asn1SccLaserScan_ranges& assign "operator="(asn1SccLaserScan_ranges&)
 
         int nCount
         int32_t[60] arr
 
-    cdef cppclass LaserScan_remission:
-        LaserScan_remission& assign "operator="(LaserScan_remission&)
+    cdef cppclass asn1SccLaserScan_remission:
+        asn1SccLaserScan_remission& assign "operator="(asn1SccLaserScan_remission&)
 
         int nCount
         float[60] arr
 
-    cdef cppclass LaserScan:
-        LaserScan& assign "operator="(LaserScan&)
+    cdef cppclass asn1SccLaserScan:
+        asn1SccLaserScan& assign "operator="(asn1SccLaserScan&)
 
-        Time ref_time;
+        asn1SccTime ref_time;
         double start_angle
         double angular_resolution
         double speed
-        LaserScan_ranges ranges
+        asn1SccLaserScan_ranges ranges
         uint32_t minRange
         uint32_t maxRange
-        LaserScan_remission remission
+        asn1SccLaserScan_remission remission
 
 
 cdef extern from "taste-extended.h":
-    cdef cppclass T_String:
+    cdef cppclass asn1SccT_String:
         int nCount
         const_uchar[256] arr
 
 
 cdef extern from "RigidBodyState.h":
-    cdef cppclass RigidBodyState:
-            Time timestamp
-            T_String sourceFrame
-            T_String targetFrame
-            Vector3d pos
-            Matrix3d cov_position
-            Quaterniond orient
-            Matrix3d cov_orientation
-            Vector3d velocity
-            Matrix3d cov_velocity
-            Vector3d angular_velocity
-            Matrix3d cov_angular_velocity
+    cdef cppclass asn1SccRigidBodyState:
+            asn1SccTime timestamp
+            asn1SccT_String sourceFrame
+            asn1SccT_String targetFrame
+            asn1SccVector3d pos
+            asn1SccMatrix3d cov_position
+            asn1SccQuaterniond orient
+            asn1SccMatrix3d cov_orientation
+            asn1SccVector3d velocity
+            asn1SccMatrix3d cov_velocity
+            asn1SccVector3d angular_velocity
+            asn1SccMatrix3d cov_angular_velocity
 
 
 cdef extern from "JointState.h":
-    cdef cppclass JointState:
-        JointState& assign "operator="(JointState&)
+    cdef cppclass asn1SccJointState:
+        asn1SccJointState& assign "operator="(asn1SccJointState&)
 
         double position
         float speed
@@ -225,18 +225,18 @@ cdef extern from "JointState.h":
 
 
 cdef extern from "Joints.h":
-    cdef cppclass Joints_names:
+    cdef cppclass asn1SccJoints_names:
         int nCount
-        T_String[30] arr
+        asn1SccT_String[30] arr
 
-    cdef cppclass Joints_elements:
+    cdef cppclass asn1SccJoints_elements:
         int nCount
-        JointState[30] arr
+        asn1SccJointState[30] arr
 
-    cdef cppclass Joints:
-        Joints& assign "operator="(Joints&)
+    cdef cppclass asn1SccJoints:
+        asn1SccJoints& assign "operator="(asn1SccJoints&)
 
-        Time timestamp
-        Joints_names names
-        Joints_elements elements
+        asn1SccTime timestamp
+        asn1SccJoints_names names
+        asn1SccJoints_elements elements
 
