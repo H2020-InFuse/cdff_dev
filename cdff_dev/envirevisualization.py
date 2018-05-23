@@ -38,7 +38,7 @@ class ReplayControlWidget(QWidget):
         self.pause_button.clicked.connect(worker.pause)
         layout.addWidget(self.pause_button)
         self.break_edit = QDoubleSpinBox()
-        self.break_edit.setValue(0.0)
+        self.break_edit.setValue(worker.break_length)
         self.break_edit.setMinimum(0.0)
         self.break_edit.setMaximum(sys.float_info.max)
         self.break_edit.setSingleStep(0.01)
