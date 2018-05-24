@@ -1,6 +1,9 @@
+import sys
 import numpy as np
-from cdff_dev import logloader, typefromdict, dataflowcontrol
+from cdff_dev import logloader, typefromdict, dataflowcontrol, envirevisualization
 import cdff_types
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 
 class LaserFilterDummyDFN:
@@ -46,6 +49,18 @@ class PointcloudBuilderDummyDFN:
         return self.pointcloud
 
 
+class Step:
+    def __init__(self, stream_names, log, dfc):
+        self.iterator = logloader.replay(stream_names, log, verbose=0)
+        self.dfc = dfc
+
+    def __call__(self):
+        timestamp, stream_name, typename, sample = next(self.iterator)
+        obj = typefromdict.create_from_dict(typename, sample)
+        self.dfc.process_sample(
+            timestamp=timestamp, stream_name=stream_name, sample=obj)
+
+
 def main():
     nodes = {
         "laser_filter": LaserFilterDummyDFN(),
@@ -73,11 +88,15 @@ def main():
 
     log = logloader.load_log("test/test_data/logs/test_log.msg")
     stream_names = ["/hokuyo.scans", "/dynamixel.transforms"]
-    for timestamp, stream_name, typename, sample in logloader.replay(
-            stream_names, log, verbose=0):
-        obj = typefromdict.create_from_dict(typename, sample)
-        dfc.process_sample(
-            timestamp=timestamp, stream_name=stream_name, sample=obj)
+
+    app = QApplication(sys.argv)
+    worker = envirevisualization.Worker(Step(stream_names, log, dfc))
+    worker.start()
+    win = envirevisualization.ReplayMainWindow(worker)
+    win.show()
+    app.aboutToQuit.connect(worker.quit)
+    app.exec_()
+
     dfc.node_statistics_.print_statistics()
 
 
