@@ -93,7 +93,7 @@ class ASN1TypeInfo(object):
         """Search generated ASN1 types."""
         ASN1_paths = glob.glob(os.path.join(
             cdffpath, "Common/Types/ASN.1/ESROCOS/*/*.asn")) + glob.glob(
-            os.path.join(cdffpath, "Common/Types/ASN.1/Infuse/*.asn"))
+            os.path.join(cdffpath, "Common/Types/ASN.1/InFuse/*.asn"))
         asn1_types = {}
         asn1_list = []
         for asn1_path in ASN1_paths:
