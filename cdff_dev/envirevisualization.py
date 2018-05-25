@@ -63,8 +63,10 @@ class ReplayControlWidget(QWidget):
 
 
 class Worker(QThread):
-    def __init__(self, work):
+    def __init__(self, work, *worker_args, **worker_kwargs):
         self.work = work
+        self.worker_args = worker_args
+        self.worker_kwargs = worker_kwargs
         self.one_step = False
         self.all_steps = False
         self.keep_alive = True
@@ -75,7 +77,7 @@ class Worker(QThread):
         self.quit()
 
     def run(self):
-        work = self.work()
+        work = self.work(*self.worker_args, **self.worker_kwargs)
 
         # TODO would be better to signal that the main window is loaded
         #for _ in range(4):  # wait until widget is loaded
@@ -88,9 +90,9 @@ class Worker(QThread):
                 if self.all_steps:
                     print(self.break_length)
                     time.sleep(self.break_length)
-                    next(work)
+                    work()
                 elif self.one_step:
-                    next(work)
+                    work()
                     self.one_step = False
             except StopIteration:
                 print("Reached the end of the logfile")
@@ -117,13 +119,17 @@ class Worker(QThread):
 
 
 if __name__ == "__main__":
-    def dummy_worker():
-        for i in range(10000):
-            print(i)
-            yield
+    class Work:
+        def __init__(self, stream_names, log, dfc):
+            self.i = 0
+
+        def __call__(self):
+            self.i += 1
+            if self.i > 10000:
+                raise StopIteration()
 
     app = QApplication(sys.argv)
-    worker = Worker(dummy_worker)
+    worker = Worker(Work)
     worker.start()
     win = ReplayMainWindow(worker)
     win.show()

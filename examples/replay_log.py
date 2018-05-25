@@ -90,7 +90,7 @@ def main():
     stream_names = ["/hokuyo.scans", "/dynamixel.transforms"]
 
     app = QApplication(sys.argv)
-    worker = envirevisualization.Worker(Step(stream_names, log, dfc))
+    worker = envirevisualization.Worker(Step, stream_names, log, dfc)
     worker.start()
     win = envirevisualization.ReplayMainWindow(worker)
     win.show()
