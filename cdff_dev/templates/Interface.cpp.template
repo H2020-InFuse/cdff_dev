@@ -15,22 +15,21 @@ namespace dfn_ci
 {{ desc["name"] }}Interface::~{{ desc["name"] }}Interface()
 {
 }
-{{ space }}
-{%- for input_port in desc["input_ports"] %}
+
+{% for input_port in desc["input_ports"] %}
 void {{ desc["name"] }}Interface::{{ input_port["name"] }}Input(const {{ input_port["type"] }}& data)
 {
     in{{ input_port["name"]|capfirst }} = data;
 }
-{{ space }}
-{%- endfor %}
 
-{%- for output_port in desc["output_ports"] %}
+{% endfor %}
+{% for output_port in desc["output_ports"] %}
 const {{ output_port["type"] }}& {{ desc["name"] }}Interface::{{ output_port["name"] }}Output() const
 {
     return out{{ output_port["name"]|capfirst }};
 }
-{{ space }}
-{%- endfor %}
+
+{% endfor %}
 }
 
 /** @} */

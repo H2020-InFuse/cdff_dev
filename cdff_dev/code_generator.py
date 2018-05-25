@@ -528,6 +528,8 @@ def render(template_name, **kwargs):
     """
     env = jinja2.Environment(
         loader=jinja2.PackageLoader("cdff_dev", "templates"),
+        lstrip_blocks=True,
+        trim_blocks=True,
         keep_trailing_newline=True
     )
     env.filters['capfirst'] = capfirst

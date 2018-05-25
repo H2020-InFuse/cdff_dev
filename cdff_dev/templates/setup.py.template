@@ -20,37 +20,37 @@ if __name__ == '__main__':
             "{{ name }}",
             [
                 "{{ pyx_filename }}",
-{%- for filename in implementation %}
+{% for filename in implementation %}
                 "{{ filename }}",
-{%- endfor %}
+{% endfor %}
             ],
             include_dirs=[
                 "{{ sourcedir }}",
-{%- for incdir in incdirs %}
+{% for incdir in incdirs %}
                 "{{ incdir }}",
-{%- endfor %}
+{% endfor %}
             ],
             define_macros=[
                 ("NDEBUG",),
              ],
             extra_compile_args=[
                 "-std=c++11",
-{%- for compiler_flag in compiler_flags %}
+{% for compiler_flag in compiler_flags %}
                 "{{ compiler_flag }}",
-{%- endfor %}
+{% endfor %}
                 # disable warnings caused by Cython using the deprecated
                 # NumPy C-API
                 "-Wno-cpp", "-Wno-unused-function"
             ],
             library_dirs=[
-            {%- for library_dir in library_dirs %}
+            {% for library_dir in library_dirs %}
                 "{{ library_dir }}",
-            {%- endfor %}
+            {% endfor %}
             ],
             libraries=[
-            {%- for library in libraries %}
+            {% for library in libraries %}
                 "{{ library }}",
-            {%- endfor %}
+            {% endfor %}
             ],
             language="c++"
         )

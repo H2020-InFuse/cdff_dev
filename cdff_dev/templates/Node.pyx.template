@@ -4,13 +4,13 @@ cimport {{ desc["name"].lower() }}
 from cython.operator cimport dereference as deref
 from libcpp cimport bool
 from libcpp.string cimport string
-{%- if import_cdfftypes %}
+{% if import_cdfftypes %}
 cimport cdff_types
 cimport _cdff_types
-{%- endif %}
-{%- for class_name in desc["implementations"] %}
-{{ break }}
-{{ break }}
+{% endif %}
+{% for class_name in desc["implementations"] %}
+
+
 cdef class {{ class_name }}:
     def __cinit__(self):
         self.thisptr = NULL
@@ -33,6 +33,7 @@ cdef class {{ class_name }}:
 
     def configure(self):
         self.thisptr.configure()
-    {{ input_ports }}{{ output_ports }}
-{{ break }}
-{%- endfor %}
+
+{{ input_ports -}}
+{{ output_ports -}}
+{% endfor %}
