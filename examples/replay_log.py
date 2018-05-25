@@ -49,18 +49,6 @@ class PointcloudBuilderDummyDFN:
         return self.pointcloud
 
 
-class Step:
-    def __init__(self, stream_names, log, dfc):
-        self.iterator = logloader.replay(stream_names, log, verbose=0)
-        self.dfc = dfc
-
-    def __call__(self):
-        timestamp, stream_name, typename, sample = next(self.iterator)
-        obj = typefromdict.create_from_dict(typename, sample)
-        self.dfc.process_sample(
-            timestamp=timestamp, stream_name=stream_name, sample=obj)
-
-
 def main():
     nodes = {
         "laser_filter": LaserFilterDummyDFN(),
@@ -86,15 +74,13 @@ def main():
     dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods, vis)
     dfc.setup()
 
-    log = logloader.load_log("test/test_data/logs/test_log.msg")
+    log = logloader.load_log("infuse.msg")
     stream_names = ["/hokuyo.scans", "/dynamixel.transforms"]
 
     app = QApplication(sys.argv)
-    worker = envirevisualization.Worker(Step, stream_names, log, dfc)
-    worker.start()
-    win = envirevisualization.ReplayMainWindow(worker)
+    win = envirevisualization.ReplayMainWindow(
+        app, envirevisualization.Step, stream_names, log, dfc)
     win.show()
-    app.aboutToQuit.connect(worker.quit)
     app.exec_()
 
     dfc.node_statistics_.print_statistics()

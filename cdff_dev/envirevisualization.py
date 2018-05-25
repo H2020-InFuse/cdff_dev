@@ -1,14 +1,17 @@
-import time
 import sys
+import time
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from . import logloader, typefromdict
 
 
 class ReplayMainWindow(QMainWindow):
-    def __init__(self, worker, parent=None):
-        super(ReplayMainWindow, self).__init__(parent)
+    def __init__(self, app, work, *args, **kwargs):
+        super(ReplayMainWindow, self).__init__()
 
-        self.worker = worker
+        self.worker = Worker(work, *args, **kwargs)
+        self.worker.start()
+        app.aboutToQuit.connect(self.worker.quit)
 
         self.setWindowTitle("Log Replay")
 
@@ -23,7 +26,7 @@ class ReplayControlWidget(QWidget):
     def __init__(self, worker):
         super(ReplayControlWidget, self).__init__()
 
-        layout = QHBoxLayout()
+        layout = QVBoxLayout()
         self.setLayout(layout)
 
         self.step_button = QPushButton("Step")
@@ -37,19 +40,27 @@ class ReplayControlWidget(QWidget):
         self.pause_button = QPushButton("Pause")
         self.pause_button.clicked.connect(worker.pause)
         layout.addWidget(self.pause_button)
+
+        layout.addWidget(QLabel("Break between samples:"))
         self.break_edit = QDoubleSpinBox()
         self.break_edit.setValue(worker.break_length)
         self.break_edit.setMinimum(0.0)
         self.break_edit.setMaximum(sys.float_info.max)
         self.break_edit.setSingleStep(0.01)
-
         layout.addWidget(self.break_edit)
 
         self.break_update_button = QPushButton("Update Break")
         self.break_update_button.clicked.connect(self.update_break)
         layout.addWidget(self.break_update_button)
 
+        layout.addWidget(QLabel("Current sample:"))
+        self.step_info = QSpinBox()
+        self.step_info.setMaximum(2000000000)
+        self.step_info.setEnabled(False)
+        layout.addWidget(self.step_info)
+
         self.worker = worker
+        self.worker.step_done.connect(self.step_info.setValue)
 
     def update_break(self):
         text = self.break_edit.text()
@@ -71,10 +82,13 @@ class Worker(QThread):
         self.all_steps = False
         self.keep_alive = True
         self.break_length = 0.0
+        self.t = 0
         super(Worker, self).__init__()
 
     def __del__(self):
         self.quit()
+
+    step_done = pyqtSignal(int)
 
     def run(self):
         work = self.work(*self.worker_args, **self.worker_kwargs)
@@ -88,11 +102,14 @@ class Worker(QThread):
         while self.keep_alive:
             try:
                 if self.all_steps:
-                    print(self.break_length)
                     time.sleep(self.break_length)
                     work()
+                    self.t += 1
+                    self.step_done.emit(self.t)
                 elif self.one_step:
                     work()
+                    self.t += 1
+                    self.step_done.emit(self.t)
                     self.one_step = False
             except StopIteration:
                 print("Reached the end of the logfile")
@@ -111,27 +128,37 @@ class Worker(QThread):
     def pause(self):
         self.all_steps = False
 
-
     def quit(self):
         self.all_steps = False
         self.keep_alive = False
-        time.sleep(1)
+        #import time
+        #time.sleep(1)
+
+
+class Step:
+    def __init__(self, stream_names, log, dfc):
+        self.iterator = logloader.replay(stream_names, log, verbose=0)
+        self.dfc = dfc
+
+    def __call__(self):
+        timestamp, stream_name, typename, sample = next(self.iterator)
+        obj = typefromdict.create_from_dict(typename, sample)
+        self.dfc.process_sample(
+            timestamp=timestamp, stream_name=stream_name, sample=obj)
 
 
 if __name__ == "__main__":
     class Work:
-        def __init__(self, stream_names, log, dfc):
+        def __init__(self):
             self.i = 0
 
         def __call__(self):
+            print(self.i)
             self.i += 1
             if self.i > 10000:
                 raise StopIteration()
 
     app = QApplication(sys.argv)
-    worker = Worker(Work)
-    worker.start()
-    win = ReplayMainWindow(worker)
+    win = ReplayMainWindow(app, Work)
     win.show()
-    app.aboutToQuit.connect(worker.quit)
     app.exec_()
