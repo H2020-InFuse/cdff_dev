@@ -15,11 +15,11 @@
 
 namespace dfpc_ci
 {
-     {%- if "doc" in desc %}
+    {%- if "doc" in desc %}
     /**
      * {{ desc["doc"] }}
      */
-     {%- endif %}
+    {%- endif %}
     class {{ desc["name"] }}Interface : public DFPCCommonInterface
     {
         public:
@@ -30,7 +30,7 @@ namespace dfpc_ci
             {%- for input_port in desc["input_ports"] %}
             /**
              * Send value to input port "{{ input_port["name"] }}"
-             * @param {{ input_port["name"] }}, {{ input_port["doc"] }}
+             * @param {{ input_port["name"] }}: {{ input_port["doc"] }}
              */
             virtual void {{ input_port["name"] }}Input(const {{ input_port["type"] }}& data);
             {%- endfor %}
@@ -38,7 +38,7 @@ namespace dfpc_ci
             {%- for output_port in desc["output_ports"] %}
             /**
              * Query value from output port "{{ output_port["name"] }}"
-             * @return {{ output_port["name"] }}, {{ output_port["doc"] }}
+             * @return {{ output_port["name"] }}: {{ output_port["doc"] }}
              */
             virtual const {{ output_port["type"] }}& {{ output_port["name"] }}Output() const;
             {%- endfor %}

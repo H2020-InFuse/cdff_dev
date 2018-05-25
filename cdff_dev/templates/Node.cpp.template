@@ -16,11 +16,10 @@ namespace dfn_ci
 {
 }
 
-void {{ class_name }}::configure() 
+void {{ class_name }}::configure()
 {
     // TODO DFN configuration steps
 }
-
 
 void {{ class_name }}::process()
 {

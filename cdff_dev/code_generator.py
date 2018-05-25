@@ -527,7 +527,8 @@ def render(template_name, **kwargs):
         template with context filled in
     """
     env = jinja2.Environment(
-        loader=jinja2.PackageLoader("cdff_dev", "templates")
+        loader=jinja2.PackageLoader("cdff_dev", "templates"),
+        keep_trailing_newline=True
     )
     env.filters['capfirst'] = capfirst
 

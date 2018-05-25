@@ -16,6 +16,7 @@ namespace dfn_ci
     class {{ class_name }} : public {{ desc["name"] }}Interface
     {
         public:
+
             {{ class_name }}();
             virtual ~{{ class_name }}();
 
