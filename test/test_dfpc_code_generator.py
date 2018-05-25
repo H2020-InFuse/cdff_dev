@@ -40,7 +40,7 @@ def test_compile():
         incdirs = ["test/test_output/", os.path.join(cdffpath, "DFPCs"),
                    os.path.join(cdffpath, CTYPESDIR)]
         build_extension(
-            tmp_folder, hide_stderr=False,
+            tmp_folder, hide_stderr=True,
             name=node["name"].lower(),
             pyx_filename=os.path.join(
                 tmp_folder, "python", node["name"].lower() + ".pyx"),
