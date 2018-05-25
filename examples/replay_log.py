@@ -70,8 +70,11 @@ def main():
         "/dynamixel.transforms": "lower_dynamixel",
         "pointcloud_builder.pointcloud": "body"
     }
-    vis = dataflowcontrol.EnvireVisualization(frames)
-    vis.load_urdf("SeekurJr/urdf/seekurjr.urdf")
+    vis = dataflowcontrol.EnvireVisualization(
+        frames,
+        ["SeekurJr/urdf/seekurjr.urdf"]
+        #["test/test_data/model.urdf"]
+    )
     dfc = dataflowcontrol.DataFlowControl(
         nodes, connections, periods, vis)
     dfc.setup()

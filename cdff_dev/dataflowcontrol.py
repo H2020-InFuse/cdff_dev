@@ -371,13 +371,12 @@ class EnvireVisualization:
     ----------
     frames : dict
         Mapping from port names to frame names
-    """
-    def __init__(self, frames):
-        self.world_state_ = WorldState(frames)
 
-    def load_urdf(self, filename):
-        """Load URDF file in EnviRe graph."""
-        self.world_state_.load_urdf(filename)
+    urdf_files : list, optional (default: [])
+        URDF files that should be loaded
+    """
+    def __init__(self, frames, urdf_files=[]):
+        self.world_state_ = WorldState(frames, urdf_files)
 
     def report_node_output(self, port_name, sample, timestamp):
         self.world_state_.report_node_output(port_name, sample, timestamp)
@@ -392,12 +391,17 @@ class WorldState:
     ----------
     frames : dict
         Mapping from port names to frame names
+
+    urdf_files : list
+        URDF files that should be loaded
     """
-    def __init__(self, frames):
+    def __init__(self, frames, urdf_files):
         self.frames = frames
         self.items = dict()
         self.samples = dict()
         self.graph = cdff_envire.EnvireGraph()
+        for filename in urdf_files:
+            cdff_envire.load_urdf(self.graph, filename)
         for frame in self.frames.values():
             if not self.graph.contains_frame(frame):
                 self.graph.add_frame(frame)
@@ -406,10 +410,6 @@ class WorldState:
         for port_name in self.items.keys():
             self.graph.remove_item_from_frame(
                 self.items[port_name], self.samples[port_name])
-
-    def load_urdf(self, filename):
-        """Load URDF file in EnviRe graph."""
-        cdff_envire.load_urdf(self.graph, filename)
 
     def report_node_output(self, port_name, sample, timestamp):
         if port_name not in self.frames:
