@@ -2,6 +2,8 @@
 #include <stdexcept>
 #include <envire_core/items/Item.hpp>
 #include <envire_core/graph/EnvireGraph.hpp>
+#include <envire_urdf/GraphLoader.hpp>
+#include <urdf_parser/urdf_parser.h>
 
 
 template <class _ItemData>
@@ -49,3 +51,28 @@ public:
         ptr = 0;
     }
 };
+
+template <typename T>
+struct NoDeleter
+{
+    void operator()(T* p) const
+    {
+    }
+};
+
+void loadURDF(envire::core::EnvireGraph& graph, const std::string& filename,
+              bool load_frames=false, bool load_joints=false)
+{
+    std::shared_ptr<envire::core::EnvireGraph> ptr(&graph, NoDeleter<envire::core::EnvireGraph>());
+    std::shared_ptr<urdf::ModelInterface> model = urdf::parseURDFFile(filename);
+
+    // TODO
+    // everything is attached to iniPose, which is initialized with the current
+    // timestamp, we should at least allow the user to do something else
+    envire::urdf::GraphLoader loader(ptr);
+    loader.loadStructure(*model);
+    if(load_frames)
+        loader.loadFrames(*model);
+    if(load_joints)
+        loader.loadJoints(*model);
+}

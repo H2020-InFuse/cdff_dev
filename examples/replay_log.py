@@ -71,7 +71,9 @@ def main():
         "pointcloud_builder.pointcloud": "body"
     }
     vis = dataflowcontrol.EnvireVisualization(frames)
-    dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods, vis)
+    vis.load_urdf("SeekurJr/urdf/seekurjr.urdf")
+    dfc = dataflowcontrol.DataFlowControl(
+        nodes, connections, periods, vis)
     dfc.setup()
 
     log = logloader.load_log("infuse.msg")

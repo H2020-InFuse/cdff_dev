@@ -1,6 +1,7 @@
 from libcpp.string cimport string
 from libcpp cimport bool
 from libc.stdint cimport int64_t
+from libcpp.memory cimport shared_ptr as std_shared_ptr
 
 
 # Type definitions
@@ -160,3 +161,5 @@ cdef extern from "envire_helper.hpp":
         EnvireGraph& graph, const string& frame, _ItemData* contentPtr) except +
     unsigned getItemCount[_ItemData](
         EnvireGraph& graph, const string& frame, _ItemData* contentPtr) except +
+    void loadURDF(EnvireGraph& graph, const string& filename, bool load_frames,
+                  bool load_joints) except +

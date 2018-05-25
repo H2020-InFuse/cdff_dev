@@ -375,6 +375,10 @@ class EnvireVisualization:
     def __init__(self, frames):
         self.world_state_ = WorldState(frames)
 
+    def load_urdf(self, filename):
+        """Load URDF file in EnviRe graph."""
+        self.world_state_.load_urdf(filename)
+
     def report_node_output(self, port_name, sample, timestamp):
         self.world_state_.report_node_output(port_name, sample, timestamp)
 
@@ -402,6 +406,10 @@ class WorldState:
         for port_name in self.items.keys():
             self.graph.remove_item_from_frame(
                 self.items[port_name], self.samples[port_name])
+
+    def load_urdf(self, filename):
+        """Load URDF file in EnviRe graph."""
+        cdff_envire.load_urdf(self.graph, filename)
 
     def report_node_output(self, port_name, sample, timestamp):
         if port_name not in self.frames:

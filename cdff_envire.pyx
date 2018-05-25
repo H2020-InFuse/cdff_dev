@@ -1,11 +1,13 @@
 # distutils: language = c++
 from cython.operator cimport dereference as deref
 from libc.stdint cimport int64_t
+from libcpp.memory cimport shared_ptr as std_shared_ptr
 cimport numpy as np
 import numpy as np
 cimport cdff_envire
 cimport cdff_types
 cimport _cdff_types
+import os
 
 
 np.import_array()  # must be here because we use the NumPy C API
@@ -436,3 +438,10 @@ cdef class EnvireGraph:
     def get_item_count(self, str frame, GenericType item):
         return _cdff_envire.getItemCount(
             deref(self.thisptr), frame.encode(), item.thisptr)
+
+
+cpdef load_urdf(EnvireGraph graph, str filename, bool load_frames=False, bool load_joints=False):
+    if not os.path.exists(filename):
+        raise IOError("File '%s' does not exist." % filename)
+
+    _cdff_envire.loadURDF(deref(graph.thisptr), filename.encode(), load_frames, load_joints)

@@ -336,3 +336,18 @@ def test_envire_graph_add_item():
     assert_equal(g.get_item_count("test", content), 1)
     assert_equal(g.get_total_item_count("test"), 1)
     g.remove_item_from_frame(item, content)
+
+
+def test_envire_urdf_file_does_not_exist():
+    g = cdff_envire.EnvireGraph()
+    assert_raises_regexp(
+        IOError, "File .* does not exist", cdff_envire.load_urdf,
+        g, "does_not_exist.urdf")
+
+
+def test_envire_urdf_load():
+    g = cdff_envire.EnvireGraph()
+    cdff_envire.load_urdf(g, "test/test_data/model.urdf")
+    assert_true(g.contains_frame("body"))
+    assert_true(g.contains_frame("dynamixel/lower"))
+    assert_true(g.contains_edge("body", "dynamixel/lower"))
