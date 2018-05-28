@@ -163,3 +163,21 @@ cdef extern from "envire_helper.hpp":
         EnvireGraph& graph, const string& frame, _ItemData* contentPtr) except +
     void loadURDF(EnvireGraph& graph, const string& filename, bool load_frames,
                   bool load_joints) except +
+
+
+# EnviRe visualizer
+
+cdef extern from "envire_visualizer_interface/EnvireVisualizer.hpp":
+    cdef cppclass EnvireVisualizerInterface:
+        EnvireVisualizerInterface()
+        void displayGraph(EnvireGraph graph, string base)
+        void redraw()
+        void show()
+        void startRedrawThread()
+        void stopRedrawThread()
+        void lockRedrawThread()
+        void unlockRedrawThread()
+
+
+cdef extern from "envire_visualizer_interface/RegisterItems.hpp":
+    pass

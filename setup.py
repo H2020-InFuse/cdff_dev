@@ -90,7 +90,8 @@ def configuration(parent_package='', top_path=None):
         library_dirs=[
             os.path.join(install_dir, "lib")
         ],
-        libraries=["base-types", "envire_core", "envire_urdf", "urdfdom_model"],
+        libraries=["base-types", "envire_core", "envire_urdf", "urdfdom_model",
+                   "envire_visualizer_interface"],
         define_macros=[("NDEBUG",)],
         extra_compile_args=[
             "-std=c++11",

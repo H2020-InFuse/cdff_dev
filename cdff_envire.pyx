@@ -445,3 +445,38 @@ cpdef load_urdf(EnvireGraph graph, str filename, bool load_frames=False, bool lo
         raise IOError("File '%s' does not exist." % filename)
 
     _cdff_envire.loadURDF(deref(graph.thisptr), filename.encode(), load_frames, load_joints)
+
+
+cdef class EnvireVisualizer:
+    cdef _cdff_envire.EnvireVisualizerInterface* thisptr
+
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        if self.thisptr != NULL:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_envire.EnvireVisualizerInterface()
+
+    def display_graph(self, EnvireGraph graph, str base):
+        self.thisptr.displayGraph(deref(graph.thisptr), base.encode())
+
+    def redraw(self):
+        self.thisptr.redraw()
+
+    def show(self):
+        self.thisptr.show()
+
+    def start_redraw_thread(self):
+        self.thisptr.startRedrawThread()
+
+    def stop_redraw_thread(self):
+        self.thisptr.stopRedrawThread()
+
+    def lock_redraw_thread(self):
+        self.thisptr.lockRedrawThread()
+
+    def unlock_redraw_thread(self):
+        self.thisptr.unlockRedrawThread()
