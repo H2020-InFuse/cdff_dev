@@ -104,11 +104,17 @@ class ASN1TypeInfo(object):
             for i,f in enumerate(splitted_file):
                 asn1_type = list(filter(lambda a: a != '', f.split(' ')))[-1]
                 if asn1_type != "DEFINITIONS" and asn1_type not in asn1_list:
-                    asn1_list.append(asn1_type)
+                    asn1_list.append(cls._handle_taste_types(asn1_type))
                     types_in_file.append(asn1_type)
             asn1_types[asn1_path.split('/')[-1]] = types_in_file
         cls.asn1_types = asn1_types
         return asn1_list
+
+    def _handle_taste_types(asn1_type):
+        if '-' in asn1_type:
+            return asn1_type.replace('-', '_')
+        else:
+            return asn1_type
 
     def has_cdfftype(self):
         return True
