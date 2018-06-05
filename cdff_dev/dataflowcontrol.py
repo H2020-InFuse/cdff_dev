@@ -1,5 +1,3 @@
-import cdff_envire
-import warnings
 from collections import defaultdict
 import time
 
