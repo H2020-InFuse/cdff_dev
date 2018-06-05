@@ -71,8 +71,7 @@ def main():
         "pointcloud_builder.pointcloud": "body"
     }
 
-    app = envirevisualization.EnvireVisualizerApplication()
-    app.show(
+    app = envirevisualization.EnvireVisualizerApplication(
         frames,
         #["SeekurJr/urdf/seekurjr.urdf"]
         ["test/test_data/model.urdf"]
@@ -84,9 +83,7 @@ def main():
     log = logloader.load_log("infuse.msg")
     stream_names = ["/hokuyo.scans", "/dynamixel.transforms"]
 
-    win = envirevisualization.ReplayMainWindow(
-        envirevisualization.Step, stream_names, log, dfc)
-    win.show()
+    app.show_controls(stream_names, log, dfc)
     app.exec_()
 
     dfc.node_statistics_.print_statistics()

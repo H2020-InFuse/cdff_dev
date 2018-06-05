@@ -16,6 +16,6 @@ if __name__ == "__main__":
                 raise StopIteration()
 
     app = QApplication(sys.argv)
-    win = envirevisualization.ReplayMainWindow(app, Work)
+    win = envirevisualization.ReplayMainWindow(Work)
     win.show()
     app.exec_()

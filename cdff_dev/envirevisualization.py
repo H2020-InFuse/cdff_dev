@@ -8,14 +8,22 @@ import cdff_envire
 
 
 class EnvireVisualizerApplication:
-    def __init__(self):
+    """Qt Application with EnviRe visualizer.
+
+    Parameters
+    ----------
+    frames : dict
+        Mapping from port names to frame names
+
+    urdf_files : list, optional (default: [])
+        URDF files that should be loaded
+    """
+    def __init__(self, frames, urdf_files=[]):
         self.app = QApplication(sys.argv)
-        self.visualization_ = None
+        self.visualization_ = EnvireVisualization(frames, urdf_files)
+        self.control_window = None
 
     def __del__(self):
-        if self.visualization_ is None:
-            return
-
         # Make sure to remove all items before visualizer is deleted,
         # otherwise the published events will result in a segfault!
         self.visualization_.world_state_.remove_all_items()
@@ -23,18 +31,9 @@ class EnvireVisualizerApplication:
         # unsubscribing from events will result in a segfault!
         del self.visualization_.visualizer
 
-    def show(self, frames, urdf_files=[]):
-        """Show EnviRe graph.
-
-        Parameters
-        ----------
-        frames : dict
-            Mapping from port names to frame names
-
-        urdf_files : list, optional (default: [])
-            URDF files that should be loaded
-        """
-        self.visualization_ = EnvireVisualization(frames, urdf_files)
+    def show_controls(self, stream_names, log, dfc):
+        self.control_window = ReplayMainWindow(Step, stream_names, log, dfc)
+        self.control_window.show()
 
     def exec_(self):
         self.app.exec_()
@@ -146,6 +145,9 @@ class ReplayMainWindow(QMainWindow):
         self.central_widget = ReplayControlWidget(self.worker)
         self.setCentralWidget(self.central_widget)
 
+    def closeEvent(self, QCloseEvent):
+        self.worker.quit()
+
 
 class ReplayControlWidget(QWidget):
     def __init__(self, worker):
@@ -199,6 +201,26 @@ class ReplayControlWidget(QWidget):
 
 
 class Worker(QThread):
+    """Worker thread that runs a loop in which callable is called.
+
+    This thread is designed to be controlled precisely with a GUI.
+    It is possible to do only step-wise execution of the work or introduce
+    a break between steps. After each step the signal 'step_done' will be
+    emitted. The current step count will be stored in the member 't_'.
+    The length of the break is stored in 'break_length_'.
+
+    Parameters
+    ----------
+    work : Callable
+        The logic should be implemented in this callable. Note that this is
+        a class that will be instantiated.
+
+    worker_args : list
+        Contructor paramters of work.
+
+    worker_kwargs : dict
+        Contructor paramters of work.
+    """
     def __init__(self, work, *worker_args, **worker_kwargs):
         self.work = work
         self.worker_args = worker_args
@@ -206,8 +228,10 @@ class Worker(QThread):
         self.one_step = False
         self.all_steps = False
         self.keep_alive = True
-        self.break_length = 0.0
-        self.t = 0
+
+        self.break_length_ = 0.0
+        self.t_ = 0
+
         super(Worker, self).__init__()
 
     def __del__(self):
@@ -218,31 +242,21 @@ class Worker(QThread):
     def run(self):
         work = self.work(*self.worker_args, **self.worker_kwargs)
 
-        # TODO would be better to signal that the main window is loaded
-        #for _ in range(4):  # wait until widget is loaded
-        #    time.sleep(1)
-        #    if not self.keep_alive:
-        #        break
-
         while self.keep_alive:
             try:
                 if self.all_steps:
-                    time.sleep(self.break_length)
+                    time.sleep(self.break_length_)
                     work()
-                    self.t += 1
-                    self.step_done.emit(self.t)
+                    self.t_ += 1
+                    self.step_done.emit(self.t_)
                 elif self.one_step:
                     work()
-                    self.t += 1
-                    self.step_done.emit(self.t)
+                    self.t_ += 1
+                    self.step_done.emit(self.t_)
                     self.one_step = False
             except StopIteration:
                 print("Reached the end of the logfile")
                 break
-
-        # TODO remove
-        #while self.keep_alive:  # thread is kept alive to avoid a segfault
-        #    time.sleep(1)
 
     def step(self):
         self.one_step = True
@@ -256,8 +270,6 @@ class Worker(QThread):
     def quit(self):
         self.all_steps = False
         self.keep_alive = False
-        #import time
-        #time.sleep(1)
 
 
 class Step:
