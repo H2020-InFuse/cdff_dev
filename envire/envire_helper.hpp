@@ -1,5 +1,6 @@
 #include <string>
 #include <stdexcept>
+#include <cstdint>
 #include <envire_core/items/Item.hpp>
 #include <envire_core/graph/EnvireGraph.hpp>
 #include <envire_urdf/GraphLoader.hpp>
@@ -50,6 +51,15 @@ public:
         typename envire::core::Item<_ItemData>::Ptr* typedPtr = (typename envire::core::Item<_ItemData>::Ptr *) ptr;
         (*typedPtr)->setData(*content);
         (*typedPtr)->contentsChanged();
+    }
+
+    template <class _ItemData>
+    void setTime(_ItemData* content, int64_t timestamp)
+    {
+        typename envire::core::Item<_ItemData>::Ptr* typedPtr = (typename envire::core::Item<_ItemData>::Ptr *) ptr;
+        base::Time time;
+        time.microseconds = timestamp;
+        (*typedPtr)->setTime(time);
     }
 
     template <class _ItemData>

@@ -362,6 +362,11 @@ cdef class GenericItem:
             raise RuntimeError("Item does not have any content.")
         content.thisptr[0] = self.thisptr.getItem(content.thisptr).get().getData()
 
+    def set_time(self, GenericType content, int64_t timestamp):
+        if not self.filled:
+            raise RuntimeError("Item does not have any content.")
+        self.thisptr.setTime(content.thisptr, timestamp)
+
     def delete_item(self, GenericType content):
         self.thisptr.deleteItem(content.thisptr)
         self.filled = False

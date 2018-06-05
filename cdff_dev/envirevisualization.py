@@ -110,17 +110,17 @@ class WorldState:
         # TODO set time stamp
         if port_name in self.items:
             item = self.items[port_name]
-            self.samples[port_name] = sample
             item.set_data(sample)
         else:
             item = cdff_envire.GenericItem()
             self.items[port_name] = item
             try:
                 self.graph_.add_item_to_frame(
-                    self.frames[port_name], item, sample)  # TODO use timestamp
+                    self.frames[port_name], item, sample)
             except TypeError as e:
                 warnings.warn("Cannot store type '%s' in EnviRe graph. "
                               "Reason: %s" % (type(sample), e))
+        item.set_time(sample, timestamp)
 
 
 class ReplayMainWindow(QMainWindow):
