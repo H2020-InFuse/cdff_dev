@@ -170,7 +170,7 @@ class ReplayControlWidget(QWidget):
 
         layout.addWidget(QLabel("Break between samples:"))
         self.break_edit = QDoubleSpinBox()
-        self.break_edit.setValue(worker.break_length)
+        self.break_edit.setValue(worker.break_length_)
         self.break_edit.setMinimum(0.0)
         self.break_edit.setMaximum(sys.float_info.max)
         self.break_edit.setSingleStep(0.01)
@@ -197,7 +197,7 @@ class ReplayControlWidget(QWidget):
                 raise ValueError("Length smaller than 0: %g" % break_length)
         except ValueError as e:
             print("Invalid break length: '%s'" % text)
-        self.worker.break_length = break_length
+        self.worker.break_length_ = break_length
 
 
 class Worker(QThread):

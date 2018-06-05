@@ -1,9 +1,6 @@
-import sys
 import numpy as np
 from cdff_dev import logloader, dataflowcontrol, envirevisualization
 import cdff_types
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
 
 
 class LaserFilterDummyDFN:
@@ -70,18 +67,22 @@ def main():
         "/dynamixel.transforms": "lower_dynamixel",
         "pointcloud_builder.pointcloud": "body"
     }
+    urdf_files = [
+        "test/test_data/model.urdf"
+        #"SeekurJr/urdf/seekurjr.urdf"
+    ]
+    stream_names = ["/hokuyo.scans", "/dynamixel.transforms"]
 
-    app = envirevisualization.EnvireVisualizerApplication(
-        frames,
-        #["SeekurJr/urdf/seekurjr.urdf"]
-        ["test/test_data/model.urdf"]
+    log = logloader.load_log(
+        "test/test_data/logs/test_log.msg"
+        #"infuse.msg"
     )
+
+    app = envirevisualization.EnvireVisualizerApplication(frames, urdf_files)
+
     dfc = dataflowcontrol.DataFlowControl(
         nodes, connections, periods, app.visualization_)
     dfc.setup()
-
-    log = logloader.load_log("infuse.msg")
-    stream_names = ["/hokuyo.scans", "/dynamixel.transforms"]
 
     app.show_controls(stream_names, log, dfc)
     app.exec_()
