@@ -1110,3 +1110,70 @@ cdef class Joints_elementsReference:
 
     def size(self):
         return self.thisptr.nCount
+
+
+cdef class IMUSensors:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_types.asn1SccIMUSensors()
+        self.delete_thisptr = True
+
+    def __str__(self):
+        return str(
+            "{type: IMUSensors, timestamp=%s, acc=%s, gyro=%s, mag=%s}"
+            % (self.timestamp, self.acc, self.gyro, self.mag))
+
+    def _get_timestamp(self):
+        cdef Time timestamp = Time()
+        del timestamp.thisptr
+        timestamp.thisptr = &self.thisptr.timestamp
+        timestamp.delete_thisptr = False
+        return timestamp
+
+    def _set_timestamp(self, Time timestamp):
+        self.thisptr.timestamp = deref(timestamp.thisptr)
+
+    timestamp = property(_get_timestamp, _set_timestamp)
+
+    def _get_acc(self):
+        cdef Vector3d acc = Vector3d()
+        del acc.thisptr
+        acc.delete_thisptr = False
+        acc.thisptr = &self.thisptr.acc
+        return acc
+
+    def _set_acc(self, Vector3d value):
+        self.thisptr.acc = deref(value.thisptr)
+
+    acc = property(_get_acc, _set_acc)
+
+    def _get_gyro(self):
+        cdef Vector3d gyro = Vector3d()
+        del gyro.thisptr
+        gyro.delete_thisptr = False
+        gyro.thisptr = &self.thisptr.gyro
+        return gyro
+
+    def _set_gyro(self, Vector3d value):
+        self.thisptr.gyro = deref(value.thisptr)
+
+    gyro = property(_get_gyro, _set_gyro)
+
+    def _get_mag(self):
+        cdef Vector3d mag = Vector3d()
+        del mag.thisptr
+        mag.delete_thisptr = False
+        mag.thisptr = &self.thisptr.mag
+        return mag
+
+    def _set_mag(self, Vector3d value):
+        self.thisptr.mag = deref(value.thisptr)
+
+    mag = property(_get_mag, _set_mag)

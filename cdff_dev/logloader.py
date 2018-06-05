@@ -21,6 +21,37 @@ def load_log(filename):
     return streams
 
 
+def print_stream_info(log):
+    """Print meta information about streams.
+
+    Parameters
+    ----------
+    log : dict
+        Log data
+    """
+    stream_meta_data = []
+    for stream_name in log.keys():
+        if stream_name.endswith(".meta"):
+            continue
+        typename = log[stream_name + ".meta"]["type"]
+        n_samples = len(log[stream_name])
+        stream_meta_data.append((stream_name, typename, str(n_samples).rjust(14)))
+
+    print("=" * 80)
+    MAXLENGTHS = (35, 30, 15)
+    print("".join(map(lambda t: t[0].ljust(t[1]), zip(["stream name", "type", "# samples"], MAXLENGTHS))))
+    print("-" * 80)
+    for stream_meta_data in stream_meta_data:
+        line = ""
+        for i in range(len(MAXLENGTHS)):
+            if len(stream_meta_data[i]) >= MAXLENGTHS[i]:
+                line += stream_meta_data[i][:MAXLENGTHS[i] - 4] + "... "
+            else:
+                line += stream_meta_data[i].ljust(MAXLENGTHS[i])
+        print(line)
+    print("=" * 80)
+
+
 def replay(stream_names, log, verbose=0):
     """Generator that will output samples in the correct temporal order.
 

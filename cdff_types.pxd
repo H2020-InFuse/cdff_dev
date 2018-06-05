@@ -115,3 +115,8 @@ cdef class Joints_namesReference:
 
 cdef class Joints_elementsReference:
     cdef _cdff_types.asn1SccJoints_elements* thisptr
+
+
+cdef class IMUSensors:
+    cdef _cdff_types.asn1SccIMUSensors* thisptr
+    cdef bool delete_thisptr

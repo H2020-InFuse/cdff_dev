@@ -240,3 +240,10 @@ cdef extern from "Joints.h":
         asn1SccJoints_names names
         asn1SccJoints_elements elements
 
+
+cdef extern from "IMUSensors.h":
+    cdef cppclass asn1SccIMUSensors:
+        asn1SccTime timestamp
+        asn1SccVector3d acc
+        asn1SccVector3d gyro
+        asn1SccVector3d mag

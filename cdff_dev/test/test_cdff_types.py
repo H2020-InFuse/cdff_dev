@@ -883,3 +883,21 @@ def test_joints_get_set_elements():
     joints.elements[1] = js2
     assert_equal(joints.elements[0].position, 1.0)
     assert_equal(joints.elements[1].position, 2.0)
+
+
+def test_imu_sensors():
+    imu = cdff_types.IMUSensors()
+
+    imu.timestamp = cdff_types.Time()
+    imu.timestamp.microseconds = 10
+    assert_equal(imu.timestamp.microseconds, 10)
+
+    imu.acc[0] = 1.0
+    assert_equal(imu.acc[0], 1.0)
+
+    imu.gyro[0] = 2.0
+    assert_equal(imu.gyro[0], 2.0)
+
+    imu.mag[0] = 3.0
+    assert_equal(imu.mag[0], 3.0)
+

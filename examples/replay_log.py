@@ -65,18 +65,25 @@ def main():
         "/hokuyo.scans": "upper_dynamixel",
         "laser_filter.filteredScan": "upper_dynamixel",
         "/dynamixel.transforms": "lower_dynamixel",
-        "pointcloud_builder.pointcloud": "body"
+        "pointcloud_builder.pointcloud": "body",
+
+        #"/xsens.calibrated_sensors": "body"
     }
     urdf_files = [
         "test/test_data/model.urdf"
         #"SeekurJr/urdf/seekurjr.urdf"
     ]
-    stream_names = ["/hokuyo.scans", "/dynamixel.transforms"]
 
     log = logloader.load_log(
         "test/test_data/logs/test_log.msg"
         #"infuse.msg"
+        #"xsens.calibrated_sensors.msg"
     )
+    logloader.print_stream_info(log)
+    stream_names = [
+        "/hokuyo.scans", "/dynamixel.transforms",
+        #"/xsens.calibrated_sensors"
+    ]
 
     app = envirevisualization.EnvireVisualizerApplication(frames, urdf_files)
 

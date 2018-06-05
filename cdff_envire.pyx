@@ -332,6 +332,7 @@ ctypedef fused GenericType:
     cdff_types.RigidBodyState
     cdff_types.JointState
     cdff_types.Joints
+    cdff_types.IMUSensors
 
 
 cdef class GenericItem:

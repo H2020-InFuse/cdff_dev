@@ -141,6 +141,9 @@ class DataFlowControl:
             port.
         """
         self._run_all_nodes_before(timestamp)
+        if self.visualization is not None:
+            self.visualization.report_node_output(
+                stream_name, sample, timestamp)
         self._push_input(stream_name, sample)
 
     def process(self, timestamp):
@@ -181,10 +184,11 @@ class DataFlowControl:
 
                 outputs = self._pull_output(current_node)
 
-                for port_name, sample in outputs.items():
-                    # TODO should we add the processing time?
-                    self.visualization.report_node_output(
-                        port_name, sample, timestamp_before_process)
+                if self.visualization is not None:
+                    for port_name, sample in outputs.items():
+                        # TODO should we add the processing time?
+                        self.visualization.report_node_output(
+                            port_name, sample, timestamp_before_process)
 
                 for port_name, sample in outputs.items():
                     self._push_input(port_name, sample)
