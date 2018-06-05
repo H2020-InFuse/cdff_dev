@@ -1,6 +1,6 @@
 import sys
 import numpy as np
-from cdff_dev import logloader, typefromdict, dataflowcontrol, envirevisualization
+from cdff_dev import logloader, dataflowcontrol, envirevisualization
 import cdff_types
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -70,21 +70,22 @@ def main():
         "/dynamixel.transforms": "lower_dynamixel",
         "pointcloud_builder.pointcloud": "body"
     }
-    vis = dataflowcontrol.EnvireVisualization(
+
+    app = envirevisualization.EnvireVisualizerApplication()
+    app.show(
         frames,
-        ["SeekurJr/urdf/seekurjr.urdf"]
-        #["test/test_data/model.urdf"]
+        #["SeekurJr/urdf/seekurjr.urdf"]
+        ["test/test_data/model.urdf"]
     )
     dfc = dataflowcontrol.DataFlowControl(
-        nodes, connections, periods, vis)
+        nodes, connections, periods, app.visualization_)
     dfc.setup()
 
     log = logloader.load_log("infuse.msg")
     stream_names = ["/hokuyo.scans", "/dynamixel.transforms"]
 
-    app = QApplication(sys.argv)
     win = envirevisualization.ReplayMainWindow(
-        app, envirevisualization.Step, stream_names, log, dfc)
+        envirevisualization.Step, stream_names, log, dfc)
     win.show()
     app.exec_()
 

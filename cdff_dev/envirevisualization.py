@@ -1,17 +1,142 @@
 import sys
 import time
+import warnings
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from . import logloader, typefromdict
+import cdff_envire
+
+
+class EnvireVisualizerApplication:
+    def __init__(self):
+        self.app = QApplication(sys.argv)
+        self.visualization_ = None
+
+    def __del__(self):
+        if self.visualization_ is None:
+            return
+
+        # Make sure to remove all items before visualizer is deleted,
+        # otherwise the published events will result in a segfault!
+        self.visualization_.world_state_.remove_all_items()
+        # Visualizer must be deleted before graph, otherwise
+        # unsubscribing from events will result in a segfault!
+        del self.visualization_.visualizer
+
+    def show(self, frames, urdf_files=[]):
+        """Show EnviRe graph.
+
+        Parameters
+        ----------
+        frames : dict
+            Mapping from port names to frame names
+
+        urdf_files : list, optional (default: [])
+            URDF files that should be loaded
+        """
+        self.visualization_ = EnvireVisualization(frames, urdf_files)
+
+    def exec_(self):
+        self.app.exec_()
+
+
+class EnvireVisualization:
+    """EnviRe visualization.
+
+    Parameters
+    ----------
+    frames : dict
+        Mapping from port names to frame names
+
+    urdf_files : list, optional (default: [])
+        URDF files that should be loaded
+    """
+    def __init__(self, frames, urdf_files=[]):
+        self.world_state_ = WorldState(frames, urdf_files)
+        self.visualizer = cdff_envire.EnvireVisualizer()
+        center_frame = list(frames.values())[0]  # TODO let user define center frame
+        self.visualizer.display_graph(self.world_state_.graph_, center_frame)
+        self.visualizer.show()
+
+    def report_node_output(self, port_name, sample, timestamp):
+        self.world_state_.report_node_output(port_name, sample, timestamp)
+        self.visualizer.redraw()
+
+
+class WorldState:
+    """Represents the estimated world state of the system based on log data.
+
+    Parameters
+    ----------
+    frames : dict
+        Mapping from port names to frame names
+
+    urdf_files : list
+        URDF files that should be loaded
+    """
+    def __init__(self, frames, urdf_files):
+        self.frames = frames
+        self.items = dict()
+        self.samples = dict()
+        self.graph_ = cdff_envire.EnvireGraph()
+        for filename in urdf_files:
+            cdff_envire.load_urdf(self.graph_, filename)
+        for frame in self.frames.values():
+            if not self.graph_.contains_frame(frame):
+                self.graph_.add_frame(frame)
+        self.items_initialized = True
+
+    def __del__(self):
+        if self.items_initialized:
+            self.remove_all_items()
+        del self.graph_
+
+    def remove_all_items(self):
+        for port_name in self.items.keys():
+            self.graph_.remove_item_from_frame(
+                self.items[port_name], self.samples[port_name])
+        self.items_initialized = False
+
+    def report_node_output(self, port_name, sample, timestamp):
+        if port_name not in self.frames:
+            warnings.warn("No frame registered for port '%s'" % port_name)
+            return
+
+        self.samples[port_name] = sample
+
+        # TODO set time stamp
+        if port_name in self.items:
+            item = self.items[port_name]
+            # TODO update item instead of removing and adding it
+            try:
+                self.graph_.remove_item_from_frame(item, sample)
+            except TypeError as e:
+                warnings.warn("Cannot remove type '%s' from EnviRe graph. "
+                              "Reason: %s" % (type(sample), e))
+            try:
+                self.graph_.add_item_to_frame(
+                    self.frames[port_name], item, sample)  # TODO use timestamp
+            except TypeError as e:
+                warnings.warn("Cannot store type '%s' in EnviRe graph. "
+                              "Reason: %s" % (type(sample), e))
+        else:
+            item = cdff_envire.GenericItem()
+            self.items[port_name] = item
+            try:
+                self.graph_.add_item_to_frame(
+                    self.frames[port_name], item, sample)  # TODO use timestamp
+            except TypeError as e:
+                warnings.warn("Cannot store type '%s' in EnviRe graph. "
+                              "Reason: %s" % (type(sample), e))
 
 
 class ReplayMainWindow(QMainWindow):
-    def __init__(self, app, work, *args, **kwargs):
+    def __init__(self, work, *args, **kwargs):
         super(ReplayMainWindow, self).__init__()
 
         self.worker = Worker(work, *args, **kwargs)
         self.worker.start()
-        app.aboutToQuit.connect(self.worker.quit)
+        QApplication.instance().aboutToQuit.connect(self.worker.quit)
 
         self.setWindowTitle("Log Replay")
 
