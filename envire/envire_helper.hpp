@@ -30,7 +30,7 @@ public:
     }
 
     template <class _ItemData>
-    void saveItem(_ItemData* content)
+    void initialize(_ItemData* content)
     {
         typename envire::core::Item<_ItemData>::Ptr* typedPtr =
             new typename envire::core::Item<_ItemData>::Ptr(
@@ -42,6 +42,14 @@ public:
     typename envire::core::Item<_ItemData>::Ptr getItem(_ItemData* content)
     {
         return *((typename envire::core::Item<_ItemData>::Ptr *) ptr);
+    }
+
+    template <class _ItemData>
+    void setData(_ItemData* content)
+    {
+        typename envire::core::Item<_ItemData>::Ptr* typedPtr = (typename envire::core::Item<_ItemData>::Ptr *) ptr;
+        (*typedPtr)->setData(*content);
+        (*typedPtr)->contentsChanged();
     }
 
     template <class _ItemData>

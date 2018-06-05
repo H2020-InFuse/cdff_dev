@@ -346,13 +346,18 @@ cdef class GenericItem:
     def __init__(self):
         self.filled = False
 
-    def save_item(self, GenericType content):
+    def initialize(self, GenericType content):
         if self.filled:
             raise RuntimeError("Item already contains data.")
-        self.thisptr.saveItem(content.thisptr)
+        self.thisptr.initialize(content.thisptr)
         self.filled = True
 
-    def get_content(self, GenericType content):
+    def set_data(self, GenericType content):
+        if not self.filled:
+            raise RuntimeError("Item does not have any content.")
+        self.thisptr.setData(content.thisptr)
+
+    def get_data(self, GenericType content):
         if not self.filled:
             raise RuntimeError("Item does not have any content.")
         content.thisptr[0] = self.thisptr.getItem(content.thisptr).get().getData()
@@ -427,7 +432,7 @@ cdef class EnvireGraph:
         return self.thisptr.getTotalItemCount(name.encode())
 
     def add_item_to_frame(self, str frame, GenericItem item, GenericType content):
-        item.save_item(content)
+        item.initialize(content)
         self.thisptr.addItemToFrame(
             frame.encode(), item.thisptr.getItem(content.thisptr))
 

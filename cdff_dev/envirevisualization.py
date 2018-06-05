@@ -91,6 +91,10 @@ class WorldState:
         del self.graph_
 
     def remove_all_items(self):
+        """Remove all items from EnviRe graph.
+
+        This has to be done manually before any attached visualizer is deleted.
+        """
         for port_name in self.items.keys():
             self.graph_.remove_item_from_frame(
                 self.items[port_name], self.samples[port_name])
@@ -106,18 +110,8 @@ class WorldState:
         # TODO set time stamp
         if port_name in self.items:
             item = self.items[port_name]
-            # TODO update item instead of removing and adding it
-            try:
-                self.graph_.remove_item_from_frame(item, sample)
-            except TypeError as e:
-                warnings.warn("Cannot remove type '%s' from EnviRe graph. "
-                              "Reason: %s" % (type(sample), e))
-            try:
-                self.graph_.add_item_to_frame(
-                    self.frames[port_name], item, sample)  # TODO use timestamp
-            except TypeError as e:
-                warnings.warn("Cannot store type '%s' in EnviRe graph. "
-                              "Reason: %s" % (type(sample), e))
+            self.samples[port_name] = sample
+            item.set_data(sample)
         else:
             item = cdff_envire.GenericItem()
             self.items[port_name] = item
