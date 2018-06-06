@@ -25,6 +25,8 @@ CDFF-Dev was initiated and is currently developed by the InFuse consortium:
 The CDFF's Dev component, available in this `CDFF_dev` repository, depends
 on the CDFF's Core and Support components, available in the
 [`CDFF`](https://gitlab.spaceapplications.com/InFuse/CDFF) repository.
+In addition to the EnviRe components that are required in CDFF, CDFF-Dev
+requires the simplified EnviRe visualizer interface.
 It also requires the Python 3 interpreter, the Python 3 headers, the Python
 3 package manager, Graphviz, and the following Python packages:
 
@@ -34,7 +36,7 @@ It also requires the Python 3 interpreter, the Python 3 headers, the Python
 * NumPy
 * msgpack-python
 * pydot
-* pyqt 4
+* PyQt 4
 
 On Ubuntu 16.04 you can install those requirements as follow:
 
@@ -53,7 +55,13 @@ $ pip3 install --user --upgrade pip
 $ pip3 install --user -r requirements.txt
 ```
 
-Or you can do without installing anything and instead use CDFF-Dev inside a Docker container started from the InFuse Docker image. It is the same image as for CDFF-Core and CDFF-Support, and comes with all the necessary dependencies. You only need to provide your local clones of the `CDFF` and `CDFF_dev` repositories. Have a look at [this section](https://gitlab.spaceapplications.com/InFuse/CDFF/blob/master/External/Readme.md#usage) in the documentation on the `CDFF` repository. With an adequately-defined alias, you can start a container as follow:
+Or you can do without installing anything and instead use CDFF-Dev inside a Docker
+container started from the InFuse Docker image. It is the same image as for
+CDFF-Core and CDFF-Support, and comes with all the necessary dependencies.
+You only need to provide your local clones of the `CDFF` and `CDFF_dev`
+repositories. Have a look at [this section](https://gitlab.spaceapplications.com/InFuse/CDFF/blob/master/External/Readme.md#usage)
+in the documentation on the `CDFF` repository. With an adequately-defined
+alias, you can start a container as follow:
 
 ```
 user@computer:~$ docker cdff-dev
