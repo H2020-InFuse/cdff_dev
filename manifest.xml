@@ -10,6 +10,7 @@
   <depend package="envire/envire_urdf"/>
   <depend package="python3"/>
   <depend package="python3-dev"/>
+  <depend package="python3-pyqt4"/>
   <depend package="python3-pip"/>
   <depend package="graphviz"/>
   <depend package="pyyaml"/>
