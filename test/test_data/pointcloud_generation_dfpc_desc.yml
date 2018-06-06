@@ -19,12 +19,12 @@ input_ports:
         - dfn: TiltScan
           port: laser2Body
 output_ports:
-    - name: pointcloud
-      type: asn1SccPointcloud
-      doc: "Merged pointcloud based on the input 2D scans"
+    - name: pointcloudAvailable
+      type: bool
+      doc: "Is the pointcloud available?"
       connections:
         dfn: TiltScan
-        port: pointcloud
+        port: pointcloudAvailable
 operations:
     - name: "getPointcloud"
       inputs:

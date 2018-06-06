@@ -66,5 +66,5 @@ def test_compile():
 
         pg.run()
 
-        p = pg.pointcloudOutput()
+        is_available = pg.pointcloudAvailableOutput()
         p = pg.getPointcloud(30)

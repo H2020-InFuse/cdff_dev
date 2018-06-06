@@ -424,6 +424,11 @@ def write_class(desc, type_registry, template_base, class_name,
     includes = set()
     for port in desc["input_ports"] + desc["output_ports"]:
         includes.add(type_registry.get_info(port["type"]).include())
+    if "operations" in desc:
+        for op in desc["operations"]:
+            for inp in op["inputs"]:
+                includes.add(type_registry.get_info(inp["type"]).include())
+            includes.add(type_registry.get_info(op["output_type"]).include())
 
     base_declaration = render(
         "%s.hpp" % template_base, desc=desc, includes=includes,
