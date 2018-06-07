@@ -311,9 +311,9 @@ def test_make_item():
     content = cdff_types.RigidBodyState()
     content.source_frame = "A"
     content.target_frame = "B"
-    item.save_item(content)
+    item.initialize(content)
     content2 = cdff_types.RigidBodyState()
-    item.get_content(content2)
+    item.get_data(content2)
     assert_equal(content2.source_frame, "A")
     assert_equal(content2.target_frame, "B")
     item.delete_item(content)
