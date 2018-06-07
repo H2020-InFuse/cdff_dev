@@ -51,6 +51,10 @@ class EnvireVisualizerApplication:
         self.control_window.show()
 
     def exec_(self):
+        """Start Qt application.
+
+        Qt will take over the main thread until the main window is closed.
+        """
         self.app.exec_()
 
 
@@ -122,7 +126,6 @@ class WorldState:
 
         self.samples[port_name] = sample
 
-        # TODO set time stamp
         if port_name in self.items:
             item = self.items[port_name]
             item.set_data(sample)
@@ -139,6 +142,7 @@ class WorldState:
 
 
 class ReplayMainWindow(QMainWindow):
+    """Contains controls for replaying log files."""
     def __init__(self, work, *args, **kwargs):
         super(ReplayMainWindow, self).__init__()
 
@@ -159,6 +163,7 @@ class ReplayMainWindow(QMainWindow):
 
 
 class ReplayControlWidget(QWidget):
+    """Contains buttons etc."""
     def __init__(self, worker):
         super(ReplayControlWidget, self).__init__()
 
@@ -282,6 +287,7 @@ class Worker(QThread):
 
 
 class Step:
+    """A callable that replays one sample in each step."""
     def __init__(self, stream_names, log, dfc):
         self.iterator = logloader.replay(stream_names, log, verbose=0)
         self.dfc = dfc
