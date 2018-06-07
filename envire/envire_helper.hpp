@@ -5,6 +5,8 @@
 #include <envire_core/graph/EnvireGraph.hpp>
 #include <envire_urdf/GraphLoader.hpp>
 #include <urdf_parser/urdf_parser.h>
+#include <envire_core/plugin/Plugin.hpp>
+#include <envire_core/items/Item.hpp>
 
 
 template <class _ItemData>
@@ -94,3 +96,23 @@ void loadURDF(envire::core::EnvireGraph& graph, const std::string& filename,
     if(load_joints)
         loader.loadJoints(*model);
 }
+
+#define ENVIRE_REGISTER_MULTI_METADATA( _classname, _datatype, _variable ) \
+static envire::core::MetadataInitializer _metadataInit##_variable(typeid(_classname), #_datatype, #_classname);
+#define ENVIRE_REGISTER_MULTI_ITEM_WITHOUT_SERIALIZATION( _datatype, _variable ) \
+CLASS_LOADER_REGISTER_CLASS(envire::core::Item<_datatype>, envire::core::ItemBase) \
+ENVIRE_REGISTER_MULTI_METADATA(envire::core::Item<_datatype>, _datatype, _variable)
+
+
+#include <base/samples/RigidBodyState.hpp>
+ENVIRE_REGISTER_MULTI_ITEM_WITHOUT_SERIALIZATION(base::samples::RigidBodyState, 1)
+#include <base/samples/Pointcloud.hpp>
+ENVIRE_REGISTER_MULTI_ITEM_WITHOUT_SERIALIZATION(base::samples::Pointcloud, 2)
+#include <base/samples/LaserScan.hpp>
+ENVIRE_REGISTER_MULTI_ITEM_WITHOUT_SERIALIZATION(base::samples::LaserScan, 3)
+#include <base/samples/Joints.hpp>
+ENVIRE_REGISTER_MULTI_ITEM_WITHOUT_SERIALIZATION(base::samples::Joints, 4)
+#include <urdf_model/joint.h>
+ENVIRE_REGISTER_MULTI_ITEM_WITHOUT_SERIALIZATION(urdf::Joint, 5)
+#include <urdf_model/link.h>
+ENVIRE_REGISTER_MULTI_ITEM_WITHOUT_SERIALIZATION(urdf::Link, 6)

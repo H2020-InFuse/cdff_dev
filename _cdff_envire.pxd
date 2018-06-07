@@ -175,7 +175,3 @@ cdef extern from "envire_visualizer/EnvireVisualizerInterface.hpp":
         void displayGraph(EnvireGraph graph, string base)
         void redraw()
         void show()
-
-
-cdef extern from "envire_visualizer_interface/RegisterItems.hpp":
-    pass
