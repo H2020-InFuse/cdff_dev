@@ -479,15 +479,3 @@ cdef class EnvireVisualizer:
 
     def show(self):
         self.thisptr.show()
-
-    def start_redraw_thread(self):
-        self.thisptr.startRedrawThread()
-
-    def stop_redraw_thread(self):
-        self.thisptr.stopRedrawThread()
-
-    def lock_redraw_thread(self):
-        self.thisptr.lockRedrawThread()
-
-    def unlock_redraw_thread(self):
-        self.thisptr.unlockRedrawThread()

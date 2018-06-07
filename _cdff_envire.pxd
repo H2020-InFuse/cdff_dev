@@ -169,16 +169,12 @@ cdef extern from "envire_helper.hpp":
 
 # EnviRe visualizer
 
-cdef extern from "envire_visualizer_interface/EnvireVisualizer.hpp":
+cdef extern from "envire_visualizer/EnvireVisualizerInterface.hpp":
     cdef cppclass EnvireVisualizerInterface:
         EnvireVisualizerInterface()
         void displayGraph(EnvireGraph graph, string base)
         void redraw()
         void show()
-        void startRedrawThread()
-        void stopRedrawThread()
-        void lockRedrawThread()
-        void unlockRedrawThread()
 
 
 cdef extern from "envire_visualizer_interface/RegisterItems.hpp":
