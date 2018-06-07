@@ -1,4 +1,5 @@
 from collections import defaultdict
+from abc import ABCMeta, abstractmethod
 import time
 
 
@@ -339,7 +340,25 @@ class NodeStatistics:
                   % average_processing_durations[node_name])
 
 
-class NoVisualization:
+class VisualizationBase(metaclass=ABCMeta):
+    @abstractmethod
+    def report_node_output(self, port_name, sample, timestamp):
+        """Report log sample or result of processing step to visualization.
+
+        Parameters
+        ----------
+        port_name : str
+            Name of an output port or log stream
+
+        sample : object
+            Log sample or result of processing step
+
+        timestamp : int
+            Current replay time
+        """
+
+
+class NoVisualization(VisualizationBase):
     """No visualization.
 
     This is just for testing purposes.
@@ -351,7 +370,7 @@ class NoVisualization:
         self.data[port_name] = (sample, timestamp)
 
 
-class TextVisualization:
+class TextVisualization(VisualizationBase):
     """Text "visualization".
 
     This is just for debugging purposes.

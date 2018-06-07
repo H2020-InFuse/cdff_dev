@@ -4,6 +4,7 @@ import warnings
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from . import logloader, typefromdict
+from . import dataflowcontrol
 import cdff_envire
 
 
@@ -39,7 +40,7 @@ class EnvireVisualizerApplication:
         self.app.exec_()
 
 
-class EnvireVisualization:
+class EnvireVisualization(dataflowcontrol.VisualizationBase):
     """EnviRe visualization.
 
     Parameters
