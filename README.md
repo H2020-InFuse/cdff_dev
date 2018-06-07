@@ -37,18 +37,18 @@ On Ubuntu 16.04 you can install those requirements as follow:
 # Python interpreter, headers, package manager, and Graphviz
 $ sudo apt-get install python3 python3-dev python3-pip graphviz
 
-# Install Python packages and a newer version of package manager
+# Install Python packages and a newer version of the package manager
 # in /usr/local/{bin,lib/python3.X/dist-packages} for all users
-$ sudo pip3 install --upgrade pip
-$ sudo pip3 install -r requirements.txt
+$ sudo -H pip3 install --upgrade pip
+$ sudo -H pip3 install -r requirements.txt
 
-# Or install Python packages and a newer version of package manager
+# Or install Python packages and a newer version of the package manager
 # in $HOME/.local/{bin,lib/python3.X/site-packages} for the current user
 $ pip3 install --user --upgrade pip
 $ pip3 install --user -r requirements.txt
 ```
 
-Or you can not install anything and instead use CDFF-Dev inside a Docker container started from the InFuse Docker image. It is the same image as for CDFF-Core and CDFF-Support, and comes with all the necessary dependencies. You only need to provide your local clones of the `CDFF` and `CDFF_dev` repositories. Have a look at [this section](https://gitlab.spaceapplications.com/InFuse/CDFF/blob/master/External/Readme.md#usage) in the documentation on the `CDFF` repository. With an adequately-defined alias, you can start a container as follow:
+Or you can do without installing anything and instead use CDFF-Dev inside a Docker container started from the InFuse Docker image. It is the same image as for CDFF-Core and CDFF-Support, and comes with all the necessary dependencies. You only need to provide your local clones of the `CDFF` and `CDFF_dev` repositories. Have a look at [this section](https://gitlab.spaceapplications.com/InFuse/CDFF/blob/master/External/Readme.md#usage) in the documentation on the `CDFF` repository. With an adequately-defined alias, you can start a container as follow:
 
 ```
 user@computer:~$ docker cdff-dev
@@ -72,13 +72,33 @@ After you have built (and optionally installed) the CDFF's Core and Support comp
 
 ```
 # Install CDFF-Dev in /usr/local/{bin,lib/python3.X/dist-packages} for all users
-$ sudo CDFFPATH=/path/to/CDFF pip3 install --editable /path/to/CDFF_dev
+$ sudo -H CDFFPATH=/path/to/CDFF pip3 install --editable /path/to/CDFF_dev
 
 # Or install it in $HOME/.local/{bin,lib/python3.X/site-packages} for the current user
 $ CDFFPATH=/path/to/CDFF pip3 install --user --editable /path/to/CDFF_dev
 ```
 
-When using the InFuse Docker image, this is performed automatically at container startup, and CDFF-Dev is of course installed inside the container, not on your hard disk.
+When using the InFuse Docker image, compilation as `root` is performed automatically at container startup, and CDFF-Dev is of course installed inside the container, not on your hard disk.
+
+Notes:
+
+* Compiling CDFF-Dev produces a number of build files in `/path/to/CDFF_dev`:
+
+    ```
+    build/
+    cdff_dev/__pycache__/
+    cdff_dev.egg-info/
+    cdff_types.cpp
+    cdff_types*.so
+    ```
+
+    They can all be removed except `cdff_types*.so` and `cdff_envire*.so`.
+
+* Compiling CDFF-Dev as `root` means that the aforementioned files and directories are owned by `root`. If they are not removed or chowned, subsequently compiling as a normal user fails because the build process isn't allowed to overwrite them.
+
+* About the `-H` flag (`--set-home`): the Python package manager caches data in `$XDG_CACHE_HOME/pip`, where `$XDG_CACHE_HOME` is `$HOME/.cache` by default, where `$HOME` is the home directory of the superuser only if `sudo -H` is used, since `sudo` does not change the home directory by default.
+
+    Running `pip3` through `sudo` without the `-H` flag disables this caching to avoid writing `root`-owned files to the cache directory of the current user. Run `pip3` through `sudo -H` to write those files to the cache directory of the superuser instead.
 
 ### Documentation about CDFF-Dev
 
@@ -131,7 +151,7 @@ You can install them as follow (already installed in the InFuse Docker image):
 
 ```
 # Install nose and nose2 in /usr/local/{bin,lib/python3.X/dist-packages} for all users
-$ sudo pip3 install nose nose2
+$ sudo -H pip3 install nose nose2
 
 # Or install them in $HOME/.local/{bin,lib/python3.X/site-packages} for the current user
 $ pip3 install --user nose nose2
@@ -146,6 +166,18 @@ nosetests -sv
 # Or
 make test
 ```
+
+Note: running the unit tests produces a number of test-related files in `/path/to/CDFF_dev`:
+
+```
+build/temp.*/test/test_output/
+cdff_dev/__pycache__/
+cdff_dev/test/__pycache__/
+test/__pycache__/
+<testname>*.so
+```
+
+If deleted they will be generated again at the next unit test run.
 
 ### Contributing to CDFF-Dev
 
