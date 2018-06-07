@@ -167,17 +167,23 @@ nosetests -sv
 make test
 ```
 
-Note: running the unit tests produces a number of test-related files in `/path/to/CDFF_dev`:
+Notes:
 
-```
-build/temp.*/test/test_output/
-cdff_dev/__pycache__/
-cdff_dev/test/__pycache__/
-test/__pycache__/
-<testname>*.so
-```
+* Running the unit tests produces a number of test-related files in `/path/to/CDFF_dev`:
 
-If deleted they will be generated again at the next unit test run.
+    ```
+    build/temp.*/test/test_output/
+    cdff_dev/__pycache__/
+    cdff_dev/test/__pycache__/
+    test/__pycache__/
+    <testname>*.so
+    ```
+
+    If deleted they will be generated again at the next unit test run.
+
+* If CDFF-dev was compiled as `root`, the directory `build/temp.*/` is owned by `root` and non world-writable, so the subdirectory `test/` cannot be created by a normal user, consequently tests that write to `build/temp.*/test/test_output/` fail.
+
+    Work around this issue by adding the writable mode bit for "others" to `build/temp.*/`, or chowning it to your user.
 
 ### Contributing to CDFF-Dev
 
