@@ -21,18 +21,32 @@ class EnvireVisualizerApplication:
     """
     def __init__(self, frames, urdf_files=[]):
         self.app = QApplication(sys.argv)
-        self.visualization_ = EnvireVisualization(frames, urdf_files)
+        self.visualization = EnvireVisualization(frames, urdf_files)
         self.control_window = None
 
     def __del__(self):
         # Make sure to remove all items before visualizer is deleted,
         # otherwise the published events will result in a segfault!
-        self.visualization_.world_state_.remove_all_items()
+        self.visualization.world_state_.remove_all_items()
         # Visualizer must be deleted before graph, otherwise
         # unsubscribing from events will result in a segfault!
-        del self.visualization_.visualizer
+        del self.visualization.visualizer
 
     def show_controls(self, stream_names, log, dfc):
+        """Show control window to replay log file.
+
+        Parameters
+        ----------
+        stream_names : list
+            List of stream names that should be replayed
+
+        log : dict
+            Log data
+
+        dfc : DataFlowControl
+            Configured processing and data fusion logic
+        """
+        dfc.set_visualization(self.visualization)
         self.control_window = ReplayMainWindow(Step, stream_names, log, dfc)
         self.control_window.show()
 

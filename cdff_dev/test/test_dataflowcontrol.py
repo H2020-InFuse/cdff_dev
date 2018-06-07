@@ -39,7 +39,6 @@ class SquareDFN:
 
 
 def test_dfc():
-    vis = dataflowcontrol.NoVisualization()
     nodes = {
         "linear": LinearDFN(),
         "square": SquareDFN()
@@ -53,8 +52,10 @@ def test_dfc():
         ("linear.y", "square.x"),
         ("square.y", "result.y")
     )
-    dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods, vis)
+    dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods)
     dfc.setup()
+    vis = dataflowcontrol.NoVisualization()
+    dfc.set_visualization(vis)
     for i in range(101):
         dfc.process_sample(timestamp=i, stream_name="log.x", sample=i)
     dfc.process(timestamp=102)

@@ -22,9 +22,6 @@ class DataFlowControl:
         Temporal interval after which the processing steps of nodes are
         triggered. The time interval must be given in seconds.
 
-    visualization : Visualization, optional (default: None)
-        Visualization
-
     verbose : int, optional (default: 0)
         Verbosity level
 
@@ -56,14 +53,13 @@ class DataFlowControl:
         A list of pairs of output node and connected input node. Full names
         of the form 'node_name.port_name' are used here.
     """
-    def __init__(self, nodes, connections, periods, visualization=None,
-                 verbose=0):
+    def __init__(self, nodes, connections, periods, verbose=0):
         self.nodes = nodes
         self.connections = connections
         self.periods = periods
-        self.visualization = visualization
         self.verbose = verbose
 
+        self.visualization = None
         self.node_statistics_ = None
         self.output_ports_ = None
         self.input_ports_ = None
@@ -85,6 +81,17 @@ class DataFlowControl:
         self._cache_ports()
         self._configure_periods()
         self._configure_connections()
+
+    def set_visualization(self, visualization):
+        """Set visualization.
+
+        Parameters
+        ----------
+        visualization : subclass of VisualizationBase
+            Visualization of replayed log samples or results of processing
+            steps
+        """
+        self.visualization = visualization
 
     def _cache_ports(self):
         self.output_ports_ = defaultdict(list)
