@@ -8,6 +8,7 @@
   <depend package="cdff/CDFF"/>
   <depend package="envire/envire_core"/>
   <depend package="envire/envire_urdf"/>
+  <depend package="envire/envire_visualizer"/>
   <depend package="python3"/>
   <depend package="python3-dev"/>
   <depend package="python3-pyqt4"/>
