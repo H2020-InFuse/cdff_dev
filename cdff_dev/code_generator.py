@@ -111,10 +111,8 @@ class ASN1TypeInfo(object):
         return asn1_list
 
     def _handle_taste_types(asn1_type):
-        if '-' in asn1_type:
-            return asn1_type.replace('-', '_')
-        else:
-            return asn1_type
+        return asn1_type.replace('-', '_')
+
 
     def has_cdfftype(self):
         return True
