@@ -1,10 +1,12 @@
 import cdff_envire
 import cdff_types
 import os
+import re
 import numpy as np
 from nose.tools import assert_equal, assert_not_equal, \
     assert_false, assert_true, assert_greater, \
-    assert_regexp_matches, assert_raises_regexp, assert_almost_equal
+    assert_regexp_matches, assert_raises_regexp, assert_almost_equal, \
+    assert_is_not_none
 from numpy.testing import assert_array_almost_equal
 
 
@@ -166,9 +168,10 @@ def test_transform_time_transform_with_covariance_ctor():
     p.orientation = cdff_envire.Quaterniond(1.0, 0.0, 0.0, 0.0)
 
     transform = cdff_envire.Transform(time=t, transform_with_covariance=p)
-    assert_equal(
-        str(transform),
-        "19700101-01:00:00\nt: (1.00 2.00 3.00)\nr: (1.00 0.00 0.00 0.00)")
+    result = re.match(
+        r"19\d\d\d\d\d\d-\d\d:\d\d:\d\d\nt: \(1.00 2.00 3.00\)\nr: \(1.00 0.00 0.00 0.00\)",
+        str(transform), re.MULTILINE)
+    assert_is_not_none(result)
 
 
 def test_envire_graph_add_frame():
