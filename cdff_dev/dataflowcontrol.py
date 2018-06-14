@@ -1,6 +1,7 @@
 from collections import defaultdict
 from abc import ABCMeta, abstractmethod
 import time
+import warnings
 
 
 class DataFlowControl:
@@ -21,6 +22,12 @@ class DataFlowControl:
     periods : dict
         Temporal interval after which the processing steps of nodes are
         triggered. The time interval must be given in seconds.
+
+    real_time : bool, optional (default: False)
+        Run logs in real time. This is a very simple implementation that
+        tries to sleep for the right amount of time before log data is
+        replayed. If any DFN takes longer than allowed this will be slower
+        than real time.
 
     verbose : int, optional (default: 0)
         Verbosity level
@@ -53,10 +60,11 @@ class DataFlowControl:
         A list of pairs of output node and connected input node. Full names
         of the form 'node_name.port_name' are used here.
     """
-    def __init__(self, nodes, connections, periods, verbose=0):
+    def __init__(self, nodes, connections, periods, real_time=False, verbose=0):
         self.nodes = nodes
         self.connections = connections
         self.periods = periods
+        self.real_time = real_time
         self.verbose = verbose
 
         self.visualization = None
@@ -68,6 +76,8 @@ class DataFlowControl:
         self.connection_map_ = None
 
         self.node_facade = None
+
+        self.last_timestamp = None
 
     def setup(self):
         """Setup network.
@@ -81,6 +91,7 @@ class DataFlowControl:
         self._cache_ports()
         self._configure_periods()
         self._configure_connections()
+        self.last_timestamp = None
 
     def set_visualization(self, visualization):
         """Set visualization.
@@ -149,10 +160,31 @@ class DataFlowControl:
             port.
         """
         self._run_all_nodes_before(timestamp)
+
+        if self.real_time and self.last_timestamp is not None:
+            self.real_start_time = time.time()
+
         if self.visualization is not None:
             self.visualization.report_node_output(
                 stream_name, sample, timestamp)
+
+        if self.real_time and self.last_timestamp is not None:
+            if self.last_timestamp is not None:
+                processing_time = time.time() - self.real_start_time
+                time_between_samples = float(
+                    timestamp - self.last_timestamp) / 1000000.0
+                sleep_time = time_between_samples - processing_time
+                if sleep_time > 0:
+                    time.sleep(sleep_time)
+                else:
+                    warnings.warn(
+                        "Processing took too long, %.3f behind real time "
+                        "schedule" % -sleep_time)
+
         self._push_input(stream_name, sample)
+
+        if self.real_time:
+            self.last_timestamp = timestamp
 
     def process(self, timestamp):
         """Runs all nodes until a specific timestamp.

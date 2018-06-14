@@ -87,7 +87,8 @@ def main():
 
     app = envirevisualization.EnvireVisualizerApplication(frames, urdf_files)
 
-    dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods)
+    dfc = dataflowcontrol.DataFlowControl(
+        nodes, connections, periods, real_time=True)
     dfc.setup()
 
     app.show_controls(stream_names, log, dfc)
