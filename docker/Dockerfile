@@ -37,7 +37,7 @@ RUN apt-get update && apt-get install -y \
   qt4-qmake
 RUN pip3 install pyyaml jinja2 cython numpy msgpack-python pydot nose nose2
 
-RUN mkdir -p /root/.ssh/
+RUN mkdir -p -m 700 /root/.ssh/
 RUN ssh-keyscan gitlab.spaceapplications.com >> /root/.ssh/known_hosts
 
 # Prepare non-interactive autoproj setup with CI user
