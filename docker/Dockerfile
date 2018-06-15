@@ -16,17 +16,6 @@ RUN apt-get update && apt-get install -y \
 RUN git config --global user.email infuse@example.com
 RUN git config --global user.name InFuse
 
-RUN mkdir -p /opt/infuse/.autoproj
-RUN mkdir -p /root/.ssh/
-WORKDIR /opt/infuse
-ADD config.yml /opt/infuse/.autoproj
-RUN wget http://www.rock-robotics.org/autoproj_bootstrap
-ENV AUTOPROJ_BOOTSTRAP_IGNORE_NONEMPTY_DIR 1
-ARG ssh_prv_key
-RUN ssh-keyscan gitlab.spaceapplications.com >> /root/.ssh/known_hosts \
-  && echo "$ssh_prv_key" > /root/.ssh/id_rsa && chmod 600 /root/.ssh/* && eval `ssh-agent -s` && ssh-add /root/.ssh/id_rsa \
-  && ruby autoproj_bootstrap git git@gitlab.spaceapplications.com:InFuse/cdff-buildconf branch=cdff_dev \
-  && rm -f /root/.ssh/*
 RUN apt-get update && apt-get install -y \
   python3 \
   python3-dev \
@@ -35,6 +24,7 @@ RUN apt-get update && apt-get install -y \
   autoconf \
   automake \
   freeglut3-dev \
+  graphviz \
   graphviz-dev \
   libgoogle-glog-dev \
   libjsoncpp-dev \
@@ -47,15 +37,24 @@ RUN apt-get update && apt-get install -y \
   qt4-qmake
 RUN pip3 install pyyaml jinja2 cython numpy msgpack-python pydot nose nose2
 
+RUN mkdir -p /root/.ssh/
+RUN ssh-keyscan gitlab.spaceapplications.com >> /root/.ssh/known_hosts
+
+# Prepare non-interactive autoproj setup with CI user
+RUN mkdir -p /tmp/infuse/.autoproj
+WORKDIR /tmp/infuse
+ADD config.yml /tmp/infuse/.autoproj
+RUN wget http://www.rock-robotics.org/autoproj_bootstrap
+ENV AUTOPROJ_BOOTSTRAP_IGNORE_NONEMPTY_DIR 1
+RUN ruby autoproj_bootstrap git https://cdff-dev:cdff-dev@gitlab.spaceapplications.com/InFuse/cdff-buildconf.git branch=cdff_dev
+ADD 00_ci_user.yml /tmp/infuse/autoproj/overrides.d/
+ADD manifest /tmp/infuse/autoproj/
+
 # Workaround for error in ESROCOS' package set
 RUN wget https://raw.githubusercontent.com/ESROCOS/buildconf/orbital/esrocos/esrocos_autoproj.rb
 RUN mkdir -p autoproj/esrocos
 RUN mv esrocos_autoproj.rb autoproj/esrocos
 RUN echo "Autobuild.env_push_path 'RUBYLIB', File.join(Autoproj.root_dir, 'autoproj', 'esrocos')" >> autoproj/init.rb
 
-RUN ssh-keyscan gitlab.spaceapplications.com >> /root/.ssh/known_hosts \
-  && echo "$ssh_prv_key" > /root/.ssh/id_rsa && chmod 600 /root/.ssh/* && eval `ssh-agent -s` && ssh-add /root/.ssh/id_rsa \
-  && bash -c "source env.sh && autoproj update" \
-  && rm -f /root/.ssh/*
+RUN bash -c "source env.sh && autoproj update"
 RUN bash -c "source env.sh && autoproj build"
-#RUN apt-get update && apt-get install -y ipython3

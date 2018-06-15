@@ -40,7 +40,7 @@ be distributed to the users through a docker registry.
 
 * Build base image with dependencies (cdff-dev-ci):
 
-    docker build -t cdff-dev-ci:latest --build-arg ssh_prv_key="$(cat ~/.ssh/spaceapps)" .
+    docker build -t cdff-dev-ci:latest .
 
 Sometimes it is necessary to clean the docker cache if you want to rebuild the
 image. You just have to add `--no-cache` in this case.
