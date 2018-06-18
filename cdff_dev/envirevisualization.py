@@ -254,6 +254,7 @@ class Worker(QThread):
     step_done = pyqtSignal(int)
 
     def run(self):
+        """Main loop."""
         work = self.work(*self.worker_args, **self.worker_kwargs)
 
         while self.keep_alive:
@@ -273,15 +274,19 @@ class Worker(QThread):
                 break
 
     def step(self):
+        """Execute only one step."""
         self.one_step = True
 
     def play(self):
+        """Continue replay."""
         self.all_steps = True
 
     def pause(self):
+        """Pause replay."""
         self.all_steps = False
 
     def quit(self):
+        """Stop replay and main loop."""
         self.all_steps = False
         self.keep_alive = False
 

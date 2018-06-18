@@ -105,6 +105,7 @@ class DataFlowControl:
         self.visualization = visualization
 
     def _cache_ports(self):
+        """Cache setters and getters for ports."""
         self.output_ports_ = defaultdict(list)
         self.input_ports_ = defaultdict(list)
         self.log_ports_ = defaultdict(list)
@@ -126,6 +127,7 @@ class DataFlowControl:
                 self.result_ports_[node_name].append(port_name)
 
     def _configure_periods(self):
+        """Check and save periods for nodes."""
         if set(self.node_facade.node_names()) != set(self.periods.keys()):
             raise ValueError(
                 "Mismatch between nodes and periods. Nodes: %s, periods: %s"
@@ -139,6 +141,7 @@ class DataFlowControl:
             node: -1 for node in self.node_facade.node_names()}
 
     def _configure_connections(self):
+        """Initialize connections."""
         self.connection_map_ = defaultdict(list)
         for output_port, input_port in self.connections:
             self.connection_map_[output_port].append(input_port)
@@ -198,6 +201,13 @@ class DataFlowControl:
         self._run_all_nodes_before(timestamp)
 
     def _run_all_nodes_before(self, timestamp):
+        """Run all nodes that should have been executed before given time.
+
+        Parameters
+        ----------
+        timestamp : int
+            Simulation time
+        """
         changed = True
         while changed:
             current_node, timestamp_before_process = self._get_next_node(
@@ -239,6 +249,7 @@ class DataFlowControl:
                 changed = False
 
     def _get_next_node(self, timestamp):
+        """Get node that will be executed next."""
         timestamp_before_process = float("inf")
         current_node = None
         # Nodes will be sorted alphabetically to ensure reproducibility
@@ -256,6 +267,7 @@ class DataFlowControl:
         return current_node, timestamp_before_process
 
     def _pull_output(self, node_name):
+        """Get all outputs from a given node."""
         outputs = dict()
         for port_name in self.output_ports_[node_name]:
             if self.verbose >= 1:
@@ -265,6 +277,7 @@ class DataFlowControl:
         return outputs
 
     def _push_input(self, output_port, sample):
+        """Push input to given port."""
         if output_port in self.connection_map_:
             for input_port in self.connection_map_[output_port]:
                 if self.verbose >= 1:
