@@ -1,5 +1,5 @@
 import numpy as np
-from cdff_dev import logloader, typefromdict, dataflowcontrol
+from cdff_dev import logloader, typefromdict, dataflowcontrol, replay
 import cdff_types
 from nose.tools import assert_equal, assert_in
 from numpy.testing import assert_array_less
@@ -83,10 +83,6 @@ def test_feed_data_flow_control():
 
     log = logloader.load_log("test/test_data/logs/test_log.msg")
     stream_names = ["/hokuyo.scans", "/dynamixel.transforms"]
-    for timestamp, stream_name, typename, sample in logloader.replay(
-            stream_names, log, verbose=0):
-        obj = typefromdict.create_from_dict(typename, sample)
-        dfc.process_sample(
-            timestamp=timestamp, stream_name=stream_name, sample=obj)
+    replay.replay_and_process(dfc, log, stream_names)
     assert_in("laser_filter.filteredScan", vis.data)
     assert_in("pointcloud_builder.pointcloud", vis.data)
