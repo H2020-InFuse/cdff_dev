@@ -385,11 +385,13 @@ class NodeStatistics:
             for node_name in self.processing_durations_.keys()
         )
 
-        print("Processing times:")
         for node_name, average_processing_duration in \
                 self.processing_durations_.items():
-            print("  " + node_name + ": %g s"
+            print("Node: %s" % node_name)
+            print("Average processing time: %g s"
                   % average_processing_durations[node_name])
+            print("Number of calls: %d"
+                  % len(self.processing_durations_[node_name]))
 
 
 class VisualizationBase(metaclass=ABCMeta):
