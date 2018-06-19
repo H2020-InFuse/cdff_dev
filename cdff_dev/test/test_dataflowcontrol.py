@@ -54,6 +54,12 @@ def test_dfc():
     )
     dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods)
     dfc.setup()
+    assert_equal(len(dfc.input_ports_), 2)
+    assert_equal(len(dfc.output_ports_), 2)
+    assert_equal(len(dfc.log_ports_), 1)
+    assert_equal(len(dfc.result_ports_), 1)
+    assert_equal(len(dfc.connection_map_), 3)
+
     vis = dataflowcontrol.NoVisualization()
     dfc.set_visualization(vis)
     for i in range(101):
