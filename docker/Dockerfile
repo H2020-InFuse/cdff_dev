@@ -59,5 +59,14 @@ RUN echo "Autobuild.env_push_path 'RUBYLIB', File.join(Autoproj.root_dir, 'autop
 RUN bash -c "source env.sh && autoproj update"
 RUN bash -c "source env.sh && autoproj build"
 
+RUN rm -rf /tmp/infuse/cdff/external/opencv/build
+RUN rm -rf /tmp/infuse/cdff/external/boost/libs
+RUN rm -rf /tmp/infuse/cdff/external/pcl/build
+RUN rm -rf /tmp/infuse/cdff/external/vtk/build
+RUN rm -rf /tmp/infuse/envire/envire_core/build
+RUN rm -rf /tmp/infuse/envire/envire_visualizer/build
+RUN rm -rf /tmp/infuse/envire/envire_smurf/build
+RUN rm -rf /tmp/infuse/envire/envire_urdf/build
+
 LABEL maintainer="Alexander.Fabisch@dfki.de"
 LABEL version="1.8"
