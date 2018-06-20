@@ -7,18 +7,23 @@ https://gitlab.spaceapplications.com/InFuse/CDFF_dev)
 
 ## CDFF-Dev
 
-CDFF-Dev provides tools to develop, test, visualize, and perform analysis on data fusion products. It includes tools such as data log replay, visualization tools, and data analysis tools. None of it is deployed on the target system.
+CDFF-Dev provides tools to develop, test, visualize, and perform
+analysis on data fusion products. It includes tools such as data
+log replay, visualization tools, and data analysis tools. None of
+it is deployed on the target system.
 
-CDFF-Dev was initiated and is currently developed by the InFuse consortium:
+CDFF-Dev was initiated and is currently developed by the
+[InFuse](https://www.h2020-infuse.eu/) consortium. The following
+institutes contributed to the software:
 * [Robotics Innovation Center](http://robotik.dfki-bremen.de/en/startpage.html)
   of the [German Research Center for Artificial Intelligence (DFKI)](http://www.dfki.de)
   in Bremen
-* [Space Mechatronics Systems Technology Laboratory](https://www.strath.ac.uk/engineering/designmanufactureengineeringmanagement/thespacemechatronicsystemstechnologylaboratory/) of the [University of Strathclyde](https://www.strath.ac.uk/) in Glasgow
-* ...
+* [Space Mechatronics Systems Technology Laboratory](https://www.strath.ac.uk/engineering/designmanufactureengineeringmanagement/thespacemechatronicsystemstechnologylaboratory/)
+  of the [University of Strathclyde](https://www.strath.ac.uk/) in
+  Glasgow
 
 <img src="https://www.dfki.de/web/presse/bildmaterial/dfki-logo-e-schrift.jpg" alt="DFKI RIC" height="50px" />&emsp;&emsp;
 <img src="doc/static/strathclyde.jpg" alt="Strathclyde SMeSTech" height="70px" />&emsp;&emsp;
-...
 
 ### Dependencies of CDFF-Dev
 
@@ -200,15 +205,17 @@ Notes:
 
 ### Contributing to CDFF-Dev
 
-It is not allowed to push to the `master` branch. To contribute a new feature, please develop it in a feature branch, push the feature branch, and open a merge request.
+It is not allowed to push to the `master` branch. To contribute a new
+feature, please develop it in a feature branch, push the feature branch,
+and open a merge request.
 
 ### Status
 
 The following features work:
 
-1. Generating a DFN template in C++
-2. Generating Python bindings for a DFN
-3. Generating a DFPC template in C++
+1. Generating a DFN template in C++ with Python bindings
+1. Generating a DFPC template in C++ with Python bindings
+1. Replaying logfiles with EnviRe visualizer
 
 ### License
 
@@ -216,4 +223,6 @@ There is no license at the moment.
 
 ### Copyright
 
-Copyright 2017, DFKI GmbH / Robotics Innovation Center, ...
+Copyright 2017-2018, DFKI GmbH / Robotics Innovation Center,
+University of Strathclyde / Space Mechatronics Systems Technology
+Laboratory
