@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 from distutils.sysconfig import get_config_vars
+from distutils.command.clean import clean
 from Cython.Build import cythonize
 import numpy
 import os
+import glob
 import cdff_dev
 from cdff_dev.path import load_cdffpath, CTYPESDIR
 
@@ -12,6 +14,23 @@ def strict_prototypes_workaround():
     opt = get_config_vars('OPT')[0]
     os.environ['OPT'] = " ".join(flag for flag in opt.split()
                                  if flag != '-Wstrict-prototypes')
+
+
+# Custom clean command to remove build artifacts
+
+class CleanCommand(clean):
+    description = "Remove build artifacts from the source tree"
+
+    def run(self):
+        clean.run(self)
+
+        print("removing Cython build artifacts")
+        cwd = os.path.abspath(os.path.dirname(__file__))
+        filenames = (glob.glob(cwd + "/cdff_*.cpp") +
+                     glob.glob(cwd + "/cdff_*.so") +
+                     glob.glob(cwd + "/cdff_*.pyd"))
+        for filename in filenames:
+            os.remove(filename)
 
 
 def configuration(parent_package='', top_path=None):
@@ -40,11 +59,18 @@ def configuration(parent_package='', top_path=None):
         (".", "cdff_envire.pyx")
     )
 
+    extra_compile_args = [
+        "-std=c++11",
+        "-O3",
+        # disable warnings caused by Cython using the deprecated
+        # NumPy C-API
+        "-Wno-cpp", "-Wno-unused-function"
+    ]
+
     cdffpath = load_cdffpath()
     ctypespath = os.path.join(cdffpath, CTYPESDIR)
 
-    pyx_filename = os.path.join("cdff_types.pyx")
-    cythonize(pyx_filename)
+    cythonize("cdff_types.pyx")
 
     config.add_extension(
         "cdff_types",
@@ -54,21 +80,13 @@ def configuration(parent_package='', top_path=None):
             numpy.get_include(),
             ctypespath
         ],
-        library_dirs=[
-        ],
+        library_dirs=[],
         libraries=[],
         define_macros=[("NDEBUG",)],
-        extra_compile_args=[
-            "-std=c++11",
-            "-O3",
-            # disable warnings caused by Cython using the deprecated
-            # NumPy C-API
-            "-Wno-cpp", "-Wno-unused-function"
-        ]
+        extra_compile_args=extra_compile_args
     )
 
-    pyx_filename = os.path.join("cdff_envire.pyx")
-    cythonize(pyx_filename)
+    cythonize("cdff_envire.pyx")
     autoproj_current_root = os.environ.get("AUTOPROJ_CURRENT_ROOT", None)
     if autoproj_current_root is None:
         # TODO might be changed to warning?
@@ -93,13 +111,7 @@ def configuration(parent_package='', top_path=None):
         libraries=["base-types", "envire_core", "envire_urdf", "urdfdom_model",
                    "envire_visualizer_interface"],
         define_macros=[("NDEBUG",)],
-        extra_compile_args=[
-            "-std=c++11",
-            "-O3",
-            # disable warnings caused by Cython using the deprecated
-            # NumPy C-API
-            "-Wno-cpp", "-Wno-unused-function"
-        ]
+        extra_compile_args=extra_compile_args
     )
 
     return config
@@ -119,6 +131,7 @@ if __name__ == "__main__":
         packages=['cdff_dev'],
         package_data={'cdff_dev': ['templates/*.template']},
         requires=['pyyaml', 'cython', 'Jinja2', 'numpy', 'pydot'],
+        cmdclass = {'clean': CleanCommand},
         configuration=configuration
     )
     setup(**metadata)
