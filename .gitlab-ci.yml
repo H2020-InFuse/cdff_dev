@@ -11,4 +11,4 @@ fetch_test:
       - source /tmp/infuse/env.sh
       - export CDFFPATH="${PWD}/CDFF"
       - python3 setup.py build_ext -i
-      - nosetests -sv
+      - nosetests -sv cdff_dev/test test/
