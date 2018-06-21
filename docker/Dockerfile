@@ -1,28 +1,10 @@
-FROM ubuntu:16.04
-
-RUN apt-get update && apt-get install -y \
-  build-essential \
-  apt-utils \
-  cmake \
-  sudo \
-  git \
-  mono-runtime libmono-system-core4.0-cil \
-  libmono-system-numerics4.0-cil \
-  ruby \
-  ruby-dev \
-  wget \
-  curl \
-  pkg-config \
-  unzip
-
-RUN git config --global user.email infuse@example.com
-RUN git config --global user.name InFuse
+FROM nexus.spaceapplications.com/repository/infuse/cdff-ci:1.8
 
 RUN apt-get update && apt-get install -y \
   python3 \
   python3-dev \
-  python3-pyqt4 \
   python3-pip \
+  python3-pyqt4 \
   autoconf \
   automake \
   freeglut3-dev \
@@ -35,8 +17,17 @@ RUN apt-get update && apt-get install -y \
   libproj-dev \
   libqt4-dev \
   libqt4-opengl-dev \
-  qt4-qmake
-RUN pip3 install pyyaml jinja2 cython numpy msgpack-python pydot nose nose2
+  libtinyxml-dev \
+  qt4-qmake \
+  pkg-config \
+  ruby \
+  ruby-dev \
+  sudo
+
+# See Romain's comments
+# https://gitlab.spaceapplications.com/InFuse/cdff-buildconf/issues/4#note_11668
+RUN git config --global user.email infuse@example.com
+RUN git config --global user.name InFuse
 
 RUN mkdir -p -m 700 /root/.ssh/
 RUN ssh-keyscan gitlab.spaceapplications.com >> /root/.ssh/known_hosts
@@ -51,6 +42,10 @@ RUN ruby autoproj_bootstrap git https://cdff-dev:cdff-dev@gitlab.spaceapplicatio
 ADD 00_ci_user.yml /tmp/infuse/autoproj/overrides.d/
 ADD manifest /tmp/infuse/autoproj/
 
+# TODO remove workaround by using CI user:
+# L : cdff-dev@spaceapplications.com pwd : cdff-dev
+RUN mkdir -p /root/.ssh/
+
 # Workaround for error in ESROCOS' package set
 RUN wget https://raw.githubusercontent.com/ESROCOS/buildconf/orbital/esrocos/esrocos_autoproj.rb
 RUN mkdir -p autoproj/esrocos
@@ -60,5 +55,4 @@ RUN echo "Autobuild.env_push_path 'RUBYLIB', File.join(Autoproj.root_dir, 'autop
 RUN bash -c "source env.sh && autoproj update"
 RUN bash -c "source env.sh && autoproj build && rm -rf /tmp/infuse/cdff/external/opencv/build && rm -rf /tmp/infuse/cdff/external/boost/libs && rm -rf /tmp/infuse/cdff/external/boost/bin.v2 && rm -rf /tmp/infuse/cdff/external/pcl/build && rm -rf /tmp/infuse/cdff/external/vtk/build && rm -rf /tmp/infuse/envire/envire_core/build && rm -rf /tmp/infuse/envire/envire_visualizer/build && rm -rf /tmp/infuse/envire/envire_smurf/build && rm -rf /tmp/infuse/envire/envire_urdf/build && rm -rf /tmp/infuse/external/ogdf/build && rm -rf /tmp/infuse/gui/vizkit3d/build && rm -rf /tmp/infuse/gui/osgviz/build && rm -rf /tmp/infuse/base/types/build"
 
-LABEL maintainer="Alexander.Fabisch@dfki.de"
-LABEL version="1.8.1"
+# TODO remove CDFF(_dev) and clone them in .gitlab-ci.yml

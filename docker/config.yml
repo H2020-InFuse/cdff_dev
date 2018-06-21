@@ -1,8 +1,8 @@
 ---
 ruby_executable: "/usr/bin/ruby2.3"
-gems_install_path: "/opt/infuse/.autoproj/config.yml"
+gems_install_path: "/tmp/infuse/.autoproj/config.yml"
 prefer_indep_over_os_packages: false
-osdeps_mode: all
+osdeps_mode: none  # all
 reused_autoproj_installations: []
 manifest_source:
   :type: git
@@ -25,7 +25,7 @@ operating_system:
   - xenial
   - xerus
   - default
-CDFF_EXTERNAL_SOURCE_INSTALL: all
+CDFF_EXTERNAL_SOURCE_INSTALL: none  # all
 DFKIGIT: ssh,ssh
 DFKIGIT_ROOT: 'git@git.hb.dfki.de:'
 DFKIGIT_PUSH_ROOT: 'git@git.hb.dfki.de:'
