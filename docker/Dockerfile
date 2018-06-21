@@ -6,11 +6,13 @@ RUN apt-get update && apt-get install -y \
   cmake \
   sudo \
   git \
-  mono-devel \
+  mono-runtime libmono-system-core4.0-cil \
+  libmono-system-numerics4.0-cil \
   ruby \
   ruby-dev \
   wget \
   curl \
+  pkg-config \
   unzip
 
 RUN git config --global user.email infuse@example.com
@@ -33,7 +35,6 @@ RUN apt-get update && apt-get install -y \
   libproj-dev \
   libqt4-dev \
   libqt4-opengl-dev \
-  libtinyxml-dev \
   qt4-qmake
 RUN pip3 install pyyaml jinja2 cython numpy msgpack-python pydot nose nose2
 
@@ -57,16 +58,7 @@ RUN mv esrocos_autoproj.rb autoproj/esrocos
 RUN echo "Autobuild.env_push_path 'RUBYLIB', File.join(Autoproj.root_dir, 'autoproj', 'esrocos')" >> autoproj/init.rb
 
 RUN bash -c "source env.sh && autoproj update"
-RUN bash -c "source env.sh && autoproj build"
-
-RUN rm -rf /tmp/infuse/cdff/external/opencv/build
-RUN rm -rf /tmp/infuse/cdff/external/boost/libs
-RUN rm -rf /tmp/infuse/cdff/external/pcl/build
-RUN rm -rf /tmp/infuse/cdff/external/vtk/build
-RUN rm -rf /tmp/infuse/envire/envire_core/build
-RUN rm -rf /tmp/infuse/envire/envire_visualizer/build
-RUN rm -rf /tmp/infuse/envire/envire_smurf/build
-RUN rm -rf /tmp/infuse/envire/envire_urdf/build
+RUN bash -c "source env.sh && autoproj build && rm -rf /tmp/infuse/cdff/external/opencv/build && rm -rf /tmp/infuse/cdff/external/boost/libs && rm -rf /tmp/infuse/cdff/external/boost/bin.v2 && rm -rf /tmp/infuse/cdff/external/pcl/build && rm -rf /tmp/infuse/cdff/external/vtk/build && rm -rf /tmp/infuse/envire/envire_core/build && rm -rf /tmp/infuse/envire/envire_visualizer/build && rm -rf /tmp/infuse/envire/envire_smurf/build && rm -rf /tmp/infuse/envire/envire_urdf/build && rm -rf /tmp/infuse/external/ogdf/build && rm -rf /tmp/infuse/gui/vizkit3d/build && rm -rf /tmp/infuse/gui/osgviz/build && rm -rf /tmp/infuse/base/types/build"
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
-LABEL version="1.8"
+LABEL version="1.8.1"
