@@ -8,7 +8,7 @@ fetch_test:
   script:
       - git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com/InFuse/CDFF.git
       - cd build_tools/ && ./get_cdff_artifacts.sh && cd ../
-      - source /opt/infuse/env.sh
+      - source /tmp/infuse/env.sh
       - export CDFFPATH="${PWD}/CDFF"
       - python3 setup.py build_ext -i
       - nosetests -sv
