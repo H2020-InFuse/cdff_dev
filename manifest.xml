@@ -9,7 +9,7 @@
   <depend package="envire/envire_core"/>
   <depend package="envire/envire_urdf"/>
   <depend package="envire/envire_visualizer"/>
-  <depend package="envire/envire_asn1"/>
+  <depend package="infuse/envire_asn1"/>
   <depend package="infuse/ASN_Viz" optional="1"/>
   <depend package="python3"/>
   <depend package="python3-dev"/>
