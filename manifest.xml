@@ -10,7 +10,7 @@
   <depend package="envire/envire_urdf"/>
   <depend package="envire/envire_visualizer"/>
   <depend package="envire/envire_asn1"/>
-  <depend package="infuse/ASN_Viz"/>
+  <depend package="infuse/ASN_Viz" optional="1"/>
   <depend package="python3"/>
   <depend package="python3-dev"/>
   <depend package="python3-pyqt4"/>
