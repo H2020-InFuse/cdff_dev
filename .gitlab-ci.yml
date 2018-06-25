@@ -1,4 +1,4 @@
-image: h2020infuse/cdff-dev-ci:1.8.1
+image: h2020infuse/cdff-dev-ci:1.8.2
 
 stages:
   - fetch_test
@@ -6,9 +6,11 @@ stages:
 fetch_test:
   stage : fetch_test
   script:
-      - git clone --depth 1 https://gitlab-ci-token:pVUF6xEhoz2kgWAUyyCr@gitlab.spaceapplications.com/InFuse/CDFF.git
+      - git config --global user.email infuse@example.com
+      - git config --global user.name InFuse
+      - git clone --depth 1 https://cdff-dev:cdff-dev@gitlab.spaceapplications.com/InFuse/CDFF.git
       - cd build_tools/ && ./get_cdff_artifacts.sh && cd ../
       - source /tmp/infuse/env.sh
       - export CDFFPATH="${PWD}/CDFF"
-      - python3 setup.py build_ext -i
+      - amake
       - nosetests -sv cdff_dev/test test/

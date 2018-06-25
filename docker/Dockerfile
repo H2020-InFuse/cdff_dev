@@ -1,4 +1,4 @@
-FROM nexus.spaceapplications.com/repository/infuse/cdff-ci:1.8
+FROM nexus.spaceapplications.com/repository/infuse/cdff-ci:1.8.2
 
 RUN apt-get update && apt-get install -y \
   python3 \
@@ -57,6 +57,13 @@ RUN pip3 install --upgrade pip
 RUN pip3 install pyyaml jinja2 cython numpy msgpack-python pydot nose nose2
 RUN echo "Autobuild::Package['cdff/CDFF'].define 'USE_BUNDLED_DEPENDENCIES', 'OFF'" >> autoproj/overrides.rb
 
-RUN bash -c "source env.sh && autoproj build && rm -rf /tmp/infuse/envire/envire_core/build && rm -rf /tmp/infuse/envire/envire_visualizer/build && rm -rf /tmp/infuse/envire/envire_smurf/build && rm -rf /tmp/infuse/envire/envire_urdf/build && rm -rf /tmp/infuse/external/ogdf/build && rm -rf /tmp/infuse/gui/vizkit3d/build && rm -rf /tmp/infuse/gui/osgviz/build && rm -rf /tmp/infuse/base/types/build"
-
-# TODO remove CDFF(_dev) and clone them in .gitlab-ci.yml
+RUN bash -c "source env.sh && autoproj build" \
+  && rm -rf /tmp/infuse/envire/envire_core/build \
+  && rm -rf /tmp/infuse/envire/envire_visualizer/build \
+  && rm -rf /tmp/infuse/envire/envire_smurf/build \
+  && rm -rf /tmp/infuse/envire/envire_urdf/build \
+  && rm -rf /tmp/infuse/external/ogdf/build \
+  && rm -rf /tmp/infuse/gui/vizkit3d/build \
+  && rm -rf /tmp/infuse/gui/osgviz/build \
+  && rm -rf /tmp/infuse/base/types/build \
+  && rm -rf /tmp/infuse/cdff/CDFF_dev
