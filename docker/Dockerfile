@@ -1,4 +1,4 @@
-FROM nexus.spaceapplications.com/repository/infuse/cdff-ci:1.8.2
+FROM nexus.spaceapplications.com/repository/infuse/cdff-ci:1.8
 
 RUN apt-get update && apt-get install -y \
   python3 \
@@ -49,7 +49,7 @@ RUN echo "Autobuild.env_push_path 'RUBYLIB', File.join(Autoproj.root_dir, 'autop
 RUN git config --global user.email infuse@example.com
 RUN git config --global user.name InFuse
 
-RUN bash -c "source env.sh && autoproj update && echo done"
+RUN bash -c "source env.sh && autoproj update"
 
 RUN rm /root/.gitconfig
 
