@@ -12,5 +12,7 @@ fetch_test:
       - cd build_tools/ && ./get_cdff_artifacts.sh && cd ../
       - source /tmp/infuse/env.sh
       - export CDFFPATH="${PWD}/CDFF"
+      - ln -s ${PWD} /tmp/infuse/cdff/CDFF_dev
+      - cd /tmp/infuse/cdff/CDFF_dev
       - amake
       - nosetests -sv cdff_dev/test test/
