@@ -24,11 +24,6 @@ RUN apt-get update && apt-get install -y \
   ruby-dev \
   sudo
 
-# See Romain's comments
-# https://gitlab.spaceapplications.com/InFuse/cdff-buildconf/issues/4#note_11668
-RUN git config --global user.email infuse@example.com
-RUN git config --global user.name InFuse
-
 RUN mkdir -p -m 700 /root/.ssh/
 RUN ssh-keyscan gitlab.spaceapplications.com >> /root/.ssh/known_hosts
 
@@ -50,7 +45,13 @@ RUN mkdir -p autoproj/esrocos
 RUN mv esrocos_autoproj.rb autoproj/esrocos
 RUN echo "Autobuild.env_push_path 'RUBYLIB', File.join(Autoproj.root_dir, 'autoproj', 'esrocos')" >> autoproj/init.rb
 
+# Autoproj needs these to be defined (will be removed later):
+RUN git config --global user.email infuse@example.com
+RUN git config --global user.name InFuse
+
 RUN bash -c "source env.sh && autoproj update && echo done"
+
+RUN rm /root/.gitconfig
 
 RUN pip3 install --upgrade pip
 RUN pip3 install pyyaml jinja2 cython numpy msgpack-python pydot nose nose2
