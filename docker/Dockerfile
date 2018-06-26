@@ -23,6 +23,8 @@ RUN apt-get update && apt-get install -y \
   ruby \
   ruby-dev \
   sudo
+RUN pip3 install --upgrade pip
+RUN pip3 install pyyaml jinja2 cython numpy msgpack-python pydot nose nose2
 
 RUN mkdir -p -m 700 /root/.ssh/
 RUN ssh-keyscan gitlab.spaceapplications.com >> /root/.ssh/known_hosts
@@ -37,8 +39,6 @@ RUN ruby autoproj_bootstrap git https://cdff-dev:cdff-dev@gitlab.spaceapplicatio
 ADD 00_ci_user.yml /tmp/infuse/autoproj/overrides.d/
 ADD manifest /tmp/infuse/autoproj/
 
-RUN mkdir -p /root/.ssh/
-
 # Workaround for error in ESROCOS' package set
 RUN wget https://raw.githubusercontent.com/ESROCOS/buildconf/orbital/esrocos/esrocos_autoproj.rb
 RUN mkdir -p autoproj/esrocos
@@ -51,13 +51,25 @@ RUN git config --global user.name InFuse
 
 RUN bash -c "source env.sh && autoproj update"
 
-RUN rm /root/.gitconfig
-
-RUN pip3 install --upgrade pip
-RUN pip3 install pyyaml jinja2 cython numpy msgpack-python pydot nose nose2
 RUN echo "Autobuild::Package['cdff/CDFF'].define 'USE_BUNDLED_DEPENDENCIES', 'OFF'" >> autoproj/overrides.rb
 
+# Boost must be reinstalled because we need boost serialization
+RUN rm -rf /usr/local/include/boost /usr/local/lib/libboost_*.so*
+RUN bash -c "source env.sh && autoproj build cdff/external/boost" \
+  && rm -rf /tmp/infuse/cdff/external/boost
+
+# Install direct dependencies of CDFF_dev
 RUN bash -c "source env.sh && autoproj build" \
+  && rm -rf /tmp/infuse/cdff/CDFF_dev
+
+# Fix missing pkg-config files
+RUN mkdir -p /tmp/infuse/install/lib/pkgconfig/
+ADD pcl_registration-1.8.pc /tmp/infuse/install/lib/pkgconfig/
+ADD pcl_features-1.8.pc /tmp/infuse/install/lib/pkgconfig/
+ADD pcl_2d-1.8.pc /tmp/infuse/install/lib/pkgconfig/
+
+# Install EnviRe visualizer because it is not yet in the master branch
+RUN bash -c "source env.sh && autoproj build envire/envire_visualizer" \
   && rm -rf /tmp/infuse/envire/envire_core/build \
   && rm -rf /tmp/infuse/envire/envire_visualizer/build \
   && rm -rf /tmp/infuse/envire/envire_smurf/build \
@@ -65,5 +77,7 @@ RUN bash -c "source env.sh && autoproj build" \
   && rm -rf /tmp/infuse/external/ogdf/build \
   && rm -rf /tmp/infuse/gui/vizkit3d/build \
   && rm -rf /tmp/infuse/gui/osgviz/build \
-  && rm -rf /tmp/infuse/base/types/build \
-  && rm -rf /tmp/infuse/cdff/CDFF_dev
+  && rm -rf /tmp/infuse/base/types/build
+
+# Reset git configuration
+RUN rm /root/.gitconfig
