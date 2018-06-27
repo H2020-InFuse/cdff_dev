@@ -4,7 +4,6 @@ RUN apt-get update && apt-get install -y \
   python3 \
   python3-dev \
   python3-pip \
-  python3-pyqt4 \
   autoconf \
   automake \
   freeglut3-dev \
@@ -23,6 +22,8 @@ RUN apt-get update && apt-get install -y \
   ruby \
   ruby-dev \
   sudo
+# removed:
+#  python3-pyqt4 \
 RUN pip3 install --upgrade pip
 RUN pip3 install pyyaml jinja2 cython numpy msgpack-python pydot nose nose2
 
@@ -30,46 +31,46 @@ RUN mkdir -p -m 700 /root/.ssh/
 RUN ssh-keyscan gitlab.spaceapplications.com >> /root/.ssh/known_hosts
 
 # Prepare non-interactive autoproj setup with CI user
-RUN mkdir -p /tmp/infuse/.autoproj
 WORKDIR /tmp/infuse
-ADD config.yml /tmp/infuse/.autoproj
-RUN wget http://www.rock-robotics.org/autoproj_bootstrap
-ENV AUTOPROJ_BOOTSTRAP_IGNORE_NONEMPTY_DIR 1
-RUN ruby autoproj_bootstrap git https://cdff-dev:cdff-dev@gitlab.spaceapplications.com/InFuse/cdff-buildconf.git branch=cdff_dev
-ADD 00_ci_user.yml /tmp/infuse/autoproj/overrides.d/
-ADD manifest /tmp/infuse/autoproj/
+COPY config.yml /tmp/infuse/.autoproj/
+RUN wget http://www.rock-robotics.org/autoproj_bootstrap --directory-prefix=/tmp/infuse/
+RUN AUTOPROJ_BOOTSTRAP_IGNORE_NONEMPTY_DIR=1 ruby autoproj_bootstrap git https://cdff-dev:cdff-dev@gitlab.spaceapplications.com/InFuse/cdff-buildconf.git branch=cdff_dev
+COPY 00_ci_user.yml /tmp/infuse/autoproj/overrides.d/
+COPY manifest /tmp/infuse/autoproj/
 
-# Workaround for error in ESROCOS' package set
-RUN wget https://raw.githubusercontent.com/ESROCOS/buildconf/orbital/esrocos/esrocos_autoproj.rb
-RUN mkdir -p autoproj/esrocos
-RUN mv esrocos_autoproj.rb autoproj/esrocos
+# Temporary workaround for error in ESROCOS' package set.
+RUN mkdir -p /tmp/infuse/autoproj/esrocos
+RUN wget https://raw.githubusercontent.com/ESROCOS/buildconf/orbital/esrocos/esrocos_autoproj.rb --directory-prefix=/tmp/infuse/autoproj/esrocos/
 RUN echo "Autobuild.env_push_path 'RUBYLIB', File.join(Autoproj.root_dir, 'autoproj', 'esrocos')" >> autoproj/init.rb
 
 # Autoproj needs these to be defined (will be removed later):
-RUN git config --global user.email infuse@example.com
-RUN git config --global user.name InFuse
+RUN git config --global user.email infuse@example.com \
+  && git config --global user.name InFuse
 
-RUN bash -c "source env.sh && autoproj update"
+SHELL ["/bin/bash", "-c"]
 
+RUN source env.sh && autoproj update
+
+# We use CDFF's preinstalled dependencies.
 RUN echo "Autobuild::Package['cdff/CDFF'].define 'USE_BUNDLED_DEPENDENCIES', 'OFF'" >> autoproj/overrides.rb
 
-# Boost must be reinstalled because we need boost serialization
-RUN rm -rf /usr/local/include/boost /usr/local/lib/libboost_*.so*
-RUN bash -c "source env.sh && autoproj build cdff/external/boost" \
+# Boost must be reinstalled because we need boost serialization.
+# NOTE: This is a temporary workaround.
+RUN rm -rf /usr/local/include/boost /usr/local/lib/libboost_*.so* \
+  && source env.sh && autoproj build cdff/external/boost \
+  && mv /tmp/infuse/install/include/boost/ /usr/local/include/ \
+  && mv /tmp/infuse/install/lib/libboost_*.so* /usr/local/lib/ \
   && rm -rf /tmp/infuse/cdff/external/boost
 
 # Install direct dependencies of CDFF_dev
-RUN bash -c "source env.sh && autoproj build" \
+RUN source env.sh && autoproj build \
   && rm -rf /tmp/infuse/cdff/CDFF_dev
 
 # Fix missing pkg-config files
-RUN mkdir -p /tmp/infuse/install/lib/pkgconfig/
-ADD pcl_registration-1.8.pc /tmp/infuse/install/lib/pkgconfig/
-ADD pcl_features-1.8.pc /tmp/infuse/install/lib/pkgconfig/
-ADD pcl_2d-1.8.pc /tmp/infuse/install/lib/pkgconfig/
+COPY pcl_registration-1.8.pc pcl_features-1.8.pc pcl_2d-1.8.pc /tmp/infuse/install/lib/pkgconfig/
 
 # Install EnviRe visualizer because it is not yet in the master branch
-RUN bash -c "source env.sh && autoproj build envire/envire_visualizer" \
+RUN source env.sh && autoproj build envire/envire_visualizer \
   && rm -rf /tmp/infuse/envire/envire_core/build \
   && rm -rf /tmp/infuse/envire/envire_visualizer/build \
   && rm -rf /tmp/infuse/envire/envire_smurf/build \
@@ -81,3 +82,8 @@ RUN bash -c "source env.sh && autoproj build envire/envire_visualizer" \
 
 # Reset git configuration
 RUN rm /root/.gitconfig
+
+WORKDIR /
+
+LABEL maintainer="Alexander.Fabisch@dfki.de"
+#LABEL version="1.8.6"
