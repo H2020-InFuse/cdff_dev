@@ -21,14 +21,13 @@ RUN apt-get update && apt-get install -y \
   pkg-config \
   ruby \
   ruby-dev \
-  sudo
-# removed:
-#  python3-pyqt4 \
+  sudo \
+  python3-pyqt4
 RUN pip3 install --upgrade pip
 RUN pip3 install pyyaml jinja2 cython numpy msgpack-python pydot nose nose2
 
-RUN mkdir -p -m 700 /root/.ssh/
-RUN ssh-keyscan gitlab.spaceapplications.com >> /root/.ssh/known_hosts
+RUN mkdir -p -m 700 /root/.ssh/ && \
+  ssh-keyscan gitlab.spaceapplications.com >> /root/.ssh/known_hosts
 
 # Prepare non-interactive autoproj setup with CI user
 WORKDIR /tmp/infuse
@@ -39,9 +38,9 @@ COPY 00_ci_user.yml /tmp/infuse/autoproj/overrides.d/
 COPY manifest /tmp/infuse/autoproj/
 
 # Temporary workaround for error in ESROCOS' package set.
-RUN mkdir -p /tmp/infuse/autoproj/esrocos
-RUN wget https://raw.githubusercontent.com/ESROCOS/buildconf/orbital/esrocos/esrocos_autoproj.rb --directory-prefix=/tmp/infuse/autoproj/esrocos/
-RUN echo "Autobuild.env_push_path 'RUBYLIB', File.join(Autoproj.root_dir, 'autoproj', 'esrocos')" >> autoproj/init.rb
+#RUN mkdir -p /tmp/infuse/autoproj/esrocos
+#RUN wget https://raw.githubusercontent.com/ESROCOS/buildconf/orbital/esrocos/esrocos_autoproj.rb --directory-prefix=/tmp/infuse/autoproj/esrocos/
+#RUN echo "Autobuild.env_push_path 'RUBYLIB', File.join(Autoproj.root_dir, 'autoproj', 'esrocos')" >> autoproj/init.rb
 
 # Autoproj needs these to be defined (will be removed later):
 RUN git config --global user.email infuse@example.com \
@@ -56,11 +55,11 @@ RUN echo "Autobuild::Package['cdff/CDFF'].define 'USE_BUNDLED_DEPENDENCIES', 'OF
 
 # Boost must be reinstalled because we need boost serialization.
 # NOTE: This is a temporary workaround.
-RUN rm -rf /usr/local/include/boost /usr/local/lib/libboost_*.so* \
-  && source env.sh && autoproj build cdff/external/boost \
-  && mv /tmp/infuse/install/include/boost/ /usr/local/include/ \
-  && mv /tmp/infuse/install/lib/libboost_*.so* /usr/local/lib/ \
-  && rm -rf /tmp/infuse/cdff/external/boost
+# rm -rf /usr/local/include/boost /usr/local/lib/libboost_*.so*
+# rm -rf /tmp/infuse/cdff/external/boost
+RUN source env.sh && autoproj build cdff/external/boost \
+  && mv -f /tmp/infuse/install/include/boost/* /usr/local/include/boost/ \
+  && mv /tmp/infuse/install/lib/libboost_*.so* /usr/local/lib/
 
 # Install direct dependencies of CDFF_dev
 RUN source env.sh && autoproj build \
@@ -81,9 +80,10 @@ RUN source env.sh && autoproj build envire/envire_visualizer \
   && rm -rf /tmp/infuse/base/types/build
 
 # Reset git configuration
-RUN rm /root/.gitconfig
+#RUN rm /root/.gitconfig
 
 WORKDIR /
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
 #LABEL version="1.8.6"
+#LABEL description="Image providing the dependencies of CDFF-dev for continuous integration"
