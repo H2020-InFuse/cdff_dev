@@ -78,6 +78,7 @@ class DataFlowControl:
         self.node_facade = None
 
         self.last_timestamp = None
+        self.real_start_time = None
 
     def setup(self):
         """Setup network.
