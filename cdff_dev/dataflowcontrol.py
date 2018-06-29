@@ -158,9 +158,9 @@ class DataFlowControl:
         stream_name : str
             Name of the stream in the form 'node.port'.
 
-        sample : anything
+        sample : CDFF type
             Current sample. The type must correspond to the connected input
-            port.
+            port. Only CDFF types are allowed.
         """
         self._run_all_nodes_before(timestamp)
 
