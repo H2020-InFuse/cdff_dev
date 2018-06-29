@@ -154,7 +154,7 @@ class DataFlowControl:
         ----------
         timestamp : int
             Current time from the log data. Note that timestamps must be
-            greater than or equal 0.
+            greater than or equal 0 and must be given in microseconds.
 
         stream_name : str
             Name of the stream in the form 'node.port'.
@@ -176,7 +176,7 @@ class DataFlowControl:
             if self._last_timestamp is not None:
                 processing_time = time.time() - self._real_start_time
                 time_between_samples = float(
-                    timestamp - self._last_timestamp) / 1000000.0
+                    timestamp - self._last_timestamp) / 1e6
                 sleep_time = time_between_samples - processing_time
                 if sleep_time > 0:
                     time.sleep(sleep_time)
