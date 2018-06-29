@@ -75,10 +75,10 @@ class DataFlowControl:
         self.result_ports_ = None
         self.connection_map_ = None
 
-        self.node_facade = None
+        self._node_facade = None
 
-        self.last_timestamp = None
-        self.real_start_time = None
+        self._last_timestamp = None
+        self._real_start_time = None
 
     def setup(self):
         """Setup network.
@@ -87,12 +87,12 @@ class DataFlowControl:
         class. Initializes internal data structures and configures nodes.
         """
         self.node_statistics_ = NodeStatistics()
-        self.node_facade = NodeFacade(self.nodes, self.verbose)
-        self.node_facade.configure_all()
+        self._node_facade = NodeFacade(self.nodes, self.verbose)
+        self._node_facade.configure_all()
         self._cache_ports()
         self._configure_periods()
         self._configure_connections()
-        self.last_timestamp = None
+        self._last_timestamp = None
 
     def set_visualization(self, visualization):
         """Set visualization.
@@ -113,14 +113,14 @@ class DataFlowControl:
         self.result_ports_ = defaultdict(list)
 
         for output_port, input_port in self.connections:
-            node_name, port_name, port_exists = self.node_facade.check_port(
+            node_name, port_name, port_exists = self._node_facade.check_port(
                 output_port, "Output")
             if port_exists:
                 self.output_ports_[node_name].append(port_name)
             else:
                 self.log_ports_[node_name].append(port_name)
 
-            node_name, port_name, port_exists = self.node_facade.check_port(
+            node_name, port_name, port_exists = self._node_facade.check_port(
                 input_port, "Input")
             if port_exists:
                 self.input_ports_[node_name].append(port_name)
@@ -129,17 +129,17 @@ class DataFlowControl:
 
     def _configure_periods(self):
         """Check and save periods for nodes."""
-        if set(self.node_facade.node_names()) != set(self.periods.keys()):
+        if set(self._node_facade.node_names()) != set(self.periods.keys()):
             raise ValueError(
                 "Mismatch between nodes and periods. Nodes: %s, periods: %s"
-                % (sorted(self.node_facade.node_names()),
+                % (sorted(self._node_facade.node_names()),
                    sorted(self.periods.keys())))
 
         self.periods_microseconds = {
             node_name: max(int(1e6 * period), 1)
             for node_name, period in self.periods.items()}
         self.last_processed = {
-            node: -1 for node in self.node_facade.node_names()}
+            node: -1 for node in self._node_facade.node_names()}
 
     def _configure_connections(self):
         """Initialize connections."""
@@ -165,18 +165,18 @@ class DataFlowControl:
         """
         self._run_all_nodes_before(timestamp)
 
-        if self.real_time and self.last_timestamp is not None:
-            self.real_start_time = time.time()
+        if self.real_time and self._last_timestamp is not None:
+            self._real_start_time = time.time()
 
         if self.visualization is not None:
             self.visualization.report_node_output(
                 stream_name, sample, timestamp)
 
-        if self.real_time and self.last_timestamp is not None:
-            if self.last_timestamp is not None:
-                processing_time = time.time() - self.real_start_time
+        if self.real_time and self._last_timestamp is not None:
+            if self._last_timestamp is not None:
+                processing_time = time.time() - self._real_start_time
                 time_between_samples = float(
-                    timestamp - self.last_timestamp) / 1000000.0
+                    timestamp - self._last_timestamp) / 1000000.0
                 sleep_time = time_between_samples - processing_time
                 if sleep_time > 0:
                     time.sleep(sleep_time)
@@ -188,7 +188,7 @@ class DataFlowControl:
         self._push_input(stream_name, sample)
 
         if self.real_time:
-            self.last_timestamp = timestamp
+            self._last_timestamp = timestamp
 
     def process(self, timestamp):
         """Runs all nodes until a specific timestamp.
@@ -218,12 +218,12 @@ class DataFlowControl:
                 changed = True
                 self.last_processed[current_node] = timestamp_before_process
 
-                self.node_facade.set_time(
+                self._node_facade.set_time(
                     current_node, timestamp_before_process)
 
                 start_time = time.process_time()
 
-                self.node_facade.process(current_node)
+                self._node_facade.process(current_node)
 
                 end_time = time.process_time()
                 processing_time = end_time - start_time
@@ -273,7 +273,7 @@ class DataFlowControl:
         for port_name in self.output_ports_[node_name]:
             if self.verbose >= 1:
                 print("[DataFlowControl] getting %s" % port_name)
-            sample = self.node_facade.read_output_port(node_name, port_name)
+            sample = self._node_facade.read_output_port(node_name, port_name)
             outputs[node_name + "." + port_name] = sample
         return outputs
 
@@ -285,7 +285,7 @@ class DataFlowControl:
                     print("[DataFlowControl] setting %s" % input_port)
                 input_node_name, input_port_name = input_port.split(".")
                 if input_node_name in self.input_ports_:
-                    self.node_facade.write_input_port(
+                    self._node_facade.write_input_port(
                         input_node_name, input_port_name, sample)
                 elif input_node_name in self.result_ports_:
                     pass  # TODO how should we handle result ports?
