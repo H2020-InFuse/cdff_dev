@@ -26,8 +26,8 @@ class DataFlowControl:
     real_time : bool, optional (default: False)
         Run logs in real time. This is a very simple implementation that
         tries to sleep for the right amount of time before log data is
-        replayed. If any DFN takes longer than allowed this will be slower
-        than real time.
+        replayed. If any DFN takes longer than allowed, the whole processing
+        network will be delayed and slower than real time.
 
     verbose : int, optional (default: 0)
         Verbosity level
