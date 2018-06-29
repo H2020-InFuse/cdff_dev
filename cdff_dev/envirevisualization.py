@@ -205,6 +205,8 @@ class ReplayControlWidget(QWidget):
 
     def update_break(self):
         text = self.break_edit.text()
+        # NOTE: workaround for German style numbers
+        text = text.replace(",", ".")
         try:
             break_length = float(text)
             if break_length < 0:
