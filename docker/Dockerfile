@@ -58,7 +58,8 @@ RUN echo "Autobuild::Package['cdff/CDFF'].define 'USE_BUNDLED_DEPENDENCIES', 'OF
 # rm -rf /usr/local/include/boost /usr/local/lib/libboost_*.so*
 # rm -rf /tmp/infuse/cdff/external/boost
 RUN source env.sh && autoproj build cdff/external/boost \
-  && mv -f /tmp/infuse/install/include/boost/* /usr/local/include/boost/ \
+  && cp -r /tmp/infuse/install/include/boost/ /usr/local/include/ \
+  && rm -rf /tmp/infuse/install/include/boost \
   && mv /tmp/infuse/install/lib/libboost_*.so* /usr/local/lib/
 
 # Install direct dependencies of CDFF_dev
