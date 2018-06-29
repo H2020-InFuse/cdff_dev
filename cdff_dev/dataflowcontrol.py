@@ -324,12 +324,12 @@ class NodeFacade:
     def process(self, node_name):
         self.nodes[node_name].process()
 
-    def set_time(self, node_name, time):
+    def set_time(self, node_name, timestamp):
         node = self.nodes[node_name]
         try:
             # TODO how do we pass the current time to the node?
-            node.set_time(time)
-        except:
+            node.set_time(timestamp)
+        except AttributeError:
             if self.verbose >= 1:
                 print(node_name + ".set_time(time) not implemented")
 
