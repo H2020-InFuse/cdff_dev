@@ -47,6 +47,19 @@ class PointcloudBuilderDummyDFN:
 
 
 def main():
+    log = logloader.load_log(
+        #"test/test_data/logs/test_log.msg"
+        #"infuse.msg"
+        #"xsens.calibrated_sensors.msg"
+        "open_day.msg"
+    )
+    logloader.print_stream_info(log)
+    stream_names = [
+        #"/hokuyo.scans", "/dynamixel.transforms",
+        #"/xsens.calibrated_sensors"
+        "/xsens_imu.calibrated_sensors", "/velodyne.laser_scans"
+    ]
+
     nodes = {
         "laser_filter": LaserFilterDummyDFN(),
         "pointcloud_builder": PointcloudBuilderDummyDFN()
@@ -67,22 +80,14 @@ def main():
         "/dynamixel.transforms": "lower_dynamixel",
         "pointcloud_builder.pointcloud": "body",
 
-        #"/xsens.calibrated_sensors": "body"
+        #"/xsens.calibrated_sensors": "body",
+
+        "/xsens_imu.calibrated_sensors": "body",        
+        "/velodyne.laser_scans": "body",
     }
     urdf_files = [
         "test/test_data/model.urdf"
         #"SeekurJr/urdf/seekurjr.urdf"
-    ]
-
-    log = logloader.load_log(
-        "test/test_data/logs/test_log.msg"
-        #"infuse.msg"
-        #"xsens.calibrated_sensors.msg"
-    )
-    logloader.print_stream_info(log)
-    stream_names = [
-        "/hokuyo.scans", "/dynamixel.transforms",
-        #"/xsens.calibrated_sensors"
     ]
 
     app = envirevisualization.EnvireVisualizerApplication(frames, urdf_files)

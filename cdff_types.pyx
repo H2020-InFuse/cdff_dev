@@ -1177,3 +1177,37 @@ cdef class IMUSensors:
         self.thisptr.mag = deref(value.thisptr)
 
     mag = property(_get_mag, _set_mag)
+
+
+cdef class DepthMap:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_types.asn1SccDepthMap()
+        self.delete_thisptr = True
+
+    def __str__(self):
+        # TODO
+        return str(
+            "{type: DepthMap, ref_time=%s, ...}"
+            % (self.ref_time,))
+
+    def _get_ref_time(self):
+        cdef Time ref_time = Time()
+        del ref_time.thisptr
+        ref_time.thisptr = &self.thisptr.ref_time
+        ref_time.delete_thisptr = False
+        return ref_time
+
+    def _set_ref_time(self, Time ref_time):
+        self.thisptr.ref_time= deref(ref_time.thisptr)
+
+    ref_time = property(_get_ref_time, _set_ref_time)
+
+    # TODO

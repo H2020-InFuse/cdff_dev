@@ -120,3 +120,8 @@ cdef class Joints_elementsReference:
 cdef class IMUSensors:
     cdef _cdff_types.asn1SccIMUSensors* thisptr
     cdef bool delete_thisptr
+
+
+cdef class DepthMap:
+    cdef _cdff_types.asn1SccDepthMap* thisptr
+    cdef bool delete_thisptr

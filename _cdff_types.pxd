@@ -247,3 +247,53 @@ cdef extern from "IMUSensors.h":
         asn1SccVector3d acc
         asn1SccVector3d gyro
         asn1SccVector3d mag
+
+
+cdef extern from "DepthMap.h":
+    cdef enum asn1SccUNIT_AXIS:
+        asn1Sccunit_x
+        asn1Sccunit_y
+        asn1Sccunit_z
+
+
+cdef extern from "DepthMap.h":
+    cdef enum asn1SccDEPTH_MEASUREMENT_STATE:
+        asn1Sccvalid_measurement
+        asn1SccDEPTH_MEASUREMENT_STATE_too_far
+        asn1SccDEPTH_MEASUREMENT_STATE_too_near
+        asn1SccDEPTH_MEASUREMENT_STATE_measurement_error
+
+
+cdef extern from "DepthMap.h":
+    cdef enum asn1SccPROJECTION_TYPE:
+        asn1Sccpolar
+        asn1Sccplanar
+
+
+cdef extern from "DepthMap.h":
+    cdef cppclass asn1SccDepthMap_horizontal_interval:
+        int nCount
+        double arr[60]
+    cdef cppclass asn1SccDepthMap_vertical_interval:
+        int nCount
+        double arr[60]
+    cdef cppclass asn1SccDepthMap_remissions:
+        int nCount
+        double arr[60]
+    cdef cppclass asn1SccDepthMap_distances:
+        int nCount
+        double arr[60]
+    cdef cppclass asn1SccDepthMap_timestamps:
+        int nCount
+        double arr[60]
+    cdef cppclass asn1SccDepthMap:
+        asn1SccTime ref_time
+        asn1SccDepthMap_timestamps timestamps
+        asn1SccPROJECTION_TYPE vertical_projection
+        asn1SccPROJECTION_TYPE horizontal_projection
+        asn1SccDepthMap_vertical_interval vertical_interval
+        asn1SccDepthMap_horizontal_interval horizontal_interval
+        uint32_t vertical_size
+        uint32_t horizontal_size
+        asn1SccDepthMap_distances distances
+        asn1SccDepthMap_remissions remissions
