@@ -55,12 +55,8 @@ RUN echo "Autobuild::Package['cdff/CDFF'].define 'USE_BUNDLED_DEPENDENCIES', 'OF
 
 # Boost must be reinstalled because we need boost serialization.
 # NOTE: This is a temporary workaround.
-# rm -rf /usr/local/include/boost /usr/local/lib/libboost_*.so*
-# rm -rf /tmp/infuse/cdff/external/boost
-RUN source env.sh && autoproj build cdff/external/boost \
-  && cp -r /tmp/infuse/install/include/boost/ /usr/local/include/ \
-  && rm -rf /tmp/infuse/install/include/boost \
-  && mv /tmp/infuse/install/lib/libboost_*.so* /usr/local/lib/
+RUN rm -rf /usr/local/include/boost /usr/local/lib/libboost_*.so* \
+  && source env.sh && autoproj build cdff/external/boost
 
 # Install direct dependencies of CDFF_dev
 RUN source env.sh && autoproj build \
