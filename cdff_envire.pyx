@@ -340,8 +340,6 @@ cdef class GenericItem:
         self.thisptr = new _cdff_envire.GenericItem()
 
     def __dealloc__(self):
-        if self.filled:
-            raise RuntimeError("Item content must be deleted explicitely.")
         del self.thisptr
 
     def __init__(self):
@@ -367,10 +365,6 @@ cdef class GenericItem:
         if not self.filled:
             raise RuntimeError("Item does not have any content.")
         self.thisptr.setTime(content.thisptr, timestamp)
-
-    def delete_item(self, GenericType content):
-        self.thisptr.deleteItem(content.thisptr)
-        self.filled = False
 
 
 cdef class EnvireGraph:
@@ -444,7 +438,6 @@ cdef class EnvireGraph:
 
     def remove_item_from_frame(self, GenericItem item, GenericType content):
         self.thisptr.removeItemFromFrame(item.thisptr.getItem(content.thisptr))
-        item.delete_item(content)
 
     def get_item_count(self, str frame, GenericType item):
         return _cdff_envire.getItemCount(

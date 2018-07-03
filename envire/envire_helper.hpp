@@ -1,6 +1,7 @@
 #include <string>
 #include <stdexcept>
 #include <cstdint>
+#include <cstdio>
 #include <envire_core/items/Item.hpp>
 #include <envire_core/graph/EnvireGraph.hpp>
 #include <envire_urdf/GraphLoader.hpp>
@@ -19,7 +20,6 @@ unsigned getItemCount(
     return graph.getItemCount<typename envire::core::Item<_ItemData> >(frame);
 }
 
-#include <iostream>
 class GenericItem
 {
     envire::core::ItemBase::Ptr item;

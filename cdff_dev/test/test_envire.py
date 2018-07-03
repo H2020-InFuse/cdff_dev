@@ -319,7 +319,6 @@ def test_make_item():
     item.get_data(content2)
     assert_equal(content2.source_frame, "A")
     assert_equal(content2.target_frame, "B")
-    item.delete_item(content)
 
 
 def test_envire_graph_add_remove_frame():
