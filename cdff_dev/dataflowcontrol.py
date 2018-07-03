@@ -67,14 +67,13 @@ class DataFlowControl:
         self.real_time = real_time
         self.verbose = verbose
 
+        self.visualization = None
         self.node_statistics_ = None
         self.output_ports_ = None
         self.input_ports_ = None
         self.log_ports_ = None
         self.result_ports_ = None
         self.connection_map_ = None
-
-        self._visualizations = []
 
         self._node_facade = None
 
@@ -98,30 +97,13 @@ class DataFlowControl:
     def set_visualization(self, visualization):
         """Set visualization.
 
-        Deprecated function, use add_visualization.
-
         Parameters
         ----------
         visualization : subclass of VisualizationBase
             Visualization of replayed log samples or results of processing
             steps
         """
-        self._visualizations = [visualization]
-        warnings.warn(
-            "DataFlowControl.set_visualization is deprecated, use "
-            "DataFlowControl.register_visualization instead.",
-            DeprecationWarning)
-
-    def add_visualization(self, visualization):
-        """Add visualization.
-
-        Parameters
-        ----------
-        visualization : subclass of VisualizationBase
-            Visualization of replayed log samples or results of processing
-            steps
-        """
-        self._visualizations.append(visualization)
+        self.visualization = visualization
 
     def _cache_ports(self):
         """Cache setters and getters for ports."""
@@ -186,9 +168,9 @@ class DataFlowControl:
         if self.real_time and self._last_timestamp is not None:
             self._real_start_time = time.time()
 
-        if self._visualizations:
-            for vis in self._visualizations:
-                vis.report_node_output(stream_name, sample, timestamp)
+        if self.visualization is not None:
+            self.visualization.report_node_output(
+                stream_name, sample, timestamp)
 
         if self.real_time and self._last_timestamp is not None:
             if self._last_timestamp is not None:
@@ -253,12 +235,11 @@ class DataFlowControl:
 
                 outputs = self._pull_output(current_node)
 
-                if self._visualizations:
-                    for vis in self._visualizations:
-                        for port_name, sample in outputs.items():
-                            # TODO should we add the processing time?
-                            vis.report_node_output(
-                                port_name, sample, timestamp_before_process)
+                if self.visualization is not None:
+                    for port_name, sample in outputs.items():
+                        # TODO should we add the processing time?
+                        self.visualization.report_node_output(
+                            port_name, sample, timestamp_before_process)
 
                 for port_name, sample in outputs.items():
                     self._push_input(port_name, sample)
