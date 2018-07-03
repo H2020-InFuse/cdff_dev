@@ -83,11 +83,6 @@ public:
     {
         return item->getID();
     }
-
-    template <class _ItemData>
-    void deleteItem(_ItemData* content)
-    {
-    }
 };
 
 template <typename T>

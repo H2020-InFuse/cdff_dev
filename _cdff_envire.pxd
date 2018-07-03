@@ -158,7 +158,6 @@ cdef extern from "envire_helper.hpp":
         void setData[_ItemData](_ItemData* content)
         void setTime[_ItemData](_ItemData* content, int64_t timestamp)
         shared_ptr[Item[_ItemData]] getItem[_ItemData](_ItemData* content)
-        void deleteItem[_ItemData](_ItemData* content)
     void addItemToFrame[_ItemData](
         EnvireGraph& graph, const string& frame, _ItemData* contentPtr) except +
     unsigned getItemCount[_ItemData](
