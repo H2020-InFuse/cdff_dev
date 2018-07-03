@@ -95,17 +95,15 @@ class WorldState:
     def __init__(self, frames, urdf_files):
         self.frames = frames
         self.items = dict()
-        self.samples = dict()
         self.graph_ = cdff_envire.EnvireGraph()
         for filename in urdf_files:
             cdff_envire.load_urdf(self.graph_, filename)
         for frame in self.frames.values():
             if not self.graph_.contains_frame(frame):
                 self.graph_.add_frame(frame)
-        self.items_initialized = True
 
     def __del__(self):
-        if self.items_initialized:
+        if self.items:
             self.remove_all_items()
         del self.graph_
 
@@ -115,30 +113,49 @@ class WorldState:
         This has to be done manually before any attached visualizer is deleted.
         """
         for port_name in self.items.keys():
-            self.graph_.remove_item_from_frame(
-                self.items[port_name], self.samples[port_name])
-        self.items_initialized = False
+            self.items[port_name].remove_from(self.graph_)
+        self.items = {}
 
     def report_node_output(self, port_name, sample, timestamp):
         if port_name not in self.frames:
             warnings.warn("No frame registered for port '%s'" % port_name)
             return
 
-        self.samples[port_name] = sample
-
         if port_name in self.items:
-            item = self.items[port_name]
-            item.set_data(sample)
+            self.items[port_name].set_data(sample)
         else:
-            item = cdff_envire.GenericItem()
-            self.items[port_name] = item
+            self.items[port_name] = EnvireItem(sample)
             try:
-                self.graph_.add_item_to_frame(
-                    self.frames[port_name], item, sample)
+                self.items[port_name].add_to(
+                    self.graph_, self.frames[port_name])
             except TypeError as e:
                 warnings.warn("Cannot store type '%s' in EnviRe graph. "
                               "Reason: %s" % (type(sample), e))
-        item.set_time(sample, timestamp)
+        self.items[port_name].set_time(timestamp)
+
+
+class EnvireItem:
+    """Stores an EnviRe item with its corresponding content.
+
+    NOTE: This is a hack that is required to identify the correct
+    template type.
+    """
+    def __init__(self, sample):
+        self.sample = sample
+        self.item = cdff_envire.GenericItem()
+
+    def set_data(self, sample):
+        self.item.set_data(sample)
+        self.sample = sample
+
+    def set_time(self, timestamp):
+        self.item.set_time(self.sample, timestamp)
+
+    def add_to(self, graph, frame):
+        graph.add_item_to_frame(frame, self.item, self.sample)
+
+    def remove_from(self, graph):
+        graph.remove_item_from_frame(self.item, self.sample)
 
 
 class ReplayMainWindow(QMainWindow):
