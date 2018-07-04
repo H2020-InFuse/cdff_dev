@@ -103,6 +103,7 @@ def configuration(parent_package='', top_path=None):
             numpy.get_include(),
             os.path.join(install_dir, "include"),
             os.path.join(install_dir, "include", "eigen3"),
+            "/usr/local/include/eigen3",  # HACK: only for CI
             ctypespath
         ],
         library_dirs=[

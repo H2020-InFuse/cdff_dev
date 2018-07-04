@@ -1,4 +1,4 @@
-image: h2020infuse/cdff-dev-ci:1.8.3
+image: h2020infuse/cdff-dev-ci:1.8.4
 
 stages:
   - fetch_test
@@ -10,5 +10,5 @@ fetch_test:
       - git config --global user.name InFuse
       - source /tmp/infuse/env.sh
       - export CDFFPATH="/tmp/infuse/cdff/CDFF"
-      - amake
+      - python3 setup.py build_ext -i
       - nosetests -sv cdff_dev/test/ test/
