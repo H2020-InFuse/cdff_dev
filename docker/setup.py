@@ -102,7 +102,7 @@ def configuration(parent_package='', top_path=None):
             "envire",
             numpy.get_include(),
             os.path.join(install_dir, "include"),
-            "/usr/local/include",
+            "/usr/local/include/eigen3",
             ctypespath
         ],
         library_dirs=[
