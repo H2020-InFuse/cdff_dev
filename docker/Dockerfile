@@ -37,11 +37,6 @@ RUN AUTOPROJ_BOOTSTRAP_IGNORE_NONEMPTY_DIR=1 ruby autoproj_bootstrap git https:/
 COPY 00_ci_user.yml /tmp/infuse/autoproj/overrides.d/
 COPY manifest /tmp/infuse/autoproj/
 
-# Temporary workaround for error in ESROCOS' package set.
-#RUN mkdir -p /tmp/infuse/autoproj/esrocos
-#RUN wget https://raw.githubusercontent.com/ESROCOS/buildconf/orbital/esrocos/esrocos_autoproj.rb --directory-prefix=/tmp/infuse/autoproj/esrocos/
-#RUN echo "Autobuild.env_push_path 'RUBYLIB', File.join(Autoproj.root_dir, 'autoproj', 'esrocos')" >> autoproj/init.rb
-
 # Autoproj needs these to be defined (will be removed later):
 RUN git config --global user.email infuse@example.com \
   && git config --global user.name InFuse
