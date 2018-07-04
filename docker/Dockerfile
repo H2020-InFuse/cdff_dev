@@ -53,33 +53,31 @@ RUN source env.sh && autoproj update
 # We use CDFF's preinstalled dependencies.
 RUN echo "Autobuild::Package['cdff/CDFF'].define 'USE_BUNDLED_DEPENDENCIES', 'OFF'" >> autoproj/overrides.rb
 
-# Boost must be reinstalled because we need boost serialization.
-# NOTE: This is a temporary workaround.
-RUN rm -rf /usr/local/include/boost /usr/local/lib/libboost_*.so* \
-  && source env.sh && autoproj build cdff/external/boost
+# Fix missing pkg-config files
+COPY pcl_registration-1.8.pc pcl_features-1.8.pc pcl_2d-1.8.pc /tmp/infuse/install/lib/pkgconfig/
+
+# Workaround for Eigen include directory
+COPY setup.py /tmp/infuse/cdff/CDFF_dev/
 
 # Install direct dependencies of CDFF_dev
 RUN source env.sh && autoproj build \
   && rm -rf /tmp/infuse/cdff/CDFF_dev
 
-# Fix missing pkg-config files
-COPY pcl_registration-1.8.pc pcl_features-1.8.pc pcl_2d-1.8.pc /tmp/infuse/install/lib/pkgconfig/
-
 # Install EnviRe visualizer because it is not yet in the master branch
-RUN source env.sh && autoproj build envire/envire_visualizer \
-  && rm -rf /tmp/infuse/envire/envire_core/build \
-  && rm -rf /tmp/infuse/envire/envire_visualizer/build \
-  && rm -rf /tmp/infuse/envire/envire_smurf/build \
-  && rm -rf /tmp/infuse/envire/envire_urdf/build \
-  && rm -rf /tmp/infuse/external/ogdf/build \
-  && rm -rf /tmp/infuse/gui/vizkit3d/build \
-  && rm -rf /tmp/infuse/gui/osgviz/build \
-  && rm -rf /tmp/infuse/base/types/build
+#RUN source env.sh && autoproj build envire/envire_visualizer \
+#  && rm -rf /tmp/infuse/envire/envire_core/build \
+#  && rm -rf /tmp/infuse/envire/envire_visualizer/build \
+#  && rm -rf /tmp/infuse/envire/envire_smurf/build \
+#  && rm -rf /tmp/infuse/envire/envire_urdf/build \
+#  && rm -rf /tmp/infuse/external/ogdf/build \
+#  && rm -rf /tmp/infuse/gui/vizkit3d/build \
+#  && rm -rf /tmp/infuse/gui/osgviz/build \
+#  && rm -rf /tmp/infuse/base/types/build
 
 # Reset git configuration
 #RUN rm /root/.gitconfig
 
-WORKDIR /
+#WORKDIR /
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
 #LABEL version="1.8.6"
