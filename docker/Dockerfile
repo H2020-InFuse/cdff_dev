@@ -57,9 +57,15 @@ COPY setup.py /tmp/infuse/cdff/CDFF_dev/
 # Install direct dependencies of CDFF_dev
 RUN source env.sh && autoproj build \
   && mv /tmp/infuse/cdff/CDFF/Common/Types /tmp/ \
+  && mv /tmp/infuse/cdff/CDFF/DFNs/DFNCommonInterface.hpp /tmp/ \
+  && mv /tmp/infuse/cdff/CDFF/DFPCs/DFPCCommonInterface.hpp /tmp/ \
   && rm -rf /tmp/infuse/cdff/ \
   && mkdir -p /tmp/infuse/cdff/CDFF/Common/ \
+  && mkdir -p /tmp/infuse/cdff/CDFF/DFNs/ \
+  && mkdir -p /tmp/infuse/cdff/CDFF/DFPCs/ \
   && mv /tmp/Types /tmp/infuse/cdff/CDFF/Common/ \
+  && mv /tmp/DFNCommonInterface.hpp /tmp/infuse/cdff/CDFF/DFNs/ \
+  && mv /tmp/DFPCCommonInterface.hpp /tmp/infuse/cdff/CDFF/DFPCs/ \
   && rm -rf /tmp/infuse/install/lib/python3.5/site-packages/* \
   && rm -rf /tmp/infuse/install/bin/*_template_generator \
   && rm -rf /tmp/infuse/autoproj \
