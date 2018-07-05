@@ -125,3 +125,23 @@ cdef class IMUSensors:
 cdef class DepthMap:
     cdef _cdff_types.asn1SccDepthMap* thisptr
     cdef bool delete_thisptr
+
+
+cdef class DepthMap_timestampsReference:
+    cdef _cdff_types.asn1SccDepthMap_timestamps* thisptr
+
+
+cdef class DepthMap_vertical_intervalReference:
+    cdef _cdff_types.asn1SccDepthMap_vertical_interval* thisptr
+
+
+cdef class DepthMap_horizontal_intervalReference:
+    cdef _cdff_types.asn1SccDepthMap_horizontal_interval* thisptr
+
+
+cdef class DepthMap_distancesReference:
+    cdef _cdff_types.asn1SccDepthMap_distances* thisptr
+
+
+cdef class DepthMap_remissionsReference:
+    cdef _cdff_types.asn1SccDepthMap_remissions* thisptr

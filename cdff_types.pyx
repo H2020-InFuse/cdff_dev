@@ -1089,6 +1089,9 @@ cdef class Joints_elementsReference:
     def __dealloc__(self):
         pass
 
+    def __len__(self):
+        return self.thisptr.nCount
+
     def __getitem__(self, int i):
         cdef JointState joint_state = JointState()
         joint_state.delete_thisptr = False
@@ -1206,8 +1209,222 @@ cdef class DepthMap:
         return ref_time
 
     def _set_ref_time(self, Time ref_time):
-        self.thisptr.ref_time= deref(ref_time.thisptr)
+        self.thisptr.ref_time = deref(ref_time.thisptr)
 
     ref_time = property(_get_ref_time, _set_ref_time)
 
-    # TODO
+    @property
+    def timestamps(self):
+        cdef DepthMap_timestampsReference timestamps = DepthMap_timestampsReference()
+        timestamps.thisptr = &self.thisptr.timestamps
+        return timestamps
+
+    def _get_vertical_projection(self):
+        return <int> self.thisptr.vertical_projection
+
+    def _set_vertical_projection(self,  int vertical_projection):
+        self.thisptr.vertical_projection = <_cdff_types.asn1SccPROJECTION_TYPE> vertical_projection
+
+    vertical_projection = property(_get_vertical_projection, _set_vertical_projection)
+
+    def _get_horizontal_projection(self):
+        return <int> self.thisptr.horizontal_projection
+
+    def _set_horizontal_projection(self,  int horizontal_projection):
+        self.thisptr.horizontal_projection = <_cdff_types.asn1SccPROJECTION_TYPE> horizontal_projection
+
+    horizontal_projection = property(_get_horizontal_projection, _set_horizontal_projection)
+
+    @property
+    def vertical_interval(self):
+        cdef DepthMap_vertical_intervalReference vertical_interval = DepthMap_vertical_intervalReference()
+        vertical_interval.thisptr = &self.thisptr.vertical_interval
+        return vertical_interval
+
+    @property
+    def horizontal_interval(self):
+        cdef DepthMap_horizontal_intervalReference horizontal_interval = DepthMap_horizontal_intervalReference()
+        horizontal_interval.thisptr = &self.thisptr.horizontal_interval
+        return horizontal_interval
+
+    def _get_vertical_size(self):
+        return self.thisptr.vertical_size
+
+    def _set_vertical_size(self,  uint32_t vertical_size):
+        self.thisptr.vertical_size = vertical_size
+
+    vertical_size = property(_get_vertical_size, _set_vertical_size)
+
+    def _get_horizontal_size(self):
+        return self.thisptr.horizontal_size
+
+    def _set_horizontal_size(self,  uint32_t horizontal_size):
+        self.thisptr.horizontal_size = horizontal_size
+
+    horizontal_size = property(_get_horizontal_size, _set_horizontal_size)
+
+    @property
+    def distances(self):
+        cdef DepthMap_distancesReference distances = DepthMap_distancesReference()
+        distances.thisptr = &self.thisptr.distances
+        return distances
+
+    @property
+    def remissions(self):
+        cdef DepthMap_remissionsReference remissions = DepthMap_remissionsReference()
+        remissions.thisptr = &self.thisptr.remissions
+        return remissions
+
+
+cdef class DepthMap_timestampsReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def __len__(self):
+        return self.thisptr.nCount
+
+    def __getitem__(self, int i):
+        cdef Time time = Time()
+        time.delete_thisptr = False
+        del time.thisptr
+        time.thisptr = &self.thisptr.arr[i]
+        return time
+
+    def __setitem__(self, int i, Time timestamp):
+        if i >= 30000:
+            warnings.warn("Maximum size of DepthMap is 30000")
+            return
+        self.thisptr.arr[i] = deref(timestamp.thisptr)
+
+    def resize(self, int size):
+        if size > 30000:
+            warnings.warn("Maximum size of DepthMap is 30000")
+            return
+        self.thisptr.nCount = size
+
+    def size(self):
+        return self.thisptr.nCount
+
+
+class ProjectionType:
+    POLAR = <int> _cdff_types.asn1Sccpolar
+    PLANAR = <int> _cdff_types.asn1Sccplanar
+
+
+cdef class DepthMap_vertical_intervalReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def __len__(self):
+        return self.thisptr.nCount
+
+    def __getitem__(self, int i):
+        return self.thisptr.arr[i]
+
+    def __setitem__(self, int i, double v):
+        if i >= 30000:
+            warnings.warn("Maximum size of DepthMap is 30000")
+            return
+        self.thisptr.arr[i] = v
+
+    def resize(self, int size):
+        if size > 30000:
+            warnings.warn("Maximum size of DepthMap is 30000")
+            return
+        self.thisptr.nCount = size
+
+    def size(self):
+        return self.thisptr.nCount
+
+
+cdef class DepthMap_horizontal_intervalReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def __len__(self):
+        return self.thisptr.nCount
+
+    def __getitem__(self, int i):
+        return self.thisptr.arr[i]
+
+    def __setitem__(self, int i, double v):
+        if i >= 30000:
+            warnings.warn("Maximum size of DepthMap is 30000")
+            return
+        self.thisptr.arr[i] = v
+
+    def resize(self, int size):
+        if size > 30000:
+            warnings.warn("Maximum size of DepthMap is 30000")
+            return
+        self.thisptr.nCount = size
+
+    def size(self):
+        return self.thisptr.nCount
+
+
+cdef class DepthMap_distancesReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def __len__(self):
+        return self.thisptr.nCount
+
+    def __getitem__(self, int i):
+        return self.thisptr.arr[i]
+
+    def __setitem__(self, int i, double v):
+        if i >= 30000:
+            warnings.warn("Maximum size of DepthMap is 30000")
+            return
+        self.thisptr.arr[i] = v
+
+    def resize(self, int size):
+        if size > 30000:
+            warnings.warn("Maximum size of DepthMap is 30000")
+            return
+        self.thisptr.nCount = size
+
+    def size(self):
+        return self.thisptr.nCount
+
+
+cdef class DepthMap_remissionsReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def __len__(self):
+        return self.thisptr.nCount
+
+    def __getitem__(self, int i):
+        return self.thisptr.arr[i]
+
+    def __setitem__(self, int i, double v):
+        if i >= 30000:
+            warnings.warn("Maximum size of DepthMap is 30000")
+            return
+        self.thisptr.arr[i] = v
+
+    def resize(self, int size):
+        if size > 30000:
+            warnings.warn("Maximum size of DepthMap is 30000")
+            return
+        self.thisptr.nCount = size
+
+    def size(self):
+        return self.thisptr.nCount

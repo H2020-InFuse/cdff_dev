@@ -265,27 +265,31 @@ cdef extern from "DepthMap.h":
 
 
 cdef extern from "DepthMap.h":
-    cdef enum asn1SccPROJECTION_TYPE:
-        asn1Sccpolar
-        asn1Sccplanar
+    cdef cppclass asn1SccPROJECTION_TYPE:
+        pass
+
+
+cdef extern from "DepthMap.h" namespace "asn1SccPROJECTION_TYPE":
+    cdef asn1SccPROJECTION_TYPE asn1Sccpolar
+    cdef asn1SccPROJECTION_TYPE asn1Sccplanar
 
 
 cdef extern from "DepthMap.h":
     cdef cppclass asn1SccDepthMap_horizontal_interval:
         int nCount
-        double arr[60]
+        double arr[30000]
     cdef cppclass asn1SccDepthMap_vertical_interval:
         int nCount
-        double arr[60]
+        double arr[30000]
     cdef cppclass asn1SccDepthMap_remissions:
         int nCount
-        double arr[60]
+        double arr[30000]
     cdef cppclass asn1SccDepthMap_distances:
         int nCount
-        double arr[60]
+        double arr[30000]
     cdef cppclass asn1SccDepthMap_timestamps:
         int nCount
-        double arr[60]
+        asn1SccTime arr[30000]
     cdef cppclass asn1SccDepthMap:
         asn1SccTime ref_time
         asn1SccDepthMap_timestamps timestamps
