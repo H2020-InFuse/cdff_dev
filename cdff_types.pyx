@@ -732,20 +732,20 @@ cdef class LaserScan_remissionReference:
     def __dealloc__(self):
         pass
 
-    def __getitem__(self, int i):
+    def __getitem__(self, uint32_t i):
         return self.thisptr.arr[i]
 
-    def __setitem__(self, int i, float v):
-        if i >= 60:
-            warnings.warn("Maximum size of LaserScan is 60")
+    def __setitem__(self, uint32_t i, float v):
+        if i >= 2000:
+            warnings.warn("Maximum size of LaserScan is %d" % 2000)
             return
         self.thisptr.arr[i] = v
-        if self.thisptr.nCount <= i:
-            self.thisptr.nCount = i + 1
+        if self.thisptr.nCount <= <int> i:
+            self.thisptr.nCount = <int> (i + 1)
 
-    def resize(self, int size):
-        if size > 60:
-            warnings.warn("Maximum size of LaserScan is 60")
+    def resize(self, uint32_t size):
+        if size > 2000:
+            warnings.warn("Maximum size of LaserScan is %d" % 2000)
             return
         self.thisptr.nCount = size
 
@@ -764,20 +764,20 @@ cdef class LaserScan_rangesReference:
     def __dealloc__(self):
         pass
 
-    def __getitem__(self, int i):
+    def __getitem__(self, uint32_t i):
         return self.thisptr.arr[i]
 
-    def __setitem__(self, int i, uint32_t v):
-        if i >= 60:
-            warnings.warn("Maximum size of LaserScan is 60")
+    def __setitem__(self, uint32_t i, uint32_t v):
+        if i >= 2000:
+            warnings.warn("Maximum size of LaserScan is %d" % 2000)
             return
         self.thisptr.arr[i] = v
-        if self.thisptr.nCount <= i:
-            self.thisptr.nCount = i + 1
+        if self.thisptr.nCount <= <int> i:
+            self.thisptr.nCount = <int> (i + 1)
 
-    def resize(self, int size):
-        if size > 60:
-            warnings.warn("Maximum size of LaserScan is 60")
+    def resize(self, uint32_t size):
+        if size > 2000:
+            warnings.warn("Maximum size of LaserScan is %d" % 2000)
             return
         self.thisptr.nCount = size
 

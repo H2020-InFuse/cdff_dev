@@ -171,13 +171,13 @@ cdef extern from "LaserScan.h":
         asn1SccLaserScan_ranges& assign "operator="(asn1SccLaserScan_ranges&)
 
         int nCount
-        int32_t[60] arr
+        int32_t[2000] arr
 
     cdef cppclass asn1SccLaserScan_remission:
         asn1SccLaserScan_remission& assign "operator="(asn1SccLaserScan_remission&)
 
         int nCount
-        float[60] arr
+        float[2000] arr
 
     cdef cppclass asn1SccLaserScan:
         asn1SccLaserScan& assign "operator="(asn1SccLaserScan&)
