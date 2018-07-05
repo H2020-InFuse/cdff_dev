@@ -31,6 +31,7 @@ function unzip_function(){
     fi
 
     echo "Unzipping to $OUTPUT_DIR"
+    mkdir -p $OUTPUT_DIR
     unzip -oq generatedFiles.gz -d $OUTPUT_DIR
     rm generatedFiles.gz
     echo "Done."
@@ -38,7 +39,5 @@ function unzip_function(){
 
 branch_name=master
 download_artifact_function https://gitlab.spaceapplications.com/InFuse/CDFF/-/jobs/artifacts/$branch_name/download?job=autogeneration
-unzip_function ../CDFF/
-download_artifact_function https://gitlab.spaceapplications.com/InFuse/CDFF/-/jobs/artifacts/$branch_name/download?job=build
-unzip_function ../CDFF/
+unzip_function /tmp/infuse/cdff/CDFF/
 

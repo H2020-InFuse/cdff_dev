@@ -6,9 +6,8 @@ stages:
 fetch_test:
   stage : fetch_test
   script:
-      - git config --global user.email infuse@example.com
-      - git config --global user.name InFuse
       - source /tmp/infuse/env.sh
       - export CDFFPATH="/tmp/infuse/cdff/CDFF"
+      - build_tools/ged_cdff_artifacts.sh
       - python3 setup.py build_ext -i
       - nosetests -sv cdff_dev/test/ test/
