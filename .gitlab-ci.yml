@@ -8,6 +8,6 @@ fetch_test:
   script:
       - source /tmp/infuse/env.sh
       - export CDFFPATH="/tmp/infuse/cdff/CDFF"
-      - build_tools/ged_cdff_artifacts.sh
+      - build_tools/get_cdff_artifacts.sh
       - python3 setup.py build_ext -i
       - nosetests -sv cdff_dev/test/ test/
