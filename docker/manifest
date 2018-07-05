@@ -5,3 +5,5 @@ package_sets:
 
 layout:
    - cdff/CDFF_dev
+   - infuse/ASN_Viz
+   - infuse/envire_asn1

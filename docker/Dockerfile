@@ -76,6 +76,8 @@ RUN source env.sh && autoproj build \
   && rm -rf /tmp/infuse/simulation \
   && rm -rf /tmp/infuse/external \
   && rm -rf /tmp/infuse/tools \
+  && rm -rf /tmp/infuse/esrocos \
+  && rm -rf /tmp/infuse/infuse \
   && rm /tmp/infuse/autoproj_bootstrap
 
 # Reset git configuration
