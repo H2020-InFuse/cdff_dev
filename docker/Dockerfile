@@ -56,6 +56,10 @@ COPY setup.py /tmp/infuse/cdff/CDFF_dev/
 
 # Install direct dependencies of CDFF_dev
 RUN source env.sh && autoproj build \
+  && mv /tmp/infuse/cdff/CDFF/Common/Types /tmp/ \
+  && rm -rf /tmp/infuse/cdff/ \
+  && mkdir -p /tmp/infuse/cdff/CDFF/Common/ \
+  && mv /tmp/Types /tmp/infuse/cdff/CDFF/Common/ \
   && rm -rf /tmp/infuse/install/lib/python3.5/site-packages/* \
   && rm -rf /tmp/infuse/install/bin/*_template_generator \
   && rm -rf /tmp/infuse/autoproj \
@@ -64,7 +68,6 @@ RUN source env.sh && autoproj build \
   && rm -rf /tmp/infuse/envire \
   && rm -rf /tmp/infuse/gui \
   && rm -rf /tmp/infuse/simulation \
-  && rm -rf /tmp/infuse/cdff \
   && rm -rf /tmp/infuse/external \
   && rm -rf /tmp/infuse/tools \
   && rm /tmp/infuse/autoproj_bootstrap
