@@ -61,24 +61,24 @@ def main():
     ]
 
     nodes = {
-        "laser_filter": LaserFilterDummyDFN(),
-        "pointcloud_builder": PointcloudBuilderDummyDFN()
+        #"laser_filter": LaserFilterDummyDFN(),
+        #"pointcloud_builder": PointcloudBuilderDummyDFN()
     }
     periods = {
-        "laser_filter": 0.025,
-        "pointcloud_builder": 0.1
+        #"laser_filter": 0.025,
+        #"pointcloud_builder": 0.1
     }
     connections = (
-        ("/hokuyo.scans", "laser_filter.scanSample"),
-        ("laser_filter.filteredScan", "pointcloud_builder.scan"),
-        ("/dynamixel.transforms", "pointcloud_builder.transform"),
-        ("pointcloud_builder.pointcloud", "result.pointcloud")
+        #("/hokuyo.scans", "laser_filter.scanSample"),
+        #("laser_filter.filteredScan", "pointcloud_builder.scan"),
+        #("/dynamixel.transforms", "pointcloud_builder.transform"),
+        #("pointcloud_builder.pointcloud", "result.pointcloud")
     )
     frames = {
-        "/hokuyo.scans": "upper_dynamixel",
-        "laser_filter.filteredScan": "upper_dynamixel",
-        "/dynamixel.transforms": "lower_dynamixel",
-        "pointcloud_builder.pointcloud": "body",
+        #"/hokuyo.scans": "upper_dynamixel",
+        #"laser_filter.filteredScan": "upper_dynamixel",
+        #"/dynamixel.transforms": "lower_dynamixel",
+        #"pointcloud_builder.pointcloud": "body",
 
         #"/xsens.calibrated_sensors": "body",
 

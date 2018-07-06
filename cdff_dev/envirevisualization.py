@@ -111,8 +111,9 @@ class WorldState:
 
         This has to be done manually before any attached visualizer is deleted.
         """
-        for port_name in self.items.keys():
-            self.items[port_name].remove_from(self.graph_)
+        for item in self.items.values():
+            if item is not None:
+                item.remove_from(self.graph_)
         self.items = {}
 
     def report_node_output(self, port_name, sample, timestamp):
@@ -121,15 +122,25 @@ class WorldState:
             return
 
         if port_name in self.items:
-            self.items[port_name].set_data(sample)
+            if self.items[port_name] is None:
+                return
+            else:
+                self.items[port_name].set_data(sample)
         else:
-            self.items[port_name] = EnvireItem(sample)
+            item = EnvireItem(sample)
             try:
-                self.items[port_name].add_to(
-                    self.graph_, self.frames[port_name])
+                item.add_to(self.graph_, self.frames[port_name])
             except TypeError as e:
                 warnings.warn("Cannot store type '%s' in EnviRe graph. "
                               "Reason: %s" % (type(sample), e))
+                self.items[port_name] = None
+                return
+            except ValueError as e:
+                warnings.warn("Cannot store type '%s' in EnviRe graph. "
+                              "Reason: %s" % (type(sample), e))
+                self.items[port_name] = None
+                return
+            self.items[port_name] = item
         self.items[port_name].set_time(timestamp)
 
 

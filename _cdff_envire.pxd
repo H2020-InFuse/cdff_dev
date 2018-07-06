@@ -154,7 +154,7 @@ cdef extern from "envire_core/graph/EnvireGraph.hpp" namespace "envire::core":
 cdef extern from "envire_helper.hpp":
     cdef cppclass GenericItem:
         GenericItem()
-        void initialize[_ItemData](_ItemData* content)
+        void initialize[_ItemData](_ItemData* content) except +
         void setData[_ItemData](_ItemData* content)
         void setTime[_ItemData](_ItemData* content, int64_t timestamp)
         shared_ptr[Item[_ItemData]] getItem[_ItemData](_ItemData* content)

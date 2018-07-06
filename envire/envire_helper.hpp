@@ -35,24 +35,22 @@ public:
     template <class _ItemData>
     void initialize(_ItemData* content)
     {
-        
         std::string name = envire::core::demangleTypeName(typeid(*content));
-        std::string itemname = "envire::core::Item<"+name+">";
+        std::string itemname = "envire::core::Item<" + name + ">";
 
         envire::core::ClassLoader* loader = envire::core::ClassLoader::getInstance();
-            if(loader->hasClass(itemname))
+        if(loader->hasClass(itemname))
+        {
+            if (loader->createEnvireItem(itemname, item))
             {
-                if (loader->createEnvireItem(itemname, item))
-                {
-                    printf("created %s\n",itemname.c_str());
-                    typename envire::core::Item<_ItemData>::Ptr typedPtr = boost::dynamic_pointer_cast< typename envire::core::Item<_ItemData> >(item);
-                    typedPtr->setData(*content);
-                    typedPtr->contentsChanged();
-
-                }
-            }else{
-                printf("no class with name %s found in plugins\n",name.c_str());
+                printf("created %s\n",itemname.c_str());
+                typename envire::core::Item<_ItemData>::Ptr typedPtr = boost::dynamic_pointer_cast< typename envire::core::Item<_ItemData> >(item);
+                typedPtr->setData(*content);
+                typedPtr->contentsChanged();
             }
+        } else {
+            throw std::invalid_argument("no class with name " + name + " found in plugins");
+        }
     }
 
     template <class _ItemData>

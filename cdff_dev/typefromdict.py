@@ -75,8 +75,14 @@ def _assign_element(obj, fieldname, data):
     fieldname = _camel_case_to_snake_case(fieldname)
 
     if not hasattr(obj, fieldname):
-        raise ValueError("Type '%s' has no field with name '%s'"
-                         % (type(obj), fieldname))
+        # HACK for current version of ASN.1 types
+        if fieldname == "ref_time" and hasattr(obj, "timestamp"):
+            fieldname = "timestamp"
+        elif fieldname == "timestamp" and hasattr(obj, "ref_time"):
+            fieldname = "ref_time"
+        else:
+            raise ValueError("Type '%s' has no field with name '%s'"
+                             % (type(obj), fieldname))
 
     field = getattr(obj, fieldname)
     if type(field).__module__ == "cdff_types":
