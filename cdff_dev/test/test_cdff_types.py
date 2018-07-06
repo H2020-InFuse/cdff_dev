@@ -901,3 +901,37 @@ def test_imu_sensors():
     imu.mag[0] = 3.0
     assert_equal(imu.mag[0], 3.0)
 
+
+def test_depth_map():
+    depth_map = cdff_types.DepthMap()
+
+    depth_map.ref_time = cdff_types.Time()
+    depth_map.ref_time.microseconds = 10
+    assert_equal(depth_map.ref_time.microseconds, 10)
+
+    depth_map.distances[0] = 10.0
+    assert_equal(depth_map.distances[0], 10.0)
+
+    depth_map.remissions[0] = 10.0
+    assert_equal(depth_map.remissions[0], 10.0)
+
+    depth_map.vertical_interval[0] = 10.0
+    assert_equal(depth_map.vertical_interval[0], 10.0)
+
+    depth_map.timestamps[0].microseconds = 10
+    assert_equal(depth_map.timestamps[0].microseconds, 10)
+
+    depth_map.horizontal_interval[0] = 10.0
+    assert_equal(depth_map.horizontal_interval[0], 10.0)
+
+    depth_map.vertical_projection = "POLAR"
+    assert_equal(depth_map.vertical_projection , "POLAR")
+
+    depth_map.horizontal_projection = "PLANAR"
+    assert_equal(depth_map.horizontal_projection, "PLANAR")
+
+    depth_map.vertical_size = 10
+    assert_equal(depth_map.vertical_size, 10)
+
+    depth_map.horizontal_size = 10
+    assert_equal(depth_map.horizontal_size, 10)
