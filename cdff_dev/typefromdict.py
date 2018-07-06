@@ -82,7 +82,11 @@ def _assign_element(obj, fieldname, data):
     if type(field).__module__ == "cdff_types":
         _convert(field, data)
     else:
-        setattr(obj, fieldname, data)
+        try:
+            setattr(obj, fieldname, data)
+        except TypeError as e:
+            raise TypeError("Failed to set %s.%s = %s, error message: %s"
+                            % (obj.__class__.__name__, fieldname, data, e))
 
 
 def _camel_case_to_snake_case(name):
