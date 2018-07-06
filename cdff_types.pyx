@@ -1220,18 +1220,34 @@ cdef class DepthMap:
         return timestamps
 
     def _get_vertical_projection(self):
-        return <int> self.thisptr.vertical_projection
+        if <int> self.thisptr.vertical_projection == <int> _cdff_types.asn1Sccpolar:
+            return "POLAR"
+        else:
+            return "PLANAR"
 
-    def _set_vertical_projection(self,  int vertical_projection):
-        self.thisptr.vertical_projection = <_cdff_types.asn1SccPROJECTION_TYPE> vertical_projection
+    def _set_vertical_projection(self,  str vertical_projection):
+        if vertical_projection == "POLAR":
+            self.thisptr.vertical_projection = _cdff_types.asn1Sccpolar
+        elif vertical_projection == "PLANAR":
+            self.thisptr.vertical_projection = _cdff_types.asn1Sccplanar
+        else:
+            raise ValueError("Unknown projection: %s" % vertical_projection)
 
     vertical_projection = property(_get_vertical_projection, _set_vertical_projection)
 
     def _get_horizontal_projection(self):
-        return <int> self.thisptr.horizontal_projection
+        if <int> self.thisptr.horizontal_projection == <int> _cdff_types.asn1Sccpolar:
+            return "POLAR"
+        else:
+            return "PLANAR"
 
     def _set_horizontal_projection(self,  int horizontal_projection):
-        self.thisptr.horizontal_projection = <_cdff_types.asn1SccPROJECTION_TYPE> horizontal_projection
+        if horizontal_projection == "POLAR":
+            self.thisptr.horizontal_projection = _cdff_types.asn1Sccpolar
+        elif horizontal_projection == "PLANAR":
+            self.thisptr.horizontal_projection = _cdff_types.asn1Sccplanar
+        else:
+            raise ValueError("Unknown projection: %s" % horizontal_projection)
 
     horizontal_projection = property(_get_horizontal_projection, _set_horizontal_projection)
 
