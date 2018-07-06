@@ -1241,7 +1241,7 @@ cdef class DepthMap:
         else:
             return "PLANAR"
 
-    def _set_horizontal_projection(self,  int horizontal_projection):
+    def _set_horizontal_projection(self,  str horizontal_projection):
         if horizontal_projection == "POLAR":
             self.thisptr.horizontal_projection = _cdff_types.asn1Sccpolar
         elif horizontal_projection == "PLANAR":
