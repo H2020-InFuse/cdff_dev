@@ -5,6 +5,7 @@ from Cython.Build import cythonize
 import numpy
 import os
 import glob
+import warnings
 import cdff_dev
 from cdff_dev.path import load_cdffpath, CTYPESDIR
 
@@ -50,14 +51,16 @@ def configuration(parent_package='', top_path=None):
 
     config.add_subpackage("cdff_dev")
 
-    config.add_data_files(
-        (".", "_cdff_types.pxd"),
-        (".", "cdff_types.pxd"),
-        (".", "cdff_types.pyx"),
-        (".", "_cdff_envire.pxd"),
-        (".", "cdff_envire.pxd"),
-        (".", "cdff_envire.pyx")
-    )
+    autoproj_available = check_autoproj()
+
+    cdff_types_files = ["_cdff_types.pxd", "cdff_types.pxd", "cdff_types.pyx"]
+    cdff_envire_files = ["_cdff_envire.pxd", "cdff_envire.pxd",
+                         "cdff_envire.pyx"]
+    cython_files = cdff_types_files
+    if autoproj_available:
+        cython_files += cdff_envire_files
+
+    config.add_data_files(*[(".", filename) for filename in cython_files])
 
     extra_compile_args = [
         "-std=c++11",
@@ -70,8 +73,24 @@ def configuration(parent_package='', top_path=None):
     cdffpath = load_cdffpath()
     ctypespath = os.path.join(cdffpath, CTYPESDIR)
 
-    cythonize("cdff_types.pyx")
+    make_cdff_types(config, ctypespath, extra_compile_args)
+    if autoproj_available:
+        make_cdff_envire(config, ctypespath, extra_compile_args)
 
+    return config
+
+
+def check_autoproj():
+    autoproj_available = "AUTOPROJ_CURRENT_ROOT" in os.environ
+    if not autoproj_available:
+        warnings.warn(
+            "autoproj environment not detected, EnviRe will not be available",
+            UserWarning)
+    return autoproj_available
+
+
+def make_cdff_types(config, ctypespath, extra_compile_args):
+    cythonize("cdff_types.pyx")
     config.add_extension(
         "cdff_types",
         sources=["cdff_types.cpp"],
@@ -86,14 +105,19 @@ def configuration(parent_package='', top_path=None):
         extra_compile_args=extra_compile_args
     )
 
+
+def make_cdff_envire(config, ctypespath, extra_compile_args):
     cythonize("cdff_envire.pyx")
     autoproj_current_root = os.environ.get("AUTOPROJ_CURRENT_ROOT", None)
-    if autoproj_current_root is None:
-        # TODO might be changed to warning?
-        raise IOError("Environment variable $AUTOPROJ_CURRENT_ROOT is not "
-                      "defined. Cannot build EnviRe bindings.")
     install_dir = os.path.join(autoproj_current_root, "install")
-
+    # this path is currently only used in CI image:
+    eigen_include_dir = "/usr/local/include/eigen3"
+    if not os.path.exists(eigen_include_dir):
+        eigen_include_dir = os.path.join(install_dir, "include", "eigen3")
+        print("using Eigen 3 from autoproj installation")
+    if not os.path.exists(eigen_include_dir):
+        eigen_include_dir = "/usr/include/eigen3/"
+        print("using Eigen 3 from system path")
     config.add_extension(
         "cdff_envire",
         sources=["cdff_envire.cpp"],
@@ -102,20 +126,17 @@ def configuration(parent_package='', top_path=None):
             "envire",
             numpy.get_include(),
             os.path.join(install_dir, "include"),
-            os.path.join(install_dir, "include", "eigen3"),
-            "/usr/local/include/eigen3",  # HACK: only for CI
+            eigen_include_dir,
             ctypespath
         ],
         library_dirs=[
             os.path.join(install_dir, "lib")
         ],
-        libraries=["base-types", "envire_core", "envire_urdf", "urdfdom_model",
-                   "envire_visualizer_interface"],
+        libraries=["base-types", "envire_core", "envire_urdf",
+                   "urdfdom_model", "envire_visualizer_interface"],
         define_macros=[("NDEBUG",)],
         extra_compile_args=extra_compile_args
     )
-
-    return config
 
 
 if __name__ == "__main__":
