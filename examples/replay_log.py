@@ -57,7 +57,9 @@ def main():
     stream_names = [
         #"/hokuyo.scans", "/dynamixel.transforms",
         #"/xsens.calibrated_sensors"
-        "/xsens_imu.calibrated_sensors", "/velodyne.laser_scans"
+        "/xsens_imu.calibrated_sensors",
+        #"/velodyne.laser_scans",
+        "/tilt_scan.pointcloud",
     ]
 
     nodes = {
@@ -84,6 +86,7 @@ def main():
 
         "/xsens_imu.calibrated_sensors": "body",        
         "/velodyne.laser_scans": "body",
+        "/tilt_scan.pointcloud": "body",
     }
     urdf_files = [
         "test/test_data/model.urdf"
