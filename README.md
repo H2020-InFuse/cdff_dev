@@ -27,6 +27,10 @@ institutes contributed to the software:
 
 ### Dependencies of CDFF-Dev
 
+The recommended way of installing all dependencies of CDFF-Dev is autoproj.
+See [autoproj installation instructions](https://gitlab.spaceapplications.com/InFuse/cdff-buildconf/tree/cdff_dev#infuse-framework-install-instructions)
+for details.
+
 The CDFF's Dev component, available in this `CDFF_dev` repository, depends
 on the CDFF's Core and Support components, available in the
 [`CDFF`](https://gitlab.spaceapplications.com/InFuse/CDFF) repository.
