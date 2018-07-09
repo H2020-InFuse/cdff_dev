@@ -32,22 +32,21 @@ class EnvireVisualizerApplication:
         # unsubscribing from events will result in a segfault!
         del self.visualization.visualizer
 
-    def show_controls(self, stream_names, log, dfc):
+    def show_controls(self, iterator, dfc):
         """Show control window to replay log file.
 
         Parameters
         ----------
-        stream_names : list
-            List of stream names that should be replayed
-
-        log : dict
-            Log data
+        iterator : Iterable
+            Iterable object that yields log samples in the correct temporal
+            order. The iterable returns in each step a quadrupel of
+            (timestamp, stream_name, typename, sample).
 
         dfc : DataFlowControl
             Configured processing and data fusion logic
         """
         dfc.set_visualization(self.visualization)
-        self.control_window = ReplayMainWindow(Step, stream_names, log, dfc)
+        self.control_window = ReplayMainWindow(Step, iterator, dfc)
         self.control_window.show()
 
     def exec_(self):
@@ -312,8 +311,8 @@ class Worker(QThread):
 
 class Step:
     """A callable that replays one sample in each step."""
-    def __init__(self, stream_names, log, dfc):
-        self.iterator = logloader.replay(stream_names, log, verbose=0)
+    def __init__(self, iterator, dfc):
+        self.iterator = iterator
         self.dfc = dfc
 
     def __call__(self):

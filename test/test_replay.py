@@ -83,6 +83,6 @@ def test_feed_data_flow_control():
 
     log = logloader.load_log("test/test_data/logs/test_log.msg")
     stream_names = ["/hokuyo.scans", "/dynamixel.transforms"]
-    replay.replay_and_process(dfc, log, stream_names)
+    replay.replay_and_process(dfc, logloader.replay(stream_names, log))
     assert_in("laser_filter.filteredScan", vis.data)
     assert_in("pointcloud_builder.pointcloud", vis.data)

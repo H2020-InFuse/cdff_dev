@@ -1,7 +1,7 @@
 from . import logloader, typefromdict
 
 
-def replay_and_process(dfc, log, stream_names):
+def replay_and_process(dfc, iterator):
     """Replay log file(s) and feed them to DataFlowControl.
 
     Parameters
@@ -9,14 +9,12 @@ def replay_and_process(dfc, log, stream_names):
     dfc : DataFlowControl
         Configured processing components
 
-    log : dict
-        Log data
-
-    stream_names : list of str
-        Names of the streams that should be read from the logs
+    iterator : Iterable
+        Iterable object that yields log samples in the correct temporal
+        order. The iterable returns in each step a quadrupel of
+        (timestamp, stream_name, typename, sample).
     """
-    for timestamp, stream_name, typename, sample in logloader.replay(
-            stream_names, log, verbose=0):
+    for timestamp, stream_name, typename, sample in iterator:
         obj = typefromdict.create_from_dict(typename, sample)
         dfc.process_sample(
             timestamp=timestamp, stream_name=stream_name, sample=obj)

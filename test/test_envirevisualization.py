@@ -68,7 +68,7 @@ def test_step():
     log = logloader.load_log("test/test_data/logs/test_log.msg")
     stream_names = ["/hokuyo.scans", "/dynamixel.transforms"]
 
-    step = envirevisualization.Step(stream_names, log, dfc)
+    step = envirevisualization.Step(logloader.replay(stream_names, log), dfc)
     stopped = False
     try:
         while True:

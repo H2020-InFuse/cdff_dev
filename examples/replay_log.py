@@ -91,7 +91,7 @@ def main():
         nodes, connections, periods, real_time=True)
     dfc.setup()
 
-    app.show_controls(stream_names, log, dfc)
+    app.show_controls(logloader.replay(stream_names, log, verbose=0), dfc)
     app.exec_()
 
     dfc.node_statistics_.print_statistics()
