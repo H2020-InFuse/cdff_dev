@@ -67,7 +67,7 @@ class DataFlowControl:
         self.real_time = real_time
         self.verbose = verbose
 
-        self.visualization = None
+        self.visualization = []
         self.node_statistics_ = None
         self.output_ports_ = None
         self.input_ports_ = None
@@ -103,7 +103,7 @@ class DataFlowControl:
             Visualization of replayed log samples or results of processing
             steps
         """
-        self.visualization = visualization
+        self.visualization.append(visualization)
 
     def register_world_state(self, world_state):
         """Register a world state representation.
@@ -178,8 +178,8 @@ class DataFlowControl:
         if self.real_time and self._last_timestamp is not None:
             self._real_start_time = time.time()
 
-        if self.visualization is not None:
-            self.visualization.report_node_output(
+        for visualization in self.visualization:
+            visualization.report_node_output(
                 stream_name, sample, timestamp)
 
         if self.real_time and self._last_timestamp is not None:
@@ -245,10 +245,10 @@ class DataFlowControl:
 
                 outputs = self._pull_output(current_node)
 
-                if self.visualization is not None:
+                for visualization in self.visualization:
                     for port_name, sample in outputs.items():
                         # TODO should we add the processing time?
-                        self.visualization.report_node_output(
+                        visualization.report_node_output(
                             port_name, sample, timestamp_before_process)
 
                 for port_name, sample in outputs.items():
