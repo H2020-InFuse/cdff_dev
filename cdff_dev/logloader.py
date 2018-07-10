@@ -83,7 +83,7 @@ def replay(stream_names, log, verbose=0):
     streams = [log[sn] for sn in stream_names]
     meta_streams = [log[sn + ".meta"] for sn in stream_names]
 
-    n_streams = len(streams)
+    n_streams = len(stream_names)
     current_sample_indices = [-1] * n_streams
 
     if verbose >= 1:
@@ -93,10 +93,9 @@ def replay(stream_names, log, verbose=0):
         print("    " + (os.linesep + "    ").join(stream_statistics))
 
     while True:
-        try:
-            current_stream, _ = next_timestamp(
-                meta_streams, current_sample_indices)
-        except StopIteration:
+        current_stream, _ = next_timestamp(
+            meta_streams, current_sample_indices)
+        if current_stream < 0:
             return
 
         if verbose >= 2:
@@ -114,9 +113,14 @@ def replay(stream_names, log, verbose=0):
 
 
 def replay_files(filename_groups, stream_names):
-    groups = [LogfileGroup(group) for group in filename_groups]
+    groups = [LogfileGroup(group, stream_names) for group in filename_groups]
 
-    raise NotImplementedError()
+    while True:
+        next_timestamps = [g.next_timestamp() for g in groups]
+        current_group, _ = _argmin(next_timestamps)
+        timestamp, stream_name, typename, sample = groups[
+            current_group].next_sample()
+        yield timestamp, stream_name, typename, sample
 
 
 class LogfileGroup:
@@ -138,10 +142,12 @@ class LogfileGroup:
             if stream_idx + 1 >= len(self.streams[i]):
                 self._load_streams()
 
-        self.next_stream, timestamp = next_timestamp()
+        self.next_stream, timestamp = next_timestamp(
+            self.meta_streams, self.current_stream_indices)
         return timestamp
 
     def _load_streams(self):
+        raise NotImplementedError()
         # TODO: extend existing logs...
         if self.file_index + 1 >= len(self.filenames):
             return
@@ -158,27 +164,29 @@ class LogfileGroup:
         self.current_sample_indices = [-1] * len(self.streams)
 
     def next_sample(self):
-        sample_idx = self.current_sample_indices[self.next_stream]
+        self.current_sample_indices[self.next_stream] += 1
         return extract_sample(
             self.streams, self.meta_streams, self.group_stream_names,
-            self.next_stream, sample_idx)
+            self.next_stream, self.current_sample_indices[self.next_stream])
 
 
-def next_timestamp(meta_streams, current_stream_indices):
-    n_streams = len(current_stream_indices)
+def next_timestamp(meta_streams, current_sample_indices):
+    n_streams = len(current_sample_indices)
 
     next_timestamps = [float("inf")] * n_streams
     for i in range(n_streams):
-        stream_idx = current_stream_indices[i]
-        if stream_idx + 1 < len(meta_streams[i]["timestamps"]):
-            next_timestamps[i] = meta_streams[i]["timestamps"][stream_idx + 1]
+        sample_idx = current_sample_indices[i]
+        if sample_idx + 1 < len(meta_streams[i]["timestamps"]):
+            next_timestamps[i] = meta_streams[i]["timestamps"][sample_idx + 1]
 
     if all(map(math.isinf, next_timestamps)):
-        raise StopIteration("reached end of log")
+        return -1, float("inf")
 
-    next_stream, next_timestamp = min(
-        enumerate(next_timestamps), key=lambda p: p[1])
-    return next_stream, next_timestamp
+    return _argmin(next_timestamps)
+
+
+def _argmin(next_timestamps):
+    return min(enumerate(next_timestamps), key=lambda p: p[1])
 
 
 def extract_sample(streams, meta_streams, stream_names, stream_idx,
