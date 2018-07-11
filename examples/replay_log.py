@@ -1,4 +1,5 @@
 import numpy as np
+import glob
 from cdff_dev import logloader, dataflowcontrol, envirevisualization
 import cdff_types
 
@@ -146,6 +147,7 @@ def main():
         "/laser_filter.filtered_scans": "upper_dynamixel",
         "/tilt_scan.pointcloud": "body",
         "/dynamixel.transforms": "body",
+        "/velodyne.laser_scans": "body",
 
         #"/xsens.calibrated_sensors": "body"
     }
@@ -164,6 +166,7 @@ def main():
         "/laser_filter.filtered_scans",
         "/tilt_scan.pointcloud",
         "/dynamixel.transforms",
+        "/velodyne.laser_scans",
     ]
     #log = logloader.load_log(
     #    "test/test_data/logs/test_log.msg"
@@ -181,11 +184,11 @@ def main():
         nodes, connections, periods, real_time=True)
     dfc.setup()
 
-    import glob
     log_iterator = logloader.replay_files(
         [sorted(glob.glob("logs/open_day/open_day_laser_filter_*.msg")),
          sorted(glob.glob("logs/open_day/open_day_tilt_scan_*.msg")),
-         sorted(glob.glob("logs/open_day/open_day_dynamixel_*.msg"))],
+         sorted(glob.glob("logs/open_day/open_day_dynamixel_*.msg")),
+         sorted(glob.glob("logs/open_day/open_day_velodyne_*.msg"))],
         stream_names
     )
     app.show_controls(log_iterator, dfc)
