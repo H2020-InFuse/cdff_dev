@@ -40,7 +40,8 @@ def print_stream_info(log):
 
     print("=" * 80)
     MAXLENGTHS = (35, 30, 15)
-    print("".join(map(lambda t: t[0].ljust(t[1]), zip(["stream name", "type", "# samples"], MAXLENGTHS))))
+    print("".join(map(lambda t: t[0].ljust(t[1]),
+                      zip(["stream name", "type", "# samples"], MAXLENGTHS))))
     print("-" * 80)
     for stream_meta_data in stream_meta_data:
         line = ""
@@ -96,7 +97,7 @@ def replay(stream_names, log, verbose=0):
     while True:
         current_stream, _ = next_timestamp(
             meta_streams, current_sample_indices)
-        if current_stream < 0:
+        if current_stream is None:
             return
 
         if verbose >= 2:
@@ -181,16 +182,20 @@ class LogfileGroup:
         self._load_streams()
 
     def next_timestamp(self):
-        for i in range(len(self.group_stream_names)):
-            sample_idx = self.current_sample_indices[i]
-            if sample_idx + 1 >= len(self.streams[i]):
-                self._load_streams()
+        """Get next timestamp from any of the streams in this group.
+
+        Returns
+        -------
+        timestamp : int
+            Next timestamp
+        """
+        self._check_load_next_logfile()
 
         self.next_stream, timestamp = next_timestamp(
             self.meta_streams, self.current_sample_indices)
 
         if self.verbose >= 2:
-            if self.next_stream < 0:
+            if self.next_stream is None:
                 print("[logloader] Reached the end of the logfile.")
             else:
                 stream_name = self.group_stream_names[self.next_stream]
@@ -199,7 +204,15 @@ class LogfileGroup:
 
         return timestamp
 
+    def _check_load_next_logfile(self):
+        """Check if next logfile should be loaded and do this if required."""
+        for i in range(len(self.group_stream_names)):
+            sample_idx = self.current_sample_indices[i]
+            if sample_idx + 1 >= len(self.streams[i]):
+                self._load_streams()
+
     def _load_streams(self):
+        """Load next logfile."""
         if self.file_index + 1 >= len(self.filenames):
             if self.verbose >= 1:
                 print("[logloader] No more logfiles in this group.")
@@ -229,22 +242,11 @@ class LogfileGroup:
                         len(new_stream), len(new_meta_stream["timestamps"]),
                         new_stream_name)
                 if new_stream_name not in self.group_stream_names:
-                    self.group_stream_names.append(new_stream_name)
-                    self.streams.append(new_stream)
-                    self.meta_streams.append(new_meta_stream)
-                    self.current_sample_indices.append(-1)
+                    self._add_new_stream(
+                        new_meta_stream, new_stream, new_stream_name)
                 else:
-                    stream_idx = self.group_stream_names.index(new_stream_name)
-
-                    assert (
-                        self.meta_streams[stream_idx]["type"] ==
-                        new_meta_stream["type"]), (
-                        "%s != %s" % (self.meta_streams[stream_idx]["type"],
-                                      new_meta_stream["type"]))
-
-                    self.streams[stream_idx].extend(new_stream)
-                    self.meta_streams[stream_idx]["timestamps"].extend(
-                        new_meta_stream["timestamps"])
+                    self._extend_existing_stream(
+                        new_meta_stream, new_stream, new_stream_name)
 
         if len(self.group_stream_names) == 0:
             warnings.warn(
@@ -254,6 +256,7 @@ class LogfileGroup:
             )
 
     def _delete_processed_samples(self):
+        """Remove samples from the buffer that have already been processed."""
         for stream_idx in range(len(self.streams)):
             sample_idx = self.current_sample_indices[stream_idx]
             self.streams[stream_idx] = self.streams[stream_idx][sample_idx:]
@@ -261,10 +264,51 @@ class LogfileGroup:
                 self.meta_streams[stream_idx]["timestamps"][sample_idx:]
             self.current_sample_indices[stream_idx] = 0
 
+    def _add_new_stream(self, new_meta_stream, new_stream, new_stream_name):
+        self.group_stream_names.append(new_stream_name)
+        self.streams.append(new_stream)
+        self.meta_streams.append(new_meta_stream)
+        self.current_sample_indices.append(-1)
+
+    def _extend_existing_stream(self, new_meta_stream, new_stream,
+                                new_stream_name):
+        stream_idx = self.group_stream_names.index(new_stream_name)
+        assert (
+            self.meta_streams[stream_idx]["type"] ==
+            new_meta_stream["type"]), (
+            "%s != %s" % (self.meta_streams[stream_idx]["type"],
+                          new_meta_stream["type"]))
+        self.streams[stream_idx].extend(new_stream)
+        self.meta_streams[stream_idx]["timestamps"].extend(
+            new_meta_stream["timestamps"])
+
     def next_sample(self):
+        """Return next sample.
+
+        Should only be called after next_timestamp()! This function will also
+        increment the sample counter for the current stream as a side effect.
+
+        Returns
+        -------
+        current_timestamp : int
+            Current time in microseconds
+
+        stream_name : str
+            Name of the currently active stream
+
+        typename : str
+            Name of the data type of the stream
+
+        sample : dict
+            Current sample
+        """
+        if self.next_stream is None:
+            raise StopIteration("Reached end of logfiles.")
+
         if self.verbose >= 2:
             print("[logloader] Processing sample from stream %d/%d"
                   % (self.next_stream + 1, len(self.group_stream_names)))
+
         self.current_sample_indices[self.next_stream] += 1
         return extract_sample(
             self.streams, self.meta_streams, self.group_stream_names,
@@ -281,7 +325,7 @@ def next_timestamp(meta_streams, current_sample_indices):
             next_timestamps[i] = meta_streams[i]["timestamps"][sample_idx + 1]
 
     if all(map(math.isinf, next_timestamps)):
-        return -1, float("inf")
+        return None, float("inf")
 
     return _argmin(next_timestamps)
 
