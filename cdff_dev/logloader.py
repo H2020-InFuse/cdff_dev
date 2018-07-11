@@ -1,5 +1,6 @@
 import os
 import math
+import warnings
 import msgpack
 
 
@@ -113,10 +114,38 @@ def replay(stream_names, log, verbose=0):
 
 
 def replay_files(filename_groups, stream_names):
-    groups = [LogfileGroup(group, stream_names) for group in filename_groups]
+    """Generator that yields samples of multiple logs in correct temporal order.
 
+    Parameters
+    ----------
+    filename_groups : list of list of str
+        Groups of filenames in chronological order
+
+    stream_names : list
+        Names of the streams that we want to load
+
+    verbose : int, optional (default: 0)
+        Verbosity level
+
+    Returns
+    -------
+    current_timestamp : int
+        Current time in microseconds
+
+    stream_name : str
+        Name of the currently active stream
+
+    typename : str
+        Name of the data type of the stream
+
+    sample : dict
+        Current sample
+    """
+    groups = [LogfileGroup(group, stream_names) for group in filename_groups]
     while True:
         next_timestamps = [g.next_timestamp() for g in groups]
+        if all(map(math.isinf, next_timestamps)):
+            return
         current_group, _ = _argmin(next_timestamps)
         timestamp, stream_name, typename, sample = groups[
             current_group].next_sample()
@@ -124,46 +153,118 @@ def replay_files(filename_groups, stream_names):
 
 
 class LogfileGroup:
-    def __init__(self, filenames, stream_names):
+    """A group of logfiles that are actually one log cut into smaller chunks.
+
+    Parameters
+    ----------
+    filenames : list
+        Names of the files in chronological order
+
+    stream_names : list
+        Names of the streams that we want to load
+
+    verbose : int
+        Verbosity level
+    """
+    def __init__(self, filenames, stream_names, verbose=0):
         self.filenames = filenames
         self.stream_names = stream_names
+        self.verbose = verbose
 
         self.file_index = -1
-        self.current_sample_indices = None
-        self.streams = None
-        self.group_stream_names = None
+        self.current_sample_indices = []
+        self.group_stream_names = []
+        self.streams = []
+        self.meta_streams = []
         self.next_stream = -1
 
         self._load_streams()
 
     def next_timestamp(self):
-        for i in range(self.group_stream_names):
-            stream_idx = self.current_sample_indices[i]
-            if stream_idx + 1 >= len(self.streams[i]):
+        for i in range(len(self.group_stream_names)):
+            sample_idx = self.current_sample_indices[i]
+            if sample_idx + 1 >= len(self.streams[i]):
                 self._load_streams()
 
         self.next_stream, timestamp = next_timestamp(
-            self.meta_streams, self.current_stream_indices)
+            self.meta_streams, self.current_sample_indices)
+
+        if self.verbose >= 2:
+            if self.next_stream < 0:
+                print("[logloader] Reached the end of the logfile.")
+            else:
+                stream_name = self.group_stream_names[self.next_stream]
+                print("[logloader] Next sample from stream #%d (%s), clock: %f"
+                      % (self.next_stream, stream_name, timestamp))
+
         return timestamp
 
     def _load_streams(self):
-        raise NotImplementedError()
-        # TODO: extend existing logs...
         if self.file_index + 1 >= len(self.filenames):
+            if self.verbose >= 1:
+                print("[logloader] No more logfiles in this group.")
             return
 
         self.file_index += 1
 
-        streams = load_log(self.filenames[self.file_index])
-        self.group_stream_names = sorted(
-            k for k in streams.keys() if k in self.stream_names)
+        if self.verbose >= 1:
+            print("[logloader] Loading logfile #%d: %s"
+                  % (self.file_index + 1, self.filenames[self.file_index]))
 
-        self.streams = [streams[k] for k in self.group_stream_names]
-        self.meta_streams = [
-            streams[k + ".meta"] for k in self.group_stream_names]
-        self.current_sample_indices = [-1] * len(self.streams)
+        self._delete_processed_samples()
+
+        new_streams = load_log(self.filenames[self.file_index])
+        new_stream_names = [sn for sn in new_streams.keys()
+                            if not sn.endswith(".meta")]
+
+        if self.verbose >= 1:
+            print_stream_info(new_streams)
+
+        for new_stream_name in new_stream_names:
+            if new_stream_name in self.stream_names:
+                new_stream = new_streams[new_stream_name]
+                new_meta_stream = new_streams[new_stream_name + ".meta"]
+                assert len(new_stream) == len(new_meta_stream["timestamps"]), \
+                    "got %d samples, but %d timestamps in stream '%s'" % (
+                        len(new_stream), len(new_meta_stream["timestamps"]),
+                        new_stream_name)
+                if new_stream_name not in self.group_stream_names:
+                    self.group_stream_names.append(new_stream_name)
+                    self.streams.append(new_stream)
+                    self.meta_streams.append(new_meta_stream)
+                    self.current_sample_indices.append(-1)
+                else:
+                    stream_idx = self.group_stream_names.index(new_stream_name)
+
+                    assert (
+                        self.meta_streams[stream_idx]["type"] ==
+                        new_meta_stream["type"]), (
+                        "%s != %s" % (self.meta_streams[stream_idx]["type"],
+                                      new_meta_stream["type"]))
+
+                    self.streams[stream_idx].extend(new_stream)
+                    self.meta_streams[stream_idx]["timestamps"].extend(
+                        new_meta_stream["timestamps"])
+
+        if len(self.group_stream_names) == 0:
+            warnings.warn(
+                "Could not load any streams in this logfile group. "
+                "Allowed stream names: %s; Streams in this group: %s"
+                % (self.stream_names, new_stream_names)
+            )
+
+    def _delete_processed_samples(self):
+        for stream_idx in range(len(self.streams)):
+            sample_idx = self.current_sample_indices[stream_idx]
+            self.streams[stream_idx] = self.streams[stream_idx][sample_idx:]
+            self.meta_streams[stream_idx]["timestamps"] = \
+                self.meta_streams[stream_idx]["timestamps"][sample_idx:]
+            self.current_sample_indices[stream_idx] = 0
 
     def next_sample(self):
+        if self.verbose >= 2:
+            print("[logloader] Processing sample from stream %d/%d"
+                  % (self.next_stream + 1, len(self.group_stream_names)))
         self.current_sample_indices[self.next_stream] += 1
         return extract_sample(
             self.streams, self.meta_streams, self.group_stream_names,
