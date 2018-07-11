@@ -6,6 +6,7 @@ from PyQt4.QtGui import *
 from . import logloader, typefromdict
 from . import dataflowcontrol
 import cdff_envire
+import cdff_types
 
 
 class EnvireVisualizerApplication:
@@ -18,10 +19,14 @@ class EnvireVisualizerApplication:
 
     urdf_files : list, optional (default: [])
         URDF files that should be loaded
+
+    center_frame : str, optional (default: first in lexical order)
+        Frame that represents the center of visualization
     """
-    def __init__(self, frames, urdf_files=[]):
+    def __init__(self, frames, urdf_files=[], center_frame=None):
         self.app = QApplication(sys.argv)
-        self.visualization = EnvireVisualization(frames, urdf_files)
+        self.visualization = EnvireVisualization(
+            frames, urdf_files, center_frame)
         self.control_window = None
 
     def __del__(self):
@@ -46,6 +51,7 @@ class EnvireVisualizerApplication:
             Configured processing and data fusion logic
         """
         dfc.set_visualization(self.visualization)
+        dfc.register_world_state(self.visualization.world_state_)
         self.control_window = ReplayMainWindow(Step, iterator, dfc)
         self.control_window.show()
 
@@ -67,11 +73,15 @@ class EnvireVisualization(dataflowcontrol.VisualizationBase):
 
     urdf_files : list, optional (default: [])
         URDF files that should be loaded
+
+    center_frame : str, optional (default: first in lexical order)
+        Frame that represents the center of visualization
     """
-    def __init__(self, frames, urdf_files=[]):
+    def __init__(self, frames, urdf_files=[], center_frame=None):
         self.world_state_ = WorldState(frames, urdf_files)
         self.visualizer = cdff_envire.EnvireVisualizer()
-        center_frame = list(frames.values())[0]  # TODO let user define center frame
+        if center_frame is None:
+            center_frame = sorted(frames.values())[0]
         self.visualizer.display_graph(self.world_state_.graph_, center_frame)
         self.visualizer.show()
 
@@ -117,7 +127,12 @@ class WorldState:
         self.items = {}
 
     def report_node_output(self, port_name, sample, timestamp):
-        if port_name not in self.frames:
+        if isinstance(sample, cdff_types.RigidBodyState):
+            # TODO add other types?
+            # Does not have to be added as an item to the graph.
+            # Should be used to update transformations.
+            return
+        elif port_name not in self.frames:
             warnings.warn("No frame registered for port '%s'" % port_name)
             return
 

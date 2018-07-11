@@ -105,6 +105,9 @@ class DataFlowControl:
         """
         self.visualization = visualization
 
+    def register_world_state(self, world_state):  # TODO document
+        self._node_facade.register_graph(world_state.graph_)
+
     def _cache_ports(self):
         """Cache setters and getters for ports."""
         self.output_ports_ = defaultdict(list)
@@ -315,6 +318,10 @@ class NodeFacade:
         for node in self.nodes.values():
             node.configure()
 
+    def register_graph(self, graph):  # TODO document
+        if self.exists("transformer"):
+            self.nodes["transformer"].graph_ = graph
+
     def node_names(self):
         return self.nodes.keys()
 
@@ -347,7 +354,7 @@ class NodeFacade:
         if port_type == "Input" and not hasattr(node, method_name):
             raise AttributeError(
                 "Could not find %s.%s(...) corresponding to port %s"
-                % (type(node), method_name, port_name))
+                % (node.__class__.__name__, method_name, port_name))
 
         return node_name, port_name, True
 
