@@ -114,7 +114,7 @@ def replay(stream_names, log, verbose=0):
         yield timestamp, stream_name, typename, sample
 
 
-def replay_files(filename_groups, stream_names):
+def replay_files(filename_groups, stream_names, verbose=0):
     """Generator that yields samples of multiple logs in correct temporal order.
 
     Parameters
@@ -142,7 +142,8 @@ def replay_files(filename_groups, stream_names):
     sample : dict
         Current sample
     """
-    groups = [LogfileGroup(group, stream_names) for group in filename_groups]
+    groups = [LogfileGroup(group, stream_names, verbose)
+              for group in filename_groups]
     while True:
         next_timestamps = [g.next_timestamp() for g in groups]
         if all(map(math.isinf, next_timestamps)):
