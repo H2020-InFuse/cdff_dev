@@ -333,6 +333,7 @@ ctypedef fused GenericType:
     cdff_types.JointState
     cdff_types.Joints
     cdff_types.IMUSensors
+    cdff_types.DepthMap
 
 
 cdef class GenericItem:

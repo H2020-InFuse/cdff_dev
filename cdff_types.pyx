@@ -1071,6 +1071,8 @@ cdef class Joints_namesReference:
             return
         cdef string value = name.encode()
         self.thisptr.arr[i].arr = value.c_str()
+        if self.thisptr.nCount <= <int> i:
+            self.thisptr.nCount = <int> (i + 1)
 
     def resize(self, int size):
         if size > 30:
@@ -1104,6 +1106,8 @@ cdef class Joints_elementsReference:
             warnings.warn("Maximum size of Joints is 30")
             return
         self.thisptr.arr[i] = deref(joint_state.thisptr)
+        if self.thisptr.nCount <= <int> i:
+            self.thisptr.nCount = <int> (i + 1)
 
     def resize(self, int size):
         if size > 30:
@@ -1314,6 +1318,8 @@ cdef class DepthMap_timestampsReference:
             warnings.warn("Maximum size of DepthMap is 30000")
             return
         self.thisptr.arr[i] = deref(timestamp.thisptr)
+        if self.thisptr.nCount <= <int> i:
+            self.thisptr.nCount = <int> (i + 1)
 
     def resize(self, int size):
         if size > 30000:
@@ -1348,6 +1354,8 @@ cdef class DepthMap_vertical_intervalReference:
             warnings.warn("Maximum size of DepthMap is 30000")
             return
         self.thisptr.arr[i] = v
+        if self.thisptr.nCount <= <int> i:
+            self.thisptr.nCount = <int> (i + 1)
 
     def resize(self, int size):
         if size > 30000:
@@ -1377,6 +1385,8 @@ cdef class DepthMap_horizontal_intervalReference:
             warnings.warn("Maximum size of DepthMap is 30000")
             return
         self.thisptr.arr[i] = v
+        if self.thisptr.nCount <= <int> i:
+            self.thisptr.nCount = <int> (i + 1)
 
     def resize(self, int size):
         if size > 30000:
@@ -1406,6 +1416,8 @@ cdef class DepthMap_distancesReference:
             warnings.warn("Maximum size of DepthMap is 30000")
             return
         self.thisptr.arr[i] = v
+        if self.thisptr.nCount <= <int> i:
+            self.thisptr.nCount = <int> (i + 1)
 
     def resize(self, int size):
         if size > 30000:
@@ -1435,6 +1447,8 @@ cdef class DepthMap_remissionsReference:
             warnings.warn("Maximum size of DepthMap is 30000")
             return
         self.thisptr.arr[i] = v
+        if self.thisptr.nCount <= <int> i:
+            self.thisptr.nCount = <int> (i + 1)
 
     def resize(self, int size):
         if size > 30000:
