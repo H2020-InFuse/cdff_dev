@@ -351,5 +351,5 @@ def test_envire_urdf_load():
     g = cdff_envire.EnvireGraph()
     cdff_envire.load_urdf(g, "test/test_data/model.urdf")
     assert_true(g.contains_frame("body"))
-    assert_true(g.contains_frame("dynamixel/lower"))
-    assert_true(g.contains_edge("body", "dynamixel/lower"))
+    assert_true(g.contains_frame("lower_dynamixel"))
+    assert_true(g.contains_edge("body", "lower_dynamixel"))
