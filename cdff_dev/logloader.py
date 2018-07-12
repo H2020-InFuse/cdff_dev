@@ -95,7 +95,7 @@ def replay(stream_names, log, verbose=0):
         print("    " + (os.linesep + "    ").join(stream_statistics))
 
     while True:
-        current_stream, _ = next_timestamp(
+        current_stream, _ = _next_timestamp(
             meta_streams, current_sample_indices)
         if current_stream is None:
             return
@@ -192,7 +192,7 @@ class LogfileGroup:
         """
         self._check_load_next_logfile()
 
-        self.next_stream, timestamp = next_timestamp(
+        self.next_stream, timestamp = _next_timestamp(
             self.meta_streams, self.current_sample_indices)
 
         if self.verbose >= 2:
@@ -316,7 +316,26 @@ class LogfileGroup:
             self.next_stream, self.current_sample_indices[self.next_stream])
 
 
-def next_timestamp(meta_streams, current_sample_indices):
+def _next_timestamp(meta_streams, current_sample_indices):
+    """Determine next timestamp from meta streams and sample indices.
+
+    Parameters
+    ----------
+    meta_streams : dict
+        Meta data streams, must contain a field "timestamps" with a list of
+        timestamps
+
+    current_sample_indices : list
+        For each meta data stream the index of the current sample
+
+    Returns
+    -------
+    stream_idx : int
+        Index of the stream that contains the chronologically next sample
+
+    timestamp : float
+        Next timestamp
+    """
     n_streams = len(current_sample_indices)
 
     next_timestamps = [float("inf")] * n_streams
