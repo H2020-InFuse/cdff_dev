@@ -5,9 +5,9 @@ import numpy as np
 from nose.tools import assert_equal
 
 
-class Tranformer(transformer.EnvireDFN):
+class Transformer(transformer.EnvireDFN):
     def __init__(self):
-        super(Tranformer, self).__init__()
+        super(Transformer, self).__init__()
         self.graph_ = cdff_envire.EnvireGraph()
         self.graph_.add_frame("B")
         self.graph_.add_frame("C")
@@ -26,7 +26,7 @@ class Tranformer(transformer.EnvireDFN):
 
 
 def test_add_get_transformations():
-    transformer = Tranformer()
+    transformer = Transformer()
 
     A2B = cdff_types.RigidBodyState()
     A2B.source_frame = "B"
