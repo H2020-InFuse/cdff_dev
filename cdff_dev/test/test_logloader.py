@@ -1,6 +1,6 @@
 from cdff_dev import logloader
 from nose.tools import (assert_in, assert_equal, assert_almost_equal,
-                        assert_true, assert_raises)
+                        assert_true, assert_raises, assert_less_equal)
 import math
 import glob
 
@@ -49,7 +49,10 @@ def test_replay_files():
                     "/dynamixel.transforms"]
 
     sample_counter = 0
-    for _ in logloader.replay_files(filenames, stream_names):
+    last_timestamp = float("-inf")
+    for timestamp, _, _, _ in logloader.replay_files(filenames, stream_names):
         sample_counter += 1
+        assert_less_equal(last_timestamp, timestamp)
+        last_timestamp = timestamp
 
     assert_equal(sample_counter, 300 + 300)
