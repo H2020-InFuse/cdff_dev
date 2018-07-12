@@ -1,8 +1,16 @@
 <?xml version="1.0"?>
   <robot name="seekurjr">
     <link name="body"/>
+    <link name="velodyne"/>
     <link name="lower_dynamixel"/>
-    <joint name="offset" type="fixed">
+
+    <joint name="velodyne" type="fixed">
+      <origin xyz="0.3 0.22 0.45" rpy="0 0 0"/>
+      <parent link="body"/>
+      <child link="velodyne"/>
+    </joint>
+
+    <joint name="lower_dynamixel" type="fixed">
       <origin xyz="0 0 0.05" rpy="0 0 0"/>
       <parent link="body"/>
       <child link="lower_dynamixel"/>

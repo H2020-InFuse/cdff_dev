@@ -62,8 +62,8 @@ class EnvireNode: # TODO move to cdff_dev
         self.timestamp = timestamp
 
     def _set_transform(self, rigid_body_state):
-        origin = rigid_body_state.target_frame
-        target = rigid_body_state.source_frame
+        origin = rigid_body_state.source_frame
+        target = rigid_body_state.target_frame
         if not self.graph_.contains_frame(origin):
             self.graph_.add_frame(origin)
         if not self.graph_.contains_frame(target):
@@ -147,13 +147,14 @@ def main():
         "/laser_filter.filtered_scans": "upper_dynamixel",
         "/tilt_scan.pointcloud": "body",
         "/dynamixel.transforms": "body",
-        "/velodyne.laser_scans": "body",
+        "/velodyne.laser_scans": "velodyne",
 
         #"/xsens.calibrated_sensors": "body"
     }
     urdf_files = [
-        "test/test_data/model.urdf"
+        #"test/test_data/model.urdf"
         #"SeekurJr/urdf/seekurjr.urdf"
+        "examples/seekurjr.urdf"
     ]
 
     stream_names = [
