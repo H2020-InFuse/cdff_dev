@@ -151,5 +151,9 @@ cdef class Frame:
     cdef _cdff_types.asn1SccFrame* thisptr
 
 
+cdef class asn1SccFrame_size_tReference:
+    cdef _cdff_types.asn1SccFrame_size_t* thisptr
+
+
 cdef class Frame_imageReference:
     cdef _cdff_types.asn1SccFrame_image* thisptr

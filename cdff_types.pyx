@@ -1509,12 +1509,49 @@ cdef class Frame:
         return image
 
     #asn1SccFrame_attributes attributes
+
+    def _get_datasize(self):
+        cdef asn1SccFrame_size_tReference datasize = asn1SccFrame_size_tReference()
+        del datasize.thisptr
+        datasize.thisptr = &self.thisptr.datasize
+        datasize.delete_thisptr = False
+        return datasize
+
+    def _set_datasize(self, asn1SccFrame_size_tReference datasize):
+        self.thisptr.datasize = deref(datasize.thisptr)
+
+    datasize = property(_get_datasize, _set_datasize)
+
     #asn1SccFrame_size_t datasize
     #uint32_t data_depth
     #uint32_t pixel_size
     #uint32_t row_size
     #asn1SccFrame_mode_t frame_mode
     #asn1SccFrame_status_t frame_status
+
+
+cdef class asn1SccFrame_size_tReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def _get_width(self):
+        return self.thisptr.width
+
+    def _set_width(self, uint16_t width):
+        self.thisptr.width = width
+
+    width = property(_get_width, _set_width)
+
+    def _get_height(self):
+        return self.thisptr.height
+
+    def _set_height(self, uint16_t height):
+        self.thisptr.height = height
+
+    height = property(_get_height, _set_height)
 
 
 cdef class Frame_imageReference:
