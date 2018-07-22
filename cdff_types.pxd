@@ -145,3 +145,11 @@ cdef class DepthMap_distancesReference:
 
 cdef class DepthMap_remissionsReference:
     cdef _cdff_types.asn1SccDepthMap_remissions* thisptr
+
+
+cdef class Frame:
+    cdef _cdff_types.asn1SccFrame* thisptr
+
+
+cdef class Frame_imageReference:
+    cdef _cdff_types.asn1SccFrame_image* thisptr

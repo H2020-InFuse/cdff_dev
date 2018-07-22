@@ -1459,3 +1459,90 @@ cdef class DepthMap_remissionsReference:
 
     def size(self):
         return self.thisptr.nCount
+
+
+cdef class Frame:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_types.asn1SccFrame()
+        self.delete_thisptr = True
+
+    def __str__(self):
+        # TODO
+        return str("{type: Frame}")
+
+    def _get_frame_time(self):
+        cdef Time frame_time = Time()
+        del frame_time.thisptr
+        frame_time.thisptr = &self.thisptr.frame_time
+        frame_time.delete_thisptr = False
+        return frame_time
+
+    def _set_frame_time(self, Time frame_time):
+        self.thisptr.frame_time = deref(frame_time.thisptr)
+
+    frame_time = property(_get_frame_time, _set_frame_time)
+
+    def _get_received_time(self):
+        cdef Time received_time = Time()
+        del received_time.thisptr
+        received_time.thisptr = &self.thisptr.received_time
+        received_time.delete_thisptr = False
+        return received_time
+
+    def _set_received_time(self, Time received_time):
+        self.thisptr.received_time = deref(received_time.thisptr)
+
+    received_time = property(_get_received_time, _set_received_time)
+
+    @property
+    def image(self):
+        cdef Frame_imageReference image = Frame_imageReference()
+        image.thisptr = &self.thisptr.image
+        return image
+
+    #asn1SccFrame_attributes attributes
+    #asn1SccFrame_size_t datasize
+    #uint32_t data_depth
+    #uint32_t pixel_size
+    #uint32_t row_size
+    #asn1SccFrame_mode_t frame_mode
+    #asn1SccFrame_status_t frame_status
+
+
+cdef class Frame_imageReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def __len__(self):
+        return self.thisptr.nCount
+
+    def __getitem__(self, int i):
+        return self.thisptr.arr[i]
+
+    def __setitem__(self, int i, unsigned char v):
+        if i >= 24883200:
+            warnings.warn("Maximum size of DepthMap is 24883200")
+            return
+        self.thisptr.arr[i] = v
+        if self.thisptr.nCount <= <int> i:
+            self.thisptr.nCount = <int> (i + 1)
+
+    def resize(self, int size):
+        if size > 24883200:
+            warnings.warn("Maximum size of DepthMap is 24883200")
+            return
+        self.thisptr.nCount = size
+
+    def size(self):
+        return self.thisptr.nCount
