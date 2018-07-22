@@ -1514,7 +1514,6 @@ cdef class Frame:
         cdef asn1SccFrame_size_tReference datasize = asn1SccFrame_size_tReference()
         del datasize.thisptr
         datasize.thisptr = &self.thisptr.datasize
-        datasize.delete_thisptr = False
         return datasize
 
     def _set_datasize(self, asn1SccFrame_size_tReference datasize):
@@ -1522,7 +1521,6 @@ cdef class Frame:
 
     datasize = property(_get_datasize, _set_datasize)
 
-    #asn1SccFrame_size_t datasize
     #uint32_t data_depth
     #uint32_t pixel_size
     #uint32_t row_size
@@ -1569,7 +1567,7 @@ cdef class Frame_imageReference:
 
     def __setitem__(self, int i, unsigned char v):
         if i >= 24883200:
-            warnings.warn("Maximum size of DepthMap is 24883200")
+            warnings.warn("Maximum size of Frame is 24883200")
             return
         self.thisptr.arr[i] = v
         if self.thisptr.nCount <= <int> i:
@@ -1577,7 +1575,7 @@ cdef class Frame_imageReference:
 
     def resize(self, int size):
         if size > 24883200:
-            warnings.warn("Maximum size of DepthMap is 24883200")
+            warnings.warn("Maximum size of Frame is 24883200")
             return
         self.thisptr.nCount = size
 

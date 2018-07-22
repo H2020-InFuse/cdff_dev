@@ -149,6 +149,7 @@ cdef class DepthMap_remissionsReference:
 
 cdef class Frame:
     cdef _cdff_types.asn1SccFrame* thisptr
+    cdef bool delete_thisptr
 
 
 cdef class asn1SccFrame_size_tReference:

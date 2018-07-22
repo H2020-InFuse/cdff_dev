@@ -935,3 +935,24 @@ def test_depth_map():
 
     depth_map.horizontal_size = 10
     assert_equal(depth_map.horizontal_size, 10)
+
+
+def test_frame():
+    frame = cdff_types.Frame()
+
+    frame.frame_time.microseconds = 10
+    assert_equal(frame.frame_time.microseconds, 10)
+
+    frame.received_time.microseconds = 10
+    assert_equal(frame.received_time.microseconds, 10)
+
+    frame.image[0] = 10
+    frame.image[1] = 11
+    assert_equal(frame.image.size(), 2)
+    assert_equal(frame.image[0], 10)
+    assert_equal(frame.image[1], 11)
+
+    frame.datasize.width = 640
+    assert_equal(frame.datasize.width, 640)
+    frame.datasize.height = 480
+    assert_equal(frame.datasize.height, 480)
