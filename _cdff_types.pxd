@@ -301,3 +301,69 @@ cdef extern from "DepthMap.h":
         uint32_t horizontal_size
         asn1SccDepthMap_distances distances
         asn1SccDepthMap_remissions remissions
+
+
+cdef extern from "Frame.h":
+    cdef cppclass asn1SccFrame_mode_t:
+        pass
+
+
+cdef extern from "Frame.h" namespace "asn1SccFrame_mode_t":
+    cdef asn1SccFrame_mode_t asn1Sccmode_undefined
+    cdef asn1SccFrame_mode_t asn1Sccmode_grayscale
+    cdef asn1SccFrame_mode_t asn1Sccmode_rgb
+    cdef asn1SccFrame_mode_t asn1Sccmode_uyvy
+    cdef asn1SccFrame_mode_t asn1Sccmode_bgr
+    cdef asn1SccFrame_mode_t asn1Sccmode_rgb32
+    cdef asn1SccFrame_mode_t asn1Sccraw_modes
+    cdef asn1SccFrame_mode_t asn1Sccmode_bayer
+    cdef asn1SccFrame_mode_t asn1Sccmode_bayer_rggb
+    cdef asn1SccFrame_mode_t asn1Sccmode_bayer_grbg
+    cdef asn1SccFrame_mode_t asn1Sccmode_bayer_bggr
+    cdef asn1SccFrame_mode_t asn1Sccmode_bayer_gbrg
+    cdef asn1SccFrame_mode_t asn1Scccompressed_modes
+    cdef asn1SccFrame_mode_t asn1SccFrame_mode_t_mode_pjpg
+    cdef asn1SccFrame_mode_t asn1Sccmode_jpeg
+    cdef asn1SccFrame_mode_t asn1Sccmode_png
+
+
+cdef extern from "Frame.h":
+    cdef cppclass asn1SccFrame_status_t:
+        pass
+
+
+cdef extern from "Frame.h" namespace "asn1SccFrame_status_t":
+    cdef asn1SccFrame_status_t asn1Sccstatus_empty
+    cdef asn1SccFrame_status_t asn1Sccstatus_valid
+    cdef asn1SccFrame_status_t asn1Sccstatus_invalid
+
+
+cdef extern from "Frame.h":
+    cdef cppclass asn1SccFrame_size_t:
+        uint16_t width
+        uint16_t height
+    cdef cppclass asn1SccFrame_attrib_t:
+        asn1SccT_String data
+        asn1SccT_String att_name
+    cdef cppclass asn1SccFrame_attributes:
+        int nCount
+        asn1SccFrame_attrib_t[5] arr
+    cdef cppclass asn1SccFrame_image:
+        int nCount
+        unsigned char[24883200] arr
+    cdef cppclass asn1SccFrame:
+        asn1SccTime frame_time
+        asn1SccTime received_time
+        asn1SccFrame_image image
+        asn1SccFrame_attributes attributes
+        asn1SccFrame_size_t datasize
+        uint32_t data_depth
+        uint32_t pixel_size
+        uint32_t row_size
+        asn1SccFrame_mode_t frame_mode
+        asn1SccFrame_status_t frame_status
+    cdef cppclass asn1SccFramePair:
+        asn1SccTime frame_time
+        asn1SccFrame first
+        asn1SccFrame second
+        uint32_t id
