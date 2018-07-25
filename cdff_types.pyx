@@ -1472,6 +1472,14 @@ cdef class Frame:
 
     def __init__(self):
         self.thisptr = new _cdff_types.asn1SccFrame()
+        self.thisptr.image.nCount = 0
+        self.thisptr.attributes.nCount = 0
+        self.thisptr.datasize.width = 0
+        self.thisptr.datasize.height = 0
+        self.thisptr.data_depth = 0
+        self.thisptr.pixel_size = 0
+        self.thisptr.row_size = 0
+
         self.delete_thisptr = True
 
     def __str__(self):
@@ -1509,26 +1517,147 @@ cdef class Frame:
         return image
 
     #asn1SccFrame_attributes attributes
+    @property
+    def attributes(self):
+        cdef Frame_attributesReference attributes = Frame_attributesReference()
+        attributes.thisptr = &self.thisptr.attributes
+        return attributes
 
     def _get_datasize(self):
-        cdef asn1SccFrame_size_tReference datasize = asn1SccFrame_size_tReference()
+        cdef Frame_size_tReference datasize = Frame_size_tReference()
         del datasize.thisptr
         datasize.thisptr = &self.thisptr.datasize
         return datasize
 
-    def _set_datasize(self, asn1SccFrame_size_tReference datasize):
+    def _set_datasize(self, Frame_size_tReference datasize):
         self.thisptr.datasize = deref(datasize.thisptr)
 
     datasize = property(_get_datasize, _set_datasize)
 
     #uint32_t data_depth
+    def _get_data_depth(self):
+        return self.thisptr.data_depth
+
+    def _set_data_depth(self, uint32_t data_depth):
+        self.thisptr.data_depth = data_depth
+
+    data_depth = property(_get_data_depth, _set_data_depth)
+
     #uint32_t pixel_size
+    def _get_pixel_size(self):
+        return self.thisptr.pixel_size
+
+    def _set_pixel_size(self, uint32_t pixel_size):
+        self.thisptr.pixel_size = pixel_size
+
+    pixel_size = property(_get_pixel_size, _set_pixel_size)
+
     #uint32_t row_size
+    def _get_row_size(self):
+        return self.thisptr.row_size
+
+    def _set_row_size(self, uint32_t row_size):
+        self.thisptr.row_size = row_size
+
+    row_size = property(_get_row_size, _set_row_size)
+
     #asn1SccFrame_mode_t frame_mode
+    def _get_frame_mode(self):
+        if <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_undefined:
+            return "MODE_UNDEFINED"
+        elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_grayscale:
+            return "MODE_GRAYSCALE"
+        elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_rgb:
+            return "MODE_RGB"
+        elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_uyvy:
+            return "MODE_UYVY"
+        elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_bgr:
+            return "MODE_BGR"
+        elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_rgb32:
+            return "MODE_RGB32"
+        elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccraw_modes:
+            return "RAW_MODES"
+        elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_bayer:
+            return "MODE_BAYER"
+        elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_bayer_rggb:
+            return "MODE_BAYER_RGGB"
+        elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_bayer_grbg:
+            return "MODE_BAYER_GRBG"
+        elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_bayer_bggr:
+            return "MODE_BAYER_BGGR"
+        elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_bayer_gbrg:
+            return "MODE_BAYER_BGRG"
+        elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Scccompressed_modes:
+            return "COMPRESSED_MODES"
+        elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1SccFrame_mode_t_mode_pjpg:
+            return "FRAME_MODE_T_MODE_PJPG"
+        elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_jpeg:
+            return "MODE_JPEG"
+        else:
+            return "MODE_PNG"
+
+    def _set_frame_mode(self,  str frame_mode):
+        if frame_mode == "MODE_UNDEFINED":
+            self.thisptr.frame_mode = _cdff_types.asn1Sccmode_undefined
+        elif frame_mode == "MODE_GRAYSCALE":
+            self.thisptr.frame_mode = _cdff_types.asn1Sccmode_grayscale
+        elif frame_mode == "MODE_RGB":
+            self.thisptr.frame_mode = _cdff_types.asn1Sccmode_rgb
+        elif frame_mode == "MODE_UYVY":
+            self.thisptr.frame_mode = _cdff_types.asn1Sccmode_uyvy
+        elif frame_mode == "MODE_BGR":
+            self.thisptr.frame_mode = _cdff_types.asn1Sccmode_bgr
+        elif frame_mode == "MODE_RGB32":
+            self.thisptr.frame_mode = _cdff_types.asn1Sccmode_rgb32
+        elif frame_mode == "RAW_MODES":
+            self.thisptr.frame_mode = _cdff_types.asn1Sccraw_modes
+        elif frame_mode == "MODE_BAYER":
+            self.thisptr.frame_mode = _cdff_types.asn1Sccmode_bayer
+        elif frame_mode == "MODE_BAYER_RGGB":
+            self.thisptr.frame_mode = _cdff_types.asn1Sccmode_bayer_rggb
+        elif frame_mode == "MODE_BAYER_GRBG":
+            self.thisptr.frame_mode = _cdff_types.asn1Sccmode_bayer_grbg
+        elif frame_mode == "MODE_BAYER_BGGR":
+            self.thisptr.frame_mode = _cdff_types.asn1Sccmode_bayer_bggr
+        elif frame_mode == "MODE_BAYER_BGRG":
+            self.thisptr.frame_mode = _cdff_types.asn1Sccmode_bayer_gbrg
+        elif frame_mode == "COMPRESSED_MODES":
+            self.thisptr.frame_mode = _cdff_types.asn1Scccompressed_modes
+        elif frame_mode == "FRAME_MODE_T_MODE_PJPG":
+            self.thisptr.frame_mode = _cdff_types.asn1SccFrame_mode_t_mode_pjpg
+        elif frame_mode == "MODE_JPEG":
+            self.thisptr.frame_mode = _cdff_types.asn1Sccmode_jpeg
+        elif frame_mode == "MODE_PNG":
+            self.thisptr.frame_mode = _cdff_types.asn1Sccmode_png
+        else:
+            raise ValueError("Unknown frame_mode: %s" % frame_mode)
+
+    frame_mode = property(_get_frame_mode, _set_frame_mode)
+
+
     #asn1SccFrame_status_t frame_status
+    def _get_frame_status(self):
+        if <int> self.thisptr.frame_status == <int> _cdff_types.asn1Sccstatus_empty:
+            return "STATUS_EMPTY"
+        elif <int> self.thisptr.frame_status == <int> _cdff_types.asn1Sccstatus_valid:
+            return "STATUS_VALID"
+        else:
+            return "STATUS_INVALID"
+
+    def _set_frame_status(self,  str frame_status):
+        if frame_status == "STATUS_EMPTY":
+            self.thisptr.frame_status = _cdff_types.asn1Sccstatus_empty
+        elif frame_status == "STATUS_VALID":
+            self.thisptr.frame_status = _cdff_types.asn1Sccstatus_valid
+        elif frame_status == "STATUS_INVALID":
+            self.thisptr.frame_status = _cdff_types.asn1Sccstatus_invalid
+        else:
+            raise ValueError("Unknown frame_status: %s" % frame_status)
+
+    frame_status = property(_get_frame_status, _set_frame_status)
 
 
-cdef class asn1SccFrame_size_tReference:
+cdef class Frame_size_tReference:
     def __cinit__(self):
         self.thisptr = NULL
 
@@ -1576,6 +1705,69 @@ cdef class Frame_imageReference:
     def resize(self, int size):
         if size > 24883200:
             warnings.warn("Maximum size of Frame is 24883200")
+            return
+        self.thisptr.nCount = size
+
+    def size(self):
+        return self.thisptr.nCount
+
+
+cdef class Frame_attrib_tReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def _get_data(self):
+        cdef bytes data = self.thisptr.data.arr
+        return data.decode()
+
+    def _set_data(self, str data):
+        cdef string value = data.encode()
+        self.thisptr.data.arr = value.c_str()
+        self.thisptr.data.nCount = len(data)
+
+    data = property(_get_data, _set_data)
+
+    def _get_att_name(self):
+        cdef bytes att_name = self.thisptr.att_name.arr
+        return att_name.decode()
+
+    def _set_att_name(self, str att_name):
+        cdef string value = att_name.encode()
+        self.thisptr.att_name.arr = value.c_str()
+        self.thisptr.att_name.nCount = len(att_name)
+
+    att_name = property(_get_att_name, _set_att_name)
+
+
+cdef class Frame_attributesReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def __len__(self):
+        return self.thisptr.nCount
+
+    def __getitem__(self, int i):
+        cdef Frame_attrib_tReference frame_attrib_t = Frame_attrib_tReference()
+        frame_attrib_t.thisptr = &self.thisptr.arr[i]
+        return frame_attrib_t
+
+    def __setitem__(self, int i, Frame_attrib_tReference v):
+        if i >= 5:
+            warnings.warn("Maximum size of Frame_attributes is 5")
+            return
+        self.thisptr.arr[i] = deref(v.thisptr)
+        if self.thisptr.nCount <= <int> i:
+            self.thisptr.nCount = <int> (i + 1)
+
+    def resize(self, int size):
+        if size > 5:
+            warnings.warn("Maximum size of Frame_attributes is 5")
             return
         self.thisptr.nCount = size
 

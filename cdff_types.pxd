@@ -152,9 +152,17 @@ cdef class Frame:
     cdef bool delete_thisptr
 
 
-cdef class asn1SccFrame_size_tReference:
+cdef class Frame_size_tReference:
     cdef _cdff_types.asn1SccFrame_size_t* thisptr
 
 
 cdef class Frame_imageReference:
     cdef _cdff_types.asn1SccFrame_image* thisptr
+
+
+cdef class Frame_attrib_tReference:
+    cdef _cdff_types.asn1SccFrame_attrib_t* thisptr
+
+
+cdef class Frame_attributesReference:
+    cdef _cdff_types.asn1SccFrame_attributes* thisptr
