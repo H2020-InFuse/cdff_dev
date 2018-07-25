@@ -956,3 +956,24 @@ def test_frame():
     assert_equal(frame.datasize.width, 640)
     frame.datasize.height = 480
     assert_equal(frame.datasize.height, 480)
+
+    frame.attributes.resize(1)
+    frame.attributes[0].data = "some data"
+    frame.attributes[0].att_name = "some name"
+    assert_equal(frame.attributes[0].data, "some data")
+    assert_equal(frame.attributes[0].att_name, "some name")
+
+    frame.data_depth = 256
+    assert_equal(frame.data_depth, 256)
+
+    frame.pixel_size = 256
+    assert_equal(frame.pixel_size, 256)
+
+    frame.row_size = 256
+    assert_equal(frame.row_size, 256)
+
+    frame.frame_mode = "MODE_UNDEFINED"
+    assert_equal(frame.frame_mode, "MODE_UNDEFINED")
+
+    frame.frame_status = "STATUS_EMPTY"
+    assert_equal(frame.frame_status, "STATUS_EMPTY")
