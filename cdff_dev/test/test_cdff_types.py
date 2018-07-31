@@ -972,8 +972,8 @@ def test_frame():
     frame.row_size = 256
     assert_equal(frame.row_size, 256)
 
-    frame.frame_mode = "asn1Sccmode_undefined"
-    assert_equal(frame.frame_mode, "asn1Sccmode_undefined")
+    frame.frame_mode = "mode_undefined"
+    assert_equal(frame.frame_mode, "mode_undefined")
 
-    frame.frame_status = "asn1Sccstatus_empty"
-    assert_equal(frame.frame_status, "asn1Sccstatus_empty")
+    frame.frame_status = "status_empty"
+    assert_equal(frame.frame_status, "status_empty")

@@ -1516,7 +1516,6 @@ cdef class Frame:
         image.thisptr = &self.thisptr.image
         return image
 
-    #asn1SccFrame_attributes attributes
     @property
     def attributes(self):
         cdef Frame_attributesReference attributes = Frame_attributesReference()
@@ -1534,7 +1533,6 @@ cdef class Frame:
 
     datasize = property(_get_datasize, _set_datasize)
 
-    #uint32_t data_depth
     def _get_data_depth(self):
         return self.thisptr.data_depth
 
@@ -1543,7 +1541,6 @@ cdef class Frame:
 
     data_depth = property(_get_data_depth, _set_data_depth)
 
-    #uint32_t pixel_size
     def _get_pixel_size(self):
         return self.thisptr.pixel_size
 
@@ -1552,7 +1549,6 @@ cdef class Frame:
 
     pixel_size = property(_get_pixel_size, _set_pixel_size)
 
-    #uint32_t row_size
     def _get_row_size(self):
         return self.thisptr.row_size
 
@@ -1561,73 +1557,72 @@ cdef class Frame:
 
     row_size = property(_get_row_size, _set_row_size)
 
-    #asn1SccFrame_mode_t frame_mode
     def _get_frame_mode(self):
         if <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_undefined:
-            return "asn1Sccmode_undefined"
+            return "mode_undefined"
         elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_grayscale:
-            return "asn1Sccmode_grayscale"
+            return "mode_grayscale"
         elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_rgb:
-            return "asn1Sccmode_rgb"
+            return "mode_rgb"
         elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_uyvy:
-            return "asn1Sccmode_uyvy"
+            return "mode_uyvy"
         elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_bgr:
-            return "asn1Sccmode_bgr"
+            return "mode_bgr"
         elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_rgb32:
-            return "asn1Sccmode_rgb32"
+            return "mode_rgb32"
         elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccraw_modes:
-            return "asn1Sccraw_modes"
+            return "raw_modes"
         elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_bayer:
-            return "asn1Sccmode_bayer"
+            return "mode_bayer"
         elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_bayer_rggb:
-            return "asn1Sccmode_bayer_rggb"
+            return "mode_bayer_rggb"
         elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_bayer_grbg:
-            return "asn1Sccmode_bayer_grbg"
+            return "mode_bayer_grbg"
         elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_bayer_bggr:
-            return "asn1Sccmode_bayer_bggr"
+            return "mode_bayer_bggr"
         elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_bayer_gbrg:
-            return "asn1Sccmode_bayer_gbrg"
+            return "mode_bayer_gbrg"
         elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Scccompressed_modes:
-            return "asn1Scccompressed_modes"
+            return "compressed_modes"
         elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1SccFrame_mode_t_mode_pjpg:
-            return "asn1SccFrame_mode_t_mode_pjpg"
+            return "Frame_mode_t_mode_pjpg"
         elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_jpeg:
-            return "asn1Sccmode_jpeg"
+            return "mode_jpeg"
         else:
-            return "asn1Sccmode_png"
+            return "mode_png"
 
     def _set_frame_mode(self,  str frame_mode):
-        if frame_mode == "asn1Sccmode_undefined":
+        if frame_mode == "mode_undefined":
             self.thisptr.frame_mode = _cdff_types.asn1Sccmode_undefined
-        elif frame_mode == "asn1Sccmode_grayscale":
+        elif frame_mode == "mode_grayscale":
             self.thisptr.frame_mode = _cdff_types.asn1Sccmode_grayscale
-        elif frame_mode == "asn1Sccmode_rgb":
+        elif frame_mode == "mode_rgb":
             self.thisptr.frame_mode = _cdff_types.asn1Sccmode_rgb
-        elif frame_mode == "asn1Sccmode_uyvy":
+        elif frame_mode == "mode_uyvy":
             self.thisptr.frame_mode = _cdff_types.asn1Sccmode_uyvy
-        elif frame_mode == "asn1Sccmode_bgr":
+        elif frame_mode == "mode_bgr":
             self.thisptr.frame_mode = _cdff_types.asn1Sccmode_bgr
-        elif frame_mode == "asn1Sccmode_rgb32":
+        elif frame_mode == "mode_rgb32":
             self.thisptr.frame_mode = _cdff_types.asn1Sccmode_rgb32
-        elif frame_mode == "asn1Sccraw_modes":
+        elif frame_mode == "raw_modes":
             self.thisptr.frame_mode = _cdff_types.asn1Sccraw_modes
-        elif frame_mode == "asn1Sccmode_bayer":
+        elif frame_mode == "mode_bayer":
             self.thisptr.frame_mode = _cdff_types.asn1Sccmode_bayer
-        elif frame_mode == "asn1Sccmode_bayer_rggb":
+        elif frame_mode == "mode_bayer_rggb":
             self.thisptr.frame_mode = _cdff_types.asn1Sccmode_bayer_rggb
-        elif frame_mode == "asn1Sccmode_bayer_grbg":
+        elif frame_mode == "mode_bayer_grbg":
             self.thisptr.frame_mode = _cdff_types.asn1Sccmode_bayer_grbg
-        elif frame_mode == "asn1Sccmode_bayer_bggr":
+        elif frame_mode == "mode_bayer_bggr":
             self.thisptr.frame_mode = _cdff_types.asn1Sccmode_bayer_bggr
-        elif frame_mode == "asn1Sccmode_bayer_gbrg":
+        elif frame_mode == "mode_bayer_gbrg":
             self.thisptr.frame_mode = _cdff_types.asn1Sccmode_bayer_gbrg
-        elif frame_mode == "asn1Scccompressed_modes":
+        elif frame_mode == "compressed_modes":
             self.thisptr.frame_mode = _cdff_types.asn1Scccompressed_modes
-        elif frame_mode == "asn1SccFrame_mode_t_mode_pjpg":
+        elif frame_mode == "Frame_mode_t_mode_pjpg":
             self.thisptr.frame_mode = _cdff_types.asn1SccFrame_mode_t_mode_pjpg
-        elif frame_mode == "asn1Sccmode_jpeg":
+        elif frame_mode == "mode_jpeg":
             self.thisptr.frame_mode = _cdff_types.asn1Sccmode_jpeg
-        elif frame_mode == "asn1Sccmode_png":
+        elif frame_mode == "mode_png":
             self.thisptr.frame_mode = _cdff_types.asn1Sccmode_png
         else:
             raise ValueError("Unknown frame_mode: %s" % frame_mode)
@@ -1635,21 +1630,20 @@ cdef class Frame:
     frame_mode = property(_get_frame_mode, _set_frame_mode)
 
 
-    #asn1SccFrame_status_t frame_status
     def _get_frame_status(self):
         if <int> self.thisptr.frame_status == <int> _cdff_types.asn1Sccstatus_empty:
-            return "asn1Sccstatus_empty"
+            return "status_empty"
         elif <int> self.thisptr.frame_status == <int> _cdff_types.asn1Sccstatus_valid:
-            return "asn1Sccstatus_valid"
+            return "status_valid"
         else:
-            return "asn1Sccstatus_invalid"
+            return "status_invalid"
 
     def _set_frame_status(self,  str frame_status):
-        if frame_status == "asn1Sccstatus_empty":
+        if frame_status == "status_empty":
             self.thisptr.frame_status = _cdff_types.asn1Sccstatus_empty
-        elif frame_status == "asn1Sccstatus_valid":
+        elif frame_status == "status_valid":
             self.thisptr.frame_status = _cdff_types.asn1Sccstatus_valid
-        elif frame_status == "asn1Sccstatus_invalid":
+        elif frame_status == "status_invalid":
             self.thisptr.frame_status = _cdff_types.asn1Sccstatus_invalid
         else:
             raise ValueError("Unknown frame_status: %s" % frame_status)
