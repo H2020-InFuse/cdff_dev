@@ -26,7 +26,8 @@ cdef class Time:
         self.delete_thisptr = True
 
     def __str__(self):
-        return str("{type: Time, microseconds: %d, usec_per_sec: %d}" % (self.thisptr.microseconds, self.thisptr.usecPerSec))
+        return str("{type: Time, microseconds: %d, usec_per_sec: %d}"
+                   % (self.thisptr.microseconds, self.thisptr.usecPerSec))
 
     def assign(self, Time other):
         self.thisptr.assign(deref(other.thisptr))
@@ -1225,14 +1226,14 @@ cdef class DepthMap:
 
     def _get_vertical_projection(self):
         if <int> self.thisptr.vertical_projection == <int> _cdff_types.asn1Sccpolar:
-            return "POLAR"
+            return "polar"
         else:
-            return "PLANAR"
+            return "planar"
 
     def _set_vertical_projection(self,  str vertical_projection):
-        if vertical_projection == "POLAR":
+        if vertical_projection == "polar":
             self.thisptr.vertical_projection = _cdff_types.asn1Sccpolar
-        elif vertical_projection == "PLANAR":
+        elif vertical_projection == "planar":
             self.thisptr.vertical_projection = _cdff_types.asn1Sccplanar
         else:
             raise ValueError("Unknown projection: %s" % vertical_projection)
@@ -1241,14 +1242,14 @@ cdef class DepthMap:
 
     def _get_horizontal_projection(self):
         if <int> self.thisptr.horizontal_projection == <int> _cdff_types.asn1Sccpolar:
-            return "POLAR"
+            return "polar"
         else:
-            return "PLANAR"
+            return "planar"
 
     def _set_horizontal_projection(self,  str horizontal_projection):
-        if horizontal_projection == "POLAR":
+        if horizontal_projection == "polar":
             self.thisptr.horizontal_projection = _cdff_types.asn1Sccpolar
-        elif horizontal_projection == "PLANAR":
+        elif horizontal_projection == "planar":
             self.thisptr.horizontal_projection = _cdff_types.asn1Sccplanar
         else:
             raise ValueError("Unknown projection: %s" % horizontal_projection)
