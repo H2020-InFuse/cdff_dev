@@ -924,11 +924,11 @@ def test_depth_map():
     depth_map.horizontal_interval[0] = 10.0
     assert_equal(depth_map.horizontal_interval[0], 10.0)
 
-    depth_map.vertical_projection = "POLAR"
-    assert_equal(depth_map.vertical_projection , "POLAR")
+    depth_map.vertical_projection = "polar"
+    assert_equal(depth_map.vertical_projection , "polar")
 
-    depth_map.horizontal_projection = "PLANAR"
-    assert_equal(depth_map.horizontal_projection, "PLANAR")
+    depth_map.horizontal_projection = "planar"
+    assert_equal(depth_map.horizontal_projection, "planar")
 
     depth_map.vertical_size = 10
     assert_equal(depth_map.vertical_size, 10)
