@@ -1,4 +1,5 @@
 import cdff_types
+import warnings
 
 
 def create_cpp(typename):
@@ -61,7 +62,12 @@ def _assign_list(obj, data):
             for j in range(len(data[i])):
                 obj[i, j] = data[i][j]
         elif type(data[i]) == dict:  # nested types
-            _assign_dict(obj[i], data[i])
+            try:
+                _assign_dict(obj[i], data[i])
+            except KeyError as e:
+                warnings.warn(
+                    "Failed to assign data[%s] to obj[%s], reason:\n%s"
+                    % (i, i, str(e)))
         else:
             obj[i] = data[i]
 

@@ -2,6 +2,7 @@
 cimport cdff_types
 cimport _cdff_types
 from cython.operator cimport dereference as deref
+from libc.string cimport memcpy
 from libc.stdint cimport uint8_t, uint16_t, uint32_t, uint64_t
 from libc.stdint cimport int8_t, int16_t, int32_t, int64_t
 cimport numpy as np
@@ -828,7 +829,7 @@ cdef class RigidBodyState:
 
     def _set_source_frame(self, str sourceFrame):
         cdef string value = sourceFrame.encode()
-        self.thisptr.sourceFrame.arr = value.c_str()
+        memcpy(self.thisptr.sourceFrame.arr, value.c_str(), len(sourceFrame))
         self.thisptr.sourceFrame.nCount = len(sourceFrame)
 
     source_frame = property(_get_source_frame, _set_source_frame)
@@ -839,7 +840,7 @@ cdef class RigidBodyState:
 
     def _set_target_frame(self, str targetFrame):
         cdef string value = targetFrame.encode()
-        self.thisptr.targetFrame.arr = value.c_str()
+        memcpy(self.thisptr.targetFrame.arr, value.c_str(), len(targetFrame))
         self.thisptr.targetFrame.nCount = len(targetFrame)
 
     target_frame = property(_get_target_frame, _set_target_frame)
@@ -1071,7 +1072,7 @@ cdef class Joints_namesReference:
             warnings.warn("Maximum size of Joints is 30")
             return
         cdef string value = name.encode()
-        self.thisptr.arr[i].arr = value.c_str()
+        memcpy(self.thisptr.arr[i].arr, value.c_str(), len(name))
         if self.thisptr.nCount <= <int> i:
             self.thisptr.nCount = <int> (i + 1)
 
@@ -1719,7 +1720,7 @@ cdef class Frame_attrib_tReference:
 
     def _set_data(self, str data):
         cdef string value = data.encode()
-        self.thisptr.data.arr = value.c_str()
+        memcpy(self.thisptr.data.arr, value.c_str(), len(data))
         self.thisptr.data.nCount = len(data)
 
     data = property(_get_data, _set_data)
@@ -1730,7 +1731,7 @@ cdef class Frame_attrib_tReference:
 
     def _set_att_name(self, str att_name):
         cdef string value = att_name.encode()
-        self.thisptr.att_name.arr = value.c_str()
+        memcpy(self.thisptr.att_name.arr, value.c_str(), len(att_name))
         self.thisptr.att_name.nCount = len(att_name)
 
     att_name = property(_get_att_name, _set_att_name)
@@ -1747,17 +1748,13 @@ cdef class Frame_attributesReference:
         return self.thisptr.nCount
 
     def __getitem__(self, int i):
+        if i >= 5:
+            raise KeyError("Maximum size of Frame_attributes is 5")
+        if self.thisptr.nCount <= <int> i:
+            self.thisptr.nCount = <int> (i + 1)
         cdef Frame_attrib_tReference frame_attrib_t = Frame_attrib_tReference()
         frame_attrib_t.thisptr = &self.thisptr.arr[i]
         return frame_attrib_t
-
-    def __setitem__(self, int i, Frame_attrib_tReference v):
-        if i >= 5:
-            warnings.warn("Maximum size of Frame_attributes is 5")
-            return
-        self.thisptr.arr[i] = deref(v.thisptr)
-        if self.thisptr.nCount <= <int> i:
-            self.thisptr.nCount = <int> (i + 1)
 
     def resize(self, int size):
         if size > 5:
