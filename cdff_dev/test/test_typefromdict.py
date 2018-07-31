@@ -1,4 +1,4 @@
-from cdff_dev import typefromdict
+from cdff_dev import logloader, typefromdict
 import cdff_types
 from nose.tools import assert_raises_regex, assert_equal
 from numpy.testing import assert_array_equal
@@ -108,3 +108,21 @@ def test_create_pointcloud():
     assert_array_equal(obj.colors[0], [255, 255, 255, 255])
     assert_array_equal(obj.colors[1], [255, 255, 255, 255])
     assert_array_equal(obj.colors[2], [255, 255, 255, 255])
+
+
+def test_create_image():
+    log = logloader.load_log("test/test_data/logs/frames.msg")
+    data = log["/camera1.frame"][1]
+    obj = typefromdict.create_from_dict(
+        log["/camera1.frame.meta"]["type"], data)
+    assert_equal(obj.attributes[0].att_name, "FrameCount")
+    assert_equal(obj.attributes[0].data, "86375")
+    assert_equal(obj.attributes[1].att_name, "Exposure_ms")
+    assert_equal(obj.attributes[1].data, "4.99986")
+    assert_equal(obj.data_depth, 3)
+    assert_equal(obj.datasize.height, 512)
+    assert_equal(obj.datasize.width, 640)
+    assert_equal(obj.frame_mode, "mode_rgb")
+    assert_equal(obj.frame_status, "status_valid")
+    assert_equal(obj.frame_time.microseconds, 1530195435880000)
+    assert_equal(obj.received_time.microseconds, 1530195435905227)
