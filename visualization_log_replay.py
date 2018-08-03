@@ -1,6 +1,7 @@
 import numpy as np
 from cdff_dev import logloader, dataflowcontrol, visualization_control_panel
 import cdff_types
+import glob
 import matplotlib.pyplot as plt
 from matplotlib import animation
 
@@ -157,6 +158,7 @@ class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
         self._temp.append(timestamp)
         self.time_list.append((timestamp - self._temp[0])/1000000)
 
+        self.first_timestamp = self._temp[0]
         if len(self.time_list) >= self.max_xrange:
             self.time_list = self.time_list[(
                 len(self.time_list) - self.max_xrange):len(self.time_list)]
@@ -182,7 +184,6 @@ class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
         self.stream = self.control_panel.stream
 
         self.list_assigner.data_added = False
-
         # if no data types are chosen, clear plotting lists
         if not self.data_types:
             self.list_assigner.remove_all()
@@ -207,6 +208,17 @@ class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
         else:
             self.source_dict.clear()
 
+        #load camera frame information
+        if type(sample) == cdff_types.Frame:
+            #print("frame sample")
+            image_array = [sample.image[i] for i in range(len(sample.image))]
+            if port_name == "/camera1.frame":
+                self.frame_camera1 = np.asarray(image_array, dtype=np.uint8).reshape(
+                    sample.datasize.height, sample.datasize.width, 3)
+            elif port_name == "/camera2.frame":
+                self.frame_camera2 = np.asarray(image_array, dtype=np.uint8).reshape(
+                    sample.datasize.height, sample.datasize.width, 3)
+
         # add data to lists to be sent to graph
         for label, data in self.source_dict.items():
             if label in self.data_types:
@@ -214,12 +226,20 @@ class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
             else:
                 self.list_assigner.remove(label, self.data_types)
 
-        if (self.list_assigner.data_added or not self.data_types):
+        if self.list_assigner.data_added or not self.data_types:
             self._configure_time(timestamp)
 
 
-def set_stream_data(log):
+def set_stream_data(log, log_img):
     """Extract stream data from given log
+
+    Parameters
+    ----------
+    log: dict
+        Log information loaded through logloader.py
+
+    is_image_file: bool
+        Set True if log file contains only images, False otherwise
 
     Returns
     -------
@@ -229,10 +249,14 @@ def set_stream_data(log):
     stream_dict = {}
 
     for stream_name in log.keys():
-        if stream_name.endswith(".meta"):
-            continue
-        typename = log[stream_name + ".meta"]["type"]
-        stream_dict[stream_name] = typename
+        if not (stream_name.endswith(".meta")):
+            typename = log[stream_name + ".meta"]["type"]
+            stream_dict[stream_name] = typename
+    
+    for stream_name in log_img.keys():
+        if stream_name.endswith(".frame"):
+            typename = log_img[stream_name + ".meta"]["type"]
+            stream_dict[stream_name] = typename
 
     return stream_dict
 
@@ -253,14 +277,21 @@ def main(vdh, log_file):
         ("pointcloud_builder.pointcloud", "result.pointcloud")
     )
 
+    # Logs are being loaded individually first in order to retrieve stream names
+    # TODO: More efficient way of getting stream names
     log = logloader.load_log(log_file)
     logloader.print_stream_info(log)
 
-    stream_dict = set_stream_data(log)
-    stream_names = list(stream_dict.keys())
-    print(stream_names)
+    log_img = logloader.load_log("frames.msg")
+    logloader.print_stream_info(log_img)
 
-    control_panel = visualization_control_panel.VisualizationController(
+    stream_dict = set_stream_data(log, log_img)
+    stream_names = list(stream_dict.keys())
+    print("STREAMS:", stream_names)
+
+    log_iterator = logloader.replay_files([(log_file,), ("frames.msg",)], stream_names )
+
+    control_panel = visualization_control_panel.ControlPanelExpert(
         stream_dict)
     vdh.set_control_panel(control_panel)
 
@@ -268,5 +299,6 @@ def main(vdh, log_file):
     dfc.setup()
     dfc.set_visualization(vdh)
 
-    control_panel.show_controls(stream_names, log, dfc)
+    control_panel.show_controls(
+        stream_names, log_iterator, dfc)
     control_panel.exec_()
