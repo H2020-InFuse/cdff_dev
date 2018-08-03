@@ -22,4 +22,6 @@
   <depend package="numpy"/>
   <depend package="msgpack-python"/>
   <depend package="pydot"/>
+  <depend package="gdal"/>
+  <depend package="proj"/>
 </package>
