@@ -2085,3 +2085,30 @@ cdef class Image_attributesReference:
 
     def size(self):
         return self.thisptr.nCount
+
+
+class GpsSolution:
+    def __init__(self):
+        self.time = Time()
+        self.latitude = 0.0
+        self.longitude = 0.0
+        self.position_type = "NO_SOLUTION"
+        self.no_of_satellites = 0
+        self.altitude = 0.0
+        self.geoidal_separation = 0.0
+        self.age_of_differential_corrections = 0.0
+        self.deviation_latitude = 0.0
+        self.deviation_longitude = 0.0
+        self.deviation_altitude = 0.0
+
+    def __str__(self):
+        return str(
+            "{type: GpsSolution, time=%s, latitude=%g, longitude=%g, "
+            "position_type=%s, no_of_satellites=%d, altitude=%g, "
+            "geoidal_separation=%g, age_of_differential_corrections=%g, "
+            "deviation_latitude=%g, deviation_longitude=%g, "
+            "deviation_altitude=%g}"
+            % (self.time, self.latitude, self.longitude, self.position_type,
+               self.no_of_satellites, self.altitude, self.geoidal_separation,
+               self.age_of_differential_corrections, self.deviation_latitude,
+               self.deviation_longitude, self.deviation_altitude))

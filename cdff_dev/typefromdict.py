@@ -8,7 +8,10 @@ def create_cpp(typename):
     Parameters
     ----------
     typename : str
-        Name of the type
+        Name of the type, there must be a corresponding type in cdff_types.
+        Some conversion steps will be done automatically, for example,
+        * /bla/blub -> BlaBlub
+        * /gps/Solution -> GpsSolution
 
     Returns
     -------
@@ -16,6 +19,7 @@ def create_cpp(typename):
         The C++ class wrapped in Python. It can be passed to wrapped C++
         extensions in Python.
     """
+    typename = _translate_typename(typename)
     if not hasattr(cdff_types, typename):
         raise ValueError("Type '%s' has no Python bindings." % typename)
     Type = getattr(cdff_types, typename)
@@ -29,7 +33,10 @@ def create_from_dict(typename, data):
     Parameters
     ----------
     typename : str
-        Name of the type
+        Name of the type, there must be a corresponding type in cdff_types.
+        Some conversion steps will be done automatically, for example,
+        * /bla/blub -> BlaBlub
+        * /gps/Solution -> GpsSolution
 
     data : object
         Contains the actual data. Only basic types like list, dict, float,
@@ -43,6 +50,28 @@ def create_from_dict(typename, data):
     """
     obj = create_cpp(typename)
     return _convert(obj, data)
+
+
+def _translate_typename(typename):
+    """Translate typename from string to a valid class name.
+
+    Parameters
+    ----------
+    typename : str
+        Name of the type
+
+    Returns
+    -------
+    typename : str
+        Some conversion steps will be done, for example,
+        * /bla/blub -> BlaBlub
+        * /gps/Solution -> GpsSolution
+    """
+    while "/" in typename:
+        i = typename.find("/")
+        if i + 1 < len(typename):
+            typename = typename[:i] + typename[i + 1].upper() + typename[i + 2:]
+    return typename
 
 
 def _convert(obj, data):

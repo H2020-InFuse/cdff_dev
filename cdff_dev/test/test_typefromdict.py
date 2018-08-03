@@ -122,3 +122,31 @@ def test_create_image():
     assert_equal(obj.frame_status, "status_valid")
     assert_equal(obj.frame_time.microseconds, 1530195435880000)
     assert_equal(obj.received_time.microseconds, 1530195435905227)
+
+
+def test_create_gps_solution():
+    data = {
+        'time': {'microseconds': 1478374858471759},
+        'positionType': 'DIFFERENTIAL',
+        'latitude': 38.41203398374147,
+        'longitude': -110.78470430703186,
+        'altitude': 1353.6719970703125,
+        'ageOfDifferentialCorrections': 0.0,
+        'noOfSatellites': 0,
+        'geoidalSeparation': 0.0,
+        'deviationLatitude': 0.023057984188199043,
+        'deviationLongitude': 0.017021523788571358,
+        'deviationAltitude': 0.0556030310690403
+    }
+    obj = typefromdict.create_from_dict("/gps/Solution", data)
+    assert_equal(obj.time.microseconds, 1478374858471759)
+    assert_equal(obj.position_type, "DIFFERENTIAL")
+    assert_equal(obj.latitude, 38.41203398374147)
+    assert_equal(obj.longitude, -110.78470430703186)
+    assert_equal(obj.altitude, 1353.6719970703125)
+    assert_equal(obj.age_of_differential_corrections, 0.0)
+    assert_equal(obj.no_of_satellites, 0)
+    assert_equal(obj.geoidal_separation, 0.0)
+    assert_equal(obj.deviation_latitude, 0.023057984188199043)
+    assert_equal(obj.deviation_longitude, 0.017021523788571358)
+    assert_equal(obj.deviation_altitude, 0.0556030310690403)
