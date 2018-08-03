@@ -30,6 +30,10 @@ def test_gps():
     lat = 38.41
     alt = 1353.67
     rbs_out = converter.convertToUTM(time, lon, lat, alt)
+    print('rbs_out.pos: ', rbs_out.pos)
+
+    nwu_out = converter.convertToNWU(time, lon, lat, alt)
+    print('nwu_out.pos: ', nwu_out.pos)
 
 
 if __name__ == '__main__':

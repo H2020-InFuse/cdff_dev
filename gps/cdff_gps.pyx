@@ -64,4 +64,13 @@ cdef class UTMConverter:
         return out
 
     #convertToNWU(_cdff_types.asn1SccTime time, double longitude, double latitude, double altitude)
-    
+    def convertToNWU(self, cdff_types.Time time, double longitude,
+                    double latitude, double altitude):
+        cdef _cdff_types.asn1SccTime * cpp_time = time.thisptr
+        cdef float lon = longitude
+        cdef float lat = latitude
+        cdef float alt = altitude
+        cdef cdff_types.RigidBodyState out = cdff_types.RigidBodyState()
+        out.thisptr[0] = self.thisptr.convertToNWU(deref(cpp_time), lon,
+                                                        lat, alt)
+        return out
