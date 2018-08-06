@@ -61,11 +61,10 @@ cdef class Vector2d:
 
     def __init__(self):
         self.thisptr = new _cdff_types.asn1SccVector2d()
-        self.thisptr.nCount = 2
         self.delete_thisptr = True
 
     def __len__(self):
-        return self.thisptr.nCount
+        return 2
 
     def __str__(self):
         return str("{type: Vector2d, data=[%.2f, %.2f]}"
@@ -114,11 +113,10 @@ cdef class Vector3d:
 
     def __init__(self):
         self.thisptr = new _cdff_types.asn1SccVector3d()
-        self.thisptr.nCount = 3
         self.delete_thisptr = True
 
     def __len__(self):
-        return self.thisptr.nCount
+        return 3
 
     def __str__(self):
         return str("{type: Vector3d, data=[%.2f, %.2f, %.2f]}"
@@ -168,11 +166,10 @@ cdef class Vector4d:
 
     def __init__(self):
         self.thisptr = new _cdff_types.asn1SccVector4d()
-        self.thisptr.nCount = 4
         self.delete_thisptr = True
 
     def __len__(self):
-        return self.thisptr.nCount
+        return 4
 
     def __str__(self):
         return str("{type: Vector4d, data=[%.2f, %.2f, %.2f, %.2f]}"
@@ -222,11 +219,10 @@ cdef class Vector6d:
 
     def __init__(self):
         self.thisptr = new _cdff_types.asn1SccVector6d()
-        self.thisptr.nCount = 6
         self.delete_thisptr = True
 
     def __len__(self):
-        return self.thisptr.nCount
+        return 6
 
     def __str__(self):
         return str("{type: Vector6d, data=[%.2f, %.2f, %.2f, %.2f, %.2f, %.2f]}"
@@ -335,16 +331,9 @@ cdef class Matrix2d:
     def __init__(self):
         self.thisptr = new _cdff_types.asn1SccMatrix2d()
         self.delete_thisptr = True
-        self.allocate()
-
-    def allocate(self):
-        self.thisptr.nCount = 2
-        cdef int i
-        for i in range(self.thisptr.nCount):
-            self.thisptr.arr[i].nCount = self.thisptr.nCount
 
     def __len__(self):
-        return self.thisptr.nCount
+        return 2
 
     def __str__(self):
         return str("{type: Matrix2d, data=[?]}") # TODO print content
@@ -355,18 +344,18 @@ cdef class Matrix2d:
     def __getitem__(self, tuple indices):
         cdef int i, j
         i, j = indices
-        if i < 0 or i >= self.thisptr.nCount:
+        if i < 0 or i >= 2:
             raise KeyError("index out of range %d" % i)
-        if j < 0 or j >= self.thisptr.nCount:
+        if j < 0 or j >= 2:
             raise KeyError("index out of range %d" % j)
         return self.thisptr.arr[i].arr[j]
 
     def __setitem__(self, tuple indices, double v):
         cdef int i, j
         i, j = indices
-        if i < 0 or i >= self.thisptr.nCount:
+        if i < 0 or i >= 2:
             raise KeyError("index out of range %d" % i)
-        if j < 0 or j >= self.thisptr.nCount:
+        if j < 0 or j >= 2:
             raise KeyError("index out of range %d" % j)
         self.thisptr.arr[i].arr[j] = v
 
@@ -376,15 +365,15 @@ cdef class Matrix2d:
     def toarray(self):
         cdef np.ndarray[double, ndim=2] array = np.empty((2, 2))
         cdef int i, j
-        for i in range(self.thisptr.nCount):
-            for j in range(self.thisptr.nCount):
+        for i in range(2):
+            for j in range(2):
                 array[i, j] = self.thisptr.arr[i].arr[j]
         return array
 
     def fromarray(self, np.ndarray[double, ndim=2] array):
         cdef int i, j
-        for i in range(self.thisptr.nCount):
-            for j in range(self.thisptr.nCount):
+        for i in range(2):
+            for j in range(2):
                 self.thisptr.arr[i].arr[j] = array[i, j]
 
 
@@ -400,16 +389,9 @@ cdef class Matrix3d:
     def __init__(self):
         self.thisptr = new _cdff_types.asn1SccMatrix3d()
         self.delete_thisptr = True
-        self.allocate()
-
-    def allocate(self):
-        self.thisptr.nCount = 3
-        cdef int i
-        for i in range(self.thisptr.nCount):
-            self.thisptr.arr[i].nCount = self.thisptr.nCount
 
     def __len__(self):
-        return self.thisptr.nCount
+        return 3
 
     def __str__(self):
         return str("{type: Matrix3d, data=[?]}") # TODO print content
@@ -420,18 +402,18 @@ cdef class Matrix3d:
     def __getitem__(self, tuple indices):
         cdef int i, j
         i, j = indices
-        if i < 0 or i >= self.thisptr.nCount:
+        if i < 0 or i >= 3:
             raise KeyError("index out of range %d" % i)
-        if j < 0 or j >= self.thisptr.nCount:
+        if j < 0 or j >= 3:
             raise KeyError("index out of range %d" % j)
         return self.thisptr.arr[i].arr[j]
 
     def __setitem__(self, tuple indices, double v):
         cdef int i, j
         i, j = indices
-        if i < 0 or i >= self.thisptr.nCount:
+        if i < 0 or i >= 3:
             raise KeyError("index out of range %d" % i)
-        if j < 0 or j >= self.thisptr.nCount:
+        if j < 0 or j >= 3:
             raise KeyError("index out of range %d" % j)
         self.thisptr.arr[i].arr[j] = v
 
@@ -441,15 +423,15 @@ cdef class Matrix3d:
     def toarray(self):
         cdef np.ndarray[double, ndim=2] array = np.empty((3, 3))
         cdef int i, j
-        for i in range(self.thisptr.nCount):
-            for j in range(self.thisptr.nCount):
+        for i in range(3):
+            for j in range(3):
                 array[i, j] = self.thisptr.arr[i].arr[j]
         return array
 
     def fromarray(self, np.ndarray[double, ndim=2] array):
         cdef int i, j
-        for i in range(self.thisptr.nCount):
-            for j in range(self.thisptr.nCount):
+        for i in range(3):
+            for j in range(3):
                 self.thisptr.arr[i].arr[j] = array[i, j]
 
 
@@ -464,11 +446,10 @@ cdef class Quaterniond:
 
     def __init__(self):
         self.thisptr = new _cdff_types.asn1SccQuaterniond()
-        self.thisptr.nCount = 4
         self.delete_thisptr = True
 
     def __len__(self):
-        return self.thisptr.nCount
+        return 4
 
     def __str__(self):
         return str("{type: Quaterniond, data=[%.2f, %.2f, %.2f, %.2f]}"
@@ -507,7 +488,7 @@ cdef class Quaterniond:
             self.thisptr.arr[i] = array[i]
 
 
-cdef class Pointcloud_points:
+cdef class PointCloud_Data_pointsReference:
     def __cinit__(self):
         self.thisptr = NULL
 
@@ -526,8 +507,6 @@ cdef class Pointcloud_points:
         i, j = indices
 
         if self.thisptr.nCount <= i:
-            for k in range(self.thisptr.nCount, i + 1):
-                self.thisptr.arr[k].nCount = 3
             self.thisptr.nCount = i + 1
 
         if i < 0 or i >= self.thisptr.nCount:
@@ -543,7 +522,7 @@ cdef class Pointcloud_points:
         return self.thisptr.nCount
 
 
-cdef class Pointcloud_colors:
+cdef class PointCloud_Data_colorsReference:
     def __cinit__(self):
         self.thisptr = NULL
 
@@ -551,7 +530,7 @@ cdef class Pointcloud_colors:
         pass
 
     def __getitem__(self, int i):
-        cdef Vector4d v = Vector4d()
+        cdef Vector3d v = Vector3d()
         del v.thisptr
         v.delete_thisptr = False
         v.thisptr = &(self.thisptr.arr[i])
@@ -562,13 +541,11 @@ cdef class Pointcloud_colors:
         i, j = indices
 
         if self.thisptr.nCount <= i:
-            for k in range(self.thisptr.nCount, i + 1):
-                self.thisptr.arr[k].nCount = 4
             self.thisptr.nCount = i + 1
 
         if i < 0 or i >= self.thisptr.nCount:
             raise KeyError("index out of range %d" % i)
-        if j < 0 or j >= 4:
+        if j < 0 or j >= 3:
             raise KeyError("index out of range %d" % j)
         self.thisptr.arr[i].arr[j] = v
 
@@ -577,6 +554,82 @@ cdef class Pointcloud_colors:
 
     def size(self):
         return self.thisptr.nCount
+
+
+cdef class PointCloud_Data_intensityReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def __getitem__(self, int i):
+        return self.thisptr.arr[i]
+
+    def __setitem__(self, int i, int32_t v):
+        if i >= 400000:
+            warnings.warn("Maximum size of Pointcloud is %d" % 400000)
+            return
+        if self.thisptr.nCount <= i:
+            self.thisptr.nCount = i + 1
+        self.thisptr.arr[i] = v
+
+    def resize(self, int size):
+        self.thisptr.nCount = size
+
+    def size(self):
+        return self.thisptr.nCount
+
+
+cdef class PointCloud_DataReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    @property
+    def points(self):
+        cdef PointCloud_Data_pointsReference points = \
+            PointCloud_Data_pointsReference()
+        points.thisptr = &self.thisptr.points
+        return points
+
+    @property
+    def colors(self):
+        cdef PointCloud_Data_colorsReference colors = \
+            PointCloud_Data_colorsReference()
+        colors.thisptr = &self.thisptr.colors
+        return colors
+
+    @property
+    def intensity(self):
+        cdef PointCloud_Data_intensityReference intensity = \
+            PointCloud_Data_intensityReference()
+        intensity.thisptr = &self.thisptr.intensity
+        return intensity
+
+
+cdef class PointCloud_MetadataReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def _get_time_stamp(self):
+        cdef Time time = Time()
+        del time.thisptr
+        time.thisptr = &self.thisptr.timeStamp
+        time.delete_thisptr = False
+        return time
+
+    def _set_time_stamp(self, Time time):
+        self.thisptr.timeStamp = deref(time.thisptr)
+
+    time_stamp = property(_get_time_stamp, _set_time_stamp)
+
+    # TODO
 
 
 cdef class Pointcloud:
@@ -590,42 +643,20 @@ cdef class Pointcloud:
 
     def __init__(self):
         self.thisptr = new _cdff_types.asn1SccPointcloud()
-        self.thisptr.points.nCount = 0
-        self.thisptr.colors.nCount = 0
         self.delete_thisptr = True
 
-    def __len__(self):
-        return self.thisptr.points.nCount
-
-    def __str__(self):
-        return str("{type: Pointcloud, data=[?]}")  # TODO
-
-    def assign(self, Pointcloud other):
-        self.thisptr.assign(deref(other.thisptr))
-
-    def _get_ref_time(self):
-        cdef Time time = Time()
-        del time.thisptr
-        time.thisptr = &self.thisptr.ref_time
-        time.delete_thisptr = False
-        return time
-
-    def _set_ref_time(self, Time time):
-        self.thisptr.ref_time = deref(time.thisptr)
-
-    ref_time = property(_get_ref_time, _set_ref_time)
+    @property
+    def metadata(self):
+        cdef PointCloud_MetadataReference metadata = \
+            PointCloud_MetadataReference()
+        metadata.thisptr = &self.thisptr.metadata
+        return metadata
 
     @property
-    def points(self):
-        cdef Pointcloud_points points = Pointcloud_points()
-        points.thisptr = &self.thisptr.points
-        return points
-
-    @property
-    def colors(self):
-        cdef Pointcloud_colors colors = Pointcloud_colors()
-        colors.thisptr = &self.thisptr.colors
-        return colors
+    def data(self):
+        cdef PointCloud_DataReference data = PointCloud_DataReference()
+        data.thisptr = &self.thisptr.data
+        return data
 
 
 cdef class LaserScan:
@@ -862,7 +893,6 @@ cdef class RigidBodyState:
         del cov_position.thisptr
         cov_position.delete_thisptr = False
         cov_position.thisptr = &self.thisptr.cov_position
-        cov_position.allocate()
         return cov_position
 
     def _set_cov_position(self, Matrix3d value):
@@ -887,7 +917,6 @@ cdef class RigidBodyState:
         del cov_orientation.thisptr
         cov_orientation.delete_thisptr = False
         cov_orientation.thisptr = &self.thisptr.cov_orientation
-        cov_orientation.allocate()
         return cov_orientation
 
     def _set_cov_orientation(self, Matrix3d value):
@@ -912,7 +941,6 @@ cdef class RigidBodyState:
         del cov_velocity.thisptr
         cov_velocity.delete_thisptr = False
         cov_velocity.thisptr = &self.thisptr.cov_velocity
-        cov_velocity.allocate()
         return cov_velocity
 
     def _set_cov_velocity(self, Matrix3d value):
@@ -937,7 +965,6 @@ cdef class RigidBodyState:
         del cov_angular_velocity.thisptr
         cov_angular_velocity.delete_thisptr = False
         cov_angular_velocity.thisptr = &self.thisptr.cov_angular_velocity
-        cov_angular_velocity.allocate()
         return cov_angular_velocity
 
     def _set_cov_angular_velocity(self, Matrix3d value):

@@ -90,31 +90,27 @@ def test_create_laser_scan():
 
 def test_create_pointcloud():
     data = {
-        "ref_time":
-        {
-            "microseconds": 5,
-            "usecPerSec": 6,
-        },
-        "points": [[0, 1, 2], [1, 2, 3], [2, 3, 4]],
-        "colors": [[255, 255, 255, 255], [255, 255, 255, 255],
-                   [255, 255, 255, 255]]
+        "metadata":
+        {"timeStamp": {"microseconds": 5}},
+        "data":
+        {"points": [[0, 1, 2], [1, 2, 3], [2, 3, 4]],
+         "colors": [[255, 255, 255], [255, 255, 255], [255, 255, 255]]}
     }
     obj = typefromdict.create_from_dict("Pointcloud", data)
-    assert_equal(obj.ref_time.microseconds, 5)
-    assert_equal(obj.ref_time.usec_per_sec, 6)
-    assert_array_equal(obj.points[0], [0, 1, 2])
-    assert_array_equal(obj.points[1], [1, 2, 3])
-    assert_array_equal(obj.points[2], [2, 3, 4])
-    assert_array_equal(obj.colors[0], [255, 255, 255, 255])
-    assert_array_equal(obj.colors[1], [255, 255, 255, 255])
-    assert_array_equal(obj.colors[2], [255, 255, 255, 255])
+    assert_equal(obj.metadata.time_stamp.microseconds, 5)
+    assert_array_equal(obj.data.points[0], [0, 1, 2])
+    assert_array_equal(obj.data.points[1], [1, 2, 3])
+    assert_array_equal(obj.data.points[2], [2, 3, 4])
+    assert_array_equal(obj.data.colors[0], [255, 255, 255])
+    assert_array_equal(obj.data.colors[1], [255, 255, 255])
+    assert_array_equal(obj.data.colors[2], [255, 255, 255])
 
 
 def test_create_image():
     log = logloader.load_log("test/test_data/logs/frames.msg")
     data = log["/camera1.frame"][1]
-    obj = typefromdict.create_from_dict(
-        log["/camera1.frame.meta"]["type"], data)
+    # HACK: Type is actually the old Frame
+    obj = typefromdict.create_from_dict("Image", data)
     assert_equal(obj.attributes[0].att_name, "FrameCount")
     assert_equal(obj.attributes[0].data, "86375")
     assert_equal(obj.attributes[1].att_name, "Exposure_ms")

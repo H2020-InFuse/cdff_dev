@@ -62,14 +62,41 @@ cdef class Transform3d:
     cdef bool delete_thisptr
 
 
-cdef class Pointcloud_points:
-    cdef _cdff_types.asn1SccPointcloud_points* thisptr
+cdef class TransformWithCovariance_DataReference:
+    cdef _cdff_types.asn1SccTransformWithCovariance_Data* thisptr
+
+
+cdef class TransformWithCovariance_Metadata_dataEstimatedReference:
+    cdef _cdff_types.asn1SccTransformWithCovariance_Metadata_dataEstimated* thisptr
+
+
+cdef class TransformWithCovariance_MetadataReference:
+    cdef _cdff_types.asn1SccTransformWithCovariance_Metadata* thisptr
+
+
+cdef class TransformWithCovariance:
+    cdef _cdff_types.asn1SccTransformWithCovariance* thisptr
     cdef bool delete_thisptr
 
 
-cdef class Pointcloud_colors:
-    cdef _cdff_types.asn1SccPointcloud_colors* thisptr
-    cdef bool delete_thisptr
+cdef class PointCloud_Data_pointsReference:
+    cdef _cdff_types.asn1SccPointCloud_Data_points* thisptr
+
+
+cdef class PointCloud_Data_colorsReference:
+    cdef _cdff_types.asn1SccPointCloud_Data_colors* thisptr
+
+
+cdef class PointCloud_Data_intensityReference:
+    cdef _cdff_types.asn1SccPointCloud_Data_intensity* thisptr
+
+
+cdef class PointCloud_DataReference:
+    cdef _cdff_types.asn1SccPointCloud_Data* thisptr
+
+
+cdef class PointCloud_MetadataReference:
+    cdef _cdff_types.asn1SccPointCloud_Metadata* thisptr
 
 
 cdef class Pointcloud:

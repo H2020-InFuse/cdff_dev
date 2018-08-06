@@ -651,25 +651,24 @@ def test_quaterniond_fromarray():
 def test_create_pointcloud():
     pcl = cdff_types.Pointcloud()
 
-    pcl.ref_time.microseconds = 0
-    assert_equal(pcl.ref_time.microseconds, 0)
+    pcl.metadata.time_stamp.microseconds = 0
+    assert_equal(pcl.metadata.time_stamp.microseconds, 0)
 
-    pcl.points.resize(100)
-    point = pcl.points[0]
+    pcl.data.points.resize(100)
+    point = pcl.data.points[0]
     point[0] = 1.0
     point[1] = 2.0
     point[2] = 3.0
-    assert_equal(pcl.points.size(), 100)
-    assert_array_equal(pcl.points[0].toarray(), (1.0, 2.0, 3.0))
+    assert_equal(pcl.data.points.size(), 100)
+    assert_array_equal(pcl.data.points[0].toarray(), (1.0, 2.0, 3.0))
 
-    pcl.colors.resize(100)
-    color = pcl.colors[0]
+    pcl.data.colors.resize(100)
+    color = pcl.data.colors[0]
     color[0] = 255.0
     color[1] = 255.0
     color[2] = 255.0
-    color[3] = 255.0
-    assert_equal(pcl.colors.size(), 100)
-    assert_array_equal(pcl.colors[0].toarray(), (255.0, 255.0, 255.0, 255.0))
+    assert_equal(pcl.data.colors.size(), 100)
+    assert_array_equal(pcl.data.colors[0].toarray(), (255.0, 255.0, 255.0))
 
 
 def test_create_laserscan():
@@ -938,7 +937,7 @@ def test_depth_map():
 
 
 def test_frame():
-    frame = cdff_types.Frame()
+    frame = cdff_types.Image()
 
     frame.frame_time.microseconds = 10
     assert_equal(frame.frame_time.microseconds, 10)

@@ -2,6 +2,7 @@
 from libc.stdint cimport uint8_t, uint16_t, uint32_t, uint64_t
 from libc.stdint cimport int8_t, int16_t, int32_t, int64_t
 from libc.string cimport const_uchar
+from libcpp cimport bool
 
 
 cdef extern from "Time.h":
@@ -23,7 +24,6 @@ cdef extern from "Eigen.h":
     cdef cppclass asn1SccVector2d:
         asn1SccVector2d& assign "operator="(asn1SccVector2d&)
 
-        int nCount
         double[2] arr
 
 
@@ -31,7 +31,6 @@ cdef extern from "Eigen.h":
     cdef cppclass asn1SccVector3d:
         asn1SccVector3d& assign "operator="(asn1SccVector3d&)
 
-        int nCount
         double[3] arr
 
 
@@ -39,7 +38,6 @@ cdef extern from "Eigen.h":
     cdef cppclass asn1SccVector4d:
         asn1SccVector4d& assign "operator="(asn1SccVector4d&)
 
-        int nCount
         double[4] arr
 
 
@@ -47,7 +45,6 @@ cdef extern from "Eigen.h":
     cdef cppclass asn1SccVector6d:
         asn1SccVector6d& assign "operator="(asn1SccVector6d&)
 
-        int nCount
         double[6] arr
 
 
@@ -63,7 +60,6 @@ cdef extern from "Eigen.h":
     cdef cppclass asn1SccMatrix2d_elm:
         asn1SccMatrix2d_elm& assign "operator="(asn1SccMatrix2d_elm&)
 
-        int nCount
         double[2] arr
 
 
@@ -71,7 +67,6 @@ cdef extern from "Eigen.h":
     cdef cppclass asn1SccMatrix2d:
         asn1SccMatrix2d& assign "operator="(asn1SccMatrix2d&)
 
-        int nCount
         asn1SccMatrix2d_elm[2] arr
 
 
@@ -79,7 +74,6 @@ cdef extern from "Eigen.h":
     cdef cppclass asn1SccMatrix3d_elm:
         asn1SccMatrix3d_elm& assign "operator="(asn1SccMatrix3d_elm&)
 
-        int nCount
         double[3] arr
 
 
@@ -87,7 +81,6 @@ cdef extern from "Eigen.h":
     cdef cppclass asn1SccMatrix3d:
         asn1SccMatrix3d& assign "operator="(asn1SccMatrix3d&)
 
-        int nCount
         asn1SccMatrix3d_elm[3] arr
 
 
@@ -95,7 +88,6 @@ cdef extern from "Eigen.h":
     cdef cppclass asn1SccMatrix4d_elm:
         asn1SccMatrix4d_elm& assign "operator="(asn1SccMatrix4d_elm&)
 
-        int nCount
         double[4] arr
 
 
@@ -103,15 +95,27 @@ cdef extern from "Eigen.h":
     cdef cppclass asn1SccMatrix4d:
         asn1SccMatrix4d& assign "operator="(asn1SccMatrix4d&)
 
-        int nCount
         asn1SccMatrix4d_elm[4] arr
+
+
+cdef extern from "Eigen.h":
+    cdef cppclass asn1SccMatrix6d_elm:
+        asn1SccMatrix6d_elm& assign "operator="(asn1SccMatrix6d_elm&)
+
+        double[6] arr
+
+
+cdef extern from "Eigen.h":
+    cdef cppclass asn1SccMatrix6d:
+        asn1SccMatrix6d& assign "operator="(asn1SccMatrix6d&)
+
+        asn1SccMatrix6d_elm[6] arr
 
 
 cdef extern from "Eigen.h":
     cdef cppclass asn1SccQuaterniond:
         asn1SccQuaterniond& assign "operator="(asn1SccQuaterniond&)
 
-        int nCount
         double[4] arr
 
 
@@ -119,7 +123,6 @@ cdef extern from "Eigen.h":
     cdef cppclass asn1SccAngleAxisd:
         asn1SccAngleAxisd& assign "operator="(asn1SccAngleAxisd&)
 
-        int nCount
         double[4] arr
 
 
@@ -127,7 +130,6 @@ cdef extern from "Eigen.h":
     cdef cppclass asn1SccTransform3d_elm:
         asn1SccTransform3d_elm& assign "operator="(asn1SccTransform3d_elm&)
 
-        int nCount
         double[4] arr
 
 
@@ -135,33 +137,69 @@ cdef extern from "Eigen.h":
     cdef cppclass asn1SccTransform3d:
         asn1SccTransform3d& assign "operator="(asn1SccTransform3d&)
 
-        int nCount
         asn1SccTransform3d_elm[4] arr
 
-# TODO Matrix6d MatrixXd Isometry3d Affine3d
+
+# TODO MatrixXd Isometry3d Affine3d
+
+
+cdef extern from "TransformWithCovariance.h":
+    cdef cppclass asn1SccTransformWithCovariance_Data:
+        asn1SccVector3d translation
+        asn1SccQuaterniond orientation
+        asn1SccMatrix6d cov
+
+    cdef cppclass asn1SccTransformWithCovariance_Metadata_dataEstimated:
+        bool[7] arr
+
+    cdef cppclass asn1SccTransformWithCovariance_Metadata:
+        uint32_t msgVersion
+        asn1SccT_String producerId
+        asn1SccTransformWithCovariance_Metadata_dataEstimated dataEstimated
+        asn1SccT_String parentFrameId
+        asn1SccTime parentTime
+        asn1SccT_String childFrameId
+        asn1SccTime childTime
+
+    cdef cppclass asn1SccTransformWithCovariance:
+        asn1SccTransformWithCovariance_Metadata metadata
+        asn1SccTransformWithCovariance_Data data
 
 
 cdef extern from "Pointcloud.h":
-    cdef uint32_t maxPointcloudSize
-
-    cdef cppclass asn1SccPointcloud_colors:
-        asn1SccPointcloud_colors& assign "operator="(asn1SccPointcloud_colors&)
-
+    cdef cppclass asn1SccPointCloud_Data_points:
         int nCount
-        asn1SccVector4d[300000] arr
+        asn1SccVector3d[400000] arr
 
-    cdef cppclass asn1SccPointcloud_points:
-        asn1SccPointcloud_points& assign "operator="(asn1SccPointcloud_points&)
-
+    cdef cppclass asn1SccPointCloud_Data_colors:
         int nCount
-        asn1SccVector3d[300000] arr
+        asn1SccVector3d[400000] arr
+
+    cdef cppclass asn1SccPointCloud_Data_intensity:
+        int nCount
+        int32_t[400000] arr
+
+    cdef cppclass asn1SccPointCloud_Data:
+        asn1SccPointCloud_Data_points points
+        asn1SccPointCloud_Data_colors colors
+        asn1SccPointCloud_Data_intensity intensity
+
+    cdef cppclass asn1SccPointCloud_Metadata:
+        uint32_t msgVersion
+        asn1SccT_String sensorId
+        asn1SccT_String frameId
+        asn1SccTime timeStamp
+        uint32_t height
+        uint32_t width
+        bool isRegistered
+        bool isOrdered
+        bool hasFixedTransform
+        asn1SccTransformWithCovariance pose_robotFrame_sensorFrame
+        asn1SccTransformWithCovariance pose_fixedFrame_robotFrame
 
     cdef cppclass asn1SccPointcloud:
-        asn1SccPointcloud& assign "operator="(asn1SccPointcloud&)
-
-        asn1SccTime ref_time
-        asn1SccPointcloud_points points
-        asn1SccPointcloud_colors colors
+        asn1SccPointCloud_Metadata metadata
+        asn1SccPointCloud_Data data
 
 
 cdef extern from "LaserScan.h":
