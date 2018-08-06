@@ -1462,7 +1462,7 @@ cdef class DepthMap_remissionsReference:
         return self.thisptr.nCount
 
 
-cdef class Frame:
+cdef class Image:
     def __cinit__(self):
         self.thisptr = NULL
         self.delete_thisptr = False
@@ -1472,7 +1472,7 @@ cdef class Frame:
             del self.thisptr
 
     def __init__(self):
-        self.thisptr = new _cdff_types.asn1SccFrame()
+        self.thisptr = new _cdff_types.asn1SccImage()
         self.thisptr.image.nCount = 0
         self.thisptr.attributes.nCount = 0
         self.thisptr.datasize.width = 0
@@ -1485,7 +1485,7 @@ cdef class Frame:
 
     def __str__(self):
         # TODO
-        return str("{type: Frame}")
+        return str("{type: Image}")
 
     def _get_frame_time(self):
         cdef Time frame_time = Time()
@@ -1513,23 +1513,23 @@ cdef class Frame:
 
     @property
     def image(self):
-        cdef Frame_imageReference image = Frame_imageReference()
+        cdef Image_imageReference image = Image_imageReference()
         image.thisptr = &self.thisptr.image
         return image
 
     @property
     def attributes(self):
-        cdef Frame_attributesReference attributes = Frame_attributesReference()
+        cdef Image_attributesReference attributes = Image_attributesReference()
         attributes.thisptr = &self.thisptr.attributes
         return attributes
 
     def _get_datasize(self):
-        cdef Frame_size_tReference datasize = Frame_size_tReference()
+        cdef Image_size_tReference datasize = Image_size_tReference()
         del datasize.thisptr
         datasize.thisptr = &self.thisptr.datasize
         return datasize
 
-    def _set_datasize(self, Frame_size_tReference datasize):
+    def _set_datasize(self, Image_size_tReference datasize):
         self.thisptr.datasize = deref(datasize.thisptr)
 
     datasize = property(_get_datasize, _set_datasize)
@@ -1585,8 +1585,8 @@ cdef class Frame:
             return "mode_bayer_gbrg"
         elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Scccompressed_modes:
             return "compressed_modes"
-        elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1SccFrame_mode_t_mode_pjpg:
-            return "Frame_mode_t_mode_pjpg"
+        elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1SccImage_mode_t_mode_pjpg:
+            return "Image_mode_t_mode_pjpg"
         elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_jpeg:
             return "mode_jpeg"
         else:
@@ -1619,8 +1619,8 @@ cdef class Frame:
             self.thisptr.frame_mode = _cdff_types.asn1Sccmode_bayer_gbrg
         elif frame_mode == "compressed_modes":
             self.thisptr.frame_mode = _cdff_types.asn1Scccompressed_modes
-        elif frame_mode == "Frame_mode_t_mode_pjpg":
-            self.thisptr.frame_mode = _cdff_types.asn1SccFrame_mode_t_mode_pjpg
+        elif frame_mode == "Image_mode_t_mode_pjpg":
+            self.thisptr.frame_mode = _cdff_types.asn1SccImage_mode_t_mode_pjpg
         elif frame_mode == "mode_jpeg":
             self.thisptr.frame_mode = _cdff_types.asn1Sccmode_jpeg
         elif frame_mode == "mode_png":
@@ -1652,7 +1652,7 @@ cdef class Frame:
     frame_status = property(_get_frame_status, _set_frame_status)
 
 
-cdef class Frame_size_tReference:
+cdef class Image_size_tReference:
     def __cinit__(self):
         self.thisptr = NULL
 
@@ -1676,7 +1676,7 @@ cdef class Frame_size_tReference:
     height = property(_get_height, _set_height)
 
 
-cdef class Frame_imageReference:
+cdef class Image_imageReference:
     def __cinit__(self):
         self.thisptr = NULL
 
@@ -1691,7 +1691,7 @@ cdef class Frame_imageReference:
 
     def __setitem__(self, int i, unsigned char v):
         if i >= 24883200:
-            warnings.warn("Maximum size of Frame is 24883200")
+            warnings.warn("Maximum size of image is 24883200")
             return
         self.thisptr.arr[i] = v
         if self.thisptr.nCount <= <int> i:
@@ -1699,7 +1699,7 @@ cdef class Frame_imageReference:
 
     def resize(self, int size):
         if size > 24883200:
-            warnings.warn("Maximum size of Frame is 24883200")
+            warnings.warn("Maximum size of image is 24883200")
             return
         self.thisptr.nCount = size
 
@@ -1707,7 +1707,7 @@ cdef class Frame_imageReference:
         return self.thisptr.nCount
 
 
-cdef class Frame_attrib_tReference:
+cdef class Image_attrib_tReference:
     def __cinit__(self):
         self.thisptr = NULL
 
@@ -1737,7 +1737,7 @@ cdef class Frame_attrib_tReference:
     att_name = property(_get_att_name, _set_att_name)
 
 
-cdef class Frame_attributesReference:
+cdef class Image_attributesReference:
     def __cinit__(self):
         self.thisptr = NULL
 
@@ -1749,16 +1749,16 @@ cdef class Frame_attributesReference:
 
     def __getitem__(self, int i):
         if i >= 5:
-            raise KeyError("Maximum size of Frame_attributes is 5")
+            raise KeyError("Maximum size of Image_attributes is 5")
         if self.thisptr.nCount <= <int> i:
             self.thisptr.nCount = <int> (i + 1)
-        cdef Frame_attrib_tReference frame_attrib_t = Frame_attrib_tReference()
-        frame_attrib_t.thisptr = &self.thisptr.arr[i]
-        return frame_attrib_t
+        cdef Image_attrib_tReference image_attrib = Image_attrib_tReference()
+        image_attrib.thisptr = &self.thisptr.arr[i]
+        return image_attrib
 
     def resize(self, int size):
         if size > 5:
-            warnings.warn("Maximum size of Frame_attributes is 5")
+            warnings.warn("Maximum size of Image_attributes is 5")
             return
         self.thisptr.nCount = size
 

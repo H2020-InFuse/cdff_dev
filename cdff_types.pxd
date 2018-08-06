@@ -147,22 +147,22 @@ cdef class DepthMap_remissionsReference:
     cdef _cdff_types.asn1SccDepthMap_remissions* thisptr
 
 
-cdef class Frame:
-    cdef _cdff_types.asn1SccFrame* thisptr
+cdef class Image:
+    cdef _cdff_types.asn1SccImage* thisptr
     cdef bool delete_thisptr
 
 
-cdef class Frame_size_tReference:
-    cdef _cdff_types.asn1SccFrame_size_t* thisptr
+cdef class Image_size_tReference:
+    cdef _cdff_types.asn1SccImage_size_t* thisptr
 
 
-cdef class Frame_imageReference:
-    cdef _cdff_types.asn1SccFrame_image* thisptr
+cdef class Image_imageReference:
+    cdef _cdff_types.asn1SccImage_image* thisptr
 
 
-cdef class Frame_attrib_tReference:
-    cdef _cdff_types.asn1SccFrame_attrib_t* thisptr
+cdef class Image_attrib_tReference:
+    cdef _cdff_types.asn1SccImage_attrib_t* thisptr
 
 
-cdef class Frame_attributesReference:
-    cdef _cdff_types.asn1SccFrame_attributes* thisptr
+cdef class Image_attributesReference:
+    cdef _cdff_types.asn1SccImage_attributes* thisptr
