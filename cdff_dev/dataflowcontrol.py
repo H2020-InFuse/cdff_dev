@@ -105,7 +105,14 @@ class DataFlowControl:
         """
         self.visualization = visualization
 
-    def register_world_state(self, world_state):  # TODO document
+    def register_world_state(self, world_state):
+        """Register a world state representation.
+
+        The EnviRe graph from the world state representation will be
+        used by the transformer node if there is one. Hence, the
+        transformations in the world state reflect the current state
+        of the world.
+        """
         self._node_facade.register_graph(world_state.graph_)
 
     def _cache_ports(self):
