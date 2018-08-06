@@ -318,7 +318,13 @@ class NodeFacade:
         for node in self.nodes.values():
             node.configure()
 
-    def register_graph(self, graph):  # TODO document
+    def register_graph(self, graph):
+        """Assign EnviRe graph to a node with the name 'transformer'.
+
+        Will do nothing if there is no transformer. We assume that the
+        transformer has the field 'graph_'. See architecture documentation
+        about EnviRe integration for more details.
+        """
         if self.exists("transformer"):
             self.nodes["transformer"].graph_ = graph
 
