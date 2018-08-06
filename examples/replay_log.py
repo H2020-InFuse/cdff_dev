@@ -45,6 +45,8 @@ def main():
         nodes, connections, periods, real_time=True)
     dfc.setup()
 
+    # Note that the logfiles are not in the repository because they are too
+    # large. Ask Alexander Fabisch about it.
     log_iterator = logloader.replay_files(
         [sorted(glob.glob("logs/open_day/open_day_laser_filter_*.msg")),
          sorted(glob.glob("logs/open_day/open_day_tilt_scan_*.msg")),
