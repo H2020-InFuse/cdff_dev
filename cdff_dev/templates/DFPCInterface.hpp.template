@@ -17,7 +17,7 @@ namespace dfpc_ci
 {
     {% if "doc" in desc %}
     /**
-     * {{ desc["doc"] }}
+     * {{ desc["doc"]|prepend(" * ")|indent(width=4) }}
      */
     {% endif %}
     class {{ desc["name"] }}Interface : public DFPCCommonInterface
@@ -30,7 +30,8 @@ namespace dfpc_ci
             {% for input_port in desc["input_ports"] %}
             /**
              * Send value to input port "{{ input_port["name"] }}"
-             * @param {{ input_port["name"] }}: {{ input_port["doc"] }}
+             * @param {{ input_port["name"] }}
+             *     {{ input_port["doc"]|indent(width=4)|prepend(" * ")|indent(width=12) }}
              */
             virtual void {{ input_port["name"] }}Input(const {{ input_port["type"] }}& data);
             {% endfor %}
@@ -38,7 +39,8 @@ namespace dfpc_ci
             {% for output_port in desc["output_ports"] %}
             /**
              * Query value from output port "{{ output_port["name"] }}"
-             * @return {{ output_port["name"] }}: {{ output_port["doc"] }}
+             * @return {{ output_port["name"] }}
+             *     {{ output_port["doc"]|indent(width=4)|prepend(" * ")|indent(width=12) }}
              */
             virtual const {{ output_port["type"] }}& {{ output_port["name"] }}Output() const;
             {% endfor %}
@@ -70,6 +72,6 @@ namespace dfpc_ci
     };
 }
 
-#endif //  {{ desc["name"]|upper }}_INTERFACE_HPP
+#endif // {{ desc["name"]|upper }}_INTERFACE_HPP
 
 /** @} */

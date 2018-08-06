@@ -542,6 +542,7 @@ def render(template_name, **kwargs):
         keep_trailing_newline=True
     )
     env.filters['capfirst'] = capfirst
+    env.filters['prepend'] = prepend
 
     try:
         template = env.get_template(template_name + ".template")
@@ -562,6 +563,14 @@ def render(template_name, **kwargs):
 def capfirst(value):
     """Capitalize the first character of the value."""
     return value and value[0].upper() + value[1:]
+
+
+def prepend(value, prevalue="", first=False):
+    """Prepend prevalue to each line of the value."""
+    if first:
+        return prevalue + value.replace("\n", "\n" + prevalue)
+    else:
+        return value.replace("\n", "\n" + prevalue)
 
 
 def write_result(result, force_overwrite, verbose=0):
