@@ -22,7 +22,6 @@ void ASN1Test::process()
 {
     asn1SccVector3d someVector;
 
-    someVector.nCount = 3;
     someVector.arr[0] = inCurrentTime.microseconds + 1;
     someVector.arr[1] = inCurrentTime.microseconds + 2;
     someVector.arr[2] = inCurrentTime.microseconds + 3;
