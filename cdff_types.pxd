@@ -47,6 +47,11 @@ cdef class Matrix3d:
     cdef bool delete_thisptr
 
 
+cdef class Matrix6d:
+    cdef _cdff_types.asn1SccMatrix6d* thisptr
+    cdef bool delete_thisptr
+
+
 cdef class Quaterniond:
     cdef _cdff_types.asn1SccQuaterniond* thisptr
     cdef bool delete_thisptr

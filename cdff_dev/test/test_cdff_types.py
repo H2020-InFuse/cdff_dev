@@ -1,6 +1,7 @@
 import numpy as np
 import cdff_types
-from nose.tools import assert_equal, assert_greater, assert_regexp_matches
+from nose.tools import (assert_equal, assert_regexp_matches, assert_true,
+                        assert_false)
 from numpy.testing import assert_array_equal, assert_array_almost_equal
 
 
@@ -576,6 +577,94 @@ def test_matrix3d_fromarray():
     assert_array_equal(v1, v2)
 
 
+def test_matrix6d_len():
+    v = cdff_types.Matrix6d()
+    assert_equal(len(v), 6)
+
+
+def test_matrix6d_set_item():
+    v = cdff_types.Matrix6d()
+    for i in range(6):
+        for j in range(6):
+            v[i, j] = i * 6.0 + j
+    assert_array_equal(
+        v, np.array([[0.0, 1.0, 2.0, 3.0, 4.0, 5.0],
+                     [6.0, 7.0, 8.0, 9.0, 10.0, 11.0],
+                     [12.0, 13.0, 14.0, 15.0, 16.0, 17.0],
+                     [18.0, 19.0, 20.0, 21.0, 22.0, 23.0],
+                     [24.0, 25.0, 26.0, 27.0, 28.0, 29.0],
+                     [30.0, 31.0, 32.0, 33.0, 34.0, 35.0]]))
+
+
+def test_matrix6d_str():
+    v = cdff_types.Matrix6d()
+    for i in range(6):
+        for j in range(6):
+            v[i, j] = i * 6.0 + j
+    assert_equal(
+        str(v), "{type: Matrix6d, data=[?]}")
+
+
+def test_matrix6d_get_item():
+    v = cdff_types.Matrix6d()
+    for i in range(6):
+        for j in range(6):
+            v[i, j] = i * 6.0 + j
+    assert_equal(v[0, 0], 0.0)
+    assert_equal(v[1, 0], 6.0)
+    assert_equal(v[2, 0], 12.0)
+    assert_equal(v[0, 1], 1.0)
+    assert_equal(v[1, 1], 7.0)
+    assert_equal(v[2, 1], 13.0)
+    assert_equal(v[0, 2], 2.0)
+    assert_equal(v[1, 2], 8.0)
+    assert_equal(v[2, 2], 14.0)
+
+
+def test_matrix6d_array():
+    v = cdff_types.Matrix6d()
+    for i in range(6):
+        for j in range(6):
+            v[i, j] = i * 6.0 + j
+    assert_array_equal(
+        v.__array__(),
+        np.array([[0.0, 1.0, 2.0, 3.0, 4.0, 5.0],
+                  [6.0, 7.0, 8.0, 9.0, 10.0, 11.0],
+                  [12.0, 13.0, 14.0, 15.0, 16.0, 17.0],
+                  [18.0, 19.0, 20.0, 21.0, 22.0, 23.0],
+                  [24.0, 25.0, 26.0, 27.0, 28.0, 29.0],
+                  [30.0, 31.0, 32.0, 33.0, 34.0, 35.0]]))
+
+
+def test_matrix6d_toarray():
+    v = cdff_types.Matrix6d()
+    for i in range(6):
+        for j in range(6):
+            v[i, j] = i * 6.0 + j
+    array = v.toarray()
+    assert_array_equal(
+        array,
+        np.array([[0.0, 1.0, 2.0, 3.0, 4.0, 5.0],
+                  [6.0, 7.0, 8.0, 9.0, 10.0, 11.0],
+                  [12.0, 13.0, 14.0, 15.0, 16.0, 17.0],
+                  [18.0, 19.0, 20.0, 21.0, 22.0, 23.0],
+                  [24.0, 25.0, 26.0, 27.0, 28.0, 29.0],
+                  [30.0, 31.0, 32.0, 33.0, 34.0, 35.0]]))
+    assert_equal(type(array), np.ndarray)
+
+
+def test_matrix6d_fromarray():
+    v1 = np.array([[0.0, 1.0, 2.0, 3.0, 4.0, 5.0],
+                  [6.0, 7.0, 8.0, 9.0, 10.0, 11.0],
+                  [12.0, 13.0, 14.0, 15.0, 16.0, 17.0],
+                  [18.0, 19.0, 20.0, 21.0, 22.0, 23.0],
+                  [24.0, 25.0, 26.0, 27.0, 28.0, 29.0],
+                  [30.0, 31.0, 32.0, 33.0, 34.0, 35.0]])
+    v2 = cdff_types.Matrix6d()
+    v2.fromarray(v1)
+    assert_array_equal(v1, v2)
+
+
 def test_quaterniond_len():
     v = cdff_types.Quaterniond()
     assert_equal(len(v), 4)
@@ -648,11 +737,88 @@ def test_quaterniond_fromarray():
     assert_array_equal(v1, v2)
 
 
+def test_transform_with_covariance():
+    t = cdff_types.TransformWithCovariance()
+
+    t.metadata.msg_version = 5
+    assert_equal(t.metadata.msg_version, 5)
+
+    t.metadata.producer_id = "producer"
+    assert_equal(t.metadata.producer_id, "producer")
+
+    t.metadata.parent_frame_id = "parent"
+    assert_equal(t.metadata.parent_frame_id, "parent")
+
+    t.metadata.parent_time.microseconds = 5
+    assert_equal(t.metadata.parent_time.microseconds, 5)
+
+    t.metadata.child_frame_id = "child"
+    assert_equal(t.metadata.child_frame_id, "child")
+
+    t.metadata.child_time.microseconds = 10
+    assert_equal(t.metadata.child_time.microseconds, 10)
+
+    t.data.translation.fromarray(np.array([1.0, 2.0, 3.0]))
+    assert_array_equal(t.data.translation, np.array([1.0, 2.0, 3.0]))
+
+    t.data.orientation.fromarray(np.array([1.0, 2.0, 3.0, 4.0]))
+    assert_array_equal(t.data.orientation, np.array([1.0, 2.0, 3.0, 4.0]))
+
+    cov = np.array(
+        [[0.0, 1.0, 2.0, 3.0, 4.0, 5.0],
+         [6.0, 7.0, 8.0, 9.0, 10.0, 11.0],
+         [12.0, 13.0, 14.0, 15.0, 16.0, 17.0],
+         [18.0, 19.0, 20.0, 21.0, 22.0, 23.0],
+         [24.0, 25.0, 26.0, 27.0, 28.0, 29.0],
+         [30.0, 31.0, 32.0, 33.0, 34.0, 35.0]])
+    t.data.cov.fromarray(cov)
+    assert_array_equal(t.data.cov, cov)
+
+
 def test_create_pointcloud():
     pcl = cdff_types.Pointcloud()
 
     pcl.metadata.time_stamp.microseconds = 0
     assert_equal(pcl.metadata.time_stamp.microseconds, 0)
+
+    pcl.metadata.msg_version = 5
+    assert_equal(pcl.metadata.msg_version, 5)
+
+    pcl.metadata.sensor_id = "sensor"
+    assert_equal(pcl.metadata.sensor_id, "sensor")
+
+    pcl.metadata.frame_id = "frame"
+    assert_equal(pcl.metadata.frame_id, "frame")
+
+    pcl.metadata.time_stamp.microseconds = 10
+    assert_equal(pcl.metadata.time_stamp.microseconds, 10)
+
+    pcl.metadata.height = 20
+    assert_equal(pcl.metadata.height, 20)
+
+    pcl.metadata.width = 30
+    assert_equal(pcl.metadata.width, 30)
+
+    pcl.metadata.is_registered = True
+    assert_true(pcl.metadata.is_registered)
+
+    pcl.metadata.is_ordered = False
+    assert_false(pcl.metadata.is_ordered)
+
+    pcl.metadata.has_fixed_transform = True
+    assert_true(pcl.metadata.has_fixed_transform)
+
+    pcl.metadata.pose_robot_frame_sensor_frame.data.translation.fromarray(
+        np.array([1.0, 2.0, 3.0]))
+    assert_array_equal(
+        pcl.metadata.pose_robot_frame_sensor_frame.data.translation.toarray(),
+        np.array([1.0, 2.0, 3.0]))
+
+    pcl.metadata.pose_fixed_frame_robot_frame.data.translation.fromarray(
+        np.array([1.0, 2.0, 3.0]))
+    assert_array_equal(
+        pcl.metadata.pose_fixed_frame_robot_frame.data.translation.toarray(),
+        np.array([1.0, 2.0, 3.0]))
 
     pcl.data.points.resize(100)
     point = pcl.data.points[0]

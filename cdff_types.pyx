@@ -435,6 +435,64 @@ cdef class Matrix3d:
                 self.thisptr.arr[i].arr[j] = array[i, j]
 
 
+cdef class Matrix6d:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_types.asn1SccMatrix6d()
+        self.delete_thisptr = True
+
+    def __len__(self):
+        return 6
+
+    def __str__(self):
+        return str("{type: Matrix6d, data=[?]}") # TODO print content
+
+    def __array__(self, dtype=None):
+        return self.toarray().astype(dtype)
+
+    def __getitem__(self, tuple indices):
+        cdef int i, j
+        i, j = indices
+        if i < 0 or i >= 6:
+            raise KeyError("index out of range %d" % i)
+        if j < 0 or j >= 6:
+            raise KeyError("index out of range %d" % j)
+        return self.thisptr.arr[i].arr[j]
+
+    def __setitem__(self, tuple indices, double v):
+        cdef int i, j
+        i, j = indices
+        if i < 0 or i >= 6:
+            raise KeyError("index out of range %d" % i)
+        if j < 0 or j >= 6:
+            raise KeyError("index out of range %d" % j)
+        self.thisptr.arr[i].arr[j] = v
+
+    def assign(self, Matrix6d other):
+        self.thisptr.assign(deref(other.thisptr))
+
+    def toarray(self):
+        cdef np.ndarray[double, ndim=2] array = np.empty((6, 6))
+        cdef int i, j
+        for i in range(6):
+            for j in range(6):
+                array[i, j] = self.thisptr.arr[i].arr[j]
+        return array
+
+    def fromarray(self, np.ndarray[double, ndim=2] array):
+        cdef int i, j
+        for i in range(6):
+            for j in range(6):
+                self.thisptr.arr[i].arr[j] = array[i, j]
+
+
 cdef class Quaterniond:
     def __cinit__(self):
         self.thisptr = NULL
@@ -486,6 +544,141 @@ cdef class Quaterniond:
         cdef int i
         for i in range(4):
             self.thisptr.arr[i] = array[i]
+
+
+cdef class TransformWithCovariance_MetadataReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def _get_msg_version(self):
+        return self.thisptr.msgVersion
+
+    def _set_msg_version(self, uint32_t msg_version):
+        self.thisptr.msgVersion = msg_version
+
+    msg_version = property(_get_msg_version, _set_msg_version)
+
+    def _get_producer_id(self):
+        cdef bytes producer_id = self.thisptr.producerId.arr
+        return producer_id.decode()
+
+    def _set_producer_id(self, str producer_id):
+        cdef string value = producer_id.encode()
+        memcpy(self.thisptr.producerId.arr, value.c_str(), len(producer_id))
+        self.thisptr.producerId.nCount = len(producer_id)
+
+    producer_id = property(_get_producer_id, _set_producer_id)
+
+    # TODO asn1SccTransformWithCovariance_Metadata_dataEstimated dataEstimated
+
+    def _get_parent_frame_id(self):
+        cdef bytes parent_frame_id = self.thisptr.parentFrameId.arr
+        return parent_frame_id.decode()
+
+    def _set_parent_frame_id(self, str parent_frame_id):
+        cdef string value = parent_frame_id.encode()
+        memcpy(self.thisptr.parentFrameId.arr, value.c_str(), len(parent_frame_id))
+        self.thisptr.parentFrameId.nCount = len(parent_frame_id)
+
+    parent_frame_id = property(_get_parent_frame_id, _set_parent_frame_id)
+
+    def _get_parent_time(self):
+        cdef Time parent_time = Time()
+        del parent_time.thisptr
+        parent_time.thisptr = &self.thisptr.parentTime
+        parent_time.delete_thisptr = False
+        return parent_time
+
+    def _set_parent_time(self, Time parent_time):
+        self.thisptr.parentTime = deref(parent_time.thisptr)
+
+    parent_time = property(_get_parent_time, _set_parent_time)
+
+    def _get_child_frame_id(self):
+        cdef bytes child_frame_id = self.thisptr.childFrameId.arr
+        return child_frame_id.decode()
+
+    def _set_child_frame_id(self, str child_frame_id):
+        cdef string value = child_frame_id.encode()
+        memcpy(self.thisptr.childFrameId.arr, value.c_str(), len(child_frame_id))
+        self.thisptr.childFrameId.nCount = len(child_frame_id)
+
+    child_frame_id = property(_get_child_frame_id, _set_child_frame_id)
+
+    def _get_child_time(self):
+        cdef Time child_time = Time()
+        del child_time.thisptr
+        child_time.thisptr = &self.thisptr.childTime
+        child_time.delete_thisptr = False
+        return child_time
+
+    def _set_child_time(self, Time child_time):
+        self.thisptr.childTime = deref(child_time.thisptr)
+
+    child_time = property(_get_child_time, _set_child_time)
+
+
+cdef class TransformWithCovariance_DataReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    @property
+    def translation(self):
+        cdef Vector3d translation = Vector3d()
+        del translation.thisptr
+        translation.delete_thisptr = False
+        translation.thisptr = &self.thisptr.translation
+        return translation
+
+    @property
+    def orientation(self):
+        cdef Quaterniond orientation = Quaterniond()
+        del orientation.thisptr
+        orientation.delete_thisptr = False
+        orientation.thisptr = &self.thisptr.orientation
+        return orientation
+
+    @property
+    def cov(self):
+        cdef Matrix6d cov = Matrix6d()
+        del cov.thisptr
+        cov.delete_thisptr = False
+        cov.thisptr = &self.thisptr.cov
+        return cov
+
+
+cdef class TransformWithCovariance:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_types.asn1SccTransformWithCovariance()
+        self.delete_thisptr = True
+
+    @property
+    def metadata(self):
+        cdef TransformWithCovariance_MetadataReference metadata = \
+            TransformWithCovariance_MetadataReference()
+        metadata.thisptr = &self.thisptr.metadata
+        return metadata
+
+    @property
+    def data(self):
+        cdef TransformWithCovariance_DataReference data = \
+            TransformWithCovariance_DataReference()
+        data.thisptr = &self.thisptr.data
+        return data
 
 
 cdef class PointCloud_Data_pointsReference:
@@ -629,7 +822,108 @@ cdef class PointCloud_MetadataReference:
 
     time_stamp = property(_get_time_stamp, _set_time_stamp)
 
-    # TODO
+    def _get_msg_version(self):
+        return self.thisptr.msgVersion
+
+    def _set_msg_version(self, uint32_t msg_version):
+        self.thisptr.msgVersion = msg_version
+
+    msg_version = property(_get_msg_version, _set_msg_version)
+
+    def _get_sensor_id(self):
+        cdef bytes sensor_id = self.thisptr.sensorId.arr
+        return sensor_id.decode()
+
+    def _set_sensor_id(self, str sensor_id):
+        cdef string value = sensor_id.encode()
+        memcpy(self.thisptr.sensorId.arr, value.c_str(), len(sensor_id))
+        self.thisptr.sensorId.nCount = len(sensor_id)
+
+    sensor_id = property(_get_sensor_id, _set_sensor_id)
+
+    def _get_frame_id(self):
+        cdef bytes frame_id = self.thisptr.frameId.arr
+        return frame_id.decode()
+
+    def _set_frame_id(self, str frame_id):
+        cdef string value = frame_id.encode()
+        memcpy(self.thisptr.frameId.arr, value.c_str(), len(frame_id))
+        self.thisptr.frameId.nCount = len(frame_id)
+
+    frame_id = property(_get_frame_id, _set_frame_id)
+
+    def _get_time_stamp(self):
+        cdef Time time_stamp = Time()
+        del time_stamp.thisptr
+        time_stamp.thisptr = &self.thisptr.timeStamp
+        time_stamp.delete_thisptr = False
+        return time_stamp
+
+    def _set_time_stamp(self, Time time_stamp):
+        self.thisptr.timeStamp = deref(time_stamp.thisptr)
+
+    time_stamp = property(_get_time_stamp, _set_time_stamp)
+
+    def _get_height(self):
+        return self.thisptr.height
+
+    def _set_height(self, uint32_t height):
+        self.thisptr.height = height
+
+    height = property(_get_height, _set_height)
+
+    def _get_width(self):
+        return self.thisptr.width
+
+    def _set_width(self, uint32_t width):
+        self.thisptr.width = width
+
+    width = property(_get_width, _set_width)
+
+    def _get_is_registered(self):
+        return self.thisptr.isRegistered
+
+    def _set_is_registered(self, bool is_registered):
+        self.thisptr.isRegistered = is_registered
+
+    is_registered = property(_get_is_registered, _set_is_registered)
+
+    def _get_is_ordered(self):
+        return self.thisptr.isOrdered
+
+    def _set_is_ordered(self, bool is_ordered):
+        self.thisptr.isOrdered = is_ordered
+
+    is_ordered = property(_get_is_ordered, _set_is_ordered)
+
+    def _get_has_fixed_transform(self):
+        return self.thisptr.hasFixedTransform
+
+    def _set_has_fixed_transform(self, bool has_fixed_transform):
+        self.thisptr.hasFixedTransform = has_fixed_transform
+
+    has_fixed_transform = property(
+        _get_has_fixed_transform, _set_has_fixed_transform)
+
+    @property
+    def pose_robot_frame_sensor_frame(self):
+        cdef TransformWithCovariance pose_robotFrame_sensorFrame = \
+            TransformWithCovariance()
+        del pose_robotFrame_sensorFrame.thisptr
+        pose_robotFrame_sensorFrame.delete_thisptr = False
+        pose_robotFrame_sensorFrame.thisptr = \
+            &self.thisptr.pose_robotFrame_sensorFrame
+        return pose_robotFrame_sensorFrame
+
+    @property
+    def pose_fixed_frame_robot_frame(self):
+        cdef TransformWithCovariance pose_fixedFrame_robotFrame = \
+            TransformWithCovariance()
+        del pose_fixedFrame_robotFrame.thisptr
+        pose_fixedFrame_robotFrame.delete_thisptr = False
+        pose_fixedFrame_robotFrame.thisptr = \
+            &self.thisptr.pose_fixedFrame_robotFrame
+        return pose_fixedFrame_robotFrame
 
 
 cdef class Pointcloud:
