@@ -5,7 +5,11 @@
 
 #include "{{ class_name }}.hpp"
 
-namespace dfn_ci
+namespace CDFF
+{
+namespace DFN
+{
+namespace {{ desc["name"] }}
 {
 
 {{ class_name }}::{{ class_name }}()
@@ -26,6 +30,8 @@ void {{ class_name }}::process()
     // TODO DFN processing steps
 }
 
+}
+}
 }
 
 /** @} */

@@ -8,7 +8,9 @@
 
 #include "{{ desc["name"] }}Interface.hpp"
 
-namespace dfpc_ci
+namespace CDFF
+{
+namespace DFPC
 {
     /**
      * TODO Class documentation
@@ -35,6 +37,7 @@ namespace dfpc_ci
                 {% for arg in operation["inputs"] %}{{ arg["type"] }} {{ arg["name"] }}{{ ", " if not loop.last }}{% endfor %});
             {% endfor %}
     };
+}
 }
 
 #endif // {{ class_name.upper() }}_HPP

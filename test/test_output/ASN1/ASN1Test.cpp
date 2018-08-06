@@ -3,7 +3,11 @@
 #include <Time.h>
 #include <Eigen.h>
 
-namespace dfn_ci
+namespace CDFF
+{
+namespace DFN
+{
+namespace ASN1Test
 {
 
 ASN1Test::ASN1Test()
@@ -29,4 +33,6 @@ void ASN1Test::process()
     outSomeVector = someVector;
 }
 
+}
+}
 }

@@ -13,14 +13,16 @@
 {% endif %}
 {% endfor %}
 
-namespace dfpc_ci
+namespace CDFF
+{
+namespace DFPC
 {
     {% if "doc" in desc %}
     /**
      * {{ desc["doc"]|prepend(" * ")|indent(width=4) }}
      */
     {% endif %}
-    class {{ desc["name"] }}Interface : public DFPCCommonInterface
+    class {{ desc["name"] }}Interface : public dfpc_ci::DFPCCommonInterface
     {
         public:
 
@@ -70,6 +72,7 @@ namespace dfpc_ci
             {{ operation["output_type"] }} {{ operation["name"] }}Result;
             {% endfor %}
     };
+}
 }
 
 #endif // {{ desc["name"]|upper }}_INTERFACE_HPP

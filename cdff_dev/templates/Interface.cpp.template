@@ -5,7 +5,9 @@
 
 #include "{{ desc["name"] }}Interface.hpp"
 
-namespace dfn_ci
+namespace CDFF
+{
+namespace DFN
 {
 
 {{ desc["name"] }}Interface::{{ desc["name"] }}Interface()
@@ -30,6 +32,7 @@ const {{ output_port["type"] }}& {{ desc["name"] }}Interface::{{ output_port["na
 }
 
 {% endfor %}
+}
 }
 
 /** @} */

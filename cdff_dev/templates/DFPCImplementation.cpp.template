@@ -5,7 +5,9 @@
 
 #include "{{ class_name }}.hpp"
 
-namespace dfpc_ci
+namespace CDFF
+{
+namespace DFPC
 {
 
 {{ class_name }}::{{ class_name }}()
@@ -34,6 +36,7 @@ const {{ operation["output_type"] }}& {{ class_name }}::{{ operation["name"] }}(
 }
 
 {% endfor %}
+}
 }
 
 /** @} */

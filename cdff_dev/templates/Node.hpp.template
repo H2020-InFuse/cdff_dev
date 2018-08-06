@@ -8,7 +8,11 @@
 
 #include "{{ desc["name"] }}Interface.hpp"
 
-namespace dfn_ci
+namespace CDFF
+{
+namespace DFN
+{
+namespace {{ desc["name"] }}
 {
     /**
      * TODO Class documentation
@@ -23,6 +27,8 @@ namespace dfn_ci
             virtual void configure();
             virtual void process();
     };
+}
+}
 }
 
 #endif // {{ class_name.upper() }}_HPP

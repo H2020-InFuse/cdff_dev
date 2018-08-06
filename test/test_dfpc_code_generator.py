@@ -7,6 +7,9 @@ from cdff_dev.testing import EnsureCleanup, build_extension
 from nose.tools import assert_true, assert_raises_regexp
 
 
+hide_stderr = True
+
+
 def test_generate_files():
     with open("test/test_data/pointcloud_generation_dfpc_desc.yml", "r") as f:
         node = yaml.load(f)
@@ -40,7 +43,7 @@ def test_compile():
         incdirs = ["test/test_output/", os.path.join(cdffpath, "DFPCs"),
                    os.path.join(cdffpath, CTYPESDIR)]
         build_extension(
-            tmp_folder, hide_stderr=True,
+            tmp_folder, hide_stderr=hide_stderr,
             name=node["name"].lower(),
             pyx_filename=os.path.join(
                 tmp_folder, "python", node["name"].lower() + ".pyx"),

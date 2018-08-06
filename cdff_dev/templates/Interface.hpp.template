@@ -13,14 +13,16 @@
 {% endif %}
 {% endfor %}
 
-namespace dfn_ci
+namespace CDFF
+{
+namespace DFN
 {
     {% if "doc" in desc %}
     /**
      * {{ desc["doc"]|prepend(" * ")|indent(width=4) }}
      */
     {% endif %}
-    class {{ desc["name"] }}Interface : public DFNCommonInterface
+    class {{ desc["name"] }}Interface : public dfn_ci::DFNCommonInterface
     {
         public:
 
@@ -54,6 +56,7 @@ namespace dfn_ci
             {{ output_port["type"] }} out{{ output_port["name"]|capfirst }};
             {% endfor %}
     };
+}
 }
 
 #endif // {{ desc["name"]|upper }}_INTERFACE_HPP

@@ -8,6 +8,9 @@ import cdff_types
 from nose.tools import assert_true, assert_equal, assert_raises_regex
 
 
+hide_stderr = True
+
+
 def test_generate_files():
     with open("test/test_data/square_desc.yaml", "r") as f:
         node = yaml.load(f)
@@ -49,7 +52,7 @@ def test_square():
             lambda filename: os.path.join(tmp_folder, filename),
             ["Square.cpp", "SquareInterface.cpp"])
         build_extension(
-            tmp_folder, hide_stderr=True,
+            tmp_folder, hide_stderr=hide_stderr,
             name=node["name"].lower(),
             pyx_filename=pyx_filename, implementation=implementation,
             sourcedir=tmp_folder, incdirs=incdirs,
@@ -81,7 +84,7 @@ def test_unknown_type():
         assert_raises_regex(
             Exception, "Exit status",
             build_extension,
-            tmp_folder, hide_stderr=True,
+            tmp_folder, hide_stderr=hide_stderr,
             name=node["name"].lower(),
             pyx_filename=os.path.join(
                 tmp_folder, "python", node["name"].lower() + ".pyx"),
@@ -106,7 +109,7 @@ def test_multiple_implementations():
 
         incdirs = ["test/test_output/", os.path.join(cdffpath, "DFNs")]
         build_extension(
-            tmp_folder, hide_stderr=True,
+            tmp_folder, hide_stderr=hide_stderr,
             name=node["name"].lower(),
             pyx_filename=os.path.join(
                 tmp_folder, "python", node["name"].lower() + ".pyx"),
@@ -144,7 +147,7 @@ def test_asn1():
 
         incdirs = ["test/test_output/", ctypespath, dfnspath]
         build_extension(
-            tmp_folder, hide_stderr=True,
+            tmp_folder, hide_stderr=hide_stderr,
             name=node["name"].lower(),
             pyx_filename=os.path.join(
                 tmp_folder, "python", node["name"].lower() + ".pyx"),

@@ -1,6 +1,10 @@
 #include "Square.hpp"
 
-namespace dfn_ci
+namespace CDFF
+{
+namespace DFN
+{
+namespace Square
 {
 
 Square::Square()
@@ -21,4 +25,6 @@ void Square::process()
     outX_squared = inX * inX;
 }
 
+}
+}
 }
