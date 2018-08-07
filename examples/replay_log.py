@@ -23,8 +23,8 @@ def main():
     )
     frames = {
         "/laser_filter.filtered_scans": "upper_dynamixel",
-        "/tilt_scan.pointcloud": "body",
-        "/dynamixel.transforms": "body",
+        # Pointcloud visualization does not work at the moment, issue #66
+        #"/tilt_scan.pointcloud": "body",
         "/velodyne.laser_scans": "velodyne",
     }
     urdf_files = [
