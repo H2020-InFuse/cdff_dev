@@ -19,13 +19,13 @@ def main():
         "transformer": 0.1
     }
     connections = (
-        ("/dynamixel.transforms", "transformer.upper_dynamixel2lower_dynamixel")
+        ("/dynamixel.transforms", "transformer.upper_dynamixel2lower_dynamixel"),
     )
     frames = {
         "/laser_filter.filtered_scans": "upper_dynamixel",
         "/tilt_scan.pointcloud": "body",
         "/dynamixel.transforms": "body",
-        "/velodyne.laser_scans": "velodyne"
+        "/velodyne.laser_scans": "velodyne",
     }
     urdf_files = [
         "examples/seekurjr.urdf"
