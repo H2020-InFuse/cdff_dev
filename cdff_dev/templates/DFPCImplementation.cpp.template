@@ -9,6 +9,8 @@ namespace CDFF
 {
 namespace DFPC
 {
+namespace {{ desc["name"] }}
+{
 
 {{ class_name }}::{{ class_name }}()
 {
@@ -36,6 +38,7 @@ const {{ operation["output_type"] }}& {{ class_name }}::{{ operation["name"] }}(
 }
 
 {% endfor %}
+}
 }
 }
 

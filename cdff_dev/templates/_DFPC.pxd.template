@@ -26,7 +26,7 @@ cdef extern from "{{ desc["name"] }}Interface.hpp" namespace "CDFF::DFPC":
 {% for class_name in desc["implementations"] %}
 
 
-cdef extern from "{{ class_name }}.hpp" namespace "CDFF::DFPC":
+cdef extern from "{{ class_name }}.hpp" namespace "CDFF::DFPC::{{ desc["name"] }}":
     cdef cppclass {{ class_name }}({{ desc["name"] }}Interface):
         pass
 {% endfor %}

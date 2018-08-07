@@ -12,6 +12,8 @@ namespace CDFF
 {
 namespace DFPC
 {
+namespace {{ desc["name"] }}
+{
     /**
      * TODO Class documentation
      */
@@ -37,6 +39,7 @@ namespace DFPC
                 {% for arg in operation["inputs"] %}{{ arg["type"] }} {{ arg["name"] }}{{ ", " if not loop.last }}{% endfor %});
             {% endfor %}
     };
+}
 }
 }
 
