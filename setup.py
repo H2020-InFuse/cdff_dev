@@ -6,8 +6,12 @@ import numpy
 import os
 import glob
 import warnings
+import multiprocessing
 import cdff_dev
 from cdff_dev.path import load_cdffpath, CTYPESDIR
+
+
+NTHREADS = multiprocessing.cpu_count() / 2
 
 
 def strict_prototypes_workaround():
@@ -50,6 +54,7 @@ def configuration(parent_package='', top_path=None):
                        quiet=True)
 
     config.add_subpackage("cdff_dev")
+    config.add_subpackage("extensions")
 
     autoproj_available = check_autoproj()
 
@@ -90,7 +95,7 @@ def check_autoproj():
 
 
 def make_cdff_types(config, ctypespath, extra_compile_args):
-    cythonize("cdff_types.pyx")
+    cythonize("cdff_types.pyx", nthreads=NTHREADS)
     config.add_extension(
         "cdff_types",
         sources=["cdff_types.cpp"],
@@ -107,7 +112,7 @@ def make_cdff_types(config, ctypespath, extra_compile_args):
 
 
 def make_cdff_envire(config, ctypespath, extra_compile_args):
-    cythonize("cdff_envire.pyx")
+    cythonize("cdff_envire.pyx", nthreads=NTHREADS)
     autoproj_current_root = os.environ.get("AUTOPROJ_CURRENT_ROOT", None)
     install_dir = os.path.join(autoproj_current_root, "install")
     # this path is currently only used in CI image:

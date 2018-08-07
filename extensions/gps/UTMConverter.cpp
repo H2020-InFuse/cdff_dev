@@ -1,8 +1,6 @@
 #include "UTMConverter.hpp"
-#include <iostream>
 #include <ogr_spatialref.h>
 
-using namespace std;
 using namespace gps;
 
 UTMConverter::UTMConverter()
