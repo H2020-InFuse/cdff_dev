@@ -51,9 +51,6 @@ RUN echo "Autobuild::Package['cdff/CDFF'].define 'USE_BUNDLED_DEPENDENCIES', 'OF
 # Fix missing pkg-config files
 COPY pcl_registration-1.8.pc pcl_features-1.8.pc pcl_2d-1.8.pc /tmp/infuse/install/lib/pkgconfig/
 
-# Workaround for Eigen include directory
-COPY setup.py /tmp/infuse/cdff/CDFF_dev/
-
 # Install direct dependencies of CDFF_dev
 RUN source env.sh && autoproj build \
   && mv /tmp/infuse/cdff/CDFF/Common/Types /tmp/ \
@@ -66,8 +63,6 @@ RUN source env.sh && autoproj build \
   && mv /tmp/Types /tmp/infuse/cdff/CDFF/Common/ \
   && mv /tmp/DFNCommonInterface.hpp /tmp/infuse/cdff/CDFF/DFNs/ \
   && mv /tmp/DFPCCommonInterface.hpp /tmp/infuse/cdff/CDFF/DFPCs/ \
-  && rm -rf /tmp/infuse/install/lib/python3.5/site-packages/* \
-  && rm -rf /tmp/infuse/install/bin/*_template_generator \
   && rm -rf /tmp/infuse/autoproj \
   && rm -rf /tmp/infuse/base \
   && rm -rf /tmp/infuse/control \
@@ -86,5 +81,5 @@ RUN rm /root/.gitconfig
 WORKDIR /
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
-LABEL version="1.8.4"
+LABEL version="1.8.5"
 LABEL description="Image providing the dependencies of CDFF-dev for continuous integration"

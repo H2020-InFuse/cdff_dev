@@ -4,6 +4,9 @@ package_sets:
    - github: envire/envire-package_set
 
 layout:
-   - cdff/CDFF_dev
-   - infuse/ASN_Viz
+   - cdff/CDFF
+   - envire/envire_core
+   - envire/envire_urdf
+   - envire/envire_visualizer
    - infuse/envire_asn1
+   - infuse/ASN_Viz
