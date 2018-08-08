@@ -1,10 +1,14 @@
 import numpy as np
-import cdff_types, cdff_gps
+from cdff_dev.extensions.gps import cdff_gps
 from nose.tools import assert_equal
 from numpy.testing import assert_array_equal
 
 
 def test_gps():
+    utm_converter = cdff_gps.UTMConverter()
+
+
+def tst_gps():
     converter = cdff_gps.UTMConverter()
 
     utm_zone = 1

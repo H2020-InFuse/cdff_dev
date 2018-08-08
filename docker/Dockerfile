@@ -22,7 +22,9 @@ RUN apt-get update && apt-get install -y \
   ruby \
   ruby-dev \
   sudo \
-  python3-pyqt4
+  python3-pyqt4 \
+  libgdal-dev \
+  libproj-dev
 RUN pip3 install --upgrade pip
 RUN pip3 install pyyaml jinja2 cython numpy msgpack-python pydot nose nose2
 

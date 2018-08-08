@@ -4,78 +4,108 @@ from libcpp cimport bool
 from libcpp.string cimport string
 
 
-cdef extern from "UTMConverter.hpp" namespace "gps":
-    cdef cppclass UTMConverter:
-        UTMConverter()
-        void setUTMZone(int zone)
-        void setUTMNorth(bool north)
-        int getUTMZone()
-        bool getUTMNorth()
-        void setNWUOrigin(_cdff_types.asn1SccVector3d origin)
-        _cdff_types.asn1SccVector3d getNWUOrigin()
-        _cdff_types.asn1SccRigidBodyState convertToUTM(_cdff_types.asn1SccTime time, double longitude, double latitude, double altitude)
-        _cdff_types.asn1SccRigidBodyState convertToNWU(_cdff_types.asn1SccTime time, double longitude, double latitude, double altitude)
+cdef extern from "ogr_spatialref.h":
+    cdef cppclass OGRCoordinateTransformation:
+        OGRCoordinateTransformation()
+        int Transform(int nCount, double* x, double* y, double* z)
+    cdef cppclass OGRSpatialReference:
+        OGRSpatialReference()
+        int SetWellKnownGeogCS(const char* pszName)
+        int SetUTM(int nZone, int bNorth)
+    OGRCoordinateTransformation* OGRCreateCoordinateTransformation(
+        OGRSpatialReference* poSource, OGRSpatialReference* poTarget)
 
 
-cdef class UTMConverter:
-    cdef _cdff_gps.UTMConverter* thisptr
-    cdef bool delete_thisptr
+def convert_to_utm(self, double longitude, double latitude, double altitude,
+                   int utm_zone=32, bool utm_north=True):
+    """Convert to Universal Transverse Mercator coordinate system.
 
-    def __cinit__(self):
-        self.thisptr = NULL
-        self.delete_thisptr = False
+    Parameters
+    ----------
+    longitude : double
+        Longitude in degrees
 
-    def __dealloc__(self):
-        if self.delete_thisptr and self.thisptr != NULL:
-            del self.thisptr
+    latitude : double
+        Latitude in degrees
 
-    def __init__(self):
-        self.thisptr = new _cdff_gps.UTMConverter()
-        self.delete_thisptr = True
+    altitude : double
+        Altitude
 
-    def setUTMZone(self, int zone):
-        cdef int value = zone
-        self.thisptr.setUTMZone(value)
+    utm_zone : int, optional (default: 32 (central Europe))
+        UTM zone, see
+        https://en.wikipedia.org/wiki/Universal_Transverse_Mercator_coordinate_system
 
-    def setUTMNorth(self, bool north):
-        cdef bool value = north
-        self.thisptr.setUTMNorth(value)
+    utm_north : bool, optional (default: True)
+        Northern hemisphere
 
-    def getUTMZone(self):
-        cdef int out = self.thisptr.getUTMZone()
-        return out
+    Returns
+    -------
+    easting : double
+        x
 
-    def getUTMNorth(self):
-        cdef bool out = self.thisptr.getUTMNorth()
-        return out
+    northing : double
+        y
 
-    def setNWUOrigin(self, cdff_types.Vector3d origin):
-        cdef _cdff_types.asn1SccVector3d * cpp_data = origin.thisptr
-        self.thisptr.setNWUOrigin(deref(cpp_data))
+    alt : double
+        z
+    """
+    cdef OGRSpatialReference source_srs
+    cdef OGRSpatialReference target_srs
+    source_srs.SetWellKnownGeogCS("WGS84")
+    target_srs.SetWellKnownGeogCS("WGS84")
+    target_srs.SetUTM(utm_zone, utm_north)
 
-    def getNWUOrigin(self):
-        cdef cdff_types.Vector3d out = cdff_types.Vector3d()
-        out.thisptr[0] = self.thisptr.getNWUOrigin()
-        return out
+    cdef OGRCoordinateTransformation* transform = \
+        OGRCreateCoordinateTransformation(&source_srs, &target_srs)
 
-    def convertToUTM(self, cdff_types.Time time, double longitude,
-                    double latitude, double altitude):
-        cdef _cdff_types.asn1SccTime * cpp_time = time.thisptr
-        cdef float lon = longitude
-        cdef float lat = latitude
-        cdef float alt = altitude
-        cdef cdff_types.RigidBodyState out = cdff_types.RigidBodyState()
-        out.thisptr[0] = self.thisptr.convertToUTM(deref(cpp_time), lon,
-                                                        lat, alt)
-        return out
+    if transform == NULL:
+        raise Exception("Failed to initialize coordinate transform")
 
-    def convertToNWU(self, cdff_types.Time time, double longitude,
-                    double latitude, double altitude):
-        cdef _cdff_types.asn1SccTime * cpp_time = time.thisptr
-        cdef float lon = longitude
-        cdef float lat = latitude
-        cdef float alt = altitude
-        cdef cdff_types.RigidBodyState out = cdff_types.RigidBodyState()
-        out.thisptr[0] = self.thisptr.convertToNWU(deref(cpp_time), lon,
-                                                        lat, alt)
-        return out
+    cdef double northing = latitude
+    cdef double easting  = longitude
+    cdef double alt = altitude
+
+    transform.Transform(1, &easting, &northing, &alt)
+
+    del transform
+
+    return easting, northing, alt
+
+
+def convert_to_nwu(self, easting, northing, altitude,
+                         origin_northing, origin_westing, origin_up):
+    """Convert UTM coordinates to NWU coordinates.
+
+    Parameters
+    ----------
+    easting : double
+        x
+
+    northing : double
+        y
+
+    altitude : double
+        z
+
+    origin_northing : double
+        x-coordinate of the base coordinate system in NWU convention
+
+    origin_westing : double
+        y-coordinate of the base coordinate system in NWU convention
+
+    origin_up : double
+        z-coordinate of the base coordinate system in NWU convention
+
+    Returns
+    -------
+    northing : double
+        x-coordinate in base coordinate system in NWU convention
+
+    westing : double
+        y-coordinate in base coordinate system in NWU convention
+
+    up : double
+        z-coordinate in base coordinate system in NWU convention
+    """
+    return (northing - origin_northing, 1000000 - easting - origin_westing,
+            altitude - origin_up)

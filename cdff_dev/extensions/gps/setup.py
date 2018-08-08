@@ -1,15 +1,10 @@
 from subprocess import Popen, PIPE
 import warnings
-import os
-from cdff_dev.path import load_cdffpath, CTYPESDIR
 
 
 def configuration(parent_package='', top_path=None):
     from numpy.distutils.misc_util import Configuration
     config = Configuration("gps", parent_package, top_path)
-
-    cdffpath = load_cdffpath()
-    ctypespath = os.path.join(cdffpath, CTYPESDIR)
 
     extra_compile_args = [
         "-std=c++11",
@@ -23,14 +18,16 @@ def configuration(parent_package='', top_path=None):
     try:
         include_dirs = get_include_dirs(libraries)
         library_dirs = get_library_dirs(libraries)
+        print(include_dirs)
+        print(library_dirs)
     except IOError as e:
         warnings.warn("Could not build extension gps, reason: %s" % e)
         return config
 
     config.add_extension(
         "cdff_gps",
-        sources=["cdff_gps.pyx", "UTMConverter.cpp"],
-        include_dirs=[".", ctypespath] + include_dirs,
+        sources=["cdff_gps.pyx"],
+        include_dirs=include_dirs,
         library_dirs=library_dirs,
         libraries=libraries,
         define_macros=[("NDEBUG",)],
@@ -46,7 +43,8 @@ def get_include_dirs(libraries):
     output, err = p.communicate()
     if err:
         raise IOError(err)
-    return list(map(lambda dir: str(dir[2:]), output.split()))  # Remove -I
+    # Remove -I
+    return list(map(lambda dir: dir[2:].decode("utf-8"), output.split()))
 
 
 def get_library_dirs(libraries):
@@ -55,7 +53,8 @@ def get_library_dirs(libraries):
     output, err = p.communicate()
     if err:
         raise IOError(err)
-    return list(map(lambda dir: str(dir[2:]), output.split()))  # Remove -L
+    # Remove -L
+    return list(map(lambda dir: dir[2:].decode("utf-8"), output.split()))
 
 
 if __name__ == '__main__':
