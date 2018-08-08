@@ -40,7 +40,7 @@ def get_include_dirs(libraries):
               stdin=PIPE, stdout=PIPE, stderr=PIPE)
     output, err = p.communicate()
     if err:
-        raise IOError(err)
+        raise IOError(err.decode("utf-8"))
     # Remove -I
     return list(map(lambda dir: dir[2:].decode("utf-8"), output.split()))
 
@@ -50,7 +50,7 @@ def get_library_dirs(libraries):
               stdin=PIPE, stdout=PIPE, stderr=PIPE)
     output, err = p.communicate()
     if err:
-        raise IOError(err)
+        raise IOError(err.decode("utf-8"))
     # Remove -L
     return list(map(lambda dir: dir[2:].decode("utf-8"), output.split()))
 
