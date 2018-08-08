@@ -50,7 +50,6 @@ def configuration(parent_package='', top_path=None):
                        quiet=True)
 
     config.add_subpackage("cdff_dev")
-    config.add_subpackage("extensions")
 
     autoproj_available = check_autoproj()
 
