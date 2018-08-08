@@ -16,17 +16,17 @@ cdef extern from "ogr_spatialref.h":
         OGRSpatialReference* poSource, OGRSpatialReference* poTarget)
 
 
-def convert_to_utm(self, double longitude, double latitude, double altitude,
+def convert_to_utm(double latitude, double longitude, double altitude,
                    int utm_zone=32, bool utm_north=True):
-    """Convert to Universal Transverse Mercator coordinate system.
+    """Convert GPS coordinates to Universal Transverse Mercator coordinates.
 
     Parameters
     ----------
-    longitude : double
-        Longitude in degrees
-
     latitude : double
         Latitude in degrees
+
+    longitude : double
+        Longitude in degrees
 
     altitude : double
         Altitude
@@ -72,8 +72,9 @@ def convert_to_utm(self, double longitude, double latitude, double altitude,
     return easting, northing, alt
 
 
-def convert_to_nwu(self, easting, northing, altitude,
-                         origin_northing, origin_westing, origin_up):
+def convert_to_nwu(double easting, double northing, double altitude,
+                   double origin_northing, double origin_westing,
+                   double origin_up):
     """Convert UTM coordinates to NWU coordinates.
 
     Parameters

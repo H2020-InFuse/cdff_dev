@@ -18,15 +18,13 @@ def configuration(parent_package='', top_path=None):
     try:
         include_dirs = get_include_dirs(libraries)
         library_dirs = get_library_dirs(libraries)
-        print(include_dirs)
-        print(library_dirs)
     except IOError as e:
         warnings.warn("Could not build extension gps, reason: %s" % e)
         return config
 
     config.add_extension(
-        "cdff_gps",
-        sources=["cdff_gps.pyx"],
+        "conversion",
+        sources=["conversion.pyx"],
         include_dirs=include_dirs,
         library_dirs=library_dirs,
         libraries=libraries,
