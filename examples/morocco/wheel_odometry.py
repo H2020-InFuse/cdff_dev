@@ -12,7 +12,7 @@ utm_zone = 12  # TODO Utah 12, Germany 32, Morocco 29?
 utm_north = True
 
 
-class Transformer(transformer.EnvireDFN):  # TODO check if transformations are set correctly
+class Transformer(transformer.EnvireDFN):  # TODO check transformation handling with EnviRe
     def __init__(self):
         super(Transformer, self).__init__()
 
@@ -53,8 +53,8 @@ class GpsToRelativePoseDFN:
         self.relative_pose.timestamp.microseconds = self.gps.time.microseconds
         self.relative_pose.pos.fromarray(
             np.array(self._to_coordinates(self.gps, self.initial_pose.pos)))
-        self.relative_pose.source_frame = "start"
-        self.relative_pose.target_frame = "dgps"
+        self.relative_pose.source_frame = "dgps"
+        self.relative_pose.target_frame = "start"
         self.relative_pose.orient.fromarray(np.array([1.0, 0.0, 0.0, 0.0]))
         self.relative_pose.cov_position[0, 0] = \
             self.gps.deviation_latitude ** 2
@@ -91,7 +91,6 @@ class EvaluationDFN:
 
     def odometryPoseInput(self, odometry_pose):
         self.odometry_pose = odometry_pose
-
 
     def gpsPoseInput(self, gps_pose):
         self.gps_pose = gps_pose
@@ -162,10 +161,11 @@ def configure(logs):
 
     # TODO unify graph initialization
     app.visualization.world_state_.graph_.add_frame("body")
-    body2start = cdff_envire.Transform()
-    body2start.transform.translation.fromarray(np.array([0.0, 0.0, 0.0]))
-    body2start.transform.orientation.fromarray(np.array([1.0, 0.0, 0.0, 0.0]))
-    app.visualization.world_state_.graph_.add_transform("body", "start", body2start)
+    connect_gps_odometry = cdff_envire.Transform()
+    connect_gps_odometry.transform.translation.fromarray(np.array([0.0, 0.0, 0.0]))
+    connect_gps_odometry.transform.orientation.fromarray(np.array([1.0, 0.0, 0.0, 0.0]))
+    app.visualization.world_state_.graph_.add_transform(
+        "start", "odometry", connect_gps_odometry)
 
     # TODO visualize covariance?
 
