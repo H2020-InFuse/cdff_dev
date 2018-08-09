@@ -1,6 +1,7 @@
 import numpy as np
 from cdff_dev import logloader, envirevisualization, dataflowcontrol, transformer
 import cdff_types
+import cdff_envire
 from cdff_dev.extensions.gps import conversion
 
 
@@ -11,11 +12,14 @@ utm_zone = 12  # TODO Utah 12, Germany 32, Morocco 29?
 utm_north = True
 
 
-class Transformer(transformer.EnvireDFN):
+class Transformer(transformer.EnvireDFN):  # TODO check if transformations are set correctly
     def __init__(self):
         super(Transformer, self).__init__()
 
     def relativePoseInput(self, data):
+        self._set_transform(data)
+
+    def wheelOdometryInput(self, data):
         self._set_transform(data)
 
 
@@ -52,6 +56,12 @@ class GpsToRelativePoseDFN:
         self.relative_pose.source_frame = "start"
         self.relative_pose.target_frame = "dgps"
         self.relative_pose.orient.fromarray(np.array([1.0, 0.0, 0.0, 0.0]))
+        self.relative_pose.cov_position[0, 0] = \
+            self.gps.deviation_latitude ** 2
+        self.relative_pose.cov_position[1, 1] = \
+            self.gps.deviation_longitude ** 2
+        self.relative_pose.cov_position[2, 2] = \
+            self.gps.deviation_altitude ** 2
 
     def relativePoseOutput(self):
         return self.relative_pose
@@ -102,7 +112,9 @@ def main():
 
 def convert_logs():
     # TODO implement
-    return "logs/dgps.msg"
+    # TODO find number of samples per stream
+    # TODO chunk logfiles
+    return [["logs/Sherpa/dgps.msg"], ["logs/Sherpa/sherpa_tt_mcs.msg"]]
     #raise NotImplementedError()
 
 
@@ -111,6 +123,7 @@ def configure(logs):
         "gps_to_relative_pose": GpsToRelativePoseDFN(),
         "transformer": Transformer(),
         #"evaluation": EvaluationDFN()
+        # TODO conversion to path
     }
     periods = {
         "gps_to_relative_pose": 0.1,  # TODO
@@ -120,6 +133,7 @@ def configure(logs):
     connections = (
         ("/dgps.gps_solution", "gps_to_relative_pose.gps"),
         ("gps_to_relative_pose.relativePose", "transformer.relativePose"),
+        ("/mcs_sensor_processing.rigid_body_state_out", "transformer.wheelOdometry"),
         #("gps_to_relative_pose.relativePose", "evaluation.gpsPose"),
         #("/?.?", "evaluation.odometryPose"),  # TODO
     )
@@ -132,20 +146,28 @@ def configure(logs):
         #"sherpa?.urdf"  # TODO
     ]
 
-    log = logloader.load_log(  # TODO use multiple files
-        logs
+    log_iterator = logloader.replay_files(
+        logs,
+        stream_names = [
+            "/dgps.gps_solution",
+            "/mcs_sensor_processing.rigid_body_state_out"
+        ]
     )
-    stream_names = [
-        "/dgps.gps_solution",
-        #"/?.?"  # TODO
-    ]
-    log_iterator = logloader.replay(stream_names, log)
 
     app = envirevisualization.EnvireVisualizerApplication(
         frames, urdf_files, center_frame="start")
     dfc = dataflowcontrol.DataFlowControl(
         nodes, connections, periods, real_time=False)
     dfc.setup()
+
+    # TODO unify graph initialization
+    app.visualization.world_state_.graph_.add_frame("body")
+    body2start = cdff_envire.Transform()
+    body2start.transform.translation.fromarray(np.array([0.0, 0.0, 0.0]))
+    body2start.transform.orientation.fromarray(np.array([1.0, 0.0, 0.0, 0.0]))
+    app.visualization.world_state_.graph_.add_transform("body", "start", body2start)
+
+    # TODO visualize covariance?
 
     app.show_controls(log_iterator, dfc)
 
