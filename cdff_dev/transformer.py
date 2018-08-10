@@ -66,8 +66,8 @@ class EnvireDFN:
 
     def _get_transform(self, origin, target):
         rigid_body_state = cdff_types.RigidBodyState()
-        rigid_body_state.target_frame = origin
-        rigid_body_state.source_frame = target
+        rigid_body_state.target_frame = target
+        rigid_body_state.source_frame = origin
         if self.graph_ is None:
             warnings.warn("EnviRe Graph is not initialized.")
             return
