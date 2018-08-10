@@ -1,3 +1,4 @@
+import warnings
 import numpy as np
 from cdff_dev import logloader, envirevisualization, dataflowcontrol, transformer
 import cdff_types
@@ -8,7 +9,7 @@ from cdff_dev.extensions.gps import conversion
 # TODO configuration
 dgps_logfile = "logs/Sherpa/dgps_Logger.log"
 mcs_logfile = "logs/Sherpa/sherpa_tt_mcs_Logger.log"
-utm_zone = 12  # TODO Utah 12, Germany 32, Morocco 29?
+utm_zone = 32  # TODO Utah 12, Germany 32, Morocco 29?
 utm_north = True
 
 
@@ -43,25 +44,32 @@ class GpsToRelativePoseDFN:
 
     def gpsInput(self, gps):
         self.gps = gps
-        if not self.initial_pose_set:
-            self.initial_pose.pos.fromarray(
-                np.array(self._to_coordinates(gps)))
-            self.initial_pose.timestamp.microseconds = gps.time.microseconds
-            self.initial_pose_set = True
 
     def process(self):
-        self.relative_pose.timestamp.microseconds = self.gps.time.microseconds
-        self.relative_pose.pos.fromarray(
-            np.array(self._to_coordinates(self.gps, self.initial_pose.pos)))
-        self.relative_pose.source_frame = "dgps"
-        self.relative_pose.target_frame = "start"
-        self.relative_pose.orient.fromarray(np.array([1.0, 0.0, 0.0, 0.0]))
-        self.relative_pose.cov_position[0, 0] = \
-            self.gps.deviation_latitude ** 2
-        self.relative_pose.cov_position[1, 1] = \
-            self.gps.deviation_longitude ** 2
-        self.relative_pose.cov_position[2, 2] = \
-            self.gps.deviation_altitude ** 2
+        try:
+            if not self.initial_pose_set:
+                self.initial_pose.pos.fromarray(
+                    np.array(self._to_coordinates(self.gps)))
+                self.initial_pose.timestamp.microseconds = self.gps.time.microseconds
+                self.initial_pose_set = True
+
+            self.relative_pose.timestamp.microseconds = self.gps.time.microseconds
+            self.relative_pose.pos.fromarray(
+                np.array(self._to_coordinates(self.gps, self.initial_pose.pos)))
+            self.relative_pose.source_frame = "dgps"
+            self.relative_pose.target_frame = "start"
+            self.relative_pose.orient.fromarray(np.array([1.0, 0.0, 0.0, 0.0]))
+            self.relative_pose.cov_position[0, 0] = \
+                self.gps.deviation_latitude ** 2
+            self.relative_pose.cov_position[1, 1] = \
+                self.gps.deviation_longitude ** 2
+            self.relative_pose.cov_position[2, 2] = \
+                self.gps.deviation_altitude ** 2
+        except Exception as e:
+            warnings.warn("Failure with GPS coordinates latitude=%g, "
+                          "longitude=%g, altitude=%g, error: %s"
+                          % (self.gps.latitude, self.gps.longitude,
+                             self.gps.altitude, e))
 
     def relativePoseOutput(self):
         return self.relative_pose
@@ -79,8 +87,8 @@ class GpsToRelativePoseDFN:
 
 class EvaluationDFN:
     def __init__(self):
-        self.odometry_pose = cdff_types.RigidBodyState()
-        self.gps_pose = cdff_types.RigidBodyState()
+        self.odometry_poses = []
+        self.gps_poses = []
         self.error = 0.0
 
     def set_configuration_file(self, filename):
@@ -90,13 +98,18 @@ class EvaluationDFN:
         pass
 
     def odometryPoseInput(self, odometry_pose):
-        self.odometry_pose = odometry_pose
+        self.odometry_poses.append(odometry_pose)
 
     def gpsPoseInput(self, gps_pose):
-        self.gps_pose = gps_pose
+        self.gps_poses.append(gps_pose)
 
     def process(self):
-        raise NotImplementedError()
+        if not self.odometry_poses or not self.gps_poses:
+            return
+        self.error = np.linalg.norm(self.odometry_poses[-1].pos.toarray() -
+                                    self.gps_poses[-1].pos.toarray())
+        print("[Evaluation] position error: %.2f" % self.error)
+
 
     def errorOutput(self):
         return self.error
@@ -121,20 +134,20 @@ def configure(logs):
     nodes = {
         "gps_to_relative_pose": GpsToRelativePoseDFN(),
         "transformer": Transformer(),
-        #"evaluation": EvaluationDFN()
+        "evaluation": EvaluationDFN()
         # TODO conversion to path
     }
     periods = {
         "gps_to_relative_pose": 0.1,  # TODO
-        "transformer": 0.1 # TODO
-        #"evaluation": 0.1 # TODO
+        "transformer": 0.1, # TODO
+        "evaluation": 0.1, # TODO
     }
     connections = (
         ("/dgps.gps_solution", "gps_to_relative_pose.gps"),
         ("gps_to_relative_pose.relativePose", "transformer.relativePose"),
         ("/mcs_sensor_processing.rigid_body_state_out", "transformer.wheelOdometry"),
-        #("gps_to_relative_pose.relativePose", "evaluation.gpsPose"),
-        #("/?.?", "evaluation.odometryPose"),  # TODO
+        ("gps_to_relative_pose.relativePose", "evaluation.gpsPose"),
+        ("/mcs_sensor_processing.rigid_body_state_out", "evaluation.odometryPose"),
     )
     pose_frame = "start"  # TODO
     frames = {

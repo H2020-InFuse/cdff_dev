@@ -65,9 +65,12 @@ def convert_to_utm(double latitude, double longitude, double altitude,
     cdef double easting  = longitude
     cdef double alt = altitude
 
-    transform.Transform(1, &easting, &northing, &alt)
+    cdef int success = transform.Transform(1, &easting, &northing, &alt)
 
     del transform
+
+    if not success:
+        raise Exception("Failed to transform from GPS to UTM coordinates")
 
     return easting, northing, alt
 
