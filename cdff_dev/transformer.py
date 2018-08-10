@@ -45,8 +45,8 @@ class EnvireDFN:
             warnings.warn("EnviRe Graph is not initialized.")
             return
 
-        origin = rigid_body_state.target_frame
-        target = rigid_body_state.source_frame
+        origin = rigid_body_state.source_frame
+        target = rigid_body_state.target_frame
         if not self.graph_.contains_frame(origin):
             self.graph_.add_frame(origin)
         if not self.graph_.contains_frame(target):

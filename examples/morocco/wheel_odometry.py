@@ -56,8 +56,8 @@ class GpsToRelativePoseDFN:
             self.relative_pose.timestamp.microseconds = self.gps.time.microseconds
             self.relative_pose.pos.fromarray(
                 np.array(self._to_coordinates(self.gps, self.initial_pose.pos)))
-            self.relative_pose.source_frame = "dgps"
-            self.relative_pose.target_frame = "start"
+            self.relative_pose.source_frame = "start"
+            self.relative_pose.target_frame = "dgps"
             self.relative_pose.orient.fromarray(np.array([1.0, 0.0, 0.0, 0.0]))
             self.relative_pose.cov_position[0, 0] = \
                 self.gps.deviation_latitude ** 2
@@ -172,11 +172,12 @@ def configure(logs):
         nodes, connections, periods, real_time=False)
     dfc.setup()
 
-    # TODO unify graph initialization
+    # TODO simplify graph initialization
     app.visualization.world_state_.graph_.add_frame("body")
+    app.visualization.world_state_.graph_.add_frame("odometry")
     connect_gps_odometry = cdff_envire.Transform()
     connect_gps_odometry.transform.translation.fromarray(np.array([0.0, 0.0, 0.0]))
-    connect_gps_odometry.transform.orientation.fromarray(np.array([1.0, 0.0, 0.0, 0.0]))
+    connect_gps_odometry.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
     app.visualization.world_state_.graph_.add_transform(
         "start", "odometry", connect_gps_odometry)
 
