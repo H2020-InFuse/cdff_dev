@@ -35,6 +35,7 @@ class GpsToRelativePoseDFN:
         self.initial_pose.source_frame = "world"
         self.initial_pose.target_frame = "start"
         self.initial_pose_set = False
+        self.input_provided = False
 
     def set_configuration_file(self, filename):
         pass
@@ -44,8 +45,11 @@ class GpsToRelativePoseDFN:
 
     def gpsInput(self, gps):
         self.gps = gps
+        self.input_provided = True
 
     def process(self):
+        if not self.input_provided:
+            return
         try:
             if not self.initial_pose_set:
                 self.initial_pose.pos.fromarray(
@@ -58,7 +62,7 @@ class GpsToRelativePoseDFN:
                 np.array(self._to_coordinates(self.gps, self.initial_pose.pos)))
             self.relative_pose.source_frame = "start"
             self.relative_pose.target_frame = "dgps"
-            self.relative_pose.orient.fromarray(np.array([1.0, 0.0, 0.0, 0.0]))
+            self.relative_pose.orient.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
             self.relative_pose.cov_position[0, 0] = \
                 self.gps.deviation_latitude ** 2
             self.relative_pose.cov_position[1, 1] = \
