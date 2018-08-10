@@ -355,8 +355,14 @@ class LogfileGroup:
                 print("[logloader] Reached the end of the logfile.")
             else:
                 stream_name = self.group_stream_names[self.next_stream]
-                print("[logloader] Next sample from stream #%d (%s), clock: %f"
-                      % (self.next_stream, stream_name, timestamp))
+                try:
+                    from cdff_envire import Time
+                    t = Time()
+                    t.microseconds = timestamp
+                except ImportError:
+                    t = timestamp
+                print("[logloader] Next sample from stream #%d (%s), clock: %s"
+                      % (self.next_stream, stream_name, t))
 
         return timestamp
 

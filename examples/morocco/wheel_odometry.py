@@ -13,7 +13,7 @@ utm_zone = 32  # TODO Utah 12, Germany 32, Morocco 29?
 utm_north = True
 
 
-class Transformer(transformer.EnvireDFN):  # TODO check transformation handling with EnviRe
+class Transformer(transformer.EnvireDFN):
     def __init__(self):
         super(Transformer, self).__init__()
 
@@ -138,9 +138,11 @@ def configure(logs):
         # TODO conversion to path
     }
     periods = {
-        "gps_to_relative_pose": 0.1,  # TODO
-        "transformer": 0.1, # TODO
-        "evaluation": 0.1, # TODO
+        # frequency of odometry: 0.01
+        # frequency of gps: 0.05
+        "gps_to_relative_pose": 0.05,  # TODO
+        "transformer": 0.01,
+        "evaluation": 1.0, # TODO
     }
     connections = (
         ("/dgps.gps_solution", "gps_to_relative_pose.gps"),
@@ -163,7 +165,8 @@ def configure(logs):
         stream_names = [
             "/dgps.gps_solution",
             "/mcs_sensor_processing.rigid_body_state_out"
-        ]
+        ],
+        verbose=0
     )
 
     app = envirevisualization.EnvireVisualizerApplication(
