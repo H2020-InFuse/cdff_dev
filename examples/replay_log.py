@@ -8,7 +8,7 @@ class Transformer(transformer.EnvireDFN):
         super(Transformer, self).__init__()
 
     def upper_dynamixel2lower_dynamixelInput(self, data):
-        self._set_transform(data)
+        self._set_transform(data, data_transformation=False)
 
 
 def main():
