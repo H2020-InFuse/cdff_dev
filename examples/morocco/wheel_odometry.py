@@ -18,10 +18,10 @@ class Transformer(transformer.EnvireDFN):
         super(Transformer, self).__init__()
 
     def relativePoseInput(self, data):
-        self._set_transform(data)
+        self._set_transform(data, data_transformation=True)
 
     def wheelOdometryInput(self, data):
-        self._set_transform(data)
+        self._set_transform(data, data_transformation=True)
 
 
 class GpsToRelativePoseDFN:
@@ -31,9 +31,9 @@ class GpsToRelativePoseDFN:
 
         self.initial_pose = cdff_types.RigidBodyState()
         self.initial_pose.pos.fromarray(np.array([0.0, 0.0, 0.0]))
-        self.initial_pose.orient.fromarray(np.array([1.0, 0.0, 0.0, 0.0]))
-        self.initial_pose.source_frame = "world"
-        self.initial_pose.target_frame = "start"
+        self.initial_pose.orient.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
+        self.initial_pose.source_frame = "start"
+        self.initial_pose.target_frame = "world"
         self.initial_pose_set = False
         self.input_provided = False
 
@@ -60,8 +60,8 @@ class GpsToRelativePoseDFN:
             self.relative_pose.timestamp.microseconds = self.gps.time.microseconds
             self.relative_pose.pos.fromarray(
                 np.array(self._to_coordinates(self.gps, self.initial_pose.pos)))
-            self.relative_pose.source_frame = "start"
-            self.relative_pose.target_frame = "dgps"
+            self.relative_pose.source_frame = "dgps"
+            self.relative_pose.target_frame = "start"
             self.relative_pose.orient.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
             self.relative_pose.cov_position[0, 0] = \
                 self.gps.deviation_latitude ** 2
