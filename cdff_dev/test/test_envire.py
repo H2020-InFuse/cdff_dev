@@ -134,8 +134,8 @@ def test_norms():
 
 
 def test_quaterniond_ctor():
-    q = cdff_envire.Quaterniond(1.0, 0.0, 0.0, 0.0)
-    assert_equal(str(q), "[im=1.00, real=(0.00, 0.00, 0.00)]")
+    q = cdff_envire.Quaterniond(w=1.0, x=0.0, y=0.0, z=0.0)
+    assert_equal(str(q), "[real=1.00, im=(0.00, 0.00, 0.00)]")
 
 
 def test_transform_with_cov_ctor():
@@ -151,9 +151,9 @@ def test_transform_set_get_translation():
 
 def test_transform_set_get_orientation():
     p = cdff_envire.TransformWithCovariance()
-    o = cdff_envire.Quaterniond(1.0, 0.0, 0.0, 0.0)
+    o = cdff_envire.Quaterniond(w=1.0, x=0.0, y=0.0, z=0.0)
     p.orientation = o
-    assert_equal(str(p.orientation), "[im=1.00, real=(0.00, 0.00, 0.00)]")
+    assert_equal(str(p.orientation), "[real=1.00, im=(0.00, 0.00, 0.00)]")
 
 
 def test_default_transform_ctor():
@@ -165,7 +165,7 @@ def test_transform_time_transform_with_covariance_ctor():
 
     p = cdff_envire.TransformWithCovariance()
     p.translation = cdff_envire.Vector3d(1.0, 2.0, 3.0)
-    p.orientation = cdff_envire.Quaterniond(1.0, 0.0, 0.0, 0.0)
+    p.orientation = cdff_envire.Quaterniond(w=1.0, x=0.0, y=0.0, z=0.0)
 
     transform = cdff_envire.Transform(time=t, transform_with_covariance=p)
     result = re.match(

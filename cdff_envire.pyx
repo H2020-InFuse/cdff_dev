@@ -209,7 +209,7 @@ cdef class Quaterniond:
         if self.thisptr != NULL and self.delete_thisptr:
             del self.thisptr
 
-    def __init__(self, double w=1.0, double x=0.0, double y=0.0, double z=0.0):
+    def __init__(self, double x=0.0, double y=0.0, double z=0.0, double w=1.0):
         self.thisptr = new _cdff_envire.Quaterniond(w, x, y, z)
         self.delete_thisptr = True
 
