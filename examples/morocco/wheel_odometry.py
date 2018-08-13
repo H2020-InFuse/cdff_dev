@@ -21,10 +21,25 @@ class Transformer(transformer.EnvireDFN):
         self._set_transform(data, data_transformation=True)
 
     def wheelOdometryInput(self, data):
-        self._set_transform(data, data_transformation=True)
+        self._set_transform(data, data_transformation=False)  # TODO works if False, but is actually True...
 
     def process(self):
         super(Transformer, self).process()
+
+    def odometry2bodyOutput(self):
+        return self._get_transform("odometry", "body", data_transformation=True)
+
+    def odometry2dgpsOutput(self):
+        if self.graph_.contains_frame("dgps"):
+            return self._get_transform("odometry", "dgps", data_transformation=True)
+        else:
+            none = cdff_types.RigidBodyState()
+            none.pos.fromarray(np.zeros(3))
+            none.orient.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
+            none.timestamp.microseconds = 0
+            none.source_frame = "odometry"
+            none.target_frame = "dgps"
+            return none
 
 
 class GpsToRelativePoseDFN:
@@ -32,12 +47,8 @@ class GpsToRelativePoseDFN:
         self.gps = cdff_types.GpsSolution()
         self.relative_pose = cdff_types.RigidBodyState()
 
-        self.initial_pose = cdff_types.RigidBodyState()
-        self.initial_pose.pos.fromarray(np.array([0.0, 0.0, 0.0]))
-        self.initial_pose.orient.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
-        self.initial_pose.source_frame = "start"
-        self.initial_pose.target_frame = "world"
-        self.initial_pose_set = False
+        self.initial_pos = (0.0, 0.0, 0.0)
+        self.initial_pos_set = False
         self.input_provided = False
 
     def set_configuration_file(self, filename):
@@ -54,18 +65,15 @@ class GpsToRelativePoseDFN:
         if not self.input_provided:
             return
         try:
-            if not self.initial_pose_set:
-                self.initial_pose.pos.fromarray(
-                    np.array(self._to_coordinates(self.gps)))
-                self.initial_pose.orient.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
-                self.initial_pose.timestamp.microseconds = self.gps.time.microseconds
-                self.initial_pose_set = True
+            if not self.initial_pos_set:
+                self.initial_pos = self._to_coordinates(self.gps)
+                self.initial_pos_set = True
 
             self.relative_pose.timestamp.microseconds = self.gps.time.microseconds
             self.relative_pose.pos.fromarray(
-                np.array(self._to_coordinates(self.gps, self.initial_pose.pos)))
+                np.array(self._to_coordinates(self.gps, self.initial_pos)))
             self.relative_pose.source_frame = "dgps"
-            self.relative_pose.target_frame = "start"
+            self.relative_pose.target_frame = "odometry"
             self.relative_pose.orient.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
             self.relative_pose.cov_position[0, 0] = \
                 self.gps.deviation_latitude ** 2
@@ -82,14 +90,14 @@ class GpsToRelativePoseDFN:
     def relativePoseOutput(self):
         return self.relative_pose
 
-    def _to_coordinates(self, gps, initial_pose=(0.0, 0.0, 0.0)):
+    def _to_coordinates(self, gps, initial_pos=(0.0, 0.0, 0.0)):
         """Transform GPS coordinates to x, y, z coordinates."""
         easting, northing, altitude = conversion.convert_to_utm(
             gps.latitude, gps.longitude, gps.altitude,
             utm_zone=utm_zone, utm_north=utm_north)
         northing, westing, up = conversion.convert_to_nwu(
             easting, northing, altitude,
-            initial_pose[0], initial_pose[1], initial_pose[2])
+            initial_pos[0], initial_pos[1], initial_pos[2])
         return northing, westing, up
 
 
@@ -107,12 +115,12 @@ class EvaluationDFN:
     def configure(self):
         pass
 
-    def body2odometryInput(self, odometry_pose):
+    def odometry2bodyInput(self, odometry_pose):
         if odometry_pose.timestamp.microseconds > 0:
             self.odometry_timestamps_.append(odometry_pose.timestamp.microseconds)
             self.odometry_positions_.append(odometry_pose.pos.toarray())
 
-    def dgps2startInput(self, gps_pose):
+    def odometry2dgpsInput(self, gps_pose):
         if gps_pose.timestamp.microseconds > 0:
             self.dgps_timestamps_.append(gps_pose.timestamp.microseconds)
             self.dgps_positions_.append(gps_pose.pos.toarray())
@@ -161,10 +169,10 @@ def configure(logs):
         ("/dgps.gps_solution", "gps_to_relative_pose.gps"),
         ("gps_to_relative_pose.relativePose", "transformer.relativePose"),
         ("/mcs_sensor_processing.rigid_body_state_out", "transformer.wheelOdometry"),
-        ("gps_to_relative_pose.relativePose", "evaluation.dgps2start"),
-        ("/mcs_sensor_processing.rigid_body_state_out", "evaluation.body2odometry"),
+        ("transformer.odometry2dgps", "evaluation.odometry2dgps"),
+        ("transformer.odometry2body", "evaluation.odometry2body"),
     )
-    pose_frame = "start"  # TODO
+    pose_frame = "odometry"  # TODO
     frames = {
         "gps_to_relative_pose.gps": pose_frame,  # TODO
         #"?.?": pose_frame,  # TODO
@@ -183,19 +191,12 @@ def configure(logs):
     )
 
     app = envirevisualization.EnvireVisualizerApplication(
-        frames, urdf_files, center_frame="start")
+        frames, urdf_files, center_frame="odometry")
     dfc = dataflowcontrol.DataFlowControl(
         nodes, connections, periods, real_time=False)
     dfc.setup()
 
     # TODO simplify graph initialization
-    app.visualization.world_state_.graph_.add_frame("body")
-    app.visualization.world_state_.graph_.add_frame("odometry")
-    connect_gps_odometry = cdff_envire.Transform()
-    connect_gps_odometry.transform.translation.fromarray(np.array([0.0, 0.0, 0.0]))
-    connect_gps_odometry.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
-    app.visualization.world_state_.graph_.add_transform(
-        "start", "odometry", connect_gps_odometry)
 
     # TODO visualize covariance?
 
@@ -209,9 +210,6 @@ def evaluate(dfc):
     odometry = dfc.nodes["evaluation"].odometry_positions_
     import matplotlib.pyplot as plt
 
-    # TODO find out why this is rotated by 90 degrees
-    # dgps 2 start
-    # body 2 odometry
     plt.figure(figsize=(10, 5))
     plt.subplot(aspect="equal")
     plt.grid()
