@@ -124,7 +124,6 @@ class EvaluationDFN:
                                     self.dgps_positions_[-1])
         print("[Evaluation] position error: %.2f" % self.error)
 
-
     def errorOutput(self):
         return self.error
 
@@ -210,6 +209,9 @@ def evaluate(dfc):
     odometry = dfc.nodes["evaluation"].odometry_positions_
     import matplotlib.pyplot as plt
 
+    # TODO find out why this is rotated by 90 degrees
+    # dgps 2 start
+    # body 2 odometry
     plt.figure()
     plt.plot([p[0] for p in dgps], [p[1] for p in dgps], label="DGPS")
     plt.plot([p[0] for p in odometry], [p[1] for p in odometry], label="Odometry")
