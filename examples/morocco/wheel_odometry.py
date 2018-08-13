@@ -107,12 +107,12 @@ class EvaluationDFN:
     def configure(self):
         pass
 
-    def odometryPoseInput(self, odometry_pose):
+    def body2odometryInput(self, odometry_pose):
         if odometry_pose.timestamp.microseconds > 0:
             self.odometry_timestamps_.append(odometry_pose.timestamp.microseconds)
             self.odometry_positions_.append(odometry_pose.pos.toarray())
 
-    def gpsPoseInput(self, gps_pose):
+    def dgps2startInput(self, gps_pose):
         if gps_pose.timestamp.microseconds > 0:
             self.dgps_timestamps_.append(gps_pose.timestamp.microseconds)
             self.dgps_positions_.append(gps_pose.pos.toarray())
@@ -161,8 +161,8 @@ def configure(logs):
         ("/dgps.gps_solution", "gps_to_relative_pose.gps"),
         ("gps_to_relative_pose.relativePose", "transformer.relativePose"),
         ("/mcs_sensor_processing.rigid_body_state_out", "transformer.wheelOdometry"),
-        ("gps_to_relative_pose.relativePose", "evaluation.gpsPose"),
-        ("/mcs_sensor_processing.rigid_body_state_out", "evaluation.odometryPose"),
+        ("gps_to_relative_pose.relativePose", "evaluation.dgps2start"),
+        ("/mcs_sensor_processing.rigid_body_state_out", "evaluation.body2odometry"),
     )
     pose_frame = "start"  # TODO
     frames = {
@@ -212,7 +212,9 @@ def evaluate(dfc):
     # TODO find out why this is rotated by 90 degrees
     # dgps 2 start
     # body 2 odometry
-    plt.figure()
+    plt.figure(figsize=(10, 5))
+    plt.subplot(aspect="equal")
+    plt.grid()
     plt.plot([p[0] for p in dgps], [p[1] for p in dgps], label="DGPS")
     plt.plot([p[0] for p in odometry], [p[1] for p in odometry], label="Odometry")
     plt.legend()
