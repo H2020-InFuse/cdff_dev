@@ -23,6 +23,7 @@ class EnvireDFN:
     def __init__(self, verbose=0):
         self.graph_ = None
         self._timestamp = 0
+        self.verbose = verbose
 
     def set_configuration_file(self):
         pass
@@ -105,7 +106,8 @@ class EnvireDFN:
             rigid_body_state.source_frame = target
 
         try:
-            envire_transform = self.graph_.get_transform(origin, target)
+            envire_transform = self.graph_.get_transform(
+                rigid_body_state.source_frame, rigid_body_state.target_frame)
             base_transform = envire_transform.transform
             rigid_body_state.pos.fromarray(base_transform.translation.toarray())
             rigid_body_state.orient.fromarray(

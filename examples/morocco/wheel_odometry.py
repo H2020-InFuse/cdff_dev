@@ -23,6 +23,9 @@ class Transformer(transformer.EnvireDFN):
     def wheelOdometryInput(self, data):
         self._set_transform(data, data_transformation=True)
 
+    def process(self):
+        super(Transformer, self).process()
+
 
 class GpsToRelativePoseDFN:
     def __init__(self):
@@ -54,6 +57,7 @@ class GpsToRelativePoseDFN:
             if not self.initial_pose_set:
                 self.initial_pose.pos.fromarray(
                     np.array(self._to_coordinates(self.gps)))
+                self.initial_pose.orient.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
                 self.initial_pose.timestamp.microseconds = self.gps.time.microseconds
                 self.initial_pose_set = True
 
@@ -91,8 +95,10 @@ class GpsToRelativePoseDFN:
 
 class EvaluationDFN:
     def __init__(self):
-        self.odometry_poses = []
-        self.gps_poses = []
+        self.odometry_timestamps_ = []
+        self.odometry_positions_ = []
+        self.dgps_timestamps_ = []
+        self.dgps_positions_ = []
         self.error = 0.0
 
     def set_configuration_file(self, filename):
@@ -102,16 +108,20 @@ class EvaluationDFN:
         pass
 
     def odometryPoseInput(self, odometry_pose):
-        self.odometry_poses.append(odometry_pose)
+        if odometry_pose.timestamp.microseconds > 0:
+            self.odometry_timestamps_.append(odometry_pose.timestamp.microseconds)
+            self.odometry_positions_.append(odometry_pose.pos.toarray())
 
     def gpsPoseInput(self, gps_pose):
-        self.gps_poses.append(gps_pose)
+        if gps_pose.timestamp.microseconds > 0:
+            self.dgps_timestamps_.append(gps_pose.timestamp.microseconds)
+            self.dgps_positions_.append(gps_pose.pos.toarray())
 
     def process(self):
-        if not self.odometry_poses or not self.gps_poses:
+        if not self.odometry_positions_ or not self.dgps_positions_:
             return
-        self.error = np.linalg.norm(self.odometry_poses[-1].pos.toarray() -
-                                    self.gps_poses[-1].pos.toarray())
+        self.error = np.linalg.norm(self.odometry_positions_[-1] -
+                                    self.dgps_positions_[-1])
         print("[Evaluation] position error: %.2f" % self.error)
 
 
@@ -196,8 +206,34 @@ def configure(logs):
 
 
 def evaluate(dfc):
+    dgps = dfc.nodes["evaluation"].dgps_positions_
+    odometry = dfc.nodes["evaluation"].odometry_positions_
+    import matplotlib.pyplot as plt
+
+    plt.figure()
+    plt.plot([p[0] for p in dgps], [p[1] for p in dgps], label="DGPS")
+    plt.plot([p[0] for p in odometry], [p[1] for p in odometry], label="Odometry")
+    plt.legend()
+
+    """
+    dgps_t  = dfc.nodes["evaluation"].dgps_timestamps_
+    odometry_t  = dfc.nodes["evaluation"].odometry_timestamps_
+
+    plt.figure()
+    plt.plot(dgps_t, [p[0] for p in dgps], label="DGPS")
+    plt.plot(odometry_t, [p[0] for p in odometry], label="Odometry")
+    plt.legend()
+
+    plt.figure()
+    plt.plot(dgps_t, [p[1] for p in dgps], label="DGPS")
+    plt.plot(odometry_t, [p[1] for p in odometry], label="Odometry")
+    plt.legend()
+
+    plt.plot()
+    """
+
+    plt.show()
     # TODO implement
-    pass
     #raise NotImplementedError()
 
 

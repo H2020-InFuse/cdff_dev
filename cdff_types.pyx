@@ -512,7 +512,7 @@ cdef class Quaterniond:
         return 4
 
     def __str__(self):
-        return str("{type: Quaterniond, data=[%.2f, %.2f, %.2f, %.2f]}"
+        return str("{type: Quaterniond, data=[x=%.2f, y=%.2f, z=%.2f, w=%.2f]}"
                    % (self.thisptr.arr[0], self.thisptr.arr[1],
                       self.thisptr.arr[2], self.thisptr.arr[3]))
 

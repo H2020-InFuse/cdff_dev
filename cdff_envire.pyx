@@ -214,7 +214,7 @@ cdef class Quaterniond:
         self.delete_thisptr = True
 
     def __str__(self):
-        return str("[im=%.2f, real=(%.2f, %.2f, %.2f)]" % (
+        return str("[real=%.2f, im=(%.2f, %.2f, %.2f)]" % (
             self.thisptr.w(), self.thisptr.x(), self.thisptr.y(),
             self.thisptr.z()))
 
@@ -223,13 +223,13 @@ cdef class Quaterniond:
 
     def toarray(self):
         cdef np.ndarray[double, ndim=1] array = np.array([
-            self.thisptr.w(), self.thisptr.x(), self.thisptr.y(),
-            self.thisptr.z()])
+            self.thisptr.x(), self.thisptr.y(), self.thisptr.z(),
+            self.thisptr.w()])
         return array
 
     def fromarray(self, np.ndarray[double, ndim=1] array):
         self.thisptr[0] = _cdff_envire.Quaterniond(
-            array[0], array[1], array[2], array[3])
+            array[3], array[0], array[1], array[2])
 
 
 cdef class TransformWithCovariance:
