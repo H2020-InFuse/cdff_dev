@@ -16,30 +16,44 @@ utm_north = True
 class Transformer(transformer.EnvireDFN):
     def __init__(self):
         super(Transformer, self).__init__()
+        self.imu_initialized = False
 
-    def relativePoseInput(self, data):
+    def dgps2globalPose0Input(self, data):
         self._set_transform(data, data_transformation=True)
 
-    def wheelOdometryInput(self, data):
-        self._set_transform(data, data_transformation=False)  # TODO works if False, but is actually True...
+    """TODO extract orientation from IMU?
+    def world2GlobalPoseInput(self, data):
+        data.pos.fromarray(np.zeros(3))
+        self._set_transform(data, data_transformation=True)
+        if not self.imu_initialized:
+            t = self.graph_.get_transform("world", "global_pose")
+            self.graph_.add_transform("world0", "global_pose0", t)
+            self.imu_initialized = True
+    """
 
-    def process(self):
-        super(Transformer, self).process()
-
-    def odometry2bodyOutput(self):
-        return self._get_transform("odometry", "body", data_transformation=True)
-
-    def odometry2dgpsOutput(self):
-        if self.graph_.contains_frame("dgps"):
-            return self._get_transform("odometry", "dgps", data_transformation=True)
+    def dgps2globalPose0Output(self):
+        if (self.graph_.contains_frame("dgps") and
+                self.graph_.contains_frame("global_pose0")):
+            return self._get_transform(
+                "dgps", "global_pose0", data_transformation=True)
         else:
             none = cdff_types.RigidBodyState()
             none.pos.fromarray(np.zeros(3))
             none.orient.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
             none.timestamp.microseconds = 0
-            none.source_frame = "odometry"
-            none.target_frame = "dgps"
+            none.source_frame = "dgps"
+            none.target_frame = "global_pose0"
             return none
+
+    def body2odometryInput(self, data):
+        # TODO works if False, but is actually True...
+        self._set_transform(data, data_transformation=True)
+
+    def body2odometryOutput(self):
+        return self._get_transform("body", "odometry", data_transformation=True)
+
+    def process(self):
+        super(Transformer, self).process()
 
 
 class GpsToRelativePoseDFN:
@@ -73,7 +87,7 @@ class GpsToRelativePoseDFN:
             self.relative_pose.pos.fromarray(
                 np.array(self._to_coordinates(self.gps, self.initial_pos)))
             self.relative_pose.source_frame = "dgps"
-            self.relative_pose.target_frame = "odometry"
+            self.relative_pose.target_frame = "global_pose0"
             self.relative_pose.orient.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
             self.relative_pose.cov_position[0, 0] = \
                 self.gps.deviation_latitude ** 2
@@ -87,7 +101,7 @@ class GpsToRelativePoseDFN:
                           % (self.gps.latitude, self.gps.longitude,
                              self.gps.altitude, e))
 
-    def relativePoseOutput(self):
+    def dgps2globalPose0Output(self):
         return self.relative_pose
 
     def _to_coordinates(self, gps, initial_pos=(0.0, 0.0, 0.0)):
@@ -115,15 +129,20 @@ class EvaluationDFN:
     def configure(self):
         pass
 
-    def odometry2bodyInput(self, odometry_pose):
+    def dgps2globalPose0Input(self, gps_pose):
+        if gps_pose.timestamp.microseconds > 0:
+            self.dgps_timestamps_.append(gps_pose.timestamp.microseconds)
+            self.dgps_positions_.append(gps_pose.pos.toarray())
+
+    def body2odometryInput(self, odometry_pose):
         if odometry_pose.timestamp.microseconds > 0:
             self.odometry_timestamps_.append(odometry_pose.timestamp.microseconds)
             self.odometry_positions_.append(odometry_pose.pos.toarray())
 
-    def odometry2dgpsInput(self, gps_pose):
-        if gps_pose.timestamp.microseconds > 0:
-            self.dgps_timestamps_.append(gps_pose.timestamp.microseconds)
-            self.dgps_positions_.append(gps_pose.pos.toarray())
+    """ TODO
+    def errorOutput(self):
+        return self.error
+    """
 
     def process(self):
         if not self.odometry_positions_ or not self.dgps_positions_:
@@ -132,26 +151,37 @@ class EvaluationDFN:
                                     self.dgps_positions_[-1])
         print("[Evaluation] position error: %.2f" % self.error)
 
-    def errorOutput(self):
-        return self.error
-
 
 def main():
-    logs = convert_logs()
-    app, dfc = configure(logs)
+    logs, stream_names = convert_logs()
+    app, dfc = configure(logs, stream_names)
     app.exec_()
     evaluate(dfc)
 
 
 def convert_logs():
-    # TODO implement
+    # TODO convert from pocolog to msgpack
     # TODO find number of samples per stream
     # TODO chunk logfiles
-    return [["logs/Sherpa/dgps.msg"], ["logs/Sherpa/sherpa_tt_mcs.msg"]]
-    #raise NotImplementedError()
+
+    # logs/Sherpa/dgps.msg
+    # - /dgps.gps_solution
+    # - /dgps.imu_pose
+    # logs/Sherpa/sherpa_tt_mcs.msg
+    # - /mcs_sensor_processing.rigid_body_state_out
+
+    logfiles = [["logs/Sherpa/dgps.msg"], ["logs/Sherpa/sherpa_tt_mcs.msg"]]
+    stream_names = [
+       "/dgps.gps_solution",
+       "/dgps.imu_pose",
+       "/mcs_sensor_processing.rigid_body_state_out",
+    ]
+
+    return logfiles, stream_names
 
 
-def configure(logs):
+def configure(logs, stream_names):
+    # TODO find mapping between global and local coordinate frames
     nodes = {
         "gps_to_relative_pose": GpsToRelativePoseDFN(),
         "transformer": Transformer(),
@@ -166,37 +196,35 @@ def configure(logs):
         "evaluation": 1.0, # TODO
     }
     connections = (
+        #("/dgps.imu_pose", "transformer.world2GlobalPose"),  # TODO extract orientation from IMU
         ("/dgps.gps_solution", "gps_to_relative_pose.gps"),
-        ("gps_to_relative_pose.relativePose", "transformer.relativePose"),
-        ("/mcs_sensor_processing.rigid_body_state_out", "transformer.wheelOdometry"),
-        ("transformer.odometry2dgps", "evaluation.odometry2dgps"),
-        ("transformer.odometry2body", "evaluation.odometry2body"),
+        ("gps_to_relative_pose.dgps2globalPose0", "transformer.dgps2globalPose0"),
+        ("/mcs_sensor_processing.rigid_body_state_out", "transformer.body2odometry"),
+        ("transformer.dgps2globalPose0", "evaluation.dgps2globalPose0"),
+        ("transformer.body2odometry", "evaluation.body2odometry"),
     )
-    pose_frame = "odometry"  # TODO
-    frames = {
-        "gps_to_relative_pose.gps": pose_frame,  # TODO
-        #"?.?": pose_frame,  # TODO
-    }
+    frames = {}  # TODO?
     urdf_files = [
-        #"sherpa?.urdf"  # TODO
+        # git clone git@git.hb.dfki.de:facilitators/bundle-sherpa_tt.git
+        #"bundle-sherpa_tt/data/sherpa_tt.urdf"  # TODO uncomment
     ]
 
     log_iterator = logloader.replay_files(
-        logs,
-        stream_names = [
-            "/dgps.gps_solution",
-            "/mcs_sensor_processing.rigid_body_state_out"
-        ],
-        verbose=0
-    )
+        logs, stream_names, verbose=0)
 
     app = envirevisualization.EnvireVisualizerApplication(
-        frames, urdf_files, center_frame="odometry")
+        frames, urdf_files, center_frame="global_pose0")
     dfc = dataflowcontrol.DataFlowControl(
         nodes, connections, periods, real_time=False)
     dfc.setup()
 
     # TODO simplify graph initialization
+    app.visualization.world_state_.graph_.add_frame("odometry")
+    t = cdff_envire.Transform()
+    t.transform.translation.fromarray(np.array([-0.3, 0.0, 0.53]))
+    t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
+    app.visualization.world_state_.graph_.add_transform(
+        "odometry", "global_pose0", t)
 
     # TODO visualize covariance?
 
