@@ -4,6 +4,8 @@ from cdff_dev import logloader, envirevisualization, dataflowcontrol, transforme
 import cdff_types
 import cdff_envire
 from cdff_dev.extensions.gps import conversion
+# TODO dependency: pytransform
+import pytransform.rotations as pr
 
 
 # TODO configuration
@@ -18,35 +20,24 @@ class Transformer(transformer.EnvireDFN):
         super(Transformer, self).__init__()
         self.imu_initialized = False
 
-    def dgps2globalPose0Input(self, data):
+    def gpsPos2globalPose0Input(self, data):
         self._set_transform(data, data_transformation=True)
 
-    """TODO extract orientation from IMU?
-    def world2GlobalPoseInput(self, data):
-        data.pos.fromarray(np.zeros(3))
-        self._set_transform(data, data_transformation=True)
+    def imu02GlobalPoseInput(self, data):
         if not self.imu_initialized:
-            t = self.graph_.get_transform("world", "global_pose")
-            self.graph_.add_transform("world0", "global_pose0", t)
+            t = cdff_types.RigidBodyState()
+            t.pos.fromarray(np.zeros(3))
+            t.orient.fromarray(data.orient.toarray())
+            t.source_frame = "imu0"
+            t.target_frame = "global_pose0"
+            self._set_transform(t, data_transformation=True)
             self.imu_initialized = True
-    """
 
-    def dgps2globalPose0Output(self):
-        if (self.graph_.contains_frame("dgps") and
-                self.graph_.contains_frame("global_pose0")):
-            return self._get_transform(
-                "dgps", "global_pose0", data_transformation=True)
-        else:
-            none = cdff_types.RigidBodyState()
-            none.pos.fromarray(np.zeros(3))
-            none.orient.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
-            none.timestamp.microseconds = 0
-            none.source_frame = "dgps"
-            none.target_frame = "global_pose0"
-            return none
+    def gpsPos2odometryOutput(self):
+        return self._get_transform(
+            "gps_pos", "odometry", data_transformation=True)
 
     def body2odometryInput(self, data):
-        # TODO works if False, but is actually True...
         self._set_transform(data, data_transformation=True)
 
     def body2odometryOutput(self):
@@ -86,7 +77,7 @@ class GpsToRelativePoseDFN:
             self.relative_pose.timestamp.microseconds = self.gps.time.microseconds
             self.relative_pose.pos.fromarray(
                 np.array(self._to_coordinates(self.gps, self.initial_pos)))
-            self.relative_pose.source_frame = "dgps"
+            self.relative_pose.source_frame = "gps_pos"
             self.relative_pose.target_frame = "global_pose0"
             self.relative_pose.orient.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
             self.relative_pose.cov_position[0, 0] = \
@@ -101,7 +92,7 @@ class GpsToRelativePoseDFN:
                           % (self.gps.latitude, self.gps.longitude,
                              self.gps.altitude, e))
 
-    def dgps2globalPose0Output(self):
+    def gpsPos2globalPose0Output(self):
         return self.relative_pose
 
     def _to_coordinates(self, gps, initial_pos=(0.0, 0.0, 0.0)):
@@ -109,6 +100,21 @@ class GpsToRelativePoseDFN:
         easting, northing, altitude = conversion.convert_to_utm(
             gps.latitude, gps.longitude, gps.altitude,
             utm_zone=utm_zone, utm_north=utm_north)
+
+        # ENU
+        #easting -= initial_pos[0]
+        #northing -= initial_pos[1]
+        #altitude -= initial_pos[2]
+        #return easting, northing, altitude
+
+        # NED
+        #northing -= initial_pos[0]
+        #easting -= initial_pos[1]
+        #down = -altitude
+        #down -= initial_pos[2]
+        #return northing, easting, down
+
+        # NWU
         northing, westing, up = conversion.convert_to_nwu(
             easting, northing, altitude,
             initial_pos[0], initial_pos[1], initial_pos[2])
@@ -129,7 +135,7 @@ class EvaluationDFN:
     def configure(self):
         pass
 
-    def dgps2globalPose0Input(self, gps_pose):
+    def gpsPos2odometryInput(self, gps_pose):
         if gps_pose.timestamp.microseconds > 0:
             self.dgps_timestamps_.append(gps_pose.timestamp.microseconds)
             self.dgps_positions_.append(gps_pose.pos.toarray())
@@ -196,11 +202,11 @@ def configure(logs, stream_names):
         "evaluation": 1.0, # TODO
     }
     connections = (
-        #("/dgps.imu_pose", "transformer.world2GlobalPose"),  # TODO extract orientation from IMU
+        ("/dgps.imu_pose", "transformer.imu02GlobalPose"),  # TODO extract orientation from IMU
         ("/dgps.gps_solution", "gps_to_relative_pose.gps"),
-        ("gps_to_relative_pose.dgps2globalPose0", "transformer.dgps2globalPose0"),
+        ("gps_to_relative_pose.gpsPos2globalPose0", "transformer.gpsPos2globalPose0"),
         ("/mcs_sensor_processing.rigid_body_state_out", "transformer.body2odometry"),
-        ("transformer.dgps2globalPose0", "evaluation.dgps2globalPose0"),
+        ("transformer.gpsPos2odometry", "evaluation.gpsPos2odometry"),
         ("transformer.body2odometry", "evaluation.body2odometry"),
     )
     frames = {}  # TODO?
@@ -213,18 +219,71 @@ def configure(logs, stream_names):
         logs, stream_names, verbose=0)
 
     app = envirevisualization.EnvireVisualizerApplication(
-        frames, urdf_files, center_frame="global_pose0")
+        frames, urdf_files, center_frame="body0")
     dfc = dataflowcontrol.DataFlowControl(
         nodes, connections, periods, real_time=False)
     dfc.setup()
 
     # TODO simplify graph initialization
-    app.visualization.world_state_.graph_.add_frame("odometry")
+    graph = app.visualization.world_state_.graph_
+
+    # Frames
+    # ------
+    # odometry - base frame of odometry, anchored in the world
+    graph.add_frame("odometry")
+    # body - robot's body, used in odometry log
+    graph.add_frame("body")
+    # body0 - initial position of the robot according to odometry, same as
+    #         odometry
+    #graph.add_frame("body0") - already in the graph (center frame)
+    # imu0 - imu sensor frame on the robot, use to connect body0 to initial imu
+    #        measurements
+    graph.add_frame("imu0")
+    ### dgps0 - gps device on the robot, used to connect body/odometry to gps
+    ##graph.add_frame("dgps0")
+    # global_pose0 - initial GPS position with axes aligned to north, west, up
+    graph.add_frame("global_pose0")
+    # gps_pos - current GPS position
+    graph.add_frame("gps_pos")
+
+    # body - odometry, variable, updated continuously
     t = cdff_envire.Transform()
-    t.transform.translation.fromarray(np.array([-0.3, 0.0, 0.53]))
+    t.transform.translation.fromarray(np.zeros(3))
     t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
-    app.visualization.world_state_.graph_.add_transform(
-        "odometry", "global_pose0", t)
+    graph.add_transform("body", "odometry", t)
+
+    # body0 - odometry, constant, known before start (?)
+    t = cdff_envire.Transform()
+    t.transform.translation.fromarray(np.zeros(3))
+    t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
+    graph.add_transform("body0", "odometry", t)
+
+    ### dgps0 - body0, constant, known before start
+    ##t = cdff_envire.Transform()
+    ##t.transform.translation.fromarray(np.array([-0.3, 0.0, 0.53]))
+    ##t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
+    ##graph.add_transform("dgps0", "body0", t)
+
+    # body0 - imu0, constant, known before start, seems to be OK
+    t = cdff_envire.Transform()
+    t.transform.translation.fromarray(np.array([-0.185, 0.3139, 0.04164]))
+    R = pr.matrix_from_euler_xyz([0.44, 2.225, 0.0])
+    imu2body_wxyz = pr.quaternion_from_matrix(R)
+    imu2body_xyzw = np.hstack((imu2body_wxyz[1:], [imu2body_wxyz[0]]))
+    t.transform.orientation.fromarray(imu2body_xyzw)
+    graph.add_transform("body0", "imu0", t)
+
+    # imu0 - global_pose0, constant, known after start
+    t = cdff_envire.Transform()
+    t.transform.translation.fromarray(np.zeros(3))
+    t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
+    graph.add_transform("imu0", "global_pose0", t)
+
+    # gps_pos - global_pose0, variable, updated continuously
+    t = cdff_envire.Transform()
+    t.transform.translation.fromarray(np.zeros(3))
+    t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
+    graph.add_transform("gps_pos", "global_pose0", t)
 
     # TODO visualize covariance?
 
