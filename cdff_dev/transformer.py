@@ -34,7 +34,7 @@ class EnvireDFN:
     def set_time(self, timestamp):
         self._timestamp = timestamp
 
-    def _set_transform(self, rigid_body_state, data_transformation=True):
+    def _set_transform(self, rigid_body_state, frame_transformation=True):
         """Update transformation in an EnviRe graph.
 
         Parameters
@@ -42,17 +42,17 @@ class EnvireDFN:
         rigid_body_state : RigidBodyState
             Transformation, must have source and target frame
 
-        data_transformation : bool, optional (default: True)
-            A data transformation transforms data from a source frame to a
-            target frame. The opposite is a frame transformation that
-            represents the transformation of a source frame to a target frame
-            or tells us where a target frame is in the source frame.
+        frame_transformation : bool, optional (default: True)
+            A frame transformation represents the transformation of a source
+            frame to a target frame or tells us where a target frame is in
+            the source frame. The opposite is a data transformation that
+            transforms data from a source frame to a target frame.
         """
         if self.graph_ is None:
             warnings.warn("EnviRe Graph is not initialized.")
             return
 
-        if data_transformation:
+        if frame_transformation:
             origin = rigid_body_state.source_frame
             target = rigid_body_state.target_frame
         else:
@@ -76,7 +76,7 @@ class EnvireDFN:
         else:
             self.graph_.add_transform(origin, target, transform)
 
-    def _get_transform(self, origin, target, data_transformation=True):
+    def _get_transform(self, origin, target, frame_transformation=True):
         """Get transformation from an EnviRe graph.
 
         Parameters
@@ -87,18 +87,18 @@ class EnvireDFN:
         target : str
             Target frame
 
-        data_transformation : bool, optional (default: True)
-            A data transformation transforms data from a source frame to a
-            target frame. The opposite is a frame transformation that
-            represents the transformation of a source frame to a target frame
-            or tells us where a target frame is in the source frame.
+        frame_transformation : bool, optional (default: True)
+            A frame transformation represents the transformation of a source
+            frame to a target frame or tells us where a target frame is in
+            the source frame. The opposite is a data transformation that
+            transforms data from a source frame to a target frame.
         """
         if self.graph_ is None:
             warnings.warn("EnviRe graph is not initialized.")
             return
 
         rigid_body_state = cdff_types.RigidBodyState()
-        if data_transformation:
+        if frame_transformation:
             rigid_body_state.target_frame = target
             rigid_body_state.source_frame = origin
         else:

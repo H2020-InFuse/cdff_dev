@@ -4,9 +4,13 @@ from cdff_dev import logloader, envirevisualization, dataflowcontrol, transforme
 import cdff_types
 import cdff_envire
 from cdff_dev.extensions.gps import conversion
-# TODO dependency: pytransform
+# TODO dependency: pytransform; git@github.com:rock-learning/pytransform.git
 import pytransform.rotations as pr
 
+
+# TODO transformations:
+# - convert rock transformations to source in target
+# - invert pytransform rotations
 
 # TODO configuration
 dgps_logfile = "logs/Sherpa/dgps_Logger.log"
@@ -21,7 +25,7 @@ class Transformer(transformer.EnvireDFN):
         self.imu_initialized = False
 
     def gpsPos2globalPose0Input(self, data):
-        self._set_transform(data, data_transformation=True)
+        self._set_transform(data, frame_transformation=False)
 
     def imu02GlobalPoseInput(self, data):
         if not self.imu_initialized:
@@ -30,18 +34,19 @@ class Transformer(transformer.EnvireDFN):
             t.orient.fromarray(data.orient.toarray())
             t.source_frame = "imu0"
             t.target_frame = "global_pose0"
-            self._set_transform(t, data_transformation=True)
+            self._set_transform(t, frame_transformation=False)
+
             self.imu_initialized = True
 
     def gpsPos2odometryOutput(self):
         return self._get_transform(
-            "gps_pos", "odometry", data_transformation=True)
+            "gps_pos", "odometry", frame_transformation=False)
 
     def body2odometryInput(self, data):
-        self._set_transform(data, data_transformation=True)
+        self._set_transform(data, frame_transformation=False)
 
     def body2odometryOutput(self):
-        return self._get_transform("body", "odometry", data_transformation=True)
+        return self._get_transform("body", "odometry", frame_transformation=False)
 
     def process(self):
         super(Transformer, self).process()
@@ -268,10 +273,10 @@ def configure(logs, stream_names):
     t = cdff_envire.Transform()
     t.transform.translation.fromarray(np.array([-0.185, 0.3139, 0.04164]))
     R = pr.matrix_from_euler_xyz([0.44, 2.225, 0.0])
-    imu2body_wxyz = pr.quaternion_from_matrix(R)
+    imu2body_wxyz = pr.quaternion_from_matrix(R.T)
     imu2body_xyzw = np.hstack((imu2body_wxyz[1:], [imu2body_wxyz[0]]))
     t.transform.orientation.fromarray(imu2body_xyzw)
-    graph.add_transform("body0", "imu0", t)
+    graph.add_transform("imu0", "body0", t)
 
     # imu0 - global_pose0, constant, known after start
     t = cdff_envire.Transform()
