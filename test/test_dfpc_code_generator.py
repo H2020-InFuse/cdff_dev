@@ -4,7 +4,7 @@ from cdff_dev.code_generator import write_dfpc
 from cdff_dev.path import load_cdffpath, CTYPESDIR
 import cdff_types
 from cdff_dev.testing import EnsureCleanup, build_extension
-from nose.tools import assert_true
+from nose.tools import assert_true, assert_raises_regexp
 
 
 def test_generate_files():
@@ -68,3 +68,14 @@ def test_compile():
 
         is_available = pg.pointcloudAvailableOutput()
         p = pg.getPointcloud(30)
+
+
+def test_forbidden_type():
+    with open("test/test_data/forbidden_type_dfpc_desc.yml", "r") as f:
+        node = yaml.load(f)
+    tmp_folder = "test/test_output/dfpc_ci_ForbiddenTypeDFPC"
+    with EnsureCleanup(tmp_folder) as ec:
+        cdffpath = load_cdffpath()
+        assert_raises_regexp(
+            TypeError, "Type 'asn1SccMap' is not allowed.",
+            write_dfpc, node, cdffpath, tmp_folder)

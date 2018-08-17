@@ -12,7 +12,7 @@ class BasicTypeInfo(object):
         self.typename = typename
 
     @classmethod
-    def handles(cls, typename, cdffpath):
+    def handles(cls, typename, cdffpath, public_interface):
         return typename in cls.BASICTYPES
 
     def include(self):
@@ -42,8 +42,8 @@ class DefaultTypeInfo(object):
             "and you might have to change the Python wrapper." % self.typename)
 
     @classmethod
-    def handles(cls, typename, cdffpath):
-        return True
+    def handles(cls, typename, cdffpath, public_interface):
+        return not public_interface
 
     def include(self):
         """C++ include header."""
@@ -64,19 +64,21 @@ class DefaultTypeInfo(object):
 
 class ASN1TypeInfo(object):
     """Information about ASN1 types."""
-    asn1_types = {}
+    ASN1_TYPES = {}
+
     def __init__(self, typename):
         self.typename = typename
 
     @classmethod
-    def handles(cls, typename, cdffpath):
+    def handles(cls, typename, cdffpath, public_interface):
         if typename[:7] == 'asn1Scc':
-            return typename[7:] in cls._search_asn1_type(cdffpath)
+            return typename[7:] in cls._search_asn1_type(
+                cdffpath, public_interface)
 
     def include(self):
         """C++ include header."""
-        for key in self.asn1_types.keys():
-            if self.typename[7:] in self.asn1_types[key]:
+        for key in self.ASN1_TYPES.keys():
+            if self.typename[7:] in self.ASN1_TYPES[key]:
                 return key.split('.')[0] + ".h"
 
     def cython_type(self):
@@ -89,15 +91,14 @@ class ASN1TypeInfo(object):
         return False
 
     @classmethod
-    def _search_asn1_type(cls, cdffpath):
+    def _search_asn1_type(cls, cdffpath, public_interface):
         """Search generated ASN1 types."""
-        ASN1_paths = glob.glob(os.path.join(
-            cdffpath, "Common/Types/ASN.1/ESROCOS/*/*.asn")) + glob.glob(
-            os.path.join(cdffpath, "Common/Types/ASN.1/InFuse/*.asn"))
+        filenames = cls._search_asn1_filenames(cdffpath, public_interface)
+
         asn1_types = {}
         asn1_list = []
-        for asn1_path in ASN1_paths:
-            with open(asn1_path, "r", encoding="utf8") as f:
+        for filename in filenames:
+            with open(filename, "r", encoding="utf8") as f:
                 file_read = f.read()
             splitted_file = file_read.replace('\n', ' ').split('::=')[:-1]
             types_in_file = []
@@ -106,9 +107,21 @@ class ASN1TypeInfo(object):
                 if asn1_type != "DEFINITIONS" and asn1_type not in asn1_list:
                     asn1_list.append(cls._handle_taste_types(asn1_type))
                     types_in_file.append(asn1_type)
-            asn1_types[asn1_path.split('/')[-1]] = types_in_file
-        cls.asn1_types = asn1_types
+            asn1_types[filename.split('/')[-1]] = types_in_file
+        cls.ASN1_TYPES = asn1_types
         return asn1_list
+
+    @classmethod
+    def _search_asn1_filenames(cls, cdffpath, public_interface):
+        search_patterns = [
+            os.path.join(cdffpath, "Common/Types/ASN.1/ESROCOS/*/*.asn")]
+        if not public_interface:
+            search_patterns.append(
+                os.path.join(cdffpath, "Common/Types/ASN.1/InFuse/*.asn"))
+        filenames = []
+        for pattern in search_patterns:
+            filenames.extend(glob.glob(pattern))
+        return filenames
 
     def _handle_taste_types(asn1_type):
         return asn1_type.replace('-', '_')
@@ -120,23 +133,32 @@ class ASN1TypeInfo(object):
 
 class TypeRegistry(object):
     TYPEINFOS = [BasicTypeInfo, ASN1TypeInfo, DefaultTypeInfo]
-    """Registry for InFuse type information."""
-    def __init__(self, cdffpath):
+    """Registry for InFuse type information.
+
+    Parameters
+    ----------
+    cdffpath : str
+        Path to CDFF source code
+
+    public_interface : bool
+        Not all types are allowed at public interfaces, but any type is allowed
+        at an internal interface.
+    """
+    def __init__(self, cdffpath, public_interface):
         self.cache = {}
         self.cdffpath = cdffpath
+        self.public_interface = public_interface
 
     def get_info(self, typename):
         for TypeInfo in self.TYPEINFOS:
-            type_found = TypeInfo.handles(typename, self.cdffpath)
+            type_found = TypeInfo.handles(
+                typename, self.cdffpath, self.public_interface)
             if type_found:
                 if typename not in self.cache:
                     self.cache[typename] = TypeInfo(typename)
                 return self.cache[typename]
         else:
-            # this error would never be triggered since DefaultTypeInfo with
-            # always return true
-            raise NotImplementedError("No type info for '%s' available."
-                                      % typename)
+            raise TypeError("Type '%s' is not allowed." % typename)
 
 
 class DFNDescriptionException(Exception):
@@ -180,7 +202,7 @@ def write_dfn(node, cdffpath,
     """
     node = validate_node(node)
 
-    type_registry = TypeRegistry(cdffpath)
+    type_registry = TypeRegistry(cdffpath, public_interface=False)
     src_dir, python_dir = _prepare_output_directory(
         output, source_folder, python_folder)
     interface_files = write_class(
@@ -222,7 +244,7 @@ def write_dfpc(dfpc, cdffpath,
     """
     dfpc = validate_dfpc(dfpc)
 
-    type_registry = TypeRegistry(cdffpath)
+    type_registry = TypeRegistry(cdffpath, public_interface=True)
     src_dir, python_dir = _prepare_output_directory(
         output, source_folder, python_folder)
     interface_files = write_class(

@@ -1,0 +1,19 @@
+name: ForbiddenTypeDFPC
+doc: Bla.
+dfns:
+    - name: Node1
+    - name: Node2
+input_ports:
+    - name: blub
+      type: asn1SccMap
+      doc: "A type that is not allowed"
+      connections:
+        - dfn: Node1
+          port: blub
+output_ports:
+    - name: blubbla
+      type: asn1SccVector3d
+      doc: "Does not matter"
+      connections:
+        dfn: Node2
+        port: bla
