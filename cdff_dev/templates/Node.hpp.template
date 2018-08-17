@@ -3,8 +3,8 @@
  * @{
  */
 
-#ifndef {{ class_name.upper() }}_HPP
-#define {{ class_name.upper() }}_HPP
+#ifndef {{ desc["name"]|upper }}_{{ class_name|upper }}_HPP
+#define {{ desc["name"]|upper }}_{{ class_name|upper }}_HPP
 
 #include "{{ desc["name"] }}Interface.hpp"
 

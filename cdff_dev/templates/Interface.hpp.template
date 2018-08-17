@@ -22,7 +22,7 @@ namespace DFN
      * {{ desc["doc"]|prepend(" * ")|indent(width=4) }}
      */
     {% endif %}
-    class {{ desc["name"] }}Interface : public CDFF::DFN::DFNCommonInterface
+    class {{ desc["name"] }}Interface : public DFNCommonInterface
     {
         public:
 
