@@ -32,8 +32,8 @@ class Transformer(transformer.EnvireDFN):
             t = cdff_types.RigidBodyState()
             t.pos.fromarray(np.zeros(3))
             t.orient.fromarray(data.orient.toarray())
-            t.source_frame = "imu0"
-            t.target_frame = "global_pose0"
+            t.source_frame = "global_pose0"
+            t.target_frame = "imu0"
             self._set_transform(t, frame_transformation=False)
 
             self.imu_initialized = True
@@ -44,9 +44,6 @@ class Transformer(transformer.EnvireDFN):
 
     def body2odometryInput(self, data):
         self._set_transform(data, frame_transformation=False)
-
-    def body2odometryOutput(self):
-        return self._get_transform("body", "odometry", frame_transformation=False)
 
     def process(self):
         super(Transformer, self).process()
@@ -105,19 +102,6 @@ class GpsToRelativePoseDFN:
         easting, northing, altitude = conversion.convert_to_utm(
             gps.latitude, gps.longitude, gps.altitude,
             utm_zone=utm_zone, utm_north=utm_north)
-
-        # ENU
-        #easting -= initial_pos[0]
-        #northing -= initial_pos[1]
-        #altitude -= initial_pos[2]
-        #return easting, northing, altitude
-
-        # NED
-        #northing -= initial_pos[0]
-        #easting -= initial_pos[1]
-        #down = -altitude
-        #down -= initial_pos[2]
-        #return northing, easting, down
 
         # NWU
         northing, westing, up = conversion.convert_to_nwu(
@@ -192,7 +176,6 @@ def convert_logs():
 
 
 def configure(logs, stream_names):
-    # TODO find mapping between global and local coordinate frames
     nodes = {
         "gps_to_relative_pose": GpsToRelativePoseDFN(),
         "transformer": Transformer(),
@@ -207,12 +190,12 @@ def configure(logs, stream_names):
         "evaluation": 1.0, # TODO
     }
     connections = (
-        ("/dgps.imu_pose", "transformer.imu02GlobalPose"),  # TODO extract orientation from IMU
+        ("/dgps.imu_pose", "transformer.imu02GlobalPose"),
         ("/dgps.gps_solution", "gps_to_relative_pose.gps"),
         ("gps_to_relative_pose.gpsPos2globalPose0", "transformer.gpsPos2globalPose0"),
         ("/mcs_sensor_processing.rigid_body_state_out", "transformer.body2odometry"),
         ("transformer.gpsPos2odometry", "evaluation.gpsPos2odometry"),
-        ("transformer.body2odometry", "evaluation.body2odometry"),
+        ("/mcs_sensor_processing.rigid_body_state_out", "evaluation.body2odometry"),
     )
     frames = {}  # TODO?
     urdf_files = [
@@ -220,8 +203,7 @@ def configure(logs, stream_names):
         #"bundle-sherpa_tt/data/sherpa_tt.urdf"  # TODO uncomment
     ]
 
-    log_iterator = logloader.replay_files(
-        logs, stream_names, verbose=0)
+    log_iterator = logloader.replay_files(logs, stream_names, verbose=0)
 
     app = envirevisualization.EnvireVisualizerApplication(
         frames, urdf_files, center_frame="body0")
@@ -244,7 +226,6 @@ def configure(logs, stream_names):
     # imu0 - imu sensor frame on the robot, use to connect body0 to initial imu
     #        measurements
     graph.add_frame("imu0")
-    ### dgps0 - gps device on the robot, used to connect body/odometry to gps
     ##graph.add_frame("dgps0")
     # global_pose0 - initial GPS position with axes aligned to north, west, up
     graph.add_frame("global_pose0")
@@ -252,23 +233,11 @@ def configure(logs, stream_names):
     graph.add_frame("gps_pos")
 
     # body - odometry, variable, updated continuously
-    t = cdff_envire.Transform()
-    t.transform.translation.fromarray(np.zeros(3))
-    t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
-    graph.add_transform("body", "odometry", t)
-
-    # body0 - odometry, constant, known before start (?)
+    # body0 - odometry, constant, known before start
     t = cdff_envire.Transform()
     t.transform.translation.fromarray(np.zeros(3))
     t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
     graph.add_transform("body0", "odometry", t)
-
-    ### dgps0 - body0, constant, known before start
-    ##t = cdff_envire.Transform()
-    ##t.transform.translation.fromarray(np.array([-0.3, 0.0, 0.53]))
-    ##t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
-    ##graph.add_transform("dgps0", "body0", t)
-
     # body0 - imu0, constant, known before start, seems to be OK
     t = cdff_envire.Transform()
     t.transform.translation.fromarray(np.array([-0.185, 0.3139, 0.04164]))
@@ -277,22 +246,15 @@ def configure(logs, stream_names):
     imu2body_xyzw = np.hstack((imu2body_wxyz[1:], [imu2body_wxyz[0]]))
     t.transform.orientation.fromarray(imu2body_xyzw)
     graph.add_transform("imu0", "body0", t)
-
     # imu0 - global_pose0, constant, known after start
-    t = cdff_envire.Transform()
-    t.transform.translation.fromarray(np.zeros(3))
-    t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
-    graph.add_transform("imu0", "global_pose0", t)
-
     # gps_pos - global_pose0, variable, updated continuously
-    t = cdff_envire.Transform()
-    t.transform.translation.fromarray(np.zeros(3))
-    t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
-    graph.add_transform("gps_pos", "global_pose0", t)
 
     # TODO visualize covariance?
 
     app.show_controls(log_iterator, dfc)
+
+    #from cdff_dev.diagrams import save_graph_png
+    #save_graph_png(dfc, "wheel_odometry.png")
 
     return app, dfc
 
@@ -309,26 +271,7 @@ def evaluate(dfc):
     plt.plot([p[0] for p in odometry], [p[1] for p in odometry], label="Odometry")
     plt.legend()
 
-    """
-    dgps_t  = dfc.nodes["evaluation"].dgps_timestamps_
-    odometry_t  = dfc.nodes["evaluation"].odometry_timestamps_
-
-    plt.figure()
-    plt.plot(dgps_t, [p[0] for p in dgps], label="DGPS")
-    plt.plot(odometry_t, [p[0] for p in odometry], label="Odometry")
-    plt.legend()
-
-    plt.figure()
-    plt.plot(dgps_t, [p[1] for p in dgps], label="DGPS")
-    plt.plot(odometry_t, [p[1] for p in odometry], label="Odometry")
-    plt.legend()
-
-    plt.plot()
-    """
-
     plt.show()
-    # TODO implement
-    #raise NotImplementedError()
 
 
 if __name__ == "__main__":
