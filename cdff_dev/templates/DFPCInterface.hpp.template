@@ -3,8 +3,8 @@
  * @{
  */
 
-#ifndef {{ desc["name"]|upper }}_INTERFACE_HPP
-#define {{ desc["name"]|upper }}_INTERFACE_HPP
+#ifndef {{ desc["name"]|upper }}_{{ desc["name"]|upper }}INTERFACE_HPP
+#define {{ desc["name"]|upper }}_{{ desc["name"]|upper }}INTERFACE_HPP
 
 #include "DFPCCommonInterface.hpp"
 {% for include in includes %}
@@ -75,6 +75,6 @@ namespace DFPC
 }
 }
 
-#endif // {{ desc["name"]|upper }}_INTERFACE_HPP
+#endif // {{ desc["name"]|upper }}_{{ desc["name"]|upper }}INTERFACE_HPP
 
 /** @} */

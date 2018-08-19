@@ -31,6 +31,6 @@ namespace {{ desc["name"] }}
 }
 }
 
-#endif // {{ class_name.upper() }}_HPP
+#endif // {{ desc["name"]|upper }}_{{ class_name|upper }}_HPP
 
 /** @} */

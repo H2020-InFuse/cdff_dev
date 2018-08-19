@@ -3,8 +3,8 @@
  * @{
  */
 
-#ifndef {{ desc["name"]|upper }}_INTERFACE_HPP
-#define {{ desc["name"]|upper }}_INTERFACE_HPP
+#ifndef {{ desc["name"]|upper }}_{{ desc["name"]|upper }}INTERFACE_HPP
+#define {{ desc["name"]|upper }}_{{ desc["name"]|upper }}INTERFACE_HPP
 
 #include "DFNCommonInterface.hpp"
 {% for include in includes %}
@@ -59,6 +59,6 @@ namespace DFN
 }
 }
 
-#endif // {{ desc["name"]|upper }}_INTERFACE_HPP
+#endif // {{ desc["name"]|upper }}_{{ desc["name"]|upper }}INTERFACE_HPP
 
 /** @} */
