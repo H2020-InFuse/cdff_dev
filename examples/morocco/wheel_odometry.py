@@ -48,7 +48,7 @@ class Transformer(transformer.EnvireDFN):
         t.orient.fromarray(data.orient.toarray())
 
         t.source_frame = "ground_truth"
-        t.target_frame = "body0"
+        t.target_frame = "dgps0"
         t.timestamp.microseconds = self._timestamp
         self._set_transform(t, frame_transformation=False)
 
@@ -255,6 +255,8 @@ def configure(logs, stream_names):
     # imu0 - imu sensor frame on the robot, use to connect body0 to initial imu
     #        measurements
     graph.add_frame("imu0")
+    # TODO
+    graph.add_frame("dgps0")
     # global_pose0 - initial GPS position with axes aligned to north, west, up
     graph.add_frame("global_pose0")
     # gps_pos - current GPS position
@@ -274,6 +276,11 @@ def configure(logs, stream_names):
     imu2body_xyzw = np.hstack((imu2body_wxyz[1:], [imu2body_wxyz[0]]))
     t.transform.orientation.fromarray(imu2body_xyzw)
     graph.add_transform("imu0", "body0", t)
+    # body0 - dgps0, constant, known before start
+    t = cdff_envire.Transform()
+    t.transform.translation.fromarray(np.array([-0.3, 0.0, 0.53]))
+    t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
+    graph.add_transform("dgps0", "body0", t)
     # imu0 - global_pose0, constant, known after start
     # gps_pos - global_pose0, variable, updated continuously
 
