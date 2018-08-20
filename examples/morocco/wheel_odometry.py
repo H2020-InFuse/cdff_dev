@@ -23,24 +23,42 @@ class Transformer(transformer.EnvireDFN):
     def __init__(self):
         super(Transformer, self).__init__()
         self.imu_initialized = False
+        self.initial_pos = np.zeros(3)
 
     def gpsPos2globalPose0Input(self, data):
         self._set_transform(data, frame_transformation=False)
 
     def imu02GlobalPose0Input(self, data):
         if not self.imu_initialized:
+            self.initial_pos = data.pos.toarray()
+
             t = cdff_types.RigidBodyState()
             t.pos.fromarray(np.zeros(3))
             t.orient.fromarray(data.orient.toarray())
             t.source_frame = "global_pose0"
             t.target_frame = "imu0"
+            t.timestamp.microseconds = self._timestamp
             self._set_transform(t, frame_transformation=False)
 
             self.imu_initialized = True
 
+        # TODO initialization of rotation
+        t = cdff_types.RigidBodyState()
+        t.pos.fromarray(data.pos.toarray() - self.initial_pos)
+        t.orient.fromarray(data.orient.toarray())
+
+        t.source_frame = "ground_truth"
+        t.target_frame = "body0"
+        t.timestamp.microseconds = self._timestamp
+        self._set_transform(t, frame_transformation=False)
+
     def gpsPos2odometryOutput(self):
         return self._get_transform(
             "gps_pos", "odometry", frame_transformation=False)
+
+    def groundTruth2OdometryOutput(self):
+        return self._get_transform(
+            "ground_truth", "odometry", frame_transformation=False)
 
     def body2odometryInput(self, data):
         self._set_transform(data, frame_transformation=False)
@@ -116,6 +134,8 @@ class EvaluationDFN:
         self.odometry_positions_ = []
         self.dgps_timestamps_ = []
         self.dgps_positions_ = []
+        self.ground_truth_timestamps_ = []
+        self.ground_truth_positions_ = []
         self.error = 0.0
 
     def set_configuration_file(self, filename):
@@ -133,6 +153,11 @@ class EvaluationDFN:
         if odometry_pose.timestamp.microseconds > 0:
             self.odometry_timestamps_.append(odometry_pose.timestamp.microseconds)
             self.odometry_positions_.append(odometry_pose.pos.toarray())
+
+    def groundTruth2OdometryInput(self, ground_truth_pose):
+        if ground_truth_pose.timestamp.microseconds > 0:
+            self.ground_truth_timestamps_.append(ground_truth_pose.timestamp.microseconds)
+            self.ground_truth_positions_.append(ground_truth_pose.pos.toarray())
 
     def errorOutput(self):
         return self.error
@@ -199,6 +224,7 @@ def configure(logs, stream_names):
         ("transformer.gpsPos2odometry", "evaluation.gpsPos2odometry"),
         ("/mcs_sensor_processing.rigid_body_state_out", "evaluation.body2odometry"),
         ("evaluation.error", "result.error"),
+        ("transformer.groundTruth2Odometry", "evaluation.groundTruth2Odometry"),
     )
     frames = {}  # TODO?
     urdf_files = [
@@ -229,7 +255,6 @@ def configure(logs, stream_names):
     # imu0 - imu sensor frame on the robot, use to connect body0 to initial imu
     #        measurements
     graph.add_frame("imu0")
-    ##graph.add_frame("dgps0")
     # global_pose0 - initial GPS position with axes aligned to north, west, up
     graph.add_frame("global_pose0")
     # gps_pos - current GPS position
@@ -262,12 +287,14 @@ def configure(logs, stream_names):
 def evaluate(dfc):
     dgps = dfc.nodes["evaluation"].dgps_positions_
     odometry = dfc.nodes["evaluation"].odometry_positions_
+    ground_truth = dfc.nodes["evaluation"].ground_truth_positions_
     import matplotlib.pyplot as plt
 
     plt.figure(figsize=(10, 5))
     plt.subplot(aspect="equal")
     plt.grid()
     plt.plot([p[0] for p in dgps], [p[1] for p in dgps], label="DGPS")
+    plt.plot([p[0] for p in ground_truth], [p[1] for p in ground_truth], label="Ground Truth")
     plt.plot([p[0] for p in odometry], [p[1] for p in odometry], label="Odometry")
     plt.legend()
 
