@@ -27,7 +27,7 @@ class Transformer(transformer.EnvireDFN):
     def gpsPos2globalPose0Input(self, data):
         self._set_transform(data, frame_transformation=False)
 
-    def imu02GlobalPoseInput(self, data):
+    def imu02GlobalPose0Input(self, data):
         if not self.imu_initialized:
             t = cdff_types.RigidBodyState()
             t.pos.fromarray(np.zeros(3))
@@ -134,10 +134,8 @@ class EvaluationDFN:
             self.odometry_timestamps_.append(odometry_pose.timestamp.microseconds)
             self.odometry_positions_.append(odometry_pose.pos.toarray())
 
-    """ TODO
     def errorOutput(self):
         return self.error
-    """
 
     def process(self):
         if not self.odometry_positions_ or not self.dgps_positions_:
@@ -150,6 +148,10 @@ class EvaluationDFN:
 def main():
     logs, stream_names = convert_logs()
     app, dfc = configure(logs, stream_names)
+
+    from cdff_dev.diagrams import save_graph_png
+    save_graph_png(dfc, "wheel_odometry.png")
+
     app.exec_()
     evaluate(dfc)
 
@@ -190,12 +192,13 @@ def configure(logs, stream_names):
         "evaluation": 1.0, # TODO
     }
     connections = (
-        ("/dgps.imu_pose", "transformer.imu02GlobalPose"),
+        ("/dgps.imu_pose", "transformer.imu02GlobalPose0"),
         ("/dgps.gps_solution", "gps_to_relative_pose.gps"),
         ("gps_to_relative_pose.gpsPos2globalPose0", "transformer.gpsPos2globalPose0"),
         ("/mcs_sensor_processing.rigid_body_state_out", "transformer.body2odometry"),
         ("transformer.gpsPos2odometry", "evaluation.gpsPos2odometry"),
         ("/mcs_sensor_processing.rigid_body_state_out", "evaluation.body2odometry"),
+        ("evaluation.error", "result.error"),
     )
     frames = {}  # TODO?
     urdf_files = [
@@ -238,7 +241,7 @@ def configure(logs, stream_names):
     t.transform.translation.fromarray(np.zeros(3))
     t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
     graph.add_transform("body0", "odometry", t)
-    # body0 - imu0, constant, known before start, seems to be OK
+    # body0 - imu0, constant, known before start
     t = cdff_envire.Transform()
     t.transform.translation.fromarray(np.array([-0.185, 0.3139, 0.04164]))
     R = pr.matrix_from_euler_xyz([0.44, 2.225, 0.0])
@@ -252,9 +255,6 @@ def configure(logs, stream_names):
     # TODO visualize covariance?
 
     app.show_controls(log_iterator, dfc)
-
-    #from cdff_dev.diagrams import save_graph_png
-    #save_graph_png(dfc, "wheel_odometry.png")
 
     return app, dfc
 
