@@ -21,7 +21,7 @@ The HCRU has the following sensor configuration:
 * Camera lens: Schneider/Kreuznach Cinegon 1.8/4.8
 
 The following image illustrates the frames involved in computing the
-GPS position in the local coordinate system. `global_pose0` represents
+GPS position in the local coordinate system. `dgps0` represents
 the start position of the robot in the global GPS coordinate system.
 the rotation of the robot (frame `body0`) at the beginning in this
 global coordinate system is measured with the IMU that is attached to
@@ -37,7 +37,5 @@ both paths in the same frame.
 
 The following image is a frame diagram of the robot. The shown
 frames are used to compare localisation and DGPS ground truth.
-The initial position of the body in the world is determined by
-the IMU.
 
 ![SherpaTT](SherpaTT.png)
