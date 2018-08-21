@@ -25,17 +25,24 @@ class Transformer(transformer.EnvireDFN):
         self.imu_initialized = False
         self.start_pos = np.zeros(3)
 
-    def imu02GlobalPose0Input(self, data):
+    def groundTruth2dgps0Input(self, data):
         if not self.imu_initialized:
             self.start_pos = data.pos.toarray()
             self.start_orient = data.orient.toarray()
 
+            t = cdff_types.RigidBodyState()
+            t.pos.fromarray(self.start_pos)
+            t.orient.fromarray(self.start_orient)
+            t.source_frame = "dgps0"
+            t.target_frame = "start"
+            t.timestamp.microseconds = self._timestamp
+            self._set_transform(t, frame_transformation=False)
+
             self.imu_initialized = True
 
         t = cdff_types.RigidBodyState()
-        p, q = _subtract_pose(
-            data.pos.toarray(), data.orient.toarray(),
-            self.start_pos, self.start_orient)
+        p, q = data.pos.toarray(), data.orient.toarray()
+        p, q = _subtract_pose(p, q, self.start_pos, self.start_orient)
         t.pos.fromarray(p)
         t.orient.fromarray(q)
         t.source_frame = "ground_truth"
@@ -151,7 +158,7 @@ def configure(logs, stream_names):
     }
     connections = (
         # inputs to transformer
-        ("/dgps.imu_pose", "transformer.imu02GlobalPose0"),
+        ("/dgps.imu_pose", "transformer.groundTruth2dgps0"),
         ("/mcs_sensor_processing.rigid_body_state_out", "transformer.body2odometry"),
 
         # inputs to evaluation
