@@ -1,16 +1,9 @@
-import warnings
 import numpy as np
 from cdff_dev import logloader, envirevisualization, dataflowcontrol, transformer
 import cdff_types
 import cdff_envire
-from cdff_dev.extensions.gps import conversion
 # TODO dependency: pytransform; git@github.com:rock-learning/pytransform.git
 import pytransform.rotations as pr
-
-
-# TODO transformations:
-# - convert rock transformations to source in target
-# - invert pytransform rotations
 
 # TODO configuration
 dgps_logfile = "logs/Sherpa/dgps_Logger.log"
