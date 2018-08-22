@@ -417,7 +417,6 @@ cdef extern from "Array3D.h" namespace "asn1SccArray3D_depth_t":
     cdef asn1SccArray3D_depth_t asn1Sccdepth_8S
     cdef asn1SccArray3D_depth_t asn1Sccdepth_16U
     cdef asn1SccArray3D_depth_t asn1Sccdepth_16S
-    cdef asn1SccArray3D_depth_t asn1Sccdepth_32U
     cdef asn1SccArray3D_depth_t asn1Sccdepth_32S
     cdef asn1SccArray3D_depth_t asn1Sccdepth_32F
     cdef asn1SccArray3D_depth_t asn1Sccdepth_64F

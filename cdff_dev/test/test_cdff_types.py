@@ -1149,3 +1149,37 @@ def test_map():
 
     map.msg_version = 42
     assert_equal(map.msg_version, 42)
+
+    map.metadata.msg_version = 43
+    assert_equal(map.metadata.msg_version, 43)
+
+    map.metadata.time_stamp.microseconds = 11
+    assert_equal(map.metadata.time_stamp.microseconds, 11)
+
+    map.data.msg_version = 44
+    assert_equal(map.data.msg_version, 44)
+
+    map.data.rows = 25
+    assert_equal(map.data.rows, 25)
+
+    map.data.cols = 26
+    assert_equal(map.data.cols, 26)
+
+    map.data.channels = 27
+    assert_equal(map.data.channels, 27)
+
+    map.data.depth = "depth_8U"
+    assert_equal(map.data.depth, "depth_8U")
+
+    map.data.row_size = 28
+    assert_equal(map.data.row_size, 28)
+
+    map.data.data[0] = 10
+    map.data.data[1] = 11
+    map.data.data[2] = 12
+    map.data.data[3] = 13
+    assert_equal(len(map.data.data), 4)
+    assert_equal(map.data.data[0], 10)
+    assert_equal(map.data.data[1], 11)
+    assert_equal(map.data.data[2], 12)
+    assert_equal(map.data.data[3], 13)

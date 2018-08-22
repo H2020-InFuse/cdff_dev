@@ -204,6 +204,10 @@ cdef class Array3DReference:
     cdef _cdff_types.asn1SccArray3D* thisptr
 
 
+cdef class Array3D_dataReference:
+    cdef _cdff_types.asn1SccArray3D_data* thisptr
+
+
 cdef class Map:
     cdef _cdff_types.asn1SccMap* thisptr
     cdef bool delete_thisptr

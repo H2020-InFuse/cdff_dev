@@ -1910,8 +1910,10 @@ cdef class Image:
             return "Image_mode_t_mode_pjpg"
         elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_jpeg:
             return "mode_jpeg"
-        else:
+        elif <int> self.thisptr.frame_mode == <int> _cdff_types.asn1Sccmode_png:
             return "mode_png"
+        else:
+            raise ValueError("Unknown frame_mode: %s" % <int> self.thisptr.frame_mode)
 
     def _set_frame_mode(self,  str frame_mode):
         if frame_mode == "mode_undefined":
@@ -2129,13 +2131,122 @@ cdef class Array3DReference:
     def __dealloc__(self):
         pass
 
-    # TODO uint32_t msgVersion
-    # TODO uint32_t rows
-    # TODO uint32_t cols
-    # TODO uint32_t channels
-    # TODO asn1SccArray3D_depth_t depth
-    # TODO uint32_t rowSize
-    # TODO asn1SccArray3D_data data
+    def _get_msg_version(self):
+        return self.thisptr.msgVersion
+
+    def _set_msg_version(self, uint32_t msg_version):
+        self.thisptr.msgVersion = msg_version
+
+    msg_version = property(_get_msg_version, _set_msg_version)
+
+    def _get_rows(self):
+        return self.thisptr.rows
+
+    def _set_rows(self, uint32_t rows):
+        self.thisptr.rows = rows
+
+    rows = property(_get_rows, _set_rows)
+
+    def _get_cols(self):
+        return self.thisptr.cols
+
+    def _set_cols(self, uint32_t cols):
+        self.thisptr.cols = cols
+
+    cols = property(_get_cols, _set_cols)
+
+    def _get_channels(self):
+        return self.thisptr.channels
+
+    def _set_channels(self, uint32_t channels):
+        self.thisptr.channels = channels
+
+    channels = property(_get_channels, _set_channels)
+
+    def _get_depth(self):
+        if <int> self.thisptr.depth == <int> _cdff_types.asn1Sccdepth_8U:
+            return "depth_8U"
+        elif <int> self.thisptr.depth == <int> _cdff_types.asn1Sccdepth_8S:
+            return "depth_8S"
+        elif <int> self.thisptr.depth == <int> _cdff_types.asn1Sccdepth_16U:
+            return "depth_16U"
+        elif <int> self.thisptr.depth == <int> _cdff_types.asn1Sccdepth_16S:
+            return "depth_16S"
+        elif <int> self.thisptr.depth == <int> _cdff_types.asn1Sccdepth_32S:
+            return "depth_32S"
+        elif <int> self.thisptr.depth == <int> _cdff_types.asn1Sccdepth_32F:
+            return "depth_32F"
+        elif <int> self.thisptr.depth == <int> _cdff_types.asn1Sccdepth_64F:
+            return "depth_64F"
+        else:
+            raise ValueError("Unknown depth: %d" % <int> self.thisptr.depth)
+
+    def _set_depth(self,  str depth):
+        if depth == "depth_8U":
+            self.thisptr.depth = _cdff_types.asn1Sccdepth_8U
+        elif depth == "depth_8S":
+            self.thisptr.depth = _cdff_types.asn1Sccdepth_8S
+        elif depth == "depth_8S":
+            self.thisptr.depth = _cdff_types.asn1Sccdepth_8S
+        elif depth == "depth_16U":
+            self.thisptr.depth = _cdff_types.asn1Sccdepth_16U
+        elif depth == "depth_16S":
+            self.thisptr.depth = _cdff_types.asn1Sccdepth_16S
+        elif depth == "depth_32S":
+            self.thisptr.depth = _cdff_types.asn1Sccdepth_32S
+        elif depth == "depth_32F":
+            self.thisptr.depth = _cdff_types.asn1Sccdepth_32F
+        elif depth == "depth_64F":
+            self.thisptr.depth = _cdff_types.asn1Sccdepth_64F
+        else:
+            raise ValueError("Unknown depth: %s" % depth)
+
+    depth = property(_get_depth, _set_depth)
+
+    def _get_row_size(self):
+        return self.thisptr.rowSize
+
+    def _set_row_size(self, uint32_t row_size):
+        self.thisptr.rowSize = row_size
+
+    row_size = property(_get_row_size, _set_row_size)
+
+    @property
+    def data(self):
+        cdef Array3D_dataReference data = Array3D_dataReference()
+        data.thisptr = &self.thisptr.data
+        return data
+
+
+cdef class Array3D_dataReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def __len__(self):
+        return self.thisptr.nCount
+
+    def __getitem__(self, int i):
+        return self.thisptr.arr[i]
+
+    def __setitem__(self, int i, unsigned char v):
+        if i >= 66355200:
+            warnings.warn("Maximum size of image is 66355200")
+            return
+        self.thisptr.arr[i] = v
+        if self.thisptr.nCount <= <int> i:
+            self.thisptr.nCount = <int> (i + 1)
+
+    def resize(self, int size):
+        if size > 66355200:
+            warnings.warn("Maximum size of image is 66355200")
+            return
+        self.thisptr.nCount = size
+
+    def size(self):
+        return self.thisptr.nCount
 
 
 cdef class Map:
@@ -2183,7 +2294,26 @@ cdef class Map_metadata_tReference:
     def __dealloc__(self):
         pass
 
-    # TODO uint32_t msgVersion
+    def _get_msg_version(self):
+        return self.thisptr.msgVersion
+
+    def _set_msg_version(self, uint32_t msg_version):
+        self.thisptr.msgVersion = msg_version
+
+    msg_version = property(_get_msg_version, _set_msg_version)
+
+    def _get_time_stamp(self):
+        cdef Time time_stamp = Time()
+        del time_stamp.thisptr
+        time_stamp.thisptr = &self.thisptr.timeStamp
+        time_stamp.delete_thisptr = False
+        return time_stamp
+
+    def _set_time_stamp(self, Time time_stamp):
+        self.thisptr.timeStamp = deref(time_stamp.thisptr)
+
+    time_stamp = property(_get_time_stamp, _set_time_stamp)
+
     # TODO asn1SccTime timeStamp
     # TODO asn1SccMap_type_t type
     # TODO asn1SccMap_metadata_t_errValues errValues
