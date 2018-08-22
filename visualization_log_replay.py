@@ -278,21 +278,17 @@ def main(vdh, log_file):
     )
 
     # Logs are being loaded individually first in order to retrieve stream names
-    # TODO: More efficient way of getting stream names
-    log = logloader.load_log(log_file)
-    logloader.print_stream_info(log)
-
-    log_img = logloader.load_log("frames.msg")
-    logloader.print_stream_info(log_img)
-
-    stream_dict = set_stream_data(log, log_img)
-    stream_names = list(stream_dict.keys())
+    filenames = [[log_file],
+                 #["frames.msg"]
+                 ]
+    typenames = logloader.summarize_logfiles(filenames)
+    stream_names = list(typenames.keys())
     print("STREAMS:", stream_names)
 
-    log_iterator = logloader.replay_files([(log_file,), ("frames.msg",)], stream_names )
+    log_iterator = logloader.replay_files(filenames, stream_names)
 
     control_panel = visualization_control_panel.ControlPanelExpert(
-        stream_dict)
+        typenames)
     vdh.set_control_panel(control_panel)
 
     dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods)
