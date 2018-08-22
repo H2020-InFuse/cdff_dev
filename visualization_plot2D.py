@@ -66,7 +66,7 @@ def set_axis_limits(ax, vdh, time_list, data_lists, list_assigner, coords):
     ax.set_xlim(time_list[0], np.amax(time_list))
 
 
-def animate(i, line, ax, vdh, coords, camera_1, camera_2):
+def animate(i, line, ax, vdh, coords, camera):
     """ Update and plot line data. Anything that needs to be
     updated must lie within this function. Repeatedly called 
     by FuncAnimation, incrementing i with each iteration. 
@@ -100,8 +100,7 @@ def animate(i, line, ax, vdh, coords, camera_1, camera_2):
             pass
 
         try:
-            camera_1.set_array(vdh.frame_camera1)
-            camera_2.set_array(vdh.frame_camera2)
+            camera.set_array(vdh.frame_camera)
         except AttributeError:
             pass
 
@@ -182,8 +181,10 @@ log_files = [
     #sorted(glob.glob("logs/open_day/open_day_velodyne_*.msg"))
 ]
 stream_names = [
-    #'/laser_filter.filtered_scans', '/velodyne.laser_scans',
-    #'/tilt_scan.pointcloud', '/dynamixel.transforms',
+    #"/laser_filter.filtered_scans",
+    #"/velodyne.laser_scans",
+    #"/tilt_scan.pointcloud",
+    #"/dynamixel.transforms",
     #"/camera1.frame"
     "/xsens_imu.calibrated_sensors"
 ]
@@ -192,7 +193,6 @@ stream_names = [
 fig = plt.figure()
 ax = plt.subplot2grid((2, 2), (0, 0), colspan=2)
 ax1 = plt.subplot2grid((2, 2), (1, 0))
-ax2 = plt.subplot2grid((2, 2), (1, 1))
 
 # set axis titles
 ax.set_ylabel("units")
@@ -207,8 +207,6 @@ ax.xaxis.set_major_locator(plt.MaxNLocator(10))
 
 ax1.yaxis.set_major_locator(plt.NullLocator())
 ax1.xaxis.set_major_locator(plt.NullLocator())
-ax2.yaxis.set_major_locator(plt.NullLocator())
-ax2.xaxis.set_major_locator(plt.NullLocator())
 
 plt.tight_layout()
 
@@ -222,8 +220,7 @@ marker, = ax.plot([], color="k", marker="+")
 line = [line0, line1, line2, line3, marker]
 
 blank = mpimg.imread("Blank.png")
-camera_1 = ax1.imshow(blank, animated=True)
-camera_2 = ax2.imshow(blank, animated=True)
+camera = ax1.imshow(blank, animated=True)
 
 
 span = SpanSelector(ax, onselect, 'horizontal', useblit=True,
@@ -241,7 +238,7 @@ thread.start()
 # Setting blit to False renders animation useless - only grey window displayed
 # Blitting may have some connection to removing blinking from animation
 anim = animation.FuncAnimation(fig, animate, fargs=(
-    line, ax, vdh, coords, camera_1, camera_2), interval=0.0, blit=True)
+    line, ax, vdh, coords, camera), interval=0.0, blit=True)
 
 # display plotting window
 try:

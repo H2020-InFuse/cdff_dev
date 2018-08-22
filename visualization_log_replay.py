@@ -168,12 +168,8 @@ class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
         #load camera frame information
         if type(sample) == cdff_types.Image:
             image_array = [sample.image[i] for i in range(len(sample.image))]
-            if port_name == "/camera1.frame":
-                self.frame_camera1 = np.asarray(image_array, dtype=np.uint8).reshape(
-                    sample.datasize.height, sample.datasize.width, 3)
-            elif port_name == "/camera2.frame":
-                self.frame_camera2 = np.asarray(image_array, dtype=np.uint8).reshape(
-                    sample.datasize.height, sample.datasize.width, 3)
+            self.frame_camera = np.asarray(image_array, dtype=np.uint8).reshape(
+                sample.datasize.height, sample.datasize.width, 3)
 
         # add data to lists to be sent to graph
         for label, data in self.source_dict.items():

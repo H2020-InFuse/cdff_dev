@@ -467,7 +467,6 @@ class Worker(QThread):
 
 class Step:
     """A callable that replays one sample in each step."""
-
     def __init__(self, log_iterator, dfc):
         self.iterator = log_iterator
         self.dfc = dfc
