@@ -220,5 +220,6 @@ cdef class Map_metadata_tReference:
 cdef class Map_metadata_t_errValuesReference:
     cdef _cdff_types.asn1SccMap_metadata_t_errValues* thisptr
 
+
 cdef class Frame_error_tReference:
     cdef _cdff_types.asn1SccFrame_error_t* thisptr

@@ -151,3 +151,71 @@ def test_create_gps_solution():
     assert_equal(obj.deviation_latitude, 0.023057984188199043)
     assert_equal(obj.deviation_longitude, 0.017021523788571358)
     assert_equal(obj.deviation_altitude, 0.0556030310690403)
+
+
+def test_create_map():
+    data = {
+        "msgVersion": 1,
+        "metadata": {
+            "msgVersion": 1,
+            "timeStamp": {
+                "microseconds": 5
+            },
+            "type": "map_NAV",
+            "err_values": [
+                {"type": "error_UNDEFINED", "value": 0.0},
+                {"type": "error_DEAD", "value": 1.0},
+                {"type": "error_FILTERED", "value": 2.0}
+            ],
+            "scale": 2.0,
+            "pose_fixed_frame_map_frame": {
+                "data": {
+                    "translation": [0.0, 1.0, 2.0],
+                    "orientation": [0.0, 0.0, 0.0, 1.0]
+                }
+            }
+        },
+        "data": {
+            "msgVersion": 1,
+            "rows": 2,
+            "cols": 2,
+            "depth": "depth_8U",
+            "row_size": 2,
+            "data": [0.0, 0.0, 1.0, 0.0]
+        },
+    }
+    obj = typefromdict.create_from_dict("Map", data)
+    assert_equal(obj.msg_version, 1)
+    assert_equal(obj.metadata.msg_version, 1)
+    assert_equal(obj.metadata.time_stamp.microseconds, 5)
+    assert_equal(obj.metadata.type, "map_NAV")
+    assert_equal(obj.metadata.err_values[0].type, "error_UNDEFINED")
+    assert_equal(obj.metadata.err_values[0].value, 0.0)
+    assert_equal(obj.metadata.err_values[1].type, "error_DEAD")
+    assert_equal(obj.metadata.err_values[1].value, 1.0)
+    assert_equal(obj.metadata.err_values[2].type, "error_FILTERED")
+    assert_equal(obj.metadata.err_values[2].value, 2.0)
+    assert_equal(obj.metadata.scale, 2.0)
+    assert_equal(
+        obj.metadata.pose_fixed_frame_map_frame.data.translation[0], 0.0)
+    assert_equal(
+        obj.metadata.pose_fixed_frame_map_frame.data.translation[1], 1.0)
+    assert_equal(
+        obj.metadata.pose_fixed_frame_map_frame.data.translation[2], 2.0)
+    assert_equal(
+        obj.metadata.pose_fixed_frame_map_frame.data.orientation[0], 0.0)
+    assert_equal(
+        obj.metadata.pose_fixed_frame_map_frame.data.orientation[1], 0.0)
+    assert_equal(
+        obj.metadata.pose_fixed_frame_map_frame.data.orientation[2], 0.0)
+    assert_equal(
+        obj.metadata.pose_fixed_frame_map_frame.data.orientation[3], 1.0)
+    assert_equal(obj.data.msg_version, 1)
+    assert_equal(obj.data.rows, 2)
+    assert_equal(obj.data.cols, 2)
+    assert_equal(obj.data.depth, "depth_8U")
+    assert_equal(obj.data.row_size, 2)
+    assert_equal(obj.data.data[0], 0.0)
+    assert_equal(obj.data.data[1], 0.0)
+    assert_equal(obj.data.data[2], 1.0)
+    assert_equal(obj.data.data[3], 0.0)
