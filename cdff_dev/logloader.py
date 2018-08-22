@@ -22,6 +22,52 @@ def load_log(filename):
     return streams
 
 
+def summarize_logfile(filename):
+    """Extract summary of log file.
+
+    Parameters
+    ----------
+    filename : str
+        Name of the logfile
+
+    Returns
+    -------
+    typenames : dict
+        Mapping from stream names to type names
+
+    n_samples : dict
+        Mapping from stream names to number of samples
+    """
+    log = load_log(filename)
+    return summarize_log(log)
+
+
+def summarize_log(log):
+    """Extract summary of log file.
+
+    Parameters
+    ----------
+    log : dict
+        Log data
+
+    Returns
+    -------
+    typenames : dict
+        Mapping from stream names to type names
+
+    n_samples : dict
+        Mapping from stream names to number of samples
+    """
+    typenames = {}
+    n_samples = {}
+    for stream_name in log.keys():
+        if stream_name.endswith(".meta"):
+            continue
+        typenames[stream_name] = log[stream_name + ".meta"]["type"]
+        n_samples[stream_name] = len(log[stream_name])
+    return typenames, n_samples
+
+
 def print_stream_info(log):
     """Print meta information about streams.
 
@@ -30,26 +76,23 @@ def print_stream_info(log):
     log : dict
         Log data
     """
-    stream_meta_data = []
-    for stream_name in log.keys():
-        if stream_name.endswith(".meta"):
-            continue
-        typename = log[stream_name + ".meta"]["type"]
-        n_samples = len(log[stream_name])
-        stream_meta_data.append((stream_name, typename, str(n_samples).rjust(14)))
+    typenames, n_samples = summarize_log(log)
+    stream_names = list(typenames.keys())
+    stream_meta_data = [(sn, typenames[sn], str(n_samples[sn]).rjust(14))
+                        for sn in stream_names]
 
     print("=" * 80)
     MAXLENGTHS = (35, 30, 15)
     print("".join(map(lambda t: t[0].ljust(t[1]),
                       zip(["stream name", "type", "# samples"], MAXLENGTHS))))
     print("-" * 80)
-    for stream_meta_data in stream_meta_data:
+    for smd in stream_meta_data:
         line = ""
         for i in range(len(MAXLENGTHS)):
-            if len(stream_meta_data[i]) >= MAXLENGTHS[i]:
-                line += stream_meta_data[i][:MAXLENGTHS[i] - 4] + "... "
+            if len(smd[i]) >= MAXLENGTHS[i]:
+                line += smd[i][:MAXLENGTHS[i] - 4] + "... "
             else:
-                line += stream_meta_data[i].ljust(MAXLENGTHS[i])
+                line += smd[i].ljust(MAXLENGTHS[i])
         print(line)
     print("=" * 80)
 
@@ -108,7 +151,7 @@ def replay(stream_names, log, verbose=0):
         if verbose >= 2:
             print("[replay] Stream indices: %s" % (current_sample_indices,))
 
-        timestamp, stream_name, typename, sample = extract_sample(
+        timestamp, stream_name, typename, sample = _extract_sample(
             streams, meta_streams, stream_names, current_stream,
             current_sample_indices[current_stream])
         yield timestamp, stream_name, typename, sample
@@ -120,7 +163,10 @@ def replay_files(filename_groups, stream_names, verbose=0):
     Parameters
     ----------
     filename_groups : list of list of str
-        Groups of filenames in chronological order
+        Groups of filenames in chronological order. Each entry in the top-level
+        list represents a group of filenames. Each group contains multiple
+        files with the same streams, but they are sliced temporally. Filenames
+        of each group have to be ordered chronologically.
 
     stream_names : list
         Names of the streams that we want to load
@@ -311,7 +357,7 @@ class LogfileGroup:
                   % (self.next_stream + 1, len(self.group_stream_names)))
 
         self.current_sample_indices[self.next_stream] += 1
-        return extract_sample(
+        return _extract_sample(
             self.streams, self.meta_streams, self.group_stream_names,
             self.next_stream, self.current_sample_indices[self.next_stream])
 
@@ -354,8 +400,8 @@ def _argmin(next_timestamps):
     return min(enumerate(next_timestamps), key=lambda p: p[1])
 
 
-def extract_sample(streams, meta_streams, stream_names, stream_idx,
-                   sample_idx):
+def _extract_sample(streams, meta_streams, stream_names, stream_idx,
+                    sample_idx):
     timestamp = meta_streams[stream_idx]["timestamps"][sample_idx]
     typename = meta_streams[stream_idx]["type"]
     sample = streams[stream_idx][sample_idx]
