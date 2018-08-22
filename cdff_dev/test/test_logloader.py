@@ -15,7 +15,7 @@ def test_load_log():
     assert_in("/hokuyo.scans.meta", log)
 
 
-def test_summarize_log():
+def test_summarize_logfile():
     typenames, n_samples = logloader.summarize_logfile(
         "test/test_data/logs/test_log.msg")
     assert_in("/hokuyo.scans", typenames)
@@ -28,6 +28,16 @@ def test_summarize_log():
     assert_equal(typenames["/dynamixel.transforms"], "RigidBodyState")
     assert_equal(n_samples["/hokuyo.scans"], 3611)
     assert_equal(n_samples["/dynamixel.transforms"], 902)
+
+
+def test_summarize_logfiles():
+    filenames = [sorted(glob.glob("test/test_data/logs/xsens_imu_*.msg")),
+                 sorted(glob.glob("test/test_data/logs/dynamixel_*.msg"))]
+    typenames = logloader.summarize_logfiles(filenames)
+    assert_in("/xsens_imu.calibrated_sensors", typenames)
+    assert_in("/dynamixel.transforms", typenames)
+    assert_equal(typenames["/xsens_imu.calibrated_sensors"], "IMUSensors")
+    assert_equal(typenames["/dynamixel.transforms"], "RigidBodyState")
 
 
 def test_logfile_group_loads_sample():

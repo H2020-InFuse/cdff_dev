@@ -42,6 +42,38 @@ def summarize_logfile(filename):
     return summarize_log(log)
 
 
+def summarize_logfiles(filename_groups, only_first_of_group=True):
+    """Extract summary of log files.
+
+    We do not count the number of samples.
+
+    Parameters
+    ----------
+    filename_groups : list of list of str
+        Groups of file names in chronological order. Each entry in the top-level
+        list represents a group of filenames. Each group contains multiple
+        files with the same streams, but they are sliced temporally. File names
+        of each group have to be ordered chronologically.
+
+    only_first_of_group : bool, optional (default: True)
+        Only load the first log file of each group. We assume that all
+        following files contain the same streams.
+
+    Returns
+    -------
+    typenames : dict
+        Mapping from stream names to type names
+    """
+    typenames = {}
+    for group in filename_groups:
+        for filename in group:
+            t, _ = summarize_logfile(filename)
+            typenames.update(t)
+            if only_first_of_group:
+                break
+    return typenames
+
+
 def summarize_log(log):
     """Extract summary of log file.
 
@@ -163,9 +195,9 @@ def replay_files(filename_groups, stream_names, verbose=0):
     Parameters
     ----------
     filename_groups : list of list of str
-        Groups of filenames in chronological order. Each entry in the top-level
+        Groups of file names in chronological order. Each entry in the top-level
         list represents a group of filenames. Each group contains multiple
-        files with the same streams, but they are sliced temporally. Filenames
+        files with the same streams, but they are sliced temporally. File names
         of each group have to be ordered chronologically.
 
     stream_names : list
