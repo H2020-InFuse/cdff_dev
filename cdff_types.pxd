@@ -200,6 +200,14 @@ cdef class Image_attributesReference:
     cdef _cdff_types.asn1SccImage_attributes* thisptr
 
 
+cdef class Array3DReference:
+    cdef _cdff_types.asn1SccArray3D* thisptr
+
+
 cdef class Map:
     cdef _cdff_types.asn1SccMap* thisptr
     cdef bool delete_thisptr
+
+
+cdef class Map_metadata_tReference:
+    cdef _cdff_types.asn1SccMap_metadata_t* thisptr

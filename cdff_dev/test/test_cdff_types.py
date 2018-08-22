@@ -1142,3 +1142,10 @@ def test_frame():
 
     frame.frame_status = "status_empty"
     assert_equal(frame.frame_status, "status_empty")
+
+
+def test_map():
+    map = cdff_types.Map()
+
+    map.msg_version = 42
+    assert_equal(map.msg_version, 42)

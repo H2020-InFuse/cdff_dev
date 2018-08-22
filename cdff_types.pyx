@@ -2122,6 +2122,22 @@ class GpsSolution:
                self.deviation_longitude, self.deviation_altitude))
 
 
+cdef class Array3DReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    # TODO uint32_t msgVersion
+    # TODO uint32_t rows
+    # TODO uint32_t cols
+    # TODO uint32_t channels
+    # TODO asn1SccArray3D_depth_t depth
+    # TODO uint32_t rowSize
+    # TODO asn1SccArray3D_data data
+
+
 cdef class Map:
     def __cinit__(self):
         self.thisptr = NULL
@@ -2139,16 +2155,37 @@ cdef class Map:
         # TODO
         return str("{type: Map}")
 
-"""
-    def _get_frame_time(self):
-        cdef Time frame_time = Time()
-        del frame_time.thisptr
-        frame_time.thisptr = &self.thisptr.frame_time
-        frame_time.delete_thisptr = False
-        return frame_time
+    def _get_msg_version(self):
+        return self.thisptr.msgVersion
 
-    def _set_frame_time(self, Time frame_time):
-        self.thisptr.frame_time = deref(frame_time.thisptr)
+    def _set_msg_version(self, uint32_t msg_version):
+        self.thisptr.msgVersion = msg_version
 
-    frame_time = property(_get_frame_time, _set_frame_time)
-"""
+    msg_version = property(_get_msg_version, _set_msg_version)
+
+    @property
+    def metadata(self):
+        cdef Map_metadata_tReference metadata = Map_metadata_tReference()
+        metadata.thisptr = &self.thisptr.metadata
+        return metadata
+
+    @property
+    def data(self):
+        cdef Array3DReference data = Array3DReference()
+        data.thisptr = &self.thisptr.data
+        return data
+
+
+cdef class Map_metadata_tReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    # TODO uint32_t msgVersion
+    # TODO asn1SccTime timeStamp
+    # TODO asn1SccMap_type_t type
+    # TODO asn1SccMap_metadata_t_errValues errValues
+    # TODO double scale
+    # TODO asn1SccTransformWithCovariance pose_fixedFrame_mapFrame
