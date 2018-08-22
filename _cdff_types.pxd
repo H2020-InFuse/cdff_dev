@@ -577,4 +577,5 @@ cdef extern from "Map.h":
         double scale
         asn1SccTransformWithCovariance pose_fixedFrame_mapFrame
     cdef cppclass asn1SccMap_metadata_t_errValues:
+        int nCount
         asn1SccFrame_error_t arr[5]

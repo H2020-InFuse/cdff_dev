@@ -2298,6 +2298,7 @@ cdef class Map_metadata_tReference:
         pass
 
     def __str__(self):
+        # TODO err_values, pose_fixed_frame_map_frame
         return ("time_stamp: %s, type: %s, scale: %g"
                 % (self.time_stamp, self.type, self.scale))
 
@@ -2343,7 +2344,12 @@ cdef class Map_metadata_tReference:
 
     type = property(_get_type, _set_type)
 
-    # TODO asn1SccMap_metadata_t_errValues errValues
+    @property
+    def err_values(self):
+        cdef Map_metadata_t_errValuesReference err_values = \
+            Map_metadata_t_errValuesReference()
+        err_values.thisptr = &self.thisptr.errValues
+        return err_values
 
     def _get_scale(self):
         return self.thisptr.scale
@@ -2353,4 +2359,80 @@ cdef class Map_metadata_tReference:
 
     scale = property(_get_scale, _set_scale)
 
-    # TODO asn1SccTransformWithCovariance pose_fixedFrame_mapFrame
+    @property
+    def pose_fixed_frame_map_frame(self):
+        cdef TransformWithCovariance pose_fixedFrame_mapFrame = \
+            TransformWithCovariance()
+        del pose_fixedFrame_mapFrame.thisptr
+        pose_fixedFrame_mapFrame.delete_thisptr = False
+        pose_fixedFrame_mapFrame.thisptr = \
+            &self.thisptr.pose_fixedFrame_mapFrame
+        return pose_fixedFrame_mapFrame
+
+
+cdef class Map_metadata_t_errValuesReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def __len__(self):
+        return self.thisptr.nCount
+
+    def __getitem__(self, int i):
+        if i >= 5:
+            warnings.warn("Maximum size of image is 5")
+            return
+        cdef Frame_error_tReference entry = Frame_error_tReference()
+        entry.thisptr = &self.thisptr.arr[i]
+        if self.thisptr.nCount <= <int> i:
+            self.thisptr.nCount = <int> (i + 1)
+        return entry
+
+    def resize(self, int size):
+        if size > 5:
+            warnings.warn("Maximum size of image is 5")
+            return
+        self.thisptr.nCount = size
+
+    def size(self):
+        return self.thisptr.nCount
+
+
+cdef class Frame_error_tReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def _get_type(self):
+        if <int> self.thisptr.type == <int> _cdff_types.asn1Sccerror_UNDEFINED:
+            return "error_UNDEFINED"
+        elif <int> self.thisptr.type == <int> _cdff_types.asn1Sccerror_DEAD:
+            return "error_DEAD"
+        elif <int> self.thisptr.type == <int> _cdff_types.asn1Sccerror_FILTERED:
+            return "error_FILTERED"
+        else:
+            raise ValueError("Unknown error type: %d" % <int> self.thisptr.type)
+
+    def _set_type(self,  str type):
+        if type == "error_UNDEFINED":
+            self.thisptr.type = _cdff_types.asn1Sccerror_UNDEFINED
+        elif type == "error_DEAD":
+            self.thisptr.type = _cdff_types.asn1Sccerror_DEAD
+        elif type == "error_FILTERED":
+            self.thisptr.type = _cdff_types.asn1Sccerror_FILTERED
+        else:
+            raise ValueError("Unknown error type: %s" % type)
+
+    type = property(_get_type, _set_type)
+
+    def _get_value(self):
+        return self.thisptr.value
+
+    def _set_value(self, double value):
+        self.thisptr.value = value
+
+    value = property(_get_value, _set_value)

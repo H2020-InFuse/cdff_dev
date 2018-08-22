@@ -1159,8 +1159,19 @@ def test_map():
     map.metadata.type = "map_DEM"
     assert_equal(map.metadata.type, "map_DEM")
 
+    map.metadata.err_values[0].type = "error_UNDEFINED"
+    map.metadata.err_values[0].value = 5.0
+    assert_equal(len(map.metadata.err_values), 1)
+    assert_equal(map.metadata.err_values[0].type, "error_UNDEFINED")
+    assert_equal(map.metadata.err_values[0].value, 5.0)
+
     map.metadata.scale = 55.0
     assert_equal(map.metadata.scale, 55.0)
+
+    map.metadata.pose_fixed_frame_map_frame.data.translation.fromarray(
+        np.array([1.2, 3.4, 5.6]))
+    assert_array_equal(map.metadata.pose_fixed_frame_map_frame.data.translation,
+                       np.array([1.2, 3.4, 5.6]))
 
     map.data.msg_version = 44
     assert_equal(map.data.msg_version, 44)
@@ -1190,4 +1201,8 @@ def test_map():
     assert_equal(map.data.data[2], 12)
     assert_equal(map.data.data[3], 13)
 
-    assert_equal(str(map), "{type: Map, time_stamp: {type: Time, microseconds: 11}}")
+    assert_equal(
+        str(map),
+        "{type: Map, time_stamp: {type: Time, microseconds: 11}, "
+        "type: map_DEM, scale: 55, rows: 25, cols: 26, channels: 27, "
+        "depth: depth_8U, row_size: 28}")
