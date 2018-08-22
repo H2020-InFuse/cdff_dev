@@ -6,49 +6,6 @@ import matplotlib.pyplot as plt
 from matplotlib import animation
 
 
-class LaserFilterDummyDFN:
-    def __init__(self):
-        self.scanSample = cdff_types.LaserScan()
-
-    def configure(self):
-        pass
-
-    def scanSampleInput(self, scanSample):
-        self.scanSample = scanSample
-
-    def process(self):
-        # filter all values that are too far away from the median
-        ranges = np.array([self.scanSample.ranges[i]
-                           for i in range(self.scanSample.ranges.size())])
-        med = np.median(ranges)
-        for i in range(len(ranges)):
-            if abs(ranges[i] - med) > 100:
-                self.scanSample.ranges[i] = med
-
-    def filteredScanOutput(self):
-        return self.scanSample
-
-
-class PointcloudBuilderDummyDFN:
-    def __init__(self):
-        self.pointcloud = cdff_types.Pointcloud()
-
-    def configure(self):
-        pass
-
-    def scanInput(self, scan):
-        self.scan = scan
-
-    def transformInput(self, transform):
-        self.transform = transform
-
-    def process(self):
-        pass
-
-    def pointcloudOutput(self):
-        return self.pointcloud
-
-
 class ListAssigner():
     """Handle the assignment of data to lists.
     When its add function is called, a new list and
@@ -156,7 +113,7 @@ class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
         and keep timelist to correct size
         """
         self._temp.append(timestamp)
-        self.time_list.append((timestamp - self._temp[0])/1000000)
+        self.time_list.append((timestamp - self._temp[0]) / 1000000.0)
 
         self.first_timestamp = self._temp[0]
         if len(self.time_list) >= self.max_xrange:
@@ -209,8 +166,7 @@ class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
             self.source_dict.clear()
 
         #load camera frame information
-        if type(sample) == cdff_types.Frame:
-            #print("frame sample")
+        if type(sample) == cdff_types.Image:
             image_array = [sample.image[i] for i in range(len(sample.image))]
             if port_name == "/camera1.frame":
                 self.frame_camera1 = np.asarray(image_array, dtype=np.uint8).reshape(
@@ -261,40 +217,17 @@ def set_stream_data(log, log_img):
     return stream_dict
 
 
-def main(vdh, log_file):
-    nodes = {
-        "laser_filter": LaserFilterDummyDFN(),
-        "pointcloud_builder": PointcloudBuilderDummyDFN()
-    }
-    periods = {
-        "laser_filter": 0.025,
-        "pointcloud_builder": 0.1
-    }
-    connections = (
-        ("/hokuyo.scans", "laser_filter.scanSample"),
-        ("laser_filter.filteredScan", "pointcloud_builder.scan"),
-        ("/dynamixel.transforms", "pointcloud_builder.transform"),
-        ("pointcloud_builder.pointcloud", "result.pointcloud")
-    )
-
-    # Logs are being loaded individually first in order to retrieve stream names
-    filenames = [[log_file],
-                 #["frames.msg"]
-                 ]
-    typenames = logloader.summarize_logfiles(filenames)
-    stream_names = list(typenames.keys())
+def main(dfc, vdh, log_files, stream_names):
+    typenames = logloader.summarize_logfiles(log_files)
     print("STREAMS:", stream_names)
 
-    log_iterator = logloader.replay_files(filenames, stream_names)
+    log_iterator = logloader.replay_files(log_files, stream_names)
 
-    control_panel = visualization_control_panel.ControlPanelExpert(
-        typenames)
+    control_panel = visualization_control_panel.ControlPanelExpert(typenames)
     vdh.set_control_panel(control_panel)
 
-    dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods)
     dfc.setup()
     dfc.set_visualization(vdh)
 
-    control_panel.show_controls(
-        stream_names, log_iterator, dfc)
+    control_panel.show_controls(stream_names, log_iterator, dfc)
     control_panel.exec_()

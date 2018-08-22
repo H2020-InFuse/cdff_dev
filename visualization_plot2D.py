@@ -1,13 +1,15 @@
+import glob
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation
 import visualization_log_replay
 import threading
 from matplotlib.ticker import ScalarFormatter
-from tkinter import Tk
-from tkinter.filedialog import askopenfilename
+#from tkinter import Tk
+#from tkinter.filedialog import askopenfilename
 from matplotlib.widgets import SpanSelector
 import matplotlib.image as mpimg
+from cdff_dev import dataflowcontrol
 
 #TODO: better name
 class Coordinates():
@@ -160,8 +162,31 @@ def delete_last_line(vdh):
 
 
 # open a tk dialogue box to select log file
-Tk().withdraw()
-log_file = askopenfilename()
+#Tk().withdraw()
+#log_file = askopenfilename()
+
+import cdff_types
+
+
+nodes = {}
+periods = {}
+connections = []
+dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods)
+
+log_files = [
+    #["test/test_data/logs/frames.msg"],
+    sorted(glob.glob("logs/open_day/open_day_xsens_imu_*.msg")),
+    #sorted(glob.glob("logs/open_day/open_day_laser_filter_*.msg")),
+    #sorted(glob.glob("logs/open_day/open_day_tilt_scan_*.msg")),
+    #sorted(glob.glob("logs/open_day/open_day_dynamixel_*.msg")),
+    #sorted(glob.glob("logs/open_day/open_day_velodyne_*.msg"))
+]
+stream_names = [
+    #'/laser_filter.filtered_scans', '/velodyne.laser_scans',
+    #'/tilt_scan.pointcloud', '/dynamixel.transforms',
+    #"/camera1.frame"
+    "/xsens_imu.calibrated_sensors"
+]
 
 # create figure, subplots
 fig = plt.figure()
@@ -209,7 +234,7 @@ span = SpanSelector(ax, onselect, 'horizontal', useblit=True,
 
 # begin log replay on a separate thread in order to run concurrently
 thread = threading.Thread(target=visualization_log_replay.main, args=(
-    vdh, log_file))
+    dfc, vdh, log_files, stream_names))
 thread.start()
 
 
