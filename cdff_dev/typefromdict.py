@@ -48,7 +48,6 @@ def create_from_dict(typename, data):
         The corresponding C++ class wrapped in Python. It can be passed to
         wrapped C++ extensions in Python.
     """
-
     obj = create_cpp(typename)
     return _convert(obj, data)
 
@@ -109,6 +108,7 @@ def _assign_dict(obj, data):
 
 def _assign_element(obj, fieldname, data):
     fieldname = _camel_case_to_snake_case(fieldname)
+
     if not hasattr(obj, fieldname):
         # HACK for current version of ASN.1 types
         if fieldname == "ref_time" and hasattr(obj, "timestamp"):
