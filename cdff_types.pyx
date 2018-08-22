@@ -27,8 +27,7 @@ cdef class Time:
         self.delete_thisptr = True
 
     def __str__(self):
-        return str("{type: Time, microseconds: %d, usec_per_sec: %d}"
-                   % (self.thisptr.microseconds, self.thisptr.usecPerSec))
+        return "{type: Time, microseconds: %d}" % self.thisptr.microseconds
 
     def assign(self, Time other):
         self.thisptr.assign(deref(other.thisptr))
@@ -2131,6 +2130,10 @@ cdef class Array3DReference:
     def __dealloc__(self):
         pass
 
+    def __str__(self):
+        return ("rows: %d, cols: %d, channels: %d, depth: %s, row_size: %d"
+                % (self.rows, self.cols, self.channels, self.depth, self.row_size))
+
     def _get_msg_version(self):
         return self.thisptr.msgVersion
 
@@ -2264,7 +2267,7 @@ cdef class Map:
 
     def __str__(self):
         # TODO
-        return str("{type: Map}")
+        return str("{type: Map, %s, %s}" % (self.metadata, self.data))
 
     def _get_msg_version(self):
         return self.thisptr.msgVersion
@@ -2294,6 +2297,10 @@ cdef class Map_metadata_tReference:
     def __dealloc__(self):
         pass
 
+    def __str__(self):
+        return ("time_stamp: %s, type: %s, scale: %g"
+                % (self.time_stamp, self.type, self.scale))
+
     def _get_msg_version(self):
         return self.thisptr.msgVersion
 
@@ -2314,8 +2321,36 @@ cdef class Map_metadata_tReference:
 
     time_stamp = property(_get_time_stamp, _set_time_stamp)
 
-    # TODO asn1SccTime timeStamp
-    # TODO asn1SccMap_type_t type
+    def _get_type(self):
+        if <int> self.thisptr.type == <int> _cdff_types.asn1Sccmap_UNDEF:
+            return "map_UNDEF"
+        elif <int> self.thisptr.type == <int> _cdff_types.asn1Sccmap_DEM:
+            return "map_DEM"
+        elif <int> self.thisptr.type == <int> _cdff_types.asn1Sccmap_NAV:
+            return "map_NAV"
+        else:
+            raise ValueError("Unknown type: %d" % <int> self.thisptr.type)
+
+    def _set_type(self,  str type):
+        if type == "map_UNDEF":
+            self.thisptr.type = _cdff_types.asn1Sccmap_UNDEF
+        elif type == "map_DEM":
+            self.thisptr.type = _cdff_types.asn1Sccmap_DEM
+        elif type == "map_NAV":
+            self.thisptr.type = _cdff_types.asn1Sccmap_NAV
+        else:
+            raise ValueError("Unknown type: %s" % type)
+
+    type = property(_get_type, _set_type)
+
     # TODO asn1SccMap_metadata_t_errValues errValues
-    # TODO double scale
+
+    def _get_scale(self):
+        return self.thisptr.scale
+
+    def _set_scale(self, double scale):
+        self.thisptr.scale = scale
+
+    scale = property(_get_scale, _set_scale)
+
     # TODO asn1SccTransformWithCovariance pose_fixedFrame_mapFrame

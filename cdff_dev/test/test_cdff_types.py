@@ -14,7 +14,7 @@ def test_get_set_microseconds():
 
 def test_time_str():
     t = cdff_types.Time()
-    assert_regexp_matches(str(t), "{type: Time, microseconds: \d+, usec_per_sec: \d+}")
+    assert_regexp_matches(str(t), "{type: Time, microseconds: \d+}")
 
 
 def test_vector2d_len():
@@ -907,10 +907,10 @@ def test_rigid_body_state_str():
     assert_equal.__self__.maxDiff = None
     assert_equal(
         str(rbs),
-        "{type: RigidBodyState, timestamp={type: Time, microseconds: 0, "
-        "usec_per_sec: 0}, sourceFrame=source, targetFrame=target, "
-        "pos={type: Vector3d, data=[0.00, 0.00, 0.00]}, orient={type: "
-        "Quaterniond, data=[0.00, 0.00, 0.00, 0.00]}, ...}")
+        "{type: RigidBodyState, timestamp={type: Time, microseconds: 0}, "
+        "sourceFrame=source, targetFrame=target, pos={type: Vector3d, "
+        "data=[0.00, 0.00, 0.00]}, orient={type: Quaterniond, "
+        "data=[0.00, 0.00, 0.00, 0.00]}, ...}")
 
 
 def test_rigid_body_state_get_set_position():
@@ -1156,6 +1156,12 @@ def test_map():
     map.metadata.time_stamp.microseconds = 11
     assert_equal(map.metadata.time_stamp.microseconds, 11)
 
+    map.metadata.type = "map_DEM"
+    assert_equal(map.metadata.type, "map_DEM")
+
+    map.metadata.scale = 55.0
+    assert_equal(map.metadata.scale, 55.0)
+
     map.data.msg_version = 44
     assert_equal(map.data.msg_version, 44)
 
@@ -1183,3 +1189,5 @@ def test_map():
     assert_equal(map.data.data[1], 11)
     assert_equal(map.data.data[2], 12)
     assert_equal(map.data.data[3], 13)
+
+    assert_equal(str(map), "{type: Map, time_stamp: {type: Time, microseconds: 11}}")
