@@ -2120,3 +2120,35 @@ class GpsSolution:
                self.no_of_satellites, self.altitude, self.geoidal_separation,
                self.age_of_differential_corrections, self.deviation_latitude,
                self.deviation_longitude, self.deviation_altitude))
+
+
+cdef class Map:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_types.asn1SccMap()
+        self.delete_thisptr = True
+
+    def __str__(self):
+        # TODO
+        return str("{type: Map}")
+
+"""
+    def _get_frame_time(self):
+        cdef Time frame_time = Time()
+        del frame_time.thisptr
+        frame_time.thisptr = &self.thisptr.frame_time
+        frame_time.delete_thisptr = False
+        return frame_time
+
+    def _set_frame_time(self, Time frame_time):
+        self.thisptr.frame_time = deref(frame_time.thisptr)
+
+    frame_time = property(_get_frame_time, _set_frame_time)
+"""

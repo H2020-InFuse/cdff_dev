@@ -405,3 +405,177 @@ cdef extern from "Image.h":
         asn1SccImage first
         asn1SccImage second
         uint32_t id
+
+
+cdef extern from "Array3D.h":
+    cdef cppclass asn1SccArray3D_depth_t:
+        pass
+
+
+cdef extern from "Array3D.h" namespace "asn1SccArray3D_depth_t":
+    cdef asn1SccArray3D_depth_t asn1Sccdepth_8U
+    cdef asn1SccArray3D_depth_t asn1Sccdepth_8S
+    cdef asn1SccArray3D_depth_t asn1Sccdepth_16U
+    cdef asn1SccArray3D_depth_t asn1Sccdepth_16S
+    cdef asn1SccArray3D_depth_t asn1Sccdepth_32U
+    cdef asn1SccArray3D_depth_t asn1Sccdepth_32S
+    cdef asn1SccArray3D_depth_t asn1Sccdepth_32F
+    cdef asn1SccArray3D_depth_t asn1Sccdepth_64F
+
+
+cdef extern from "Array3D.h":
+    cdef cppclass asn1SccArray3D:
+        uint32_t msgVersion
+        uint32_t rows
+        uint32_t cols
+        uint32_t channels
+        asn1SccArray3D_depth_t depth
+        uint32_t rowSize
+        asn1SccArray3D_data data
+    cdef cppclass asn1SccArray3D_data:
+        int nCount
+        unsigned char[66355200] arr
+
+
+cdef extern from "Frame.h":
+    cdef cppclass asn1SccFrame_errorType_t:
+        pass
+
+
+cdef extern from "Frame.h" namespace "asn1SccFrame_errorType_t":
+    cdef asn1SccFrame_errorType_t asn1Sccerror_UNDEFINED
+    cdef asn1SccFrame_errorType_t asn1Sccerror_DEAD
+    cdef asn1SccFrame_errorType_t asn1Sccerror_FILTERED
+
+
+cdef extern from "Frame.h":
+    cdef cppclass asn1SccFrame_pixelModel_t:
+        pass
+
+
+cdef extern from "Frame.h" namespace "asn1SccFrame_pixelModel_t":
+    cdef asn1SccFrame_pixelModel_t asn1Sccpix_UNDEF
+    cdef asn1SccFrame_pixelModel_t asn1Sccpix_POLY
+    cdef asn1SccFrame_pixelModel_t asn1Sccpix_DISP
+
+
+cdef extern from "Frame.h":
+    cdef cppclass asn1SccFrame_mode_t:
+        pass
+
+
+cdef extern from "Frame.h" namespace "asn1SccFrame_mode_t":
+    cdef asn1SccFrame_mode_t asn1Sccmode_UNDEF
+    cdef asn1SccFrame_mode_t asn1Sccmode_GRAY
+    cdef asn1SccFrame_mode_t asn1Sccmode_RGB
+    cdef asn1SccFrame_mode_t asn1Sccmode_RGBA
+    cdef asn1SccFrame_mode_t asn1Sccmode_BGR
+    cdef asn1SccFrame_mode_t asn1Sccmode_BGRA
+    cdef asn1SccFrame_mode_t asn1Sccmode_HSV
+    cdef asn1SccFrame_mode_t asn1Sccmode_HLS
+    cdef asn1SccFrame_mode_t asn1Sccmode_YUV
+    cdef asn1SccFrame_mode_t asn1Sccmode_UYVY
+    cdef asn1SccFrame_mode_t asn1Sccmode_Lab
+    cdef asn1SccFrame_mode_t asn1Sccmode_Luv
+    cdef asn1SccFrame_mode_t asn1Sccmode_XYZ
+    cdef asn1SccFrame_mode_t asn1Sccmode_YCrCb
+    cdef asn1SccFrame_mode_t asn1Sccmode_RGB32
+    cdef asn1SccFrame_mode_t asn1Sccmode_Bayer_RGGB
+    cdef asn1SccFrame_mode_t asn1Sccmode_Bayer_GRBG
+    cdef asn1SccFrame_mode_t asn1Sccmode_Bayer_BGGR
+    cdef asn1SccFrame_mode_t asn1Sccmode_Bayer_GBRG
+    cdef asn1SccFrame_mode_t asn1Sccmode_PJPG
+    cdef asn1SccFrame_mode_t asn1Sccmode_JPEG
+    cdef asn1SccFrame_mode_t asn1Sccmode_PNG
+
+
+cdef extern from "Frame.h":
+    cdef cppclass asn1SccFrame_status_t:
+        pass
+
+
+cdef extern from "Frame.h" namespace "asn1SccFrame_status_t":
+    cdef asn1SccFrame_status_t asn1Sccstatus_EMPTY
+    cdef asn1SccFrame_status_t asn1Sccstatus_VALID
+    cdef asn1SccFrame_status_t asn1Sccstatus_INVALID
+
+
+cdef extern from "Frame.h":
+    cdef cppclass asn1SccFrame_cameraModel_t:
+        pass
+
+
+cdef extern from "Frame.h" namespace "asn1SccFrame_cameraModel_t":
+    cdef asn1SccFrame_cameraModel_t asn1Scccam_UNDEF
+    cdef asn1SccFrame_cameraModel_t asn1Scccam_PINHOLE
+    cdef asn1SccFrame_cameraModel_t asn1Scccam_FISHEYE
+    cdef asn1SccFrame_cameraModel_t asn1Scccam_MAPS
+
+
+cdef extern from "Frame.h":
+    cdef cppclass asn1SccFrame:
+        uint32_t msgVersion
+        asn1SccFrame_metadata_t metadata
+        asn1SccFrame_intrinsic_t intrinsic
+        asn1SccFrame_extrinsic_t extrinsic
+        asn1SccArray3D data
+    cdef cppclass asn1SccFrame_metadata_t:
+        uint32_t msgVersion
+        asn1SccTime timeStamp
+        asn1SccTime receivedTime
+        asn1SccFrame_pixelModel_t pixelModel
+        asn1SccVectorXd pixelCoeffs
+        asn1SccFrame_metadata_t_errValues errValues
+        asn1SccFrame_metadata_t_attributes attributes
+        asn1SccFrame_mode_t mode
+        asn1SccFrame_status_t status
+    cdef cppclass asn1SccFrame_intrinsic_t:
+        uint32_t msgVersion;
+        asn1SccT_String sensorId;
+        asn1SccMatrix3d cameraMatrix;
+        asn1SccFrame_cameraModel_t cameraModel;
+        asn1SccVectorXd distCoeffs;
+    cdef cppclass asn1SccFrame_extrinsic_t:
+        uint32_t msgVersion
+        bool hasFixedTransform
+        asn1SccTransformWithCovariance pose_robotFrame_sensorFrame
+        asn1SccTransformWithCovariance pose_fixedFrame_robotFrame
+    cdef cppclass asn1SccFrame_metadata_t_errValues:
+        int nCount
+        asn1SccFrame_error_t arr[3]
+    cdef cppclass asn1SccFrame_metadata_t_attributes:
+        int nCount
+        asn1SccFrame_attrib_t arr[5]
+    cdef cppclass asn1SccFrame_error_t:
+        asn1SccFrame_errorType_t type
+        double value
+    cdef cppclass asn1SccFrame_attrib_t:
+        asn1SccT_String name
+        asn1SccT_String data
+
+
+cdef extern from "Map.h":
+    cdef cppclass asn1SccMap_type_t:
+        pass
+
+
+cdef extern from "Map.h" namespace "asn1SccMap_type_t":
+    cdef asn1SccMap_type_t asn1Sccmap_UNDEF
+    cdef asn1SccMap_type_t asn1Sccmap_DEM
+    cdef asn1SccMap_type_t asn1Sccmap_NAV
+
+
+cdef extern from "Map.h":
+    cdef cppclass asn1SccMap:
+        uint32_t msgVersion
+        asn1SccMap_metadata_t metadata
+        asn1SccArray3D data
+    cdef cppclass asn1SccMap_metadata_t:
+        uint32_t msgVersion
+        asn1SccTime timeStamp
+        asn1SccMap_type_t type
+        asn1SccMap_metadata_t_errValues errValues
+        double scale
+        asn1SccTransformWithCovariance pose_fixedFrame_mapFrame
+    cdef cppclass asn1SccMap_metadata_t_errValues:
+        asn1SccFrame_error_t arr[5]

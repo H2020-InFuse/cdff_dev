@@ -198,3 +198,8 @@ cdef class Image_attrib_tReference:
 
 cdef class Image_attributesReference:
     cdef _cdff_types.asn1SccImage_attributes* thisptr
+
+
+cdef class Map:
+    cdef _cdff_types.asn1SccMap* thisptr
+    cdef bool delete_thisptr
