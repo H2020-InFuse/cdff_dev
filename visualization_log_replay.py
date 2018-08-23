@@ -1,9 +1,61 @@
 import numpy as np
 from cdff_dev import logloader, dataflowcontrol, visualization_control_panel
 import cdff_types
-import glob
 import matplotlib.pyplot as plt
-from matplotlib import animation
+
+
+def animate(i, line, ax, vdh):
+    """ Update and plot line data. Anything that needs to be
+    updated must lie within this function. Repeatedly called
+    by FuncAnimation, incrementing i with each iteration.
+    """
+    times = vdh.time_list
+    list_assigner = vdh.list_assigner
+    data_lists = list_assigner.get_data()
+    data_labels = list_assigner.get_labels()
+
+    # pass data from lists to lines
+    if not data_lists:
+        return line
+
+    vdh.set_axis_limits(ax, times, data_lists)
+
+    try:
+        for index, measurements in enumerate(data_lists):
+            if len(measurements) != len(times):
+                raise ValueError(
+                    "Y data and X data have different lengths. X: %d; Y: %d"
+                    % (len(times), len(measurements)))
+            line[index].set_data(times[0:i], measurements[0:i])
+    except ValueError:
+        pass
+
+    try:
+        if vdh.control_panel.remove_outlier:
+            delete_last_line(vdh)
+            print("line deleted")
+    except AttributeError:
+        pass
+
+    plt.legend(handles=line, labels=data_labels, fancybox=False, frameon=True,
+               loc="best")
+
+    # The best solution for displaying "animated" tick labels.
+    # A better solution would be to selectively only redraw these labels,
+    # instead of the entire plot
+    if i % 75 == 0:
+        plt.draw()
+
+    return line
+
+
+def delete_last_line(vdh):
+    file_r = open(vdh.control_panel.outlier_file(), "r")
+    lines = file_r.readlines()
+
+    file_w = open(vdh.control_panel.outlier_file(), "w")
+    file_w.writelines(lines[:-1])
+    vdh.control_panel.remove_outlier = False
 
 
 class ListAssigner():
