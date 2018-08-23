@@ -110,7 +110,8 @@ def test_create_image():
     log = logloader.load_log("test/test_data/logs/frames.msg")
     data = log["/camera1.frame"][1]
     # HACK: Type is actually the old Frame
-    obj = typefromdict.create_from_dict("Image", data)
+    obj = typefromdict.create_from_dict(
+        log["/camera1.frame.meta"]["type"], data)
     assert_equal(obj.attributes[0].att_name, "FrameCount")
     assert_equal(obj.attributes[0].data, "86375")
     assert_equal(obj.attributes[1].att_name, "Exposure_ms")
