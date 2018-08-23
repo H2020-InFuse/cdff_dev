@@ -11,32 +11,8 @@ from matplotlib.widgets import SpanSelector
 import matplotlib.image as mpimg
 from cdff_dev import dataflowcontrol
 
-#TODO: better name
-class Coordinates():
-    """Instantiate and maintain basic coordinate aspects of the plot.
-    These points are stored for use by other functions. 
 
-    Attributes
-    ---------
-    span_selected : list
-        stores the range of X-values selected by the user from onselect function
-
-    data_min/data_max : float
-        min/max value from Y-Axis data
-
-    """
-
-    def __init__(self):
-        self.span_selected = None
-        self.data_min = float("inf")
-        self.data_max = -float("inf")
-
-    def yrange_reset(self):
-        self.data_min = float("inf")
-        self.data_max = -float("inf")
-
-
-def animate(i, line, ax, vdh, coords):
+def animate(i, line, ax, vdh):
     """ Update and plot line data. Anything that needs to be
     updated must lie within this function. Repeatedly called 
     by FuncAnimation, incrementing i with each iteration. 
@@ -50,7 +26,7 @@ def animate(i, line, ax, vdh, coords):
     if not data_lists:
         return line
 
-    vdh.set_axis_limits(ax, time_list, data_lists, coords)
+    vdh.set_axis_limits(ax, time_list, data_lists)
 
     try:
         for index, the_list in enumerate(data_lists):
@@ -83,34 +59,6 @@ def animate(i, line, ax, vdh, coords):
 
 
 vdh = visualization_log_replay.VisualizationDataHandler()
-coords = Coordinates()
-
-def convert_back_timestamp(timestamp):
-    return timestamp * 1000000 + vdh.first_timestamp
-
-def onselect(xmin, xmax):
-    """When a range is selected, prints selected range to file
-    """
-    file_ = open(vdh.control_panel.outlier_file, "a+")
-
-    indmin, indmax = np.searchsorted(vdh.time_list, (xmin, xmax))
-    indmax = min(len(vdh.time_list) - 1, indmax)
-
-    coords.span_selected = vdh.time_list[indmin:indmax]
-
-    #TODO: simplify file write - string join
-    file_.write("[")
-    try:
-        for i, num in enumerate(coords.span_selected):
-            if i != len(coords.span_selected) - 1:
-                file_.write("%d, " % (convert_back_timestamp(num)))
-            else:
-                file_.write("%d]\n" % (convert_back_timestamp(num)))
-    except TypeError:
-        print("Data is not in list form")
-        pass
-
-    file_.close()
 
 
 def onclick(event):
@@ -184,7 +132,7 @@ line = [line0, line1, line2, line3, marker]
 blank = mpimg.imread("Blank.png")
 
 
-span = SpanSelector(ax, onselect, 'horizontal', useblit=True,
+span = SpanSelector(ax, vdh.onselect, 'horizontal', useblit=True,
                     rectprops=dict(alpha=0.5, facecolor='red'))
  
 """removes blinking from span selection, but data is not displayed during selection"""
@@ -199,7 +147,7 @@ thread.start()
 # Setting blit to False renders animation useless - only grey window displayed
 # Blitting may have some connection to removing blinking from animation
 anim = animation.FuncAnimation(fig, animate, fargs=(
-    line, ax, vdh, coords), interval=0.0, blit=True)
+    line, ax, vdh), interval=0.0, blit=True)
 
 # display plotting window
 try:

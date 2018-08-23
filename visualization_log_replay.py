@@ -83,6 +83,31 @@ class ListAssigner():
         return labels
 
 
+#TODO: better name
+class Coordinates():
+    """Instantiate and maintain basic coordinate aspects of the plot.
+    These points are stored for use by other functions.
+
+    Attributes
+    ---------
+    span_selected : list
+        stores the range of X-values selected by the user from onselect function
+
+    data_min/data_max : float
+        min/max value from Y-Axis data
+
+    """
+
+    def __init__(self):
+        self.span_selected = None
+        self.data_min = float("inf")
+        self.data_max = -float("inf")
+
+    def yrange_reset(self):
+        self.data_min = float("inf")
+        self.data_max = -float("inf")
+
+
 class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
     """Recieve log data information and control what is 
         sent to be animated.
@@ -104,6 +129,7 @@ class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
         self.source_dict = {}
         self.list_assigner = ListAssigner()
         self._temp = []
+        self.coords = Coordinates()
 
     def set_control_panel(self, control_panel):
         self.control_panel = control_panel
@@ -182,34 +208,58 @@ class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
             self._configure_time(timestamp)
 
 
-    def set_axis_limits(self, ax, time_list, data_lists, coords):
+    def set_axis_limits(self, ax, time_list, data_lists):
         """Control axis limits that change dynamically with data and user selections
         """
         control_panel = self.control_panel
 
         # find highest and lowest data points out of all lists given
         for the_list in data_lists:
-            coords.data_min = min(
-                np.amin(the_list), coords.data_min)
-            coords.data_max = max(
-                np.amax(the_list), coords.data_max)
+            self.coords.data_min = min(np.amin(the_list), self.coords.data_min)
+            self.coords.data_max = max(np.amax(the_list), self.coords.data_max)
 
         # set x and y limits based on current highest and lowest data points
         if data_lists:
-            margin = max(np.abs(coords.data_min),
-                         coords.data_max) * 0.05
-            ax.set_ylim(coords.data_min - margin,
-                        coords.data_max + margin)
+            margin = max(np.abs(self.coords.data_min),
+                         self.coords.data_max) * 0.05
+            ax.set_ylim(self.coords.data_min - margin,
+                        self.coords.data_max + margin)
 
         if self.source_dict and self.control_panel.stream_reset:
-            coords.yrange_reset()
+            self.coords.yrange_reset()
             control_panel.stream_reset = False
 
         if self.control_panel.yrange_reset:
-            coords.yrange_reset()
+            self.coords.yrange_reset()
             control_panel.yrange_reset = False
 
         ax.set_xlim(self.time_list[0], np.amax(self.time_list))
+
+    def convert_back_timestamp(self, timestamp):
+        return timestamp * 1000000 + self.first_timestamp
+
+    def onselect(self, xmin, xmax):
+        """When a range is selected, prints selected range to file."""
+        file_ = open(self.control_panel.outlier_file, "a+")
+
+        indmin, indmax = np.searchsorted(self.time_list, (xmin, xmax))
+        indmax = min(len(self.time_list) - 1, indmax)
+
+        self.coords.span_selected = self.time_list[indmin:indmax]
+
+        #TODO: simplify file write - string join
+        file_.write("[")
+        try:
+            for i, num in enumerate(self.coords.span_selected):
+                if i != len(self.coords.span_selected) - 1:
+                    file_.write("%d, " % (self.convert_back_timestamp(num)))
+                else:
+                    file_.write("%d]\n" % (self.convert_back_timestamp(num)))
+        except TypeError:
+            print("Data is not in list form")
+            pass
+
+        file_.close()
 
 
 def set_stream_data(log, log_img):
