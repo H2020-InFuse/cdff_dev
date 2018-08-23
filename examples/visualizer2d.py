@@ -11,8 +11,7 @@ import glob
 
 dfc = dataflowcontrol.DataFlowControl(nodes={}, periods={}, connections=[])
 
-log_files = [
-    #["test/test_data/logs/frames.msg"],
+logfiles = [
     sorted(glob.glob("logs/open_day/open_day_xsens_imu_*.msg")),
     #sorted(glob.glob("logs/open_day/open_day_laser_filter_*.msg")),
     #sorted(glob.glob("logs/open_day/open_day_tilt_scan_*.msg")),
@@ -24,9 +23,9 @@ stream_names = [
     #"/velodyne.laser_scans",
     #"/tilt_scan.pointcloud",
     #"/dynamixel.transforms",
-    #"/camera1.frame"
     "/xsens_imu.calibrated_sensors"
 ]
 
-vis = visualization2d.MatplotlibVisualizer(dfc, log_files, stream_names)
+vis = visualization2d.MatplotlibVisualizerApplication()
+vis.show_controls(dfc, logfiles, stream_names)
 vis.exec_()

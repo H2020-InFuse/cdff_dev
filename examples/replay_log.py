@@ -38,9 +38,6 @@ def main():
         "/velodyne.laser_scans",
     ]
 
-    app = envirevisualization.EnvireVisualizerApplication(
-        frames, urdf_files, center_frame="body")
-
     dfc = dataflowcontrol.DataFlowControl(
         nodes, connections, periods, real_time=True)
     dfc.setup()
@@ -54,6 +51,9 @@ def main():
          sorted(glob.glob("logs/open_day/open_day_velodyne_*.msg"))],
         stream_names
     )
+
+    app = envirevisualization.EnvireVisualizerApplication(
+        frames, urdf_files, center_frame="body")
     app.show_controls(log_iterator, dfc)
     app.exec_()
 

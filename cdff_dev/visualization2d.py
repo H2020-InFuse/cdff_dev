@@ -1,10 +1,11 @@
 import sys
+import threading
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import animation
-import threading
 from matplotlib.ticker import ScalarFormatter
 from matplotlib.widgets import SpanSelector
 from . import logloader, dataflowcontrol, visualization2d
@@ -12,20 +13,29 @@ from .envirevisualization import Worker, Step  # TODO move to another file
 import cdff_types
 
 
-class MatplotlibVisualizer:
-    def __init__(self, dfc, log_files, stream_names):
-        self.dfc = dfc
-        self.log_files = log_files
-        self.stream_names = stream_names
-
+class MatplotlibVisualizerApplication:
+    def __init__(self):
         self.vdh = VisualizationDataHandler()
+
+    def show_controls(self, dfc, logfiles, stream_names,
+                      image_stream_name=None):
+        # TODO start everything in main thread
 
         # create figure, subplots
         self.fig = plt.figure()
-        self.ax = plt.subplot(111)
+
+        if image_stream_name is None:
+            self.ax = plt.subplot(111)
+        else:
+            self.ax = plt.subplot(121)
+            self.ax_image = plt.subplot(122)
+            self.ax_image.xaxis.set_major_locator(plt.NullLocator())
+            self.ax_image.yaxis.set_major_locator(plt.NullLocator())
+            blank = matplotlib.image.imread("Blank.png")
+            self.image = self.ax_image.imshow(blank, animated=True)
 
         # set axis titles
-        self.ax.set_ylabel("units")
+        self.ax.set_ylabel("Units")
         self.ax.set_xlabel("Time (seconds)")
 
         # format axis labels
@@ -58,17 +68,20 @@ class MatplotlibVisualizer:
         # Setting blit to False renders animation useless - only grey window
         # displayed. Blitting may have some connection to removing blinking
         # from animation.
+        if image_stream_name is None:
+            fargs = self.line, self.ax, self.vdh
+        else:
+            fargs = self.line, self.ax, self.vdh, self.image, self.ax_image
         self.anim = animation.FuncAnimation(
-            self.fig, animate, fargs=(self.line, self.ax, self.vdh),
-            interval=0.0, blit=True)
+            self.fig, animate, fargs=fargs, interval=0.0, blit=True)
 
-    def exec_(self):
         # begin log replay on a separate thread in order to run concurrently
         thread = threading.Thread(
             target=main,
-            args=(self.dfc, self.vdh, self.log_files, self.stream_names))
+            args=(dfc, self.vdh, logfiles, stream_names, image_stream_name))
         thread.start()
 
+    def exec_(self):
         # display plotting window
         try:
             plt.show()
@@ -77,7 +90,7 @@ class MatplotlibVisualizer:
         plt.close()
 
 
-def animate(i, line, ax, vdh):
+def animate(i, line, ax, vdh, image=None, ax_image=None):
     """Update and plot line data.
 
     Anything that needs to be updated must lie within this function.
@@ -115,13 +128,22 @@ def animate(i, line, ax, vdh):
     plt.legend(handles=line, labels=data_labels, fancybox=False, frameon=True,
                loc="best")
 
+    if image is not None and ax_image is not None:
+        try:
+            image.set_array(vdh.image)
+        except AttributeError as e:
+            print(e)
+
     # The best solution for displaying "animated" tick labels.
     # A better solution would be to selectively only redraw these labels,
     # instead of the entire plot
     if i % 75 == 0:
         plt.draw()
 
-    return line
+    if image is None:
+        return line
+    else:
+        return line, image
 
 
 def delete_last_line(vdh):
@@ -336,7 +358,7 @@ class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
         # load camera frame information
         if type(sample) == cdff_types.Image:
             image_array = [sample.image[i] for i in range(len(sample.image))]
-            self.frame_camera = np.asarray(image_array, dtype=np.uint8).reshape(
+            self.image = np.asarray(image_array, dtype=np.uint8).reshape(
                 sample.datasize.height, sample.datasize.width, 3)
 
         # add data to lists to be sent to graph
@@ -403,10 +425,12 @@ class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
         file_.close()
 
 
-def main(dfc, vdh, log_files, stream_names, verbose=0):
+def main(dfc, vdh, log_files, stream_names, image_stream_name=None, verbose=0):
     typenames = logloader.summarize_logfiles(log_files)
     if verbose:
         print("Streams: %s" % stream_names)
+        if image_stream_name is not None:
+            print("Image stream: % s" % image_stream_name)
 
     log_iterator = logloader.replay_files(log_files, stream_names)
 
@@ -421,7 +445,7 @@ def main(dfc, vdh, log_files, stream_names, verbose=0):
 
 
 class ControlPanelExpert:
-    """Qt Application with EnviRe visualizer.
+    """Qt Application.
 
     Parameters
     ----------
