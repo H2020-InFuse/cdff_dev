@@ -103,36 +103,32 @@ def animate(i, line, ax, vdh, image=None, ax_image=None):
     data_labels = list_assigner.get_labels()
 
     # pass data from lists to lines
-    if not data_lists:
-        return line
+    if data_lists:
+        vdh.set_axis_limits(ax, data_lists)
 
-    vdh.set_axis_limits(ax, data_lists)
-
-    try:
-        for index, measurements in enumerate(data_lists):
-            if len(measurements) != len(times):
-                raise ValueError(
-                    "Y data and X data have different lengths. X: %d; Y: %d"
-                    % (len(times), len(measurements)))
-            line[index].set_data(times[0:i], measurements[0:i])
-    except ValueError:
-        pass
-
-    try:
-        if vdh.control_panel.remove_outlier:
-            delete_last_line(vdh)
-            print("line deleted")
-    except AttributeError:
-        pass
-
-    plt.legend(handles=line, labels=data_labels, fancybox=False, frameon=True,
-               loc="best")
-
-    if image is not None and ax_image is not None:
         try:
-            image.set_array(vdh.image)
-        except AttributeError as e:
+            for index, measurements in enumerate(data_lists):
+                if len(measurements) != len(times):
+                    raise ValueError(
+                        "Y data and X data have different lengths. X: %d; Y: %d"
+                        % (len(times), len(measurements)))
+
+                line[index].set_data(times[0:i], measurements[0:i])
+        except ValueError as e:
             print(e)
+
+        try:
+            if vdh.control_panel.remove_outlier:
+                delete_last_line(vdh)
+                print("line deleted")
+        except AttributeError:
+            pass
+
+        plt.legend(handles=line, labels=data_labels, fancybox=False, frameon=True,
+                   loc="best")
+
+    if image is not None and ax_image is not None and hasattr(vdh, "image"):
+        image.set_array(vdh.image)
 
     # The best solution for displaying "animated" tick labels.
     # A better solution would be to selectively only redraw these labels,
@@ -140,10 +136,7 @@ def animate(i, line, ax, vdh, image=None, ax_image=None):
     if i % 75 == 0:
         plt.draw()
 
-    if image is None:
-        return line
-    else:
-        return line, image
+    return line
 
 
 def delete_last_line(vdh):
