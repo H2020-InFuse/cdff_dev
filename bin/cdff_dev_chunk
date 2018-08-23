@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+import argparse
+import math
+import msgpack
+from cdff_dev import logloader
+
+
+def main():
+    args = parse_args()
+    log = logloader.load_log(args.filename)
+    chunks = chunk(log, args.stream_name, args.chunk_size)
+    output_filename = args.filename
+    if output_filename.endswith(".msg"):
+        output_filename = output_filename[:-4]
+    save_chunks(chunks, output_filename)
+
+
+def chunk(log, stream_name, chunk_size):  # TODO move to logloader?
+    meta_key = stream_name + ".meta"
+    total_size = len(log[stream_name])
+    chunks = []
+    for i in range(0, total_size, chunk_size):
+        chunk = {
+            stream_name: log[stream_name][i:i + chunk_size],
+            meta_key: {
+                "type": log[meta_key]["type"],
+                "timestamps": log[meta_key]["timestamps"][i:i + chunk_size]
+            }
+        }
+        chunks.append(chunk)
+    return chunks
+
+
+def save_chunks(chunks, name):  # TODO move to logloader?
+    n_digits = int(math.log10(len(chunks))) + 1
+    format_str = "%s_%0" + str(n_digits) + "d.msg"
+    for i, chunk in enumerate(chunks):
+        filename = format_str % (name, i)
+        with open(filename, "wb") as f:
+            msgpack.pack(chunk, f, encoding="utf8")
+
+
+def parse_args():
+    argparser = argparse.ArgumentParser(
+        description="Chunk logs to smaller files. Name of output files will "
+                    "be the old name with additional counter that indicates "
+                    "the order of the chunks.")
+    argparser.add_argument(
+        "filename", type=str, help="Name of the logfile")
+    argparser.add_argument(
+        "stream_name", type=str,
+         help="Name of the stream that will be extracted")
+    argparser.add_argument(
+        "chunk_size", type=int, help="Number of samples per file")
+    args = argparser.parse_args()
+    return args
+
+
+if __name__ == "__main__":
+    main()
