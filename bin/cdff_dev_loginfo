@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+import argparse
+from cdff_dev import logloader
+
+
+def main():
+    args = parse_args()
+    log = logloader.load_log(args.filename)
+    logloader.print_stream_info(log)
+
+
+def parse_args():
+    argparser = argparse.ArgumentParser(description="Print log info")
+    argparser.add_argument(
+        "filename", type=str, help="Name of the logfile")
+    args = argparser.parse_args()
+    return args
+
+
+if __name__ == "__main__":
+    main()
