@@ -14,25 +14,38 @@ import cdff_types
 
 
 class MatplotlibVisualizerApplication:
-    def __init__(self):
-        self.vdh = VisualizationDataHandler()
-
     def show_controls(self, dfc, logfiles, stream_names,
-                      image_stream_name=None):
+                      image_stream_names=[]):
         # TODO start everything in main thread
+
+        self.vdh = VisualizationDataHandler(image_stream_names)
 
         # create figure, subplots
         self.fig = plt.figure()
 
-        if image_stream_name is None:
+        self.ax = None
+        self.ax_images = []
+
+        self.images = []
+
+        if not image_stream_names:
             self.ax = plt.subplot(111)
         else:
-            self.ax = plt.subplot(121)
-            self.ax_image = plt.subplot(122)
-            self.ax_image.xaxis.set_major_locator(plt.NullLocator())
-            self.ax_image.yaxis.set_major_locator(plt.NullLocator())
-            blank = matplotlib.image.imread("Blank.png")
-            self.image = self.ax_image.imshow(blank, animated=True)
+            n_images = len(image_stream_names)
+            if n_images > 2:
+                raise NotImplementedError(
+                    "Only one or two images are supported, trying to plot %d."
+                    % n_images)
+
+            self.ax = plt.subplot2grid((2, 2), (0, 0), colspan=2)
+            blank_image = matplotlib.image.imread("Blank.png")
+            for i in range(n_images):
+                ax_image = plt.subplot2grid((2, 2), (1, i))
+                ax_image.xaxis.set_major_locator(plt.NullLocator())
+                ax_image.yaxis.set_major_locator(plt.NullLocator())
+                self.ax_images.append(ax_image)
+                image = ax_image.imshow(blank_image, animated=True)
+                self.images.append(image)
 
         # set axis titles
         self.ax.set_ylabel("Units")
@@ -68,17 +81,14 @@ class MatplotlibVisualizerApplication:
         # Setting blit to False renders animation useless - only grey window
         # displayed. Blitting may have some connection to removing blinking
         # from animation.
-        if image_stream_name is None:
-            fargs = self.line, self.ax, self.vdh
-        else:
-            fargs = self.line, self.ax, self.vdh, self.image, self.ax_image
+        fargs = self.line, self.ax, self.vdh, self.images, self.ax_images
         self.anim = animation.FuncAnimation(
             self.fig, animate, fargs=fargs, interval=0.0, blit=True)
 
         # begin log replay on a separate thread in order to run concurrently
         thread = threading.Thread(
             target=main,
-            args=(dfc, self.vdh, logfiles, stream_names, image_stream_name))
+            args=(dfc, self.vdh, logfiles, stream_names, image_stream_names))
         thread.start()
 
     def exec_(self):
@@ -90,7 +100,7 @@ class MatplotlibVisualizerApplication:
         plt.close()
 
 
-def animate(i, line, ax, vdh, image=None, ax_image=None):
+def animate(i, line, ax, vdh, images=None, ax_images=None):
     """Update and plot line data.
 
     Anything that needs to be updated must lie within this function.
@@ -127,8 +137,10 @@ def animate(i, line, ax, vdh, image=None, ax_image=None):
         plt.legend(handles=line, labels=data_labels, fancybox=False, frameon=True,
                    loc="best")
 
-    if image is not None and ax_image is not None and hasattr(vdh, "image"):
-        image.set_array(vdh.image)
+    if images and ax_images:
+        for image, image_data in zip(images, vdh.images):
+            if image_data is not None:
+                image.set_array(image_data)
 
     # The best solution for displaying "animated" tick labels.
     # A better solution would be to selectively only redraw these labels,
@@ -252,6 +264,11 @@ class Coordinates():
 class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
     """Recieve log data information and control what is sent to be animated.
 
+    Parameters
+    ----------
+    image_stream_names : list, optional (default: [])
+        Name of the image data streams
+
     Attributes
     ----------
     time_list: list
@@ -271,11 +288,13 @@ class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
     self.type: string
         Contains the current user-selected sample type
     """
-    def __init__(self):
+    def __init__(self, image_stream_names=[]):
         self.time_list = []
         self.source_dict = {}
         self.list_assigner = ListAssigner()
         self._temp = []
+        self.image_stream_names = image_stream_names
+        self.images = [None] * len(self.image_stream_names)
         self.coords = Coordinates()
 
     def set_control_panel(self, control_panel):
@@ -349,10 +368,13 @@ class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
             self.source_dict.clear()
 
         # load camera frame information
-        if type(sample) == cdff_types.Image:
+        if (type(sample) == cdff_types.Image and
+                port_name in self.image_stream_names):
+            image_idx = self.image_stream_names.index(port_name)
             image_array = [sample.image[i] for i in range(len(sample.image))]
-            self.image = np.asarray(image_array, dtype=np.uint8).reshape(
-                sample.datasize.height, sample.datasize.width, 3)
+            self.images[image_idx] = np.asarray(
+                image_array, dtype=np.uint8).reshape(sample.datasize.height,
+                                                     sample.datasize.width, 3)
 
         # add data to lists to be sent to graph
         for label, data in self.source_dict.items():

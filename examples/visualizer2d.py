@@ -12,17 +12,9 @@ import glob
 dfc = dataflowcontrol.DataFlowControl(nodes={}, periods={}, connections=[])
 
 logfiles = [
-    sorted(glob.glob("logs/open_day/open_day_xsens_imu_*.msg")),
-    #sorted(glob.glob("logs/open_day/open_day_laser_filter_*.msg")),
-    #sorted(glob.glob("logs/open_day/open_day_tilt_scan_*.msg")),
-    #sorted(glob.glob("logs/open_day/open_day_dynamixel_*.msg")),
-    #sorted(glob.glob("logs/open_day/open_day_velodyne_*.msg"))
+    sorted(glob.glob("test/test_data/logs/xsens_imu_*.msg")),
 ]
 stream_names = [
-    #"/laser_filter.filtered_scans",
-    #"/velodyne.laser_scans",
-    #"/tilt_scan.pointcloud",
-    #"/dynamixel.transforms",
     "/xsens_imu.calibrated_sensors"
 ]
 
