@@ -17,7 +17,7 @@ def animate(i, line, ax, vdh):
     updated must lie within this function. Repeatedly called 
     by FuncAnimation, incrementing i with each iteration. 
     """
-    time_list = vdh.time_list
+    times = vdh.time_list
     list_assigner = vdh.list_assigner
     data_lists = list_assigner.get_data()
     data_labels = list_assigner.get_labels()
@@ -26,16 +26,15 @@ def animate(i, line, ax, vdh):
     if not data_lists:
         return line
 
-    vdh.set_axis_limits(ax, time_list, data_lists)
+    vdh.set_axis_limits(ax, times, data_lists)
 
     try:
-        for index, the_list in enumerate(data_lists):
-            if len(the_list) != len(time_list):
+        for index, measurements in enumerate(data_lists):
+            if len(measurements) != len(times):
                 raise ValueError(
-                    "Y data and X data have different lengths: ", "X: ", time_list, "Y: ", the_list)
-            x = time_list[0:i]
-            y = the_list[0:i]
-            line[index].set_data(x, y)
+                    "Y data and X data have different lengths. X: %d; Y: %d"
+                    % (len(times), len(measurements)))
+            line[index].set_data(times[0:i], measurements[0:i])
     except ValueError:
         pass
 
@@ -58,13 +57,6 @@ def animate(i, line, ax, vdh):
     return line
 
 
-vdh = visualization_log_replay.VisualizationDataHandler()
-
-
-def onclick(event):
-    anim.event_source.stop()
-
-
 def delete_last_line(vdh):
     file_r = open(vdh.control_panel.outlier_file(), "r")
     lines = file_r.readlines()
@@ -72,6 +64,9 @@ def delete_last_line(vdh):
     file_w = open(vdh.control_panel.outlier_file(), "w")
     file_w.writelines(lines[:-1])
     vdh.control_panel.remove_outlier = False
+
+
+vdh = visualization_log_replay.VisualizationDataHandler()
 
 
 # open a tk dialogue box to select log file
@@ -136,6 +131,8 @@ span = SpanSelector(ax, vdh.onselect, 'horizontal', useblit=True,
                     rectprops=dict(alpha=0.5, facecolor='red'))
  
 """removes blinking from span selection, but data is not displayed during selection"""
+def onclick(event):
+    anim.event_source.stop()
 #cid = fig.canvas.mpl_connect('button_press_event', onclick)
 
 # begin log replay on a separate thread in order to run concurrently
