@@ -1,4 +1,5 @@
-from cdff_dev import visualization2d
+from cdff_dev import dataflowcontrol, visualization2d
+import glob
 
 
 # open a tk dialogue box to select log file
@@ -7,9 +8,6 @@ from cdff_dev import visualization2d
 #Tk().withdraw()
 #log_file = askopenfilename()
 
-
-from cdff_dev import dataflowcontrol
-import glob
 
 dfc = dataflowcontrol.DataFlowControl(nodes={}, periods={}, connections=[])
 
