@@ -182,6 +182,36 @@ class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
             self._configure_time(timestamp)
 
 
+    def set_axis_limits(self, ax, time_list, data_lists, coords):
+        """Control axis limits that change dynamically with data and user selections
+        """
+        control_panel = self.control_panel
+
+        # find highest and lowest data points out of all lists given
+        for the_list in data_lists:
+            coords.data_min = min(
+                np.amin(the_list), coords.data_min)
+            coords.data_max = max(
+                np.amax(the_list), coords.data_max)
+
+        # set x and y limits based on current highest and lowest data points
+        if data_lists:
+            margin = max(np.abs(coords.data_min),
+                         coords.data_max) * 0.05
+            ax.set_ylim(coords.data_min - margin,
+                        coords.data_max + margin)
+
+        if self.source_dict and self.control_panel.stream_reset:
+            coords.yrange_reset()
+            control_panel.stream_reset = False
+
+        if self.control_panel.yrange_reset:
+            coords.yrange_reset()
+            control_panel.yrange_reset = False
+
+        ax.set_xlim(self.time_list[0], np.amax(self.time_list))
+
+
 def set_stream_data(log, log_img):
     """Extract stream data from given log
 
