@@ -1,11 +1,8 @@
 import sys
 import time
-import warnings
-import glob
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from . import logloader, typefromdict
-from . import dataflowcontrol
+from . import typefromdict
 
 
 class ControlPanelExpert:
@@ -83,9 +80,7 @@ class ControlPanelExpert:
 
 
 class ControlPanelMainWindow(QMainWindow):
-    """Instantiation of Qt window and Control Panel classes
-    """
-
+    """Instantiation of Qt window and Control Panel classes."""
     def __init__(self, work, ctrl_pnl_expert, stream_dict, stream_names, log_iterator, dfc):
         super(ControlPanelMainWindow, self).__init__()
         self.worker = Worker(work, ctrl_pnl_expert, log_iterator, dfc)
@@ -110,8 +105,7 @@ class ControlPanelMainWindow(QMainWindow):
 
 
 class ControlPanelWidget(QWidget):
-    """Contains widgets that comprise physical layout
-    of control panel
+    """Contains widgets that comprise physical layout of control panel.
 
     Parameters
     ---------
@@ -127,7 +121,6 @@ class ControlPanelWidget(QWidget):
     stream_names : list
         List of stream names available to be replayed
     """
-
     def __init__(self, worker, ctrl_pnl_expert, stream_dict, stream_names):
         super(ControlPanelWidget, self).__init__()
         self.stream_names = stream_names
@@ -273,9 +266,9 @@ class ControlPanelWidget(QWidget):
 
 
 class ControlPanelController():
-    """ Contains all functions for manipulating data and values 
-    related to the visualization. These values are then passed to the
-    ControlPanelExpert
+    """ Contains all functions for manipulating the visualization.
+
+    Configuration is then passed to the ControlPanelExpert.
 
     Parameters
     ---------
@@ -288,7 +281,6 @@ class ControlPanelController():
     ctrl_pnl_expert : ControlPanelExpert
         Contains all necessary data values that are accessed externally
     """
-
     def __init__(self, central_widget, worker, ctrl_pnl_expert):
         self.central_widget = central_widget
         self.worker = worker
@@ -322,8 +314,10 @@ class ControlPanelController():
         if type_ == "IMUSensors":
             self.ctrl_pnl_expert.type = "IMUSensors"
             self._trigger_reset()
-            self.central_widget.data_edit.addItems(["Select data...", "Acceleration X", "Acceleration Y", "Acceleration Z",
-                                                    "Gyroscopic X", "Gyroscopic Y", "Gyroscopic Z"])
+            self.central_widget.data_edit.addItems(
+                ["Select data...",
+                 "Acceleration X", "Acceleration Y", "Acceleration Z",
+                 "Gyroscopic X", "Gyroscopic Y", "Gyroscopic Z"])
 
         elif type_ == "Joints":
             self.ctrl_pnl_expert.type = "Joints"
@@ -351,7 +345,9 @@ class ControlPanelController():
         data_choice = self.central_widget.data_edit.currentText()
         if len(self.ctrl_pnl_expert.data_types) == 4:
             print("Graph Display Max Reached")
-        elif (data_choice not in self.ctrl_pnl_expert.data_types) and ("+" not in data_choice) and (data_choice != "No Data") and (data_choice != "Select data..."):
+        elif ((data_choice not in self.ctrl_pnl_expert.data_types) and
+              ("+" not in data_choice) and (data_choice != "No Data") and
+              (data_choice != "Select data...")):
             self.ctrl_pnl_expert.data_types.append(data_choice)
             self.central_widget.data_edit.setItemText(
                 self.central_widget.data_edit.currentIndex(), (data_choice + " +"))
@@ -473,8 +469,6 @@ class Step:
 
     def __call__(self):
         timestamp, stream_name, typename, sample = next(self.iterator)
-        # TODO: Better way to sort out usable data types
-        if (typename != "int32_t") and (typename != "TransformerStatus") and (typename != "double") and (typename != "DepthMap") and (typename != "TimestampEstimatorStatus"):
-            obj = typefromdict.create_from_dict(typename, sample)
-            self.dfc.process_sample(
-                timestamp=timestamp, stream_name=stream_name, sample=obj)
+        obj = typefromdict.create_from_dict(typename, sample)
+        self.dfc.process_sample(
+            timestamp=timestamp, stream_name=stream_name, sample=obj)
