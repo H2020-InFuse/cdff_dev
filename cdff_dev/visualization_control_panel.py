@@ -1,8 +1,7 @@
 import sys
-import time
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from . import typefromdict
+from .envirevisualization import Worker, Step  # TODO move to another file
 
 
 class ControlPanelExpert:
@@ -83,7 +82,7 @@ class ControlPanelMainWindow(QMainWindow):
     """Instantiation of Qt window and Control Panel classes."""
     def __init__(self, work, ctrl_pnl_expert, stream_dict, stream_names, log_iterator, dfc):
         super(ControlPanelMainWindow, self).__init__()
-        self.worker = Worker(work, ctrl_pnl_expert, log_iterator, dfc)
+        self.worker = Worker(work, log_iterator, dfc)
         self.worker.start()
         QApplication.instance().aboutToQuit.connect(self.worker.quit)
 
@@ -381,94 +380,3 @@ class ControlPanelController():
 
     def remove_outlier(self):
         self.ctrl_pnl_expert.remove_outlier = True
-
-
-class Worker(QThread):
-    """Worker thread that runs a loop in which callable is called.
-
-    This thread is designed to be controlled precisely with a GUI.
-    It is possible to do only step-wise execution of the work or introduce
-    a break between steps. After each step the signal 'step_done' will be
-    emitted. The current step count will be stored in the member 't_'.
-    The length of the break is stored in 'break_length_'.
-
-    Parameters
-    ----------
-    work : Callable
-        The logic should be implemented in this callable. Note that this is
-        a class that will be instantiated.
-
-    worker_args : list
-        Contructor paramters of work.
-
-    worker_kwargs : dict
-        Contructor paramters of work.
-    """
-
-    def __init__(self, work, ctrl_pnl_expert, log_iterator, dfc):
-        self.work = work
-        self.log_iterator = log_iterator
-        self.dfc = dfc
-        self.one_step = False
-        self.all_steps = False
-        self.keep_alive = True
-        self.ctrl_pnl_expert = ctrl_pnl_expert
-
-        self.break_length_ = 0.0
-        self.t_ = 0
-
-        super(Worker, self).__init__()
-
-    def __del__(self):
-        self.quit()
-
-    step_done = pyqtSignal(int)
-
-    def run(self):
-        work = self.work(self.log_iterator, self.dfc)
-
-        while self.keep_alive:
-            try:
-                if self.ctrl_pnl_expert.data_types:
-                    if self.all_steps:
-                        time.sleep(self.break_length_)
-                        work()
-                        self.t_ += 1
-                        self.step_done.emit(self.t_)
-                    elif self.one_step:
-                        work()
-                        self.t_ += 1
-                        self.step_done.emit(self.t_)
-                        self.one_step = False
-                    else:
-                        self.pause()
-            except StopIteration:
-                print("Reached the end of the logfile")
-                break
-
-    def step(self):
-        self.one_step = True
-
-    def play(self):
-        print("playing")
-        self.all_steps = True
-
-    def pause(self):
-        self.all_steps = False
-
-    def quit(self):
-        self.all_steps = False
-        self.keep_alive = False
-
-
-class Step:
-    """A callable that replays one sample in each step."""
-    def __init__(self, log_iterator, dfc):
-        self.iterator = log_iterator
-        self.dfc = dfc
-
-    def __call__(self):
-        timestamp, stream_name, typename, sample = next(self.iterator)
-        obj = typefromdict.create_from_dict(typename, sample)
-        self.dfc.process_sample(
-            timestamp=timestamp, stream_name=stream_name, sample=obj)
