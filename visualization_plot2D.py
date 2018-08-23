@@ -1,4 +1,4 @@
-import visualization_log_replay
+from cdff_dev import visualization2d
 
 
 # open a tk dialogue box to select log file
@@ -30,6 +30,5 @@ stream_names = [
     "/xsens_imu.calibrated_sensors"
 ]
 
-vis = visualization_log_replay.MatplotlibVisualizer(
-    dfc, log_files, stream_names)
+vis = visualization2d.MatplotlibVisualizer(dfc, log_files, stream_names)
 vis.exec_()
