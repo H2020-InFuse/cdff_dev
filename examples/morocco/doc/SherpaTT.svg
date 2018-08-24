@@ -230,9 +230,9 @@
      inkscape:document-units="px"
      inkscape:current-layer="g3585-7"
      showgrid="true"
-     inkscape:window-width="1863"
-     inkscape:window-height="1176"
-     inkscape:window-x="57"
+     inkscape:window-width="1295"
+     inkscape:window-height="744"
+     inkscape:window-x="65"
      inkscape:window-y="24"
      inkscape:window-maximized="1"
      fit-margin-top="0"
@@ -324,7 +324,7 @@
            y="382.1615"
            x="385.58914"
            id="tspan3583-5-2"
-           sodipodi:role="line">body0 / odometry</tspan></text>
+           sodipodi:role="line">origin / odometry</tspan></text>
       <path
          style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
          d="M 848.62445,533.64633 C 823.60249,573.22314 779.68108,600.2395 733.07291,604.72287 686.46473,609.20624 638.19878,591.05764 606.09143,556.97626 595.33344,545.55685 586.36659,532.54043 578.62446,518.89504 557.49568,481.65591 545.37284,439.34797 543.5737,396.57016"
