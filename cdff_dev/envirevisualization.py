@@ -131,6 +131,9 @@ class WorldState:
             # Does not have to be added as an item to the graph.
             # Should be used to update transformations.
             return
+        elif sample is None:
+            warnings.warn("No sample on the output port '%s'" % port_name)
+            return
         elif port_name not in self.frames:
             warnings.warn("No frame registered for port '%s'" % port_name)
             return

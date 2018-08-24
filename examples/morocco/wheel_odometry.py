@@ -118,6 +118,37 @@ def main():
     from cdff_dev.diagrams import save_graph_png
     save_graph_png(dfc, "wheel_odometry.png")
 
+
+class Trajectory:
+    def __init__(self):
+        self.rbs = None
+        self.pose = None
+
+    def set_configuration_file(self, filename):
+        pass
+
+    def configure(self):
+        pass
+
+    def rbsInput(self, data):
+        self.rbs = data
+
+    def poseOutput(self):
+        return self.pose
+
+    def process(self):
+        if self.rbs:
+            self.pose = self.rbs.pos
+            print('*******',self.pose.toarray())
+
+
+def main():
+    logs, stream_names = convert_logs()
+    app, dfc = configure(logs, stream_names)
+
+    from cdff_dev.diagrams import save_graph_png
+    save_graph_png(dfc, "wheel_odometry.png")
+
     app.exec_()
     evaluate(dfc)
 
@@ -145,7 +176,8 @@ def convert_logs():
 def configure(logs, stream_names):
     nodes = {
         "transformer": Transformer(),
-        "evaluation": EvaluationDFN()
+        "evaluation": EvaluationDFN(),
+        "trajectory": Trajectory(),
         # TODO conversion to path
     }
     periods = {
@@ -153,6 +185,7 @@ def configure(logs, stream_names):
         # frequency of gps: 0.05
         "transformer": 0.01,
         "evaluation": 1.0, # TODO
+        "trajectory": 0.01,
     }
     connections = (
         # inputs to transformer
@@ -163,10 +196,15 @@ def configure(logs, stream_names):
         ("transformer.dgps2origin", "evaluation.dgps2origin"),
         ("transformer.groundTruth2origin", "evaluation.groundTruth2origin"),
 
+        # inputs to trajectory
+        ("transformer.groundTruth2origin", "trajectory.rbs"),
+
         # outputs
         ("evaluation.error", "result.error"),
+        ("trajectory.pose","dummy.port"), #this is necessary so register the output port in the dfc
     )
-    frames = {}  # TODO?
+    frames = {"trajectory.pose": "origin"}  # TODO?
+
     urdf_files = [
         # git clone git@git.hb.dfki.de:facilitators/bundle-sherpa_tt.git
         #"bundle-sherpa_tt/data/sherpa_tt.urdf"  # TODO uncomment
@@ -181,6 +219,7 @@ def configure(logs, stream_names):
     dfc.setup()
 
     # TODO simplify graph initialization
+
     graph = app.visualization.world_state_.graph_
 
     # Frames
