@@ -46,9 +46,13 @@ class Transformer(transformer.EnvireDFN):
     def body2odometryInput(self, data):
         self._set_transform(data, frame_transformation=False)
 
-    def groundTruth2OdometryOutput(self):
+    def dgps2originOutput(self):
         return self._get_transform(
-            "ground_truth", "odometry", frame_transformation=False)
+            "dgps", "origin", frame_transformation=False)
+
+    def groundTruth2originOutput(self):
+        return self._get_transform(
+            "ground_truth", "origin", frame_transformation=False)
 
     def process(self):
         super(Transformer, self).process()
@@ -86,12 +90,12 @@ class EvaluationDFN:
     def configure(self):
         pass
 
-    def body2odometryInput(self, odometry_pose):
+    def dgps2originInput(self, odometry_pose):
         if odometry_pose.timestamp.microseconds > 0:
             self.odometry_timestamps_.append(odometry_pose.timestamp.microseconds)
             self.odometry_positions_.append(odometry_pose.pos.toarray())
 
-    def groundTruth2OdometryInput(self, ground_truth_pose):
+    def groundTruth2originInput(self, ground_truth_pose):
         if ground_truth_pose.timestamp.microseconds > 0:
             self.ground_truth_timestamps_.append(ground_truth_pose.timestamp.microseconds)
             self.ground_truth_positions_.append(ground_truth_pose.pos.toarray())
@@ -155,8 +159,8 @@ def configure(logs, stream_names):
         ("/mcs_sensor_processing.rigid_body_state_out", "transformer.body2odometry"),
 
         # inputs to evaluation
-        ("/mcs_sensor_processing.rigid_body_state_out", "evaluation.body2odometry"),
-        ("transformer.groundTruth2Odometry", "evaluation.groundTruth2Odometry"),
+        ("transformer.dgps2origin", "evaluation.dgps2origin"),
+        ("transformer.groundTruth2origin", "evaluation.groundTruth2origin"),
 
         # outputs
         ("evaluation.error", "result.error"),
@@ -213,6 +217,7 @@ def configure(logs, stream_names):
     #t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
     t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.26067301, -0.96542715]))
     graph.add_transform("dgps0", "origin", t)
+    graph.add_transform("dgps", "body", t)
 
     # TODO visualize covariance?
 
