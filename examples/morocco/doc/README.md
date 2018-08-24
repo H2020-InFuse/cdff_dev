@@ -23,14 +23,14 @@ The HCRU has the following sensor configuration:
 The following image illustrates the frames involved in computing the
 GPS position in the local coordinate system. `dgps0` represents
 the start position of the robot in the global GPS coordinate system.
-the rotation of the robot (frame `body0`) at the beginning in this
+the rotation of the robot (frame `origin`) at the beginning in this
 global coordinate system is measured with the IMU that is attached to
-`body0`. On the other side we can see the current position of the robot
+`origin`. On the other side we can see the current position of the robot
 `body` with respect to the start pose `odometry` computed by the
 odometry of the SherpaTT. If GPS and odometry where perfect,
-`body0` and `odometry` would represent exactly the same frame.
+`origin` and `odometry` would represent exactly the same frame.
 However, we can compare the estimated paths of DGPS and odometry
-by assuming that `body0` and `odometry` are identical and plotting
+by assuming that `origin` and `odometry` are identical and plotting
 both paths in the same frame.
 
 ![DGPS](gps.png)
