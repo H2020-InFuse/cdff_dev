@@ -170,7 +170,7 @@ def configure(logs, stream_names):
     log_iterator = logloader.replay_files(logs, stream_names, verbose=0)
 
     app = envirevisualization.EnvireVisualizerApplication(
-        frames, urdf_files, center_frame="body0")
+        frames, urdf_files, center_frame="origin")
     dfc = dataflowcontrol.DataFlowControl(
         nodes, connections, periods, real_time=False)
     dfc.setup()
@@ -184,35 +184,35 @@ def configure(logs, stream_names):
     graph.add_frame("odometry")
     # body - robot's body, used in odometry log
     graph.add_frame("body")
-    # body0 - initial position of the robot according to odometry, same as
-    #         odometry
-    #graph.add_frame("body0") - already in the graph (center frame)
-    # imu0 - imu sensor frame on the robot, use to connect body0 to initial imu
-    #        measurements
+    # origin - initial position of the robot according to odometry, same as
+    #          odometry
+    #graph.add_frame("origin") - already in the graph (center frame)
+    # imu0 - imu sensor frame on the robot, use to connect origin to initial
+    #        imu measurements
     graph.add_frame("imu0")
     # dgps0 - initial GPS position with axes aligned to north, west, up
     graph.add_frame("dgps0")
 
     # body - odometry, variable, updated continuously
-    # body0 - odometry, constant, known before start
+    # origin - odometry, constant, known before start
     t = cdff_envire.Transform()
     t.transform.translation.fromarray(np.zeros(3))
     t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
-    graph.add_transform("body0", "odometry", t)
-    # body0 - imu0, constant, known before start
+    graph.add_transform("origin", "odometry", t)
+    # origin - imu0, constant, known before start
     t = cdff_envire.Transform()
     t.transform.translation.fromarray(np.array([-0.185, 0.3139, 0.04164]))
     R = pr.matrix_from_euler_zyx([0.44, 2.225, 0.0])
     imu2body_wxyz = pr.quaternion_from_matrix(R)
     imu2body_xyzw = np.hstack((imu2body_wxyz[1:], [imu2body_wxyz[0]]))
     t.transform.orientation.fromarray(imu2body_xyzw)
-    graph.add_transform("imu0", "body0", t)
-    # body0 - dgps0, constant, known before start
+    graph.add_transform("imu0", "origin", t)
+    # origin - dgps0, constant, known before start
     t = cdff_envire.Transform()
     t.transform.translation.fromarray(np.array([0.3, 0.0, -0.53]))
     #t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
     t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.26067301, -0.96542715]))
-    graph.add_transform("dgps0", "body0", t)
+    graph.add_transform("dgps0", "origin", t)
 
     # TODO visualize covariance?
 
