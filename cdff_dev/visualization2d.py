@@ -42,7 +42,8 @@ class MatplotlibVisualizerApplication:
             self.ax = plt.subplot2grid((2, 2), (0, 0), colspan=2)
             blank_file = resource_filename("cdff_dev", os.path.join(
                 "resources", "Blank.png"))
-            blank_image = matplotlib.image.imread(blank_file)
+            blank_image = (matplotlib.image.imread(blank_file) * 255.0
+                           ).astype(np.uint8)
             for i in range(n_images):
                 ax_image = plt.subplot2grid((2, 2), (1, i))
                 ax_image.xaxis.set_major_locator(plt.NullLocator())
@@ -111,6 +112,8 @@ def animate(i, line, ax, vdh, images=None, ax_images=None):
     It is repeatedly called by FuncAnimation, incrementing i with each
     iteration.
     """
+    redraw = i % 75 == 0
+
     times = vdh.time_list
     list_assigner = vdh.list_assigner
     data_lists = list_assigner.get_data()
@@ -141,7 +144,7 @@ def animate(i, line, ax, vdh, images=None, ax_images=None):
         plt.legend(handles=line, labels=data_labels, fancybox=False, frameon=True,
                    loc="best")
 
-    if images and ax_images:
+    if redraw and images and ax_images:
         for image, image_data in zip(images, vdh.images):
             if image_data is not None:
                 image.set_array(image_data)
@@ -149,7 +152,7 @@ def animate(i, line, ax, vdh, images=None, ax_images=None):
     # The best solution for displaying "animated" tick labels.
     # A better solution would be to selectively only redraw these labels,
     # instead of the entire plot
-    if i % 75 == 0:
+    if redraw:
         plt.draw()
 
     return line
@@ -375,10 +378,7 @@ class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
         if (type(sample) == cdff_types.Image and
                 port_name in self.image_stream_names):
             image_idx = self.image_stream_names.index(port_name)
-            image_array = [sample.image[i] for i in range(len(sample.image))]
-            self.images[image_idx] = np.asarray(
-                image_array, dtype=np.uint8).reshape(sample.datasize.height,
-                                                     sample.datasize.width, 3)
+            self.images[image_idx] = sample.array_reference().copy()
 
         # add data to lists to be sent to graph
         for label, data in self.source_dict.items():

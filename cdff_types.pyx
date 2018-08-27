@@ -1972,6 +1972,14 @@ cdef class Image:
 
     frame_status = property(_get_frame_status, _set_frame_status)
 
+    def array_reference(self, dtype=None):
+        cdef np.npy_intp shape[3]
+        shape[0] = <np.npy_intp> self.thisptr.datasize.height
+        shape[1] = <np.npy_intp> self.thisptr.datasize.width
+        shape[2] = <np.npy_intp> 3
+        return np.PyArray_SimpleNewFromData(
+            3, shape, np.NPY_UINT8, <void*> self.thisptr.image.arr)
+
 
 cdef class Image_size_tReference:
     def __cinit__(self):
