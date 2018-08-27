@@ -122,7 +122,9 @@ def main():
 class Trajectory:
     def __init__(self):
         self.rbs = None
-        self.pose = None
+        self.orient = np.array([0, 0, 0, 1], dtype=np.float)
+        self.pos = np.zeros(3)
+        self.output = cdff_types.Vector3d()
 
     def set_configuration_file(self, filename):
         pass
@@ -130,16 +132,19 @@ class Trajectory:
     def configure(self):
         pass
 
-    def rbsInput(self, data):
+    def poseInput(self, data):
         self.rbs = data
 
-    def poseOutput(self):
-        return self.pose
+    def posOutput(self):
+        return self.output
 
     def process(self):
-        if self.rbs:
-            self.pose = self.rbs.pos
-            print('*******',self.pose.toarray())
+        if self.rbs is not None:
+            self.orient[:] = self.rbs.orient.toarray()
+            self.pos[:] = self.rbs.pos.toarray()
+
+            for d in range(3):
+                self.output[d] = self.pos[d]
 
 
 def main():
@@ -178,7 +183,6 @@ def configure(logs, stream_names):
         "transformer": Transformer(),
         "evaluation": EvaluationDFN(),
         "trajectory": Trajectory(),
-        # TODO conversion to path
     }
     periods = {
         # frequency of odometry: 0.01
@@ -197,13 +201,13 @@ def configure(logs, stream_names):
         ("transformer.groundTruth2origin", "evaluation.groundTruth2origin"),
 
         # inputs to trajectory
-        ("transformer.groundTruth2origin", "trajectory.rbs"),
+        ("transformer.groundTruth2origin", "trajectory.pose"),
 
-        # outputs
+        # outputs, this is necessary so register the output port in the dfc
         ("evaluation.error", "result.error"),
-        ("trajectory.pose","dummy.port"), #this is necessary so register the output port in the dfc
+        ("trajectory.pos","result.trajectory"),
     )
-    frames = {"trajectory.pose": "origin"}  # TODO?
+    frames = {"trajectory.pos": "origin"}
 
     urdf_files = [
         # git clone git@git.hb.dfki.de:facilitators/bundle-sherpa_tt.git
@@ -283,8 +287,10 @@ def evaluate(dfc):
     plt.figure(figsize=(10, 5))
     plt.subplot(aspect="equal")
     plt.grid()
-    plt.plot([p[0] for p in ground_truth], [p[1] for p in ground_truth], label="Ground Truth")
-    plt.plot([p[0] for p in odometry], [p[1] for p in odometry], label="Odometry")
+    plt.plot([p[0] for p in ground_truth], [p[1] for p in ground_truth],
+             label="Ground Truth")
+    plt.plot([p[0] for p in odometry], [p[1] for p in odometry],
+             label="Odometry")
     plt.legend()
 
     plt.show()
