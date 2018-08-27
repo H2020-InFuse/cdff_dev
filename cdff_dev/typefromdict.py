@@ -86,18 +86,23 @@ def _convert(obj, data):
 
 def _assign_list(obj, data):
     """List corresponds to a sequence in ASN.1."""
-    for i in range(len(data)):
-        if type(data[i]) == list:  # special case: matrices
+    if len(data) == 0:
+        return
+
+    if type(data[0]) == list:  # special case: matrices
+        for i in range(len(data)):
             for j in range(len(data[i])):
                 obj[i, j] = data[i][j]
-        elif type(data[i]) == dict:  # nested types
+    elif type(data[0]) == dict:  # nested types
+        for i in range(len(data)):
             try:
                 _assign_dict(obj[i], data[i])
             except KeyError as e:
                 warnings.warn(
                     "Failed to assign data[%s] to obj[%s], reason:\n%s"
                     % (i, i, str(e)))
-        else:
+    else:
+        for i in range(len(data)):
             obj[i] = data[i]
 
 
