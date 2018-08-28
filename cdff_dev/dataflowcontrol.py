@@ -21,7 +21,12 @@ class DataFlowControl:
 
     periods : dict
         Temporal interval after which the processing steps of nodes are
-        triggered. The time interval must be given in seconds.
+        triggered. The time interval must be given in seconds. Each node
+        must be either periodically triggered or triggered when input on
+        a defined port arrives.
+
+    trigger_ports : dict
+        For each node the port that trigger their execution.
 
     real_time : bool, optional (default: False)
         Run logs in real time. This is a very simple implementation that
@@ -38,12 +43,12 @@ class DataFlowControl:
         Store runtime data about nodes that can be used for analysis of the
         network.
 
-    output_ports_ : dict
+    output_ports_ : dict, optional (default: {})
         A dictionary with node names as keys and dictionaries as values. The
         values represent a dictionary that maps from port names (without
         node prefix) to the corresponding function of the node implementation.
 
-    input_ports_ : dict
+    input_ports_ : dict, optional (default: {})
         A dictionary with node names as keys and dictionaries as values. The
         values represent a dictionary that maps from port names (without
         node prefix) to the corresponding function of the node implementation.
@@ -60,10 +65,12 @@ class DataFlowControl:
         A list of pairs of output node and connected input node. Full names
         of the form 'node_name.port_name' are used here.
     """
-    def __init__(self, nodes, connections, periods, real_time=False, verbose=0):
+    def __init__(self, nodes, connections, periods=None, trigger_ports=None,
+                 real_time=False, verbose=0):
         self.nodes = nodes
         self.connections = connections
         self.periods = periods
+        self.trigger_ports = trigger_ports
         self.real_time = real_time
         self.verbose = verbose
 
@@ -90,7 +97,7 @@ class DataFlowControl:
         self._node_facade = NodeFacade(self.nodes, self.verbose)
         self._node_facade.configure_all()
         self._cache_ports()
-        self._configure_periods()
+        self._configure_triggers()
         self._configure_connections()
         self._last_timestamp = None
 
@@ -137,19 +144,26 @@ class DataFlowControl:
             else:
                 self.result_ports_[node_name].append(port_name)
 
-    def _configure_periods(self):
+    def _configure_triggers(self):
         """Check and save periods for nodes."""
-        if set(self._node_facade.node_names()) != set(self.periods.keys()):
+        if self.periods is None:
+            self.periods = {}
+        if self.trigger_ports is None:
+            self.trigger_ports = {}
+
+        all_nodes = self._node_facade.node_names()
+        triggered_nodes = set(self.periods.keys()).union(
+            set(self.trigger_ports.keys()))
+        if set(all_nodes) != set(triggered_nodes):
             raise ValueError(
-                "Mismatch between nodes and periods. Nodes: %s, periods: %s"
-                % (sorted(self._node_facade.node_names()),
-                   sorted(self.periods.keys())))
+                "Mismatch between nodes and triggered nodes. "
+                "Nodes: %s, triggered nodes: %s"
+                % (sorted(all_nodes), sorted(triggered_nodes)))
 
         self.periods_microseconds = {
             node_name: max(int(1e6 * period), 1)
             for node_name, period in self.periods.items()}
-        self.last_processed = {
-            node: -1 for node in self._node_facade.node_names()}
+        self.last_processed = {node: -1 for node in self.periods.keys()}
 
     def _configure_connections(self):
         """Initialize connections."""
@@ -195,7 +209,7 @@ class DataFlowControl:
                         "Processing took too long, %.3f behind real time "
                         "schedule" % -sleep_time)
 
-        self._push_input(stream_name, sample)
+        self._push_input(stream_name, sample, timestamp)
 
         if self.real_time:
             self._last_timestamp = timestamp
@@ -227,35 +241,8 @@ class DataFlowControl:
             if timestamp_before_process <= timestamp:
                 changed = True
                 self.last_processed[current_node] = timestamp_before_process
-
-                self._node_facade.set_time(
-                    current_node, timestamp_before_process)
-
-                start_time = time.process_time()
-
-                self._node_facade.process(current_node)
-
-                end_time = time.process_time()
-                processing_time = end_time - start_time
-                self.node_statistics_.report_processing_duration(
-                    current_node, processing_time)
-                if self.verbose >= 1:
-                    print("[DataFlowControl] Processed node '%s' in %g seconds"
-                          % (current_node, processing_time))
-
-                outputs = self._pull_output(current_node)
-
-                if self.visualization is not None:
-                    for port_name, sample in outputs.items():
-                        # TODO should we add the processing time?
-                        self.visualization.report_node_output(
-                            port_name, sample, timestamp_before_process)
-
-                for port_name, sample in outputs.items():
-                    self._push_input(port_name, sample)
-
-                # TODO use output_ports_ to implement port trigger
-                # output_ports = self.output_ports_[current_node].keys()
+                self._process_node(current_node, timestamp_before_process)
+                self._post_processing(current_node, timestamp_before_process)
             else:
                 changed = False
 
@@ -277,6 +264,18 @@ class DataFlowControl:
 
         return current_node, timestamp_before_process
 
+    def _post_processing(self, node, timestamp):
+        outputs = self._pull_output(node)
+
+        if self.visualization is not None:
+            for port_name, sample in outputs.items():
+                # TODO should we add the processing time?
+                self.visualization.report_node_output(
+                    port_name, sample, timestamp)
+
+        for port_name, sample in outputs.items():
+            self._push_input(port_name, sample, timestamp)
+
     def _pull_output(self, node_name):
         """Get all outputs from a given node."""
         outputs = dict()
@@ -287,7 +286,7 @@ class DataFlowControl:
             outputs[node_name + "." + port_name] = sample
         return outputs
 
-    def _push_input(self, output_port, sample):
+    def _push_input(self, output_port, sample, timestamp):
         """Push input to given port."""
         if output_port in self.connection_map_:
             for input_port in self.connection_map_[output_port]:
@@ -297,6 +296,8 @@ class DataFlowControl:
                 if input_node_name in self.input_ports_:
                     self._node_facade.write_input_port(
                         input_node_name, input_port_name, sample)
+                    self._port_trigger(
+                        input_node_name, input_port_name, timestamp)
                 elif input_node_name in self.result_ports_:
                     pass  # TODO how should we handle result ports?
                 else:
@@ -304,6 +305,23 @@ class DataFlowControl:
         elif self.verbose >= 2:
             print("[DataFlowControl] port '%s' is not connected"
                   % output_port)
+
+    def _port_trigger(self, node_name, port_name, timestamp):
+        if (node_name in self.trigger_ports and
+                port_name in self.trigger_ports[node_name]):
+            self._process_node(node_name, timestamp)
+            self._post_processing(node_name, timestamp)
+
+    def _process_node(self, node_name, timestamp):
+        self._node_facade.set_time(node_name, timestamp)
+
+        processing_time = self._node_facade.process(node_name)
+
+        self.node_statistics_.report_processing_duration(
+            node_name, processing_time)
+        if self.verbose >= 1:
+            print("[DataFlowControl] Processed node '%s' in %g seconds"
+                    % (node_name, processing_time))
 
 
 class NodeFacade:
@@ -342,7 +360,13 @@ class NodeFacade:
         return node_name in self.nodes
 
     def process(self, node_name):
+        start_time = time.process_time()
+
         self.nodes[node_name].process()
+
+        end_time = time.process_time()
+        processing_time = end_time - start_time
+        return processing_time
 
     def set_time(self, node_name, timestamp):
         node = self.nodes[node_name]

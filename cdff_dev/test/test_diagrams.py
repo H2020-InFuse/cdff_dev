@@ -55,7 +55,7 @@ def test_graph_png():
         ("linear.y", "square.x"),
         ("square.y", "result.y")
     )
-    dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods, vis)
+    dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods, {}, vis)
     dfc.setup()
     filename = next(tempfile._get_candidate_names())
     try:

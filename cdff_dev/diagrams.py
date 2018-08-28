@@ -24,8 +24,10 @@ def save_graph_png(dfc, filename):
         if node_name in dfc.periods:
             label = "cycle time: %.3f s" % _microseconds_to_seconds(
                 dfc.periods[node_name])
-        else:  # TODO port triggered
-            label = ""
+        elif node_name in dfc.trigger_ports:
+            label = "triggered on %s" % dfc.trigger_ports[node_name]
+        else:
+            label = "no trigger"
         cluster = pydot.Cluster(__display_name(node_name), label=label)
         component_node = pydot.Node(
             __display_name(node_name), style="filled", fillcolor=fillcolor)
