@@ -205,10 +205,6 @@ class DataFlowControl:
         if self.real_time and self._last_timestamp is not None:
             self._real_start_time = time.time()
 
-        if self.visualization is not None:
-            self.visualization.report_node_output(
-                stream_name, sample, timestamp)
-
         if self.real_time and self._last_timestamp is not None:
             if self._last_timestamp is not None:
                 processing_time = time.time() - self._real_start_time
@@ -279,13 +275,6 @@ class DataFlowControl:
 
     def _post_processing(self, node, timestamp):
         outputs = self._pull_output(node)
-
-        if self.visualization is not None:
-            for port_name, sample in outputs.items():
-                # TODO should we add the processing time?
-                self.visualization.report_node_output(
-                    port_name, sample, timestamp)
-
         for port_name, sample in outputs.items():
             self._push_input(port_name, sample, timestamp)
 
@@ -301,6 +290,10 @@ class DataFlowControl:
 
     def _push_input(self, output_port, sample, timestamp):
         """Push input to given port."""
+        if self.visualization is not None:
+            self.visualization.report_node_output(
+                output_port, sample, timestamp)
+
         if output_port in self.connection_map_:
             for input_port in self.connection_map_[output_port]:
                 if self.verbose >= 1:
