@@ -48,6 +48,16 @@ def test_missing_trigger():
         ValueError, "Mismatch between nodes and triggered nodes", dfc.setup)
 
 
+def test_trigger_does_not_exist():
+    dfc = dataflowcontrol.DataFlowControl(
+        nodes={"linear": LinearDFN()},
+        connections=(("log.x", "linear.x"), ("linear.y", "result.y")),
+        periods={}, trigger_ports={"linear": "y"}
+    )
+    assert_raises_regexp(
+        ValueError, "Trigger port .* does not exist", dfc.setup)
+
+
 def test_smoke_setup():
     dfc = dataflowcontrol.DataFlowControl(
         nodes={"linear": LinearDFN()},

@@ -151,6 +151,15 @@ class DataFlowControl:
         if self.trigger_ports is None:
             self.trigger_ports = {}
 
+        self.__check_all_nodes_are_triggered()
+        self.__check_trigger_ports_exist()
+
+        self.periods_microseconds = {
+            node_name: max(int(1e6 * period), 1)
+            for node_name, period in self.periods.items()}
+        self.last_processed = {node: -1 for node in self.periods.keys()}
+
+    def __check_all_nodes_are_triggered(self):
         all_nodes = self._node_facade.node_names()
         triggered_nodes = set(self.periods.keys()).union(
             set(self.trigger_ports.keys()))
@@ -160,10 +169,14 @@ class DataFlowControl:
                 "Nodes: %s, triggered nodes: %s"
                 % (sorted(all_nodes), sorted(triggered_nodes)))
 
-        self.periods_microseconds = {
-            node_name: max(int(1e6 * period), 1)
-            for node_name, period in self.periods.items()}
-        self.last_processed = {node: -1 for node in self.periods.keys()}
+    def __check_trigger_ports_exist(self):
+        for node_name, port_name in self.trigger_ports.items():
+            input_ports = self.input_ports_[node_name]
+            if port_name not in input_ports:
+                raise ValueError(
+                    "Trigger port '%s.%s' does not exist. Node only has the "
+                    "following ports: %s"
+                    % (node_name, port_name, ", ".join(input_ports)))
 
     def _configure_connections(self):
         """Initialize connections."""
