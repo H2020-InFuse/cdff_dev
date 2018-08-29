@@ -26,7 +26,7 @@ class DataFlowControl:
         a defined port arrives.
 
     trigger_ports : dict
-        For each node the port that trigger their execution.
+        For each node the port that triggers its execution.
 
     real_time : bool, optional (default: False)
         Run logs in real time. This is a very simple implementation that
