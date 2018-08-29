@@ -138,3 +138,26 @@ def test_dfc_port_triggered():
     assert_equal(vis.data["linear.y"][0], 201.0)
     assert_in("square.y", vis.data)
     assert_equal(vis.data["square.y"][0], 40401.0)
+
+
+def test_dfc_periodic_realtime():
+    nodes = {
+        "linear": LinearDFN(),
+        "square": SquareDFN()
+    }
+    periods = {
+        "linear": 0.000001,
+        "square": 0.000001
+    }
+    connections = (
+        ("log.x", "linear.x"),
+        ("linear.y", "square.x"),
+        ("square.y", "result.y")
+    )
+    dfc = dataflowcontrol.DataFlowControl(
+        nodes, connections, periods=periods, real_time=True)
+    dfc.setup()
+
+    for i in range(101):
+        dfc.process_sample(timestamp=i, stream_name="log.x", sample=i)
+    dfc.process(timestamp=102)

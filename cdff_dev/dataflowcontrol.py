@@ -201,10 +201,13 @@ class DataFlowControl:
             port. Only CDFF types are allowed.
         """
         self._run_all_nodes_before(timestamp)
+        self._sleep_realtime(timestamp)
+        self._push_input(stream_name, sample, timestamp)
 
+    def _sleep_realtime(self, timestamp):
+        """Sleep to ensure real time replay."""
         if self.real_time and self._last_timestamp is not None:
             self._real_start_time = time.time()
-
         if self.real_time and self._last_timestamp is not None:
             if self._last_timestamp is not None:
                 processing_time = time.time() - self._real_start_time
@@ -217,9 +220,6 @@ class DataFlowControl:
                     warnings.warn(
                         "Processing took too long, %.3f behind real time "
                         "schedule" % -sleep_time)
-
-        self._push_input(stream_name, sample, timestamp)
-
         if self.real_time:
             self._last_timestamp = timestamp
 
