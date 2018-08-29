@@ -241,7 +241,6 @@ class DataFlowControl:
                 changed = True
                 self.last_processed[current_node] = timestamp_before_process
                 self._process_node(current_node, timestamp_before_process)
-                self._post_processing(current_node, timestamp_before_process)
             else:
                 changed = False
 
@@ -263,8 +262,18 @@ class DataFlowControl:
 
         return current_node, timestamp_before_process
 
-    def _post_processing(self, node, timestamp):
-        outputs = self._pull_output(node)
+    def _process_node(self, node_name, timestamp):
+        self._node_facade.set_time(node_name, timestamp)
+
+        processing_time = self._node_facade.process(node_name)
+
+        self.node_statistics_.report_processing_duration(
+            node_name, processing_time)
+        if self.verbose >= 1:
+            print("[DataFlowControl] Processed node '%s' in %g seconds"
+                  % (node_name, processing_time))
+
+        outputs = self._pull_output(node_name)
         for port_name, sample in outputs.items():
             self._push_input(port_name, sample, timestamp)
 
@@ -306,18 +315,6 @@ class DataFlowControl:
         if (node_name in self.trigger_ports and
                 port_name in self.trigger_ports[node_name]):
             self._process_node(node_name, timestamp)
-            self._post_processing(node_name, timestamp)
-
-    def _process_node(self, node_name, timestamp):
-        self._node_facade.set_time(node_name, timestamp)
-
-        processing_time = self._node_facade.process(node_name)
-
-        self.node_statistics_.report_processing_duration(
-            node_name, processing_time)
-        if self.verbose >= 1:
-            print("[DataFlowControl] Processed node '%s' in %g seconds"
-                    % (node_name, processing_time))
 
 
 class NodeFacade:
