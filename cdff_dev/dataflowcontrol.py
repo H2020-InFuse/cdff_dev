@@ -200,7 +200,7 @@ class DataFlowControl:
             Current sample. The type must correspond to the connected input
             port. Only CDFF types are allowed.
         """
-        self._run_all_nodes_before(timestamp)
+        self.process(timestamp)
         self._sleep_realtime(timestamp)
         self._push_input(stream_name, sample, timestamp)
 
@@ -224,23 +224,13 @@ class DataFlowControl:
             self._last_timestamp = timestamp
 
     def process(self, timestamp):
-        """Runs all nodes until a specific timestamp.
+        """Run all nodes that should have been executed before given time.
 
         Parameters
         ----------
         timestamp : int
             Current time from the log data. Note that timestamps must be
             greater than or equal 0.
-        """
-        self._run_all_nodes_before(timestamp)
-
-    def _run_all_nodes_before(self, timestamp):
-        """Run all nodes that should have been executed before given time.
-
-        Parameters
-        ----------
-        timestamp : int
-            Simulation time
         """
         changed = True
         while changed:
