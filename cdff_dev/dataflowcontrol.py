@@ -263,6 +263,7 @@ class DataFlowControl:
         return current_node, timestamp_before_process
 
     def _process_node(self, node_name, timestamp):
+        """Execute node and pass outputs to next nodes."""
         self._node_facade.set_time(node_name, timestamp)
 
         processing_time = self._node_facade.process(node_name)
@@ -312,6 +313,7 @@ class DataFlowControl:
                   % output_port)
 
     def _port_trigger(self, node_name, port_name, timestamp):
+        """Run port-triggered nodes recursively."""
         if (node_name in self.trigger_ports and
                 port_name in self.trigger_ports[node_name]):
             self._process_node(node_name, timestamp)
