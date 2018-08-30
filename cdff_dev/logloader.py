@@ -43,7 +43,7 @@ def summarize_logfile(filename):
 
 
 def summarize_logfiles(filename_groups, only_first_of_group=True):
-    """Extract summary of log files.
+    """Extract summary of multiple log files given as homogeneous groups.
 
     We do not count the number of samples.
 
