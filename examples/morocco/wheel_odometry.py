@@ -64,15 +64,15 @@ def _subtract_pose(p1, q1, p2, q2):
     return p, q
 
 
-def _quaternion_inverse(initial_q):
+def _quaternion_inverse(q):
     # quaternion conjugate is the inverse for unit quaternions
-    return np.hstack((-initial_q[:3], (initial_q[3],)))
+    return np.array([-q[0], -q[1], -q[2], q[3]])
 
 
 def _quaternion_product(q1, q2):
     q = np.empty(4)
-    q[0] = q1[-1] * q2[-1] - np.dot(q1[:3], q2[:3])
-    q[1:] = q1[-1] * q2[:3] + q2[-1] * q1[:3] + np.cross(q1[:3], q2[:3])
+    q[:3] = q1[-1] * q2[:3] + q2[-1] * q1[:3] + np.cross(q1[:3], q2[:3])
+    q[-1] = q1[-1] * q2[-1] - np.dot(q1[:3], q2[:3])
     return q
 
 
@@ -132,6 +132,7 @@ def convert_logs():
     # logs/Sherpa/sherpa_tt_mcs.msg
     # - /mcs_sensor_processing.rigid_body_state_out
 
+    #logfiles = [["logs/20180829_DFKI_Sherpa/dgps.msg"], ["logs/20180829_DFKI_Sherpa/sherpa_tt_mcs.msg"]]
     logfiles = [["logs/Sherpa/dgps.msg"], ["logs/Sherpa/sherpa_tt_mcs.msg"]]
     stream_names = [
        "/dgps.imu_pose",
@@ -211,11 +212,20 @@ def configure(logs, stream_names):
     imu2body_xyzw = np.hstack((imu2body_wxyz[1:], [imu2body_wxyz[0]]))
     t.transform.orientation.fromarray(imu2body_xyzw)
     graph.add_transform("imu0", "origin", t)
+
     # origin - dgps0, constant, known before start
     t = cdff_envire.Transform()
+
+    # works for old logfiles:
     t.transform.translation.fromarray(np.array([0.3, 0.0, -0.53]))
-    #t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
     t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.26067301, -0.96542715]))
+
+    #t.transform.translation.fromarray(np.array([0.0, 0.0, 0.0]))
+    #t.transform.translation.fromarray(np.array([0.3, 0.0, -0.53]))
+    #t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.26067301, -0.96542715]))
+    #t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
+    #t.transform.orientation.fromarray(np.array([  0.        ,  0.25881905,  0., 0.96592583]))
+    #t.transform.orientation.fromarray(np.array([2.58819045e-01,   1.58480958e-17,   9.65925826e-01, -5.91458986e-17]))
     graph.add_transform("dgps0", "origin", t)
     graph.add_transform("dgps", "body", t)
 
