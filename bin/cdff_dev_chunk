@@ -8,36 +8,11 @@ from cdff_dev import logloader
 def main():
     args = parse_args()
     log = logloader.load_log(args.filename)
-    chunks = chunk(log, args.stream_name, args.chunk_size)
+    chunks = logloader.chunk_log(log, args.stream_name, args.chunk_size)
     output_filename = args.filename
     if output_filename.endswith(".msg"):
         output_filename = output_filename[:-4]
-    save_chunks(chunks, output_filename)
-
-
-def chunk(log, stream_name, chunk_size):  # TODO move to logloader?
-    meta_key = stream_name + ".meta"
-    total_size = len(log[stream_name])
-    chunks = []
-    for i in range(0, total_size, chunk_size):
-        chunk = {
-            stream_name: log[stream_name][i:i + chunk_size],
-            meta_key: {
-                "type": log[meta_key]["type"],
-                "timestamps": log[meta_key]["timestamps"][i:i + chunk_size]
-            }
-        }
-        chunks.append(chunk)
-    return chunks
-
-
-def save_chunks(chunks, name):  # TODO move to logloader?
-    n_digits = int(math.log10(len(chunks))) + 1
-    format_str = "%s_%0" + str(n_digits) + "d.msg"
-    for i, chunk in enumerate(chunks):
-        filename = format_str % (name, i)
-        with open(filename, "wb") as f:
-            msgpack.pack(chunk, f, encoding="utf8")
+    logloader.save_chunks(chunks, output_filename)
 
 
 def parse_args():

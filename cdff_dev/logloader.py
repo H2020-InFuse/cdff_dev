@@ -100,6 +100,62 @@ def summarize_log(log):
     return typenames, n_samples
 
 
+def chunk_log(log, stream_name, chunk_size):
+    """Extract chunks from log data.
+
+    Parameters
+    ----------
+    log : dict
+        Log data
+
+    stream_name : str
+        Name of the stream that will be extracted
+
+    chunk_size : int
+        Maximum size of each chunk
+
+    Returns
+    -------
+    chunks : list
+        List of log chunks. Each chunk is log data object with a maximum of
+        chunk_size samples of one stream. Chunks are ordered chronologically.
+    """
+    meta_key = stream_name + ".meta"
+    total_size = len(log[stream_name])
+    chunks = []
+    for i in range(0, total_size, chunk_size):
+        chunk = {
+            stream_name: log[stream_name][i:i + chunk_size],
+            meta_key: {
+                "type": log[meta_key]["type"],
+                "timestamps": log[meta_key]["timestamps"][i:i + chunk_size]
+            }
+        }
+        chunks.append(chunk)
+    return chunks
+
+
+def save_chunks(chunks, filename_prefix):
+    """Save log chunks in files.
+
+    Parameters
+    ----------
+    chunks : list
+        List of log chunks. Each chunk is log data object with a maximum of
+        chunk_size samples of one stream. Chunks are ordered chronologically.
+
+    filename_prefix : str
+        Prefix of the output files. The names of output files will have the
+        form '<filename_prefix>_001.msg'.
+    """
+    n_digits = int(math.log10(len(chunks))) + 1
+    format_str = "%s_%0" + str(n_digits) + "d.msg"
+    for i, chunk in enumerate(chunks):
+        filename = format_str % (filename_prefix, i)
+        with open(filename, "wb") as f:
+            msgpack.pack(chunk, f, encoding="utf8")
+
+
 def print_stream_info(log):
     """Print meta information about streams.
 
