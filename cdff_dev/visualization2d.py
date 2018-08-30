@@ -1,7 +1,6 @@
 import sys
 import os
 import threading
-from pkg_resources import resource_filename
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import numpy as np
@@ -40,10 +39,8 @@ class MatplotlibVisualizerApplication:
                     % n_images)
 
             self.ax = plt.subplot2grid((2, 2), (0, 0), colspan=2)
-            blank_file = resource_filename("cdff_dev", os.path.join(
-                "resources", "Blank.png"))
-            blank_image = (matplotlib.image.imread(blank_file) * 255.0
-                           ).astype(np.uint8)
+            blank_image = np.empty((800, 600, 3), dtype=np.uint8)
+            blank_image[:, :, :] = 255
             for i in range(n_images):
                 ax_image = plt.subplot2grid((2, 2), (1, i))
                 ax_image.xaxis.set_major_locator(plt.NullLocator())

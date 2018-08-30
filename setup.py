@@ -60,9 +60,8 @@ def configuration(parent_package='', top_path=None):
     if autoproj_available:
         cython_files += cdff_envire_files
     cython_files = [(".", filename) for filename in cython_files]
-    resource_files = ["cdff_dev/resources/Blank.png"]
 
-    config.add_data_files(*(cython_files + resource_files))
+    config.add_data_files(*cython_files)
 
     extra_compile_args = [
         "-std=c++11",
