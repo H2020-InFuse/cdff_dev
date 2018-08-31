@@ -200,6 +200,27 @@ cdef class Image_attributesReference:
     cdef _cdff_types.asn1SccImage_attributes* thisptr
 
 
+cdef class Frame:
+    cdef _cdff_types.asn1SccFrame* thisptr
+    cdef bool delete_thisptr
+
+
+cdef class Frame_metadata_tReference:
+    cdef _cdff_types.asn1SccFrame_metadata_t* thisptr
+
+
+cdef class Frame_intrinsic_tReference:
+    cdef _cdff_types.asn1SccFrame_intrinsic_t* thisptr
+
+
+cdef class Frame_extrinsic_tReference:
+    cdef _cdff_types.asn1SccFrame_extrinsic_t* thisptr
+
+
+cdef class Frame_error_tReference:
+    cdef _cdff_types.asn1SccFrame_error_t* thisptr
+
+
 cdef class Array3DReference:
     cdef _cdff_types.asn1SccArray3D* thisptr
 
@@ -219,7 +240,3 @@ cdef class Map_metadata_tReference:
 
 cdef class Map_metadata_t_errValuesReference:
     cdef _cdff_types.asn1SccMap_metadata_t_errValues* thisptr
-
-
-cdef class Frame_error_tReference:
-    cdef _cdff_types.asn1SccFrame_error_t* thisptr

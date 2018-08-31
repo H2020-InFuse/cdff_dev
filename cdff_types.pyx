@@ -2123,6 +2123,211 @@ class GpsSolution:
                self.deviation_longitude, self.deviation_altitude))
 
 
+cdef class Frame:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_types.asn1SccFrame()
+        self.delete_thisptr = True
+
+    def __str__(self):
+        # TODO
+        return str("{type: Frame}")
+
+    def _get_msg_version(self):
+        return self.thisptr.msgVersion
+
+    def _set_msg_version(self, uint32_t msg_version):
+        self.thisptr.msgVersion = msg_version
+
+    msg_version = property(_get_msg_version, _set_msg_version)
+
+    @property
+    def metadata(self):
+        cdef Frame_metadata_tReference metadata = Frame_metadata_tReference()
+        metadata.thisptr = &self.thisptr.metadata
+        return metadata
+
+    @property
+    def intrinsic(self):
+        cdef Frame_intrinsic_tReference intrinsic = Frame_intrinsic_tReference()
+        intrinsic.thisptr = &self.thisptr.intrinsic
+        return intrinsic
+
+    @property
+    def extrinsic(self):
+        cdef Frame_extrinsic_tReference extrinsic = Frame_extrinsic_tReference()
+        extrinsic.thisptr = &self.thisptr.extrinsic
+        return extrinsic
+
+    @property
+    def data(self):
+        cdef Array3DReference data = Array3DReference()
+        data.thisptr = &self.thisptr.data
+        return data
+
+
+cdef class Frame_metadata_tReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def _get_msg_version(self):
+        return self.thisptr.msgVersion
+
+    def _set_msg_version(self, uint32_t msg_version):
+        self.thisptr.msgVersion = msg_version
+
+    msg_version = property(_get_msg_version, _set_msg_version)
+
+    #typedef struct {
+    #    asn1SccT_UInt32 msgVersion;
+    #    asn1SccTime timeStamp;
+    #    asn1SccTime receivedTime;
+    #    asn1SccFrame_pixelModel_t pixelModel;
+    #    asn1SccVectorXd pixelCoeffs;
+    #    asn1SccFrame_metadata_t_errValues errValues;
+    #    asn1SccFrame_metadata_t_attributes attributes;
+    #    asn1SccFrame_mode_t mode;
+    #    asn1SccFrame_status_t status;
+    #} asn1SccFrame_metadata_t;
+
+    #typedef enum {
+    #asn1Sccstatus_EMPTY = 0,
+    #asn1Sccstatus_VALID = 1,
+    #asn1Sccstatus_INVALID = 2
+    #} asn1SccFrame_status_t;
+
+    #typedef enum {
+    #asn1Sccmode_UNDEF = 0,
+    #asn1Sccmode_GRAY = 1,
+    #asn1Sccmode_RGB = 2,
+    #asn1Sccmode_RGBA = 3,
+    #asn1Sccmode_BGR = 4,
+    #asn1Sccmode_BGRA = 5,
+    #asn1Sccmode_HSV = 6,
+    #asn1Sccmode_HLS = 7,
+    #asn1Sccmode_YUV = 8,
+    #asn1Sccmode_UYVY = 9,
+    #asn1Sccmode_Lab = 10,
+    #asn1Sccmode_Luv = 11,
+    #asn1Sccmode_XYZ = 12,
+    #asn1Sccmode_YCrCb = 13,
+    #asn1Sccmode_RGB32 = 14,
+    #asn1Sccmode_Bayer_RGGB = 15,
+    #asn1Sccmode_Bayer_GRBG = 16,
+    #asn1Sccmode_Bayer_BGGR = 17,
+    #asn1Sccmode_Bayer_GBRG = 18,
+    #asn1Sccmode_PJPG = 19,
+    #asn1Sccmode_JPEG = 20,
+    #asn1Sccmode_PNG = 21
+    #} asn1SccFrame_mode_t;
+
+    #typedef enum {
+    #asn1Sccerror_UNDEFINED = 0,
+    #asn1Sccerror_DEAD = 1,
+    #asn1Sccerror_FILTERED = 2
+    #} asn1SccFrame_errorType_t;
+
+    #typedef enum {
+    #asn1Sccpix_UNDEF = 0,
+    #asn1Sccpix_POLY = 1,
+    #asn1Sccpix_DISP = 2
+    #} asn1SccFrame_pixelModel_t;
+
+    #typedef struct {
+    #asn1SccT_UInt32 msgVersion;
+    #flag hasFixedTransform;
+    #asn1SccTransformWithCovariance pose_robotFrame_sensorFrame;
+    #asn1SccTransformWithCovariance pose_fixedFrame_robotFrame;
+    #} asn1SccFrame_extrinsic_t;
+
+    #typedef struct {    int nCount;
+    #
+    #asn1SccFrame_attrib_t arr[5];
+    #} asn1SccFrame_metadata_t_attributes;
+
+    #typedef struct {
+    #asn1SccT_String name;
+    #asn1SccT_String data;
+    #} asn1SccFrame_attrib_t;
+
+
+cdef class Frame_intrinsic_tReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def _get_msg_version(self):
+        return self.thisptr.msgVersion
+
+    def _set_msg_version(self, uint32_t msg_version):
+        self.thisptr.msgVersion = msg_version
+
+    msg_version = property(_get_msg_version, _set_msg_version)
+
+    def _get_sensor_id(self):
+        cdef bytes sensorId = self.thisptr.sensorId.arr
+        return sensorId.decode()
+
+    def _set_sensor_id(self, str sensorId):
+        cdef string value = sensorId.encode()
+        memcpy(self.thisptr.sensorId.arr, value.c_str(), len(sensorId))
+        self.thisptr.sensorId.nCount = len(sensorId)
+
+    sensor_id = property(_get_sensor_id, _set_sensor_id)
+
+    @property
+    def camera_matrix(self):
+        cdef Matrix3d camera_matrix = Matrix3d()
+        del camera_matrix.thisptr
+        camera_matrix.delete_thisptr = False
+        camera_matrix.thisptr = &self.thisptr.cameraMatrix
+        return camera_matrix
+
+    # asn1SccFrame_cameraModel_t cameraModel
+    #typedef enum {
+    #asn1Scccam_UNDEF = 0,
+    #asn1Scccam_PINHOLE = 1,
+    #asn1Scccam_FISHEYE = 2,
+    #asn1Scccam_MAPS = 3
+    #} asn1SccFrame_cameraModel_t;
+
+    @property
+    def dist_coeffs(self):
+        cdef Matrix3d dist_coeffs = Matrix3d()
+        del dist_coeffs.thisptr
+        dist_coeffs.delete_thisptr = False
+        dist_coeffs.thisptr = &self.thisptr.distCoeffs
+        return dist_coeffs
+
+
+cdef class Frame_extrinsic_tReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def _get_msg_version(self):
+        return self.thisptr.msgVersion
+
+    def _set_msg_version(self, uint32_t msg_version):
+        self.thisptr.msgVersion = msg_version
+
+    msg_version = property(_get_msg_version, _set_msg_version)
+
+
 cdef class Array3DReference:
     def __cinit__(self):
         self.thisptr = NULL
@@ -2250,6 +2455,44 @@ cdef class Array3D_dataReference:
 
     def size(self):
         return self.thisptr.nCount
+
+
+cdef class Frame_error_tReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def _get_type(self):
+        if <int> self.thisptr.type == <int> _cdff_types.asn1Sccerror_UNDEFINED:
+            return "error_UNDEFINED"
+        elif <int> self.thisptr.type == <int> _cdff_types.asn1Sccerror_DEAD:
+            return "error_DEAD"
+        elif <int> self.thisptr.type == <int> _cdff_types.asn1Sccerror_FILTERED:
+            return "error_FILTERED"
+        else:
+            raise ValueError("Unknown error type: %d" % <int> self.thisptr.type)
+
+    def _set_type(self,  str type):
+        if type == "error_UNDEFINED":
+            self.thisptr.type = _cdff_types.asn1Sccerror_UNDEFINED
+        elif type == "error_DEAD":
+            self.thisptr.type = _cdff_types.asn1Sccerror_DEAD
+        elif type == "error_FILTERED":
+            self.thisptr.type = _cdff_types.asn1Sccerror_FILTERED
+        else:
+            raise ValueError("Unknown error type: %s" % type)
+
+    type = property(_get_type, _set_type)
+
+    def _get_value(self):
+        return self.thisptr.value
+
+    def _set_value(self, double value):
+        self.thisptr.value = value
+
+    value = property(_get_value, _set_value)
 
 
 cdef class Map:
@@ -2398,41 +2641,3 @@ cdef class Map_metadata_t_errValuesReference:
 
     def size(self):
         return self.thisptr.nCount
-
-
-cdef class Frame_error_tReference:
-    def __cinit__(self):
-        self.thisptr = NULL
-
-    def __dealloc__(self):
-        pass
-
-    def _get_type(self):
-        if <int> self.thisptr.type == <int> _cdff_types.asn1Sccerror_UNDEFINED:
-            return "error_UNDEFINED"
-        elif <int> self.thisptr.type == <int> _cdff_types.asn1Sccerror_DEAD:
-            return "error_DEAD"
-        elif <int> self.thisptr.type == <int> _cdff_types.asn1Sccerror_FILTERED:
-            return "error_FILTERED"
-        else:
-            raise ValueError("Unknown error type: %d" % <int> self.thisptr.type)
-
-    def _set_type(self,  str type):
-        if type == "error_UNDEFINED":
-            self.thisptr.type = _cdff_types.asn1Sccerror_UNDEFINED
-        elif type == "error_DEAD":
-            self.thisptr.type = _cdff_types.asn1Sccerror_DEAD
-        elif type == "error_FILTERED":
-            self.thisptr.type = _cdff_types.asn1Sccerror_FILTERED
-        else:
-            raise ValueError("Unknown error type: %s" % type)
-
-    type = property(_get_type, _set_type)
-
-    def _get_value(self):
-        return self.thisptr.value
-
-    def _set_value(self, double value):
-        self.thisptr.value = value
-
-    value = property(_get_value, _set_value)
