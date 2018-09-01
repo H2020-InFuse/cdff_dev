@@ -12,6 +12,13 @@ def test_get_set_microseconds():
     assert_equal(t.microseconds, m)
 
 
+def test_set_float():
+    t = cdff_types.Time()
+    m = 1000023.0
+    t.microseconds = m
+    assert_equal(t.microseconds, m)
+
+
 def test_time_str():
     t = cdff_types.Time()
     assert_regexp_matches(str(t), "{type: Time, microseconds: \d+}")
@@ -1190,8 +1197,8 @@ def test_frame():
     assert_equal(frame.metadata.err_values[0].type, "error_UNDEFINED")
     assert_equal(frame.metadata.err_values[0].value, 5.0)
 
-    frame.metadata.frame_mode = "mode_GRAY"
-    assert_equal(frame.metadata.frame_mode, "mode_GRAY")
+    frame.metadata.mode = "mode_GRAY"
+    assert_equal(frame.metadata.mode, "mode_GRAY")
 
     frame.metadata.pixel_coeffs[0] = 10
     assert_equal(frame.metadata.pixel_coeffs[0], 10)

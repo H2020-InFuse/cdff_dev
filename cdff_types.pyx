@@ -35,8 +35,8 @@ cdef class Time:
     def _get_microseconds(self):
         return self.thisptr.microseconds
 
-    def _set_microseconds(self, int64_t microseconds):
-        self.thisptr.microseconds = microseconds
+    def _set_microseconds(self, microseconds):
+        self.thisptr.microseconds = <int64_t> microseconds
 
     microseconds = property(_get_microseconds, _set_microseconds)
 
@@ -2353,7 +2353,7 @@ cdef class Frame_metadata_tReference:
         else:
             raise ValueError("Unknown frame mode: %s" % frame_mode)
 
-    frame_mode = property(_get_frame_mode, _set_frame_mode)
+    mode = property(_get_frame_mode, _set_frame_mode)
 
     def _get_frame_status(self):
         if <int> self.thisptr.status == <int> _cdff_types.asn1Sccstatus_EMPTY:

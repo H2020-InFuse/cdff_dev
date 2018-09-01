@@ -74,13 +74,16 @@ def _translate_typename(typename):
     return typename
 
 
-def _convert(obj, data):
+def _convert(obj, data, fieldname=None):
     if isinstance(data, list):
         _assign_list(obj, data)
     elif isinstance(data, dict):
         _assign_dict(obj, data)
     else:
-        raise ValueError("Cannot handle data of type '%s'" % type(data))
+        msg = "Cannot handle data of type '%s'" % type(data)
+        if fieldname is not None:
+            msg = "Trying to set field '%s'. %s" % (fieldname, msg)
+        raise ValueError(msg)
     return obj
 
 
@@ -126,7 +129,7 @@ def _assign_element(obj, fieldname, data):
 
     field = getattr(obj, fieldname)
     if type(field).__module__ == "cdff_types":
-        _convert(field, data)
+        _convert(field, data, fieldname)
     else:
         try:
             setattr(obj, fieldname, data)
