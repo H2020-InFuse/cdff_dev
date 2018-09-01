@@ -1102,7 +1102,7 @@ def test_depth_map():
     assert_equal(depth_map.horizontal_size, 10)
 
 
-def test_frame():
+def test_image():
     frame = cdff_types.Image()
 
     frame.frame_time.microseconds = 10
@@ -1142,6 +1142,105 @@ def test_frame():
 
     frame.frame_status = "status_empty"
     assert_equal(frame.frame_status, "status_empty")
+
+
+def test_frame():
+    frame = cdff_types.Frame()
+
+    frame.msg_version = 41
+    assert_equal(frame.msg_version, 41)
+
+    frame.data.channels = 1
+    assert_equal(frame.data.channels, 1)
+
+    frame.data.cols = 2
+    assert_equal(frame.data.cols, 2)
+
+    frame.data.rows = 3
+    assert_equal(frame.data.rows, 3)
+
+    frame.data.depth = "depth_32F"
+    assert_equal(frame.data.depth, "depth_32F")
+
+    frame.data.msg_version = 4
+    assert_equal(frame.data.msg_version, 4)
+
+    frame.data.row_size = 5
+    assert_equal(frame.data.row_size, 5)
+
+    frame.data.data[0] = 2
+    frame.data.data[1] = 3
+    frame.data.data[2] = 4
+    assert_equal(frame.data.data[0], 2)
+    assert_equal(frame.data.data[1], 3)
+    assert_equal(frame.data.data[2], 4)
+
+    frame.metadata.msg_version = 32
+    assert_equal(frame.metadata.msg_version, 32)
+
+    frame.metadata.attributes.resize(1)
+    frame.metadata.attributes[0].data = "some data"
+    frame.metadata.attributes[0].name = "some name"
+    assert_equal(frame.metadata.attributes[0].data, "some data")
+    assert_equal(frame.metadata.attributes[0].name, "some name")
+
+    frame.metadata.err_values[0].type = "error_UNDEFINED"
+    frame.metadata.err_values[0].value = 5.0
+    assert_equal(len(frame.metadata.err_values), 1)
+    assert_equal(frame.metadata.err_values[0].type, "error_UNDEFINED")
+    assert_equal(frame.metadata.err_values[0].value, 5.0)
+
+    frame.metadata.frame_mode = "mode_GRAY"
+    assert_equal(frame.metadata.frame_mode, "mode_GRAY")
+
+    frame.metadata.pixel_coeffs[0] = 10
+    assert_equal(frame.metadata.pixel_coeffs[0], 10)
+
+    frame.metadata.pixel_model = "pix_DISP"
+    assert_equal(frame.metadata.pixel_model, "pix_DISP")
+
+    frame.metadata.received_time.microseconds = 11
+    assert_equal(frame.metadata.received_time.microseconds, 11)
+
+    frame.metadata.status = "status_VALID"
+    assert_equal(frame.metadata.status, "status_VALID")
+
+    frame.metadata.time_stamp.microseconds = 12
+    assert_equal(frame.metadata.time_stamp.microseconds, 12)
+
+    frame.extrinsic.msg_version = 13
+    assert_equal(frame.extrinsic.msg_version, 13)
+
+    frame.extrinsic.has_fixed_transform = True
+    assert_true(frame.extrinsic.has_fixed_transform)
+
+    frame.extrinsic.pose_robot_frame_sensor_frame.data.translation.fromarray(
+        np.array([1.0, 2.0, 3.0]))
+    assert_array_equal(
+        frame.extrinsic.pose_robot_frame_sensor_frame.data.translation.toarray(),
+        np.array([1.0, 2.0, 3.0]))
+
+    frame.extrinsic.pose_fixed_frame_robot_frame.data.translation.fromarray(
+        np.array([1.0, 2.0, 3.0]))
+    assert_array_equal(
+        frame.extrinsic.pose_fixed_frame_robot_frame.data.translation.toarray(),
+        np.array([1.0, 2.0, 3.0]))
+
+    frame.intrinsic.msg_version = 5
+    assert_equal(frame.intrinsic.msg_version, 5)
+
+    frame.intrinsic.camera_matrix.fromarray(np.eye(3))
+    assert_array_equal(
+        frame.intrinsic.camera_matrix.toarray(), np.eye(3))
+
+    frame.intrinsic.camera_model = "cam_PINHOLE"
+    assert_equal(frame.intrinsic.camera_model, "cam_PINHOLE")
+
+    frame.intrinsic.dist_coeffs[0] = 11
+    assert_equal(frame.intrinsic.dist_coeffs[0], 11)
+
+    frame.intrinsic.sensor_id = "camera5"
+    assert_equal(frame.intrinsic.sensor_id, "camera5")
 
 
 def test_map():

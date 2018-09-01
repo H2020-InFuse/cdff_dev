@@ -295,8 +295,10 @@ cdef class VectorXd:
         return self.thisptr.arr[i]
 
     def __setitem__(self, int i, double v):
-        if i < 0 or i >= self.thisptr.nCount:
+        if i < 0 or i >= 100:
             raise KeyError("index out of range: %d" % i)
+        if i >= self.thisptr.nCount:
+            self.thisptr.nCount = i + 1
         self.thisptr.arr[i] = v
 
     def assign(self, VectorXd other):
@@ -2403,6 +2405,36 @@ cdef class Frame_metadata_t_attributesReference:
 
     def size(self):
         return self.thisptr.nCount
+
+
+cdef class Frame_attrib_tReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def _get_data(self):
+        cdef bytes data = self.thisptr.data.arr
+        return data.decode()
+
+    def _set_data(self, str data):
+        cdef string value = data.encode()
+        memcpy(self.thisptr.data.arr, value.c_str(), len(data))
+        self.thisptr.data.nCount = len(data)
+
+    data = property(_get_data, _set_data)
+
+    def _get_name(self):
+        cdef bytes name = self.thisptr.name.arr
+        return name.decode()
+
+    def _set_name(self, str name):
+        cdef string value = name.encode()
+        memcpy(self.thisptr.name.arr, value.c_str(), len(name))
+        self.thisptr.name.nCount = len(name)
+
+    name = property(_get_name, _set_name)
 
 
 cdef class Frame_intrinsic_tReference:
