@@ -217,8 +217,20 @@ cdef class Frame_extrinsic_tReference:
     cdef _cdff_types.asn1SccFrame_extrinsic_t* thisptr
 
 
+cdef class Frame_metadata_t_errValuesReference:
+    cdef _cdff_types.asn1SccFrame_metadata_t_errValues* thisptr
+
+
 cdef class Frame_error_tReference:
     cdef _cdff_types.asn1SccFrame_error_t* thisptr
+
+
+cdef class Frame_metadata_t_attributesReference:
+    cdef _cdff_types.asn1SccFrame_metadata_t_attributes* thisptr
+
+
+cdef class Frame_attrib_tReference:
+    cdef _cdff_types.asn1SccFrame_attrib_t* thisptr
 
 
 cdef class Array3DReference:

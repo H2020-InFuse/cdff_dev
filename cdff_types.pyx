@@ -2188,77 +2188,221 @@ cdef class Frame_metadata_tReference:
 
     msg_version = property(_get_msg_version, _set_msg_version)
 
-    #typedef struct {
-    #    asn1SccT_UInt32 msgVersion;
-    #    asn1SccTime timeStamp;
-    #    asn1SccTime receivedTime;
-    #    asn1SccFrame_pixelModel_t pixelModel;
-    #    asn1SccVectorXd pixelCoeffs;
-    #    asn1SccFrame_metadata_t_errValues errValues;
-    #    asn1SccFrame_metadata_t_attributes attributes;
-    #    asn1SccFrame_mode_t mode;
-    #    asn1SccFrame_status_t status;
-    #} asn1SccFrame_metadata_t;
+    def _get_time_stamp(self):
+        cdef Time time_stamp = Time()
+        del time_stamp.thisptr
+        time_stamp.thisptr = &self.thisptr.timeStamp
+        time_stamp.delete_thisptr = False
+        return time_stamp
 
-    #typedef enum {
-    #asn1Sccstatus_EMPTY = 0,
-    #asn1Sccstatus_VALID = 1,
-    #asn1Sccstatus_INVALID = 2
-    #} asn1SccFrame_status_t;
+    def _set_time_stamp(self, Time time_stamp):
+        self.thisptr.timeStamp = deref(time_stamp.thisptr)
 
-    #typedef enum {
-    #asn1Sccmode_UNDEF = 0,
-    #asn1Sccmode_GRAY = 1,
-    #asn1Sccmode_RGB = 2,
-    #asn1Sccmode_RGBA = 3,
-    #asn1Sccmode_BGR = 4,
-    #asn1Sccmode_BGRA = 5,
-    #asn1Sccmode_HSV = 6,
-    #asn1Sccmode_HLS = 7,
-    #asn1Sccmode_YUV = 8,
-    #asn1Sccmode_UYVY = 9,
-    #asn1Sccmode_Lab = 10,
-    #asn1Sccmode_Luv = 11,
-    #asn1Sccmode_XYZ = 12,
-    #asn1Sccmode_YCrCb = 13,
-    #asn1Sccmode_RGB32 = 14,
-    #asn1Sccmode_Bayer_RGGB = 15,
-    #asn1Sccmode_Bayer_GRBG = 16,
-    #asn1Sccmode_Bayer_BGGR = 17,
-    #asn1Sccmode_Bayer_GBRG = 18,
-    #asn1Sccmode_PJPG = 19,
-    #asn1Sccmode_JPEG = 20,
-    #asn1Sccmode_PNG = 21
-    #} asn1SccFrame_mode_t;
+    time_stamp = property(_get_time_stamp, _set_time_stamp)
 
-    #typedef enum {
-    #asn1Sccerror_UNDEFINED = 0,
-    #asn1Sccerror_DEAD = 1,
-    #asn1Sccerror_FILTERED = 2
-    #} asn1SccFrame_errorType_t;
+    def _get_received_time(self):
+        cdef Time received_time = Time()
+        del received_time.thisptr
+        received_time.thisptr = &self.thisptr.receivedTime
+        received_time.delete_thisptr = False
+        return received_time
 
-    #typedef enum {
-    #asn1Sccpix_UNDEF = 0,
-    #asn1Sccpix_POLY = 1,
-    #asn1Sccpix_DISP = 2
-    #} asn1SccFrame_pixelModel_t;
+    def _set_received_time(self, Time received_time):
+        self.thisptr.receivedTime = deref(received_time.thisptr)
 
-    #typedef struct {
-    #asn1SccT_UInt32 msgVersion;
-    #flag hasFixedTransform;
-    #asn1SccTransformWithCovariance pose_robotFrame_sensorFrame;
-    #asn1SccTransformWithCovariance pose_fixedFrame_robotFrame;
-    #} asn1SccFrame_extrinsic_t;
+    received_time = property(_get_received_time, _set_received_time)
 
-    #typedef struct {    int nCount;
-    #
-    #asn1SccFrame_attrib_t arr[5];
-    #} asn1SccFrame_metadata_t_attributes;
+    def _get_pixel_model(self):
+        if <int> self.thisptr.pixelModel == <int> _cdff_types.asn1Sccpix_UNDEF:
+            return "pix_UNDEF"
+        elif <int> self.thisptr.pixelModel == <int> _cdff_types.asn1Sccpix_POLY:
+            return "pix_POLY"
+        elif <int> self.thisptr.pixelModel == <int> _cdff_types.asn1Sccpix_DISP:
+            return "pix_DISP"
+        else:
+            raise ValueError("Unknown pixel model: %d" % <int> self.thisptr.pixelModel)
 
-    #typedef struct {
-    #asn1SccT_String name;
-    #asn1SccT_String data;
-    #} asn1SccFrame_attrib_t;
+    def _set_pixel_model(self, str pixel_model):
+        if pixel_model == "pix_UNDEF":
+            self.thisptr.pixelModel = _cdff_types.asn1Sccpix_UNDEF
+        elif pixel_model == "pix_POLY":
+            self.thisptr.pixelModel = _cdff_types.asn1Sccpix_POLY
+        elif pixel_model == "pix_DISP":
+            self.thisptr.pixelModel = _cdff_types.asn1Sccpix_DISP
+        else:
+            raise ValueError("Unknown pixel model: %s" % pixel_model)
+
+    pixel_model = property(_get_pixel_model, _set_pixel_model)
+
+    @property
+    def pixel_coeffs(self):
+        cdef VectorXd pixel_coeffs = VectorXd()
+        del pixel_coeffs.thisptr
+        pixel_coeffs.delete_thisptr = False
+        pixel_coeffs.thisptr = &self.thisptr.pixelCoeffs
+        return pixel_coeffs
+
+    @property
+    def err_values(self):
+        cdef Frame_metadata_t_errValuesReference err_values = \
+            Frame_metadata_t_errValuesReference()
+        err_values.thisptr = &self.thisptr.errValues
+        return err_values
+
+    @property
+    def attributes(self):
+        cdef Frame_metadata_t_attributesReference attributes = Frame_metadata_t_attributesReference()
+        attributes.thisptr = &self.thisptr.attributes
+        return attributes
+
+    def _get_frame_mode(self):
+        if <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_UNDEF:
+            return "mode_UNDEF"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_GRAY:
+            return "mode_GRAY"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_RGB:
+            return "mode_RGB"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_RGBA:
+            return "mode_RGBA"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_BGR:
+            return "mode_BGR"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_BGRA:
+            return "mode_BGRA"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_HSV:
+            return "mode_HSV"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_HLS:
+            return "mode_HLS"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_YUV:
+            return "mode_YUV"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_UYVY:
+            return "mode_UYVY"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_Lab:
+            return "mode_Lab"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_Luv:
+            return "mode_Luv"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_XYZ:
+            return "mode_XYZ"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_YCrCb:
+            return "mode_YCrCb"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_RGB32:
+            return "mode_RGB32"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_Bayer_RGGB:
+            return "mode_Bayer_RGGB"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_Bayer_GRBG:
+            return "mode_Bayer_GRBG"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_Bayer_BGGR:
+            return "mode_Bayer_BGGR"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_Bayer_GBRG:
+            return "mode_Bayer_GBRG"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_PJPG:
+            return "mode_PJPG"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_JPEG:
+            return "mode_JPEG"
+        elif <int> self.thisptr.mode == <int> _cdff_types.asn1Sccmode_PNG:
+            return "mode_PNG"
+        else:
+            raise ValueError("Unknown frame mode: %d" % <int> self.thisptr.mode)
+
+    def _set_frame_mode(self, str frame_mode):
+        if frame_mode == "mode_UNDEF":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_UNDEF
+        elif frame_mode == "mode_GRAY":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_GRAY
+        elif frame_mode == "mode_RGB":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_RGB
+        elif frame_mode == "mode_RGBA":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_RGBA
+        elif frame_mode == "mode_BGR":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_BGR
+        elif frame_mode == "mode_BGRA":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_BGRA
+        elif frame_mode == "mode_HSV":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_HSV
+        elif frame_mode == "mode_HLS":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_HLS
+        elif frame_mode == "mode_YUV":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_YUV
+        elif frame_mode == "mode_UYVY":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_UYVY
+        elif frame_mode == "mode_Lab":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_Lab
+        elif frame_mode == "mode_Luv":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_Luv
+        elif frame_mode == "mode_XYZ":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_XYZ
+        elif frame_mode == "mode_YCrCb":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_YCrCb
+        elif frame_mode == "mode_RGB32":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_RGB32
+        elif frame_mode == "mode_Bayer_RGGB":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_Bayer_RGGB
+        elif frame_mode == "mode_Bayer_GRBG":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_Bayer_GRBG
+        elif frame_mode == "mode_Bayer_BGGR":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_Bayer_BGGR
+        elif frame_mode == "mode_Bayer_GBRG":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_Bayer_GBRG
+        elif frame_mode == "mode_PJPG":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_PJPG
+        elif frame_mode == "mode_JPEG":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_JPEG
+        elif frame_mode == "mode_PNG":
+            self.thisptr.mode = _cdff_types.asn1Sccmode_PNG
+        else:
+            raise ValueError("Unknown frame mode: %s" % frame_mode)
+
+    frame_mode = property(_get_frame_mode, _set_frame_mode)
+
+    def _get_frame_status(self):
+        if <int> self.thisptr.status == <int> _cdff_types.asn1Sccstatus_EMPTY:
+            return "status_EMPTY"
+        elif <int> self.thisptr.status == <int> _cdff_types.asn1Sccstatus_VALID:
+            return "status_VALID"
+        elif <int> self.thisptr.status == <int> _cdff_types.asn1Sccstatus_INVALID:
+            return "status_INVALID"
+        else:
+            raise ValueError("Unknown frame status: %d" % <int> self.thisptr.status)
+
+    def _set_frame_status(self, str frame_status):
+        if frame_status == "status_EMPTY":
+            self.thisptr.status = _cdff_types.asn1Sccstatus_EMPTY
+        elif frame_status == "status_VALID":
+            self.thisptr.status = _cdff_types.asn1Sccstatus_VALID
+        elif frame_status == "status_INVALID":
+            self.thisptr.status = _cdff_types.asn1Sccstatus_INVALID
+        else:
+            raise ValueError("Unknown frame status: %s" % frame_status)
+
+    status = property(_get_frame_status, _set_frame_status)
+
+
+cdef class Frame_metadata_t_attributesReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def __len__(self):
+        return self.thisptr.nCount
+
+    def __getitem__(self, int i):
+        if i >= 5:
+            raise KeyError("Maximum size of attributes is 5")
+        if self.thisptr.nCount <= <int> i:
+            self.thisptr.nCount = <int> (i + 1)
+        cdef Frame_attrib_tReference attrib = Frame_attrib_tReference()
+        attrib.thisptr = &self.thisptr.arr[i]
+        return attrib
+
+    def resize(self, int size):
+        if size > 5:
+            warnings.warn("Maximum size of attributes is 5")
+            return
+        self.thisptr.nCount = size
+
+    def size(self):
+        return self.thisptr.nCount
 
 
 cdef class Frame_intrinsic_tReference:
@@ -2295,17 +2439,35 @@ cdef class Frame_intrinsic_tReference:
         camera_matrix.thisptr = &self.thisptr.cameraMatrix
         return camera_matrix
 
-    # asn1SccFrame_cameraModel_t cameraModel
-    #typedef enum {
-    #asn1Scccam_UNDEF = 0,
-    #asn1Scccam_PINHOLE = 1,
-    #asn1Scccam_FISHEYE = 2,
-    #asn1Scccam_MAPS = 3
-    #} asn1SccFrame_cameraModel_t;
+    def _get_camera_model(self):
+        if <int> self.thisptr.cameraModel == <int> _cdff_types.asn1Scccam_UNDEF:
+            return "cam_UNDEF"
+        elif <int> self.thisptr.cameraModel == <int> _cdff_types.asn1Scccam_PINHOLE:
+            return "cam_PINHOLE"
+        elif <int> self.thisptr.cameraModel == <int> _cdff_types.asn1Scccam_FISHEYE:
+            return "cam_FISHEYE"
+        elif <int> self.thisptr.cameraModel == <int> _cdff_types.asn1Scccam_MAPS:
+            return "cam_MAPS"
+        else:
+            raise ValueError("Unknown camera model: %d" % <int> self.thisptr.cameraModel)
+
+    def _set_camera_model(self, str camera_model):
+        if camera_model == "cam_UNDEF":
+            self.thisptr.cameraModel = _cdff_types.asn1Scccam_UNDEF
+        elif camera_model == "cam_PINHOLE":
+            self.thisptr.cameraModel = _cdff_types.asn1Scccam_PINHOLE
+        elif camera_model == "cam_FISHEYE":
+            self.thisptr.cameraModel = _cdff_types.asn1Scccam_FISHEYE
+        elif camera_model == "cam_MAPS":
+            self.thisptr.cameraModel = _cdff_types.asn1Scccam_MAPS
+        else:
+            raise ValueError("Unknown camera model: %s" % camera_model)
+
+    camera_model = property(_get_camera_model, _set_camera_model)
 
     @property
     def dist_coeffs(self):
-        cdef Matrix3d dist_coeffs = Matrix3d()
+        cdef VectorXd dist_coeffs = VectorXd()
         del dist_coeffs.thisptr
         dist_coeffs.delete_thisptr = False
         dist_coeffs.thisptr = &self.thisptr.distCoeffs
@@ -2326,6 +2488,35 @@ cdef class Frame_extrinsic_tReference:
         self.thisptr.msgVersion = msg_version
 
     msg_version = property(_get_msg_version, _set_msg_version)
+
+    def _get_has_fixed_transform(self):
+        return self.thisptr.hasFixedTransform
+
+    def _set_has_fixed_transform(self, bool has_fixed_transform):
+        self.thisptr.hasFixedTransform = has_fixed_transform
+
+    has_fixed_transform = property(
+        _get_has_fixed_transform, _set_has_fixed_transform)
+
+    @property
+    def pose_robot_frame_sensor_frame(self):
+        cdef TransformWithCovariance pose_robotFrame_sensorFrame = \
+            TransformWithCovariance()
+        del pose_robotFrame_sensorFrame.thisptr
+        pose_robotFrame_sensorFrame.delete_thisptr = False
+        pose_robotFrame_sensorFrame.thisptr = \
+            &self.thisptr.pose_robotFrame_sensorFrame
+        return pose_robotFrame_sensorFrame
+
+    @property
+    def pose_fixed_frame_robot_frame(self):
+        cdef TransformWithCovariance pose_fixedFrame_robotFrame = \
+            TransformWithCovariance()
+        del pose_fixedFrame_robotFrame.thisptr
+        pose_fixedFrame_robotFrame.delete_thisptr = False
+        pose_fixedFrame_robotFrame.thisptr = \
+            &self.thisptr.pose_fixedFrame_robotFrame
+        return pose_fixedFrame_robotFrame
 
 
 cdef class Array3DReference:
@@ -2450,6 +2641,36 @@ cdef class Array3D_dataReference:
     def resize(self, int size):
         if size > 66355200:
             warnings.warn("Maximum size of image is 66355200")
+            return
+        self.thisptr.nCount = size
+
+    def size(self):
+        return self.thisptr.nCount
+
+
+cdef class Frame_metadata_t_errValuesReference:
+    def __cinit__(self):
+        self.thisptr = NULL
+
+    def __dealloc__(self):
+        pass
+
+    def __len__(self):
+        return self.thisptr.nCount
+
+    def __getitem__(self, int i):
+        if i >= 3:
+            warnings.warn("Maximum size of image is 3")
+            return
+        cdef Frame_error_tReference entry = Frame_error_tReference()
+        entry.thisptr = &self.thisptr.arr[i]
+        if self.thisptr.nCount <= <int> i:
+            self.thisptr.nCount = <int> (i + 1)
+        return entry
+
+    def resize(self, int size):
+        if size > 3:
+            warnings.warn("Maximum size of image is 3")
             return
         self.thisptr.nCount = size
 
