@@ -138,8 +138,8 @@ def animate(i, line, ax, vdh, images=None, ax_images=None, plot_frequency=75):
         except AttributeError:
             pass
 
-        plt.legend(handles=line, labels=data_labels, fancybox=False, frameon=True,
-                   loc="best")
+        plt.legend(handles=line, labels=data_labels, fancybox=False,
+                   frameon=True, loc="best")
 
     if redraw and images and ax_images:
         for image, image_data in zip(images, vdh.images):
