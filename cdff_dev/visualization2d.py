@@ -102,14 +102,14 @@ class MatplotlibVisualizerApplication:
         plt.close()
 
 
-def animate(i, line, ax, vdh, images=None, ax_images=None):
+def animate(i, line, ax, vdh, images=None, ax_images=None, plot_frequency=75):
     """Update and plot line data.
 
     Anything that needs to be updated must lie within this function.
     It is repeatedly called by FuncAnimation, incrementing i with each
     iteration.
     """
-    redraw = i % 75 == 0
+    redraw = i % plot_frequency == 0
 
     times = vdh.time_list
     list_assigner = vdh.list_assigner
