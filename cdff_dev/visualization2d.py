@@ -310,7 +310,7 @@ class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
         Also keep time list to correct size.
         """
         self._temp.append(timestamp)
-        self.time_list.append((timestamp - self._temp[0]) / 1000000.0)
+        self.time_list.append((timestamp - self._temp[0]) / 1e6)
 
         self.first_timestamp = self._temp[0]
         if len(self.time_list) >= self.max_xrange:
@@ -415,7 +415,7 @@ class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
         ax.set_xlim(self.time_list[0], np.amax(self.time_list))
 
     def convert_back_timestamp(self, timestamp):
-        return timestamp * 1000000 + self.first_timestamp
+        return int(timestamp * 1e6) + self.first_timestamp
 
     def onselect(self, xmin, xmax):
         """When a range is selected, prints selected range to file."""
