@@ -2648,6 +2648,14 @@ cdef class Array3DReference:
         data.thisptr = &self.thisptr.data
         return data
 
+    def array_reference(self, dtype=None):
+        cdef np.npy_intp shape[3]
+        shape[0] = <np.npy_intp> self.thisptr.rows
+        shape[1] = <np.npy_intp> self.thisptr.cols
+        shape[2] = <np.npy_intp> self.thisptr.channels
+        return np.PyArray_SimpleNewFromData(
+            3, shape, np.NPY_UINT8, <void*> self.thisptr.data.arr)
+
 
 cdef class Array3D_dataReference:
     def __cinit__(self):
