@@ -1,15 +1,13 @@
 import sys
-import os
 import threading
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import animation
 from matplotlib.ticker import ScalarFormatter
 from matplotlib.widgets import SpanSelector
-from . import logloader, dataflowcontrol, visualization2d
+from . import logloader, dataflowcontrol
 from .envirevisualization import Worker, Step  # TODO move to another file
 import cdff_types
 
@@ -450,7 +448,7 @@ def main(dfc, vdh, log_files, stream_names, image_stream_name=None, verbose=0):
 
     log_iterator = logloader.replay_files(log_files, stream_names)
 
-    control_panel = visualization2d.ControlPanelExpert(typenames)
+    control_panel = ControlPanelExpert(typenames)
     vdh.set_control_panel(control_panel)
 
     dfc.setup()
@@ -635,7 +633,7 @@ class ControlPanelWidget(QWidget):
 
         # Current sample
         self.step_info = QSpinBox()
-        self.step_info.setMaximum(2000000000)
+        self.step_info.setMaximum(2 ** 31 - 1)
         self.step_info.setEnabled(False)
         layout_sub_1.addWidget(self.step_info)
 
