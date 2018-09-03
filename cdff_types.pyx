@@ -1,6 +1,7 @@
 # distutils: language = c++
 cimport cdff_types
 cimport _cdff_types
+import cython
 from cython.operator cimport dereference as deref
 from libc.string cimport memcpy
 from libc.stdint cimport uint8_t, uint16_t, uint32_t, uint64_t
@@ -2068,6 +2069,14 @@ cdef class Image_imageReference:
     def size(self):
         return self.thisptr.nCount
 
+    def fill(self, list data):
+        cdef int data_len = len(data)
+        self.resize(data_len)
+
+        cdef int i
+        for i in range(data_len):
+            self.thisptr.arr[i] = data[i]
+
 
 cdef class Image_attrib_tReference:
     def __cinit__(self):
@@ -2732,6 +2741,14 @@ cdef class Array3D_dataReference:
 
     def size(self):
         return self.thisptr.nCount
+
+    def fill(self, list data):
+        cdef int data_len = len(data)
+        self.resize(data_len)
+
+        cdef int i
+        for i in range(data_len):
+            self.thisptr.arr[i] = data[i]
 
 
 cdef class Frame_metadata_t_errValuesReference:

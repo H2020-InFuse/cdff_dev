@@ -92,7 +92,9 @@ def _assign_list(obj, data):
     if len(data) == 0:
         return
 
-    if type(data[0]) == list:  # special case: matrices
+    if hasattr(obj, "fill"):
+        obj.fill(data)
+    elif type(data[0]) == list:  # special case: matrices
         for i in range(len(data)):
             for j in range(len(data[i])):
                 obj[i, j] = data[i][j]
