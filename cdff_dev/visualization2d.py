@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib import animation
 from matplotlib.ticker import ScalarFormatter
 from matplotlib.widgets import SpanSelector
+from matplotlib.colors import NoNorm
 from . import logloader, dataflowcontrol
 from .envirevisualization import Worker, Step  # TODO move to another file
 import cdff_types
@@ -14,7 +15,7 @@ import cdff_types
 
 class MatplotlibVisualizerApplication:
     def show_controls(self, dfc, logfiles, stream_names,
-                      image_stream_names=[]):
+                      image_stream_names=[], image_shape=(0, 0)):
         # TODO start everything in main thread
 
         self.vdh = VisualizationDataHandler(image_stream_names)
@@ -37,14 +38,20 @@ class MatplotlibVisualizerApplication:
                     % n_images)
 
             self.ax = plt.subplot2grid((2, 2), (0, 0), colspan=2)
-            blank_image = np.empty((800, 600, 3), dtype=np.uint8)
-            blank_image[:, :, :] = 255
+            blank_image = np.empty(image_shape, dtype=np.uint8)
+            if len(image_shape) == 2:
+                cmap = "gray"
+                blank_image[:, :] = 255
+            else:
+                cmap = None
+                blank_image[:, :, :] = 255
             for i in range(n_images):
                 ax_image = plt.subplot2grid((2, 2), (1, i))
                 ax_image.xaxis.set_major_locator(plt.NullLocator())
                 ax_image.yaxis.set_major_locator(plt.NullLocator())
                 self.ax_images.append(ax_image)
-                image = ax_image.imshow(blank_image, animated=True)
+                image = ax_image.imshow(
+                    blank_image, cmap=cmap, norm=NoNorm(), animated=True)
                 self.images.append(image)
 
         # set axis titles
@@ -142,7 +149,7 @@ def animate(i, line, ax, vdh, images=None, ax_images=None, plot_frequency=75):
     if redraw and images and ax_images:
         for image, image_data in zip(images, vdh.images):
             if image_data is not None:
-                image.set_array(image_data)
+                image.set_data(image_data)
 
     # The best solution for displaying "animated" tick labels.
     # A better solution would be to selectively only redraw these labels,
@@ -370,8 +377,8 @@ class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
             self.source_dict.clear()
 
         # load camera frame information
-        if (type(sample) == cdff_types.Image and
-                port_name in self.image_stream_names):
+        if (port_name in self.image_stream_names and
+                type(sample) in [cdff_types.Image, cdff_types.Frame]):
             image_idx = self.image_stream_names.index(port_name)
             self.images[image_idx] = sample.array_reference().copy()
 
