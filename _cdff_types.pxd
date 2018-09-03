@@ -143,6 +143,12 @@ cdef extern from "Eigen.h":
 # TODO MatrixXd Isometry3d Affine3d
 
 
+cdef extern from "Pose.h":
+    cdef cppclass asn1SccPose:
+        asn1SccVector3d pos
+        asn1SccQuaterniond orient
+
+
 cdef extern from "TransformWithCovariance.h":
     cdef cppclass asn1SccTransformWithCovariance_Data:
         asn1SccVector3d translation

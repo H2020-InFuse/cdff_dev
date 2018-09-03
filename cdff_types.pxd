@@ -67,6 +67,11 @@ cdef class Transform3d:
     cdef bool delete_thisptr
 
 
+cdef class Pose:
+    cdef _cdff_types.asn1SccPose* thisptr
+    cdef bool delete_thisptr
+
+
 cdef class TransformWithCovariance_DataReference:
     cdef _cdff_types.asn1SccTransformWithCovariance_Data* thisptr
 

@@ -547,6 +547,36 @@ cdef class Quaterniond:
             self.thisptr.arr[i] = array[i]
 
 
+cdef class Pose:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_types.asn1SccPose()
+        self.delete_thisptr = True
+
+    @property
+    def pos(self):
+        cdef Vector3d pos = Vector3d()
+        del pos.thisptr
+        pos.delete_thisptr = False
+        pos.thisptr = &self.thisptr.pos
+        return pos
+
+    @property
+    def orient(self):
+        cdef Quaterniond orient = Quaterniond()
+        del orient.thisptr
+        orient.delete_thisptr = False
+        orient.thisptr = &self.thisptr.orient
+        return orient
+
+
 cdef class TransformWithCovariance_MetadataReference:
     def __cinit__(self):
         self.thisptr = NULL

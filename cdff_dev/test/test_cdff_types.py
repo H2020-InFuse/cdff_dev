@@ -744,6 +744,16 @@ def test_quaterniond_fromarray():
     assert_array_equal(v1, v2)
 
 
+def test_transform_pose():
+    p = cdff_types.Pose()
+
+    p.pos.fromarray(np.array([1.0, 2.0, 3.0]))
+    assert_array_equal(p.pos, np.array([1.0, 2.0, 3.0]))
+
+    p.orient.fromarray(np.array([1.0, 2.0, 3.0, 4.0]))
+    assert_array_equal(p.orient, np.array([1.0, 2.0, 3.0, 4.0]))
+
+
 def test_transform_with_covariance():
     t = cdff_types.TransformWithCovariance()
 
