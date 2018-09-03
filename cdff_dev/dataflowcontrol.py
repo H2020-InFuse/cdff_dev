@@ -130,6 +130,9 @@ class DataFlowControl:
         self.result_ports_ = defaultdict(list)
 
         for output_port, input_port in self.connections:
+            input_port = self._check_stream_name(input_port)
+            output_port = self._check_stream_name(output_port)
+
             node_name, port_name, port_exists = self._node_facade.check_port(
                 output_port, "Output")
             if port_exists:
@@ -207,9 +210,21 @@ class DataFlowControl:
             Current sample. The type must correspond to the connected input
             port. Only CDFF types are allowed.
         """
+        stream_name = self._check_stream_name(stream_name)
         self.process(timestamp)
         self._sleep_realtime(timestamp)
         self._push_input(stream_name, sample, timestamp)
+
+    def _check_stream_name(self, stream_name):
+        """Check if stream name satisfies the pattern '<node>.<port>'.
+
+        This function also supports stream name aliases.
+        """
+        if "." not in stream_name:
+            raise ValueError(
+                "Stream name must have the form '<node>.<port>', got '%s'."
+                % stream_name)
+        return stream_name
 
     def _sleep_realtime(self, timestamp):
         """Sleep to ensure real time replay."""

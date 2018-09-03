@@ -38,6 +38,16 @@ class SquareDFN:
         return self.y
 
 
+def test_wrong_stream_name_pattern():
+    dfc = dataflowcontrol.DataFlowControl(
+        nodes={"linear": LinearDFN()},
+        connections=(("log/x", "linear.x"), ("linear.y", "result.y")),
+        periods={}, trigger_ports={"linear": "x"}
+    )
+    assert_raises_regexp(
+        ValueError, "Stream name must have the form", dfc.setup)
+
+
 def test_missing_trigger():
     dfc = dataflowcontrol.DataFlowControl(
         nodes={"linear": LinearDFN()},
