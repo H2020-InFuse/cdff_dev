@@ -48,6 +48,16 @@ def test_wrong_stream_name_pattern():
         ValueError, "Stream name must have the form", dfc.setup)
 
 
+def test_stream_name_alias():
+    dfc = dataflowcontrol.DataFlowControl(
+        nodes={"linear": LinearDFN()},
+        connections=(("log/x", "linear.x"), ("linear.y", "result.y")),
+        periods={}, trigger_ports={"linear": "x"},
+        stream_aliases={"log/x": "log.x"}
+    )
+    dfc.setup()
+
+
 def test_missing_trigger():
     dfc = dataflowcontrol.DataFlowControl(
         nodes={"linear": LinearDFN()},

@@ -66,12 +66,13 @@ class DataFlowControl:
         of the form 'node_name.port_name' are used here.
     """
     def __init__(self, nodes, connections, periods=None, trigger_ports=None,
-                 real_time=False, verbose=0):
+                 real_time=False, stream_aliases=None, verbose=0):
         self.nodes = nodes
         self.connections = connections
         self.periods = periods
         self.trigger_ports = trigger_ports
         self.real_time = real_time
+        self.stream_aliases = stream_aliases
         self.verbose = verbose
 
         self.visualization = None
@@ -93,6 +94,9 @@ class DataFlowControl:
         This function must be called before any log data can be fed into this
         class. Initializes internal data structures and configures nodes.
         """
+        if self.stream_aliases is None:
+            self.stream_aliases = {}
+
         self.node_statistics_ = NodeStatistics()
         self._node_facade = NodeFacade(self.nodes, self.verbose)
         self._node_facade.configure_all()
@@ -220,10 +224,14 @@ class DataFlowControl:
 
         This function also supports stream name aliases.
         """
+        if stream_name in self.stream_aliases:
+            stream_name = self.stream_aliases[stream_name]
+
         if "." not in stream_name:
             raise ValueError(
                 "Stream name must have the form '<node>.<port>', got '%s'."
                 % stream_name)
+
         return stream_name
 
     def _sleep_realtime(self, timestamp):
