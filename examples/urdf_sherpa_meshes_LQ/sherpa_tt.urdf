@@ -1,0 +1,865 @@
+<?xml version="1.0"?>
+<robot name="Sherpa_tt">
+    <material name="Yellow">
+        <color rgba="1.0 1.0 0.0 1.0"/>
+    </material>
+    <material name="Gray">
+        <color rgba="0.2 0.2 0.2 1.0"/>
+    </material>
+    <material name="Black">
+        <color rgba="0 0 0 1.0"/>
+    </material>
+
+    <link name="body">        
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="14.1"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Yellow" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/body.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+        </visual>
+    </link>
+
+
+    <!-- Front left Leg -->
+    <link name="pan_front_left">
+        <inertial>
+            <origin xyz="0.05 0 0" rpy="0 0 0"/>
+            <mass value="3.0"/> <!--0.8for the structure+ pan-actuator and IL actuator -->
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Black" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/steeringPivot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="inner_strut_front_left">
+        <inertial>
+            <origin xyz="0.2 0 0" rpy="0 0 0"/>
+            <mass value="1.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Yellow" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/innerStrut.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="knee_front_left">
+        <inertial>
+            <origin xyz="0.1 0.05 0" rpy="0 0 0"/>
+            <mass value="3.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Black" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/knee.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="outer_strut_front_left">
+        <inertial>
+            <origin xyz="0.2 0 0" rpy="0 0 0"/>
+            <mass value="2.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Yellow" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/outerStrut.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="wheel_upper_front_left">
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="2.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Black" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/steeringUnit.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="wheel_lower_front_left">
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="5.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Black" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/driveUnit.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="wheel_front_left">
+        <visual>
+            <material name="Black" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/wheel.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="inner_leg_front_left">
+        <inertial>
+            <origin xyz="0.2 0 0" rpy="0 0 0"/>
+            <mass value="4.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Yellow" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/innerLegInt.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="outer_leg_front_left">
+        <inertial>
+            <origin xyz="0.2 0 0" rpy="0 0 0"/>
+            <mass value="4.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Yellow" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/outerLegInt.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="wheel_end_point_link_front_left" />
+    <link name="force_torque_sensor_link_front_left" />
+
+
+
+    <joint name="alpha_front_left" type="revolute">
+        <parent link="body"/>
+        <child link="pan_front_left"/>
+        <origin xyz="0.4 0.4 0" rpy="0 0 0.7854" />
+        <axis xyz="0 0 1" />
+        <limit lower="-1.5707963268" upper="2.181661565" effort="1" velocity="0.0872664626"/>
+    </joint>
+    <joint name="beta_front_left" type="revolute">
+        <parent link="pan_front_left"/>
+        <child link="inner_strut_front_left"/>
+        <origin xyz="0.1375 0 0" rpy="-1.570796 0 0" />
+        <axis xyz="0 0 1" />
+        <limit lower="-0.872664626" upper="0.2967059728" effort="1" velocity="0.034906585"/>
+    </joint>
+    <joint name="beta1_fake_front_left" type="revolute">
+        <parent link="inner_strut_front_left"/>
+        <child link="knee_front_left"/>
+        <origin xyz="0.4 0 0" rpy="0 0 0" />
+        <axis xyz="0 0 1" />
+        <limit lower="-0.297" upper="1.038" effort="1" velocity="0.034906585"/>
+        <mimic joint="beta_front_left" multiplier="-1" offset="0"/>
+    </joint>
+    <joint name="beta2_fake_front_left" type="revolute">
+        <parent link="pan_front_left"/>
+        <child link="inner_leg_front_left"/>
+        <origin xyz="0.05 0 0.15155" rpy="-1.570796 0 0" />
+        <axis xyz="0 0 1" />
+        <limit lower="-1.038" upper="0.297" effort="1" velocity="0.034906585"/>
+        <mimic joint="beta_front_left" multiplier="1" offset="0"/>
+    </joint>
+    <joint name="gamma_front_left" type="revolute">
+        <parent link="knee_front_left"/>
+        <child link="outer_strut_front_left"/>
+        <origin xyz="0.045 0 0" rpy="0 0 0.130550" />
+        <axis xyz="0 0 1" />
+        <limit lower="-0.0174532925" upper="1.308996939" effort="1" velocity="0.034906585"/>
+    </joint>
+    <joint name="gamma1_fake_front_left" type="revolute">
+        <parent link="outer_strut_front_left"/>
+        <child link="wheel_upper_front_left"/>
+        <origin xyz="0.4 0 0" rpy="0 0 -0.130550" />
+        <axis xyz="0 0 1" />
+        <limit lower="-1.286" upper="0.087" effort="1" velocity="0.034906585"/>
+        <mimic joint="gamma_front_left" multiplier="-1" offset="0"/>
+    </joint>
+    <joint name="gamma2_fake_front_left" type="revolute">
+        <parent link="knee_front_left"/>
+        <child link="outer_leg_front_left"/>
+        <origin xyz="0.13 -0.127 0" rpy="0 0 0.130550" />
+        <axis xyz="0 0 1" />
+        <limit lower="-0.087" upper="1.286" effort="1" velocity="0.034906585"/>
+        <mimic joint="gamma_front_left" multiplier="1" offset="0"/>
+    </joint>
+    <joint name="phi_front_left" type="revolute">
+        <parent link="wheel_upper_front_left"/>
+        <child link="wheel_lower_front_left"/>
+        <origin xyz="0.04302 0.355 0" rpy="1.570796 0 0" />
+        <axis xyz="0 0 1" />
+        <limit lower="-2.8797932658" upper="2.8797932658" effort="1" velocity="0.436332313"/>
+    </joint>
+    <joint name="omega_front_left" type="continuous">
+        <parent link="wheel_lower_front_left"/>
+        <child link="wheel_front_left"/>
+        <origin xyz="0 0 0" rpy="0 -1.570796 0" />
+        <axis xyz="0 0 1" />
+        <limit effort="1" velocity="0.78539816339"/>
+    </joint>
+    <joint name="wheel_end_point_front_left" type="fixed">
+        <parent link="wheel_lower_front_left"/>
+        <child link="wheel_end_point_link_front_left"/>
+        <origin xyz="0 0 -0.2" rpy="0 0 0" />
+        <axis xyz="0 0 1" />
+    </joint>
+    <joint name="force_torque_sensor_front_left" type="fixed">
+        <parent link="wheel_lower_front_left"/>
+        <child link="force_torque_sensor_link_front_left"/>
+        <origin xyz="0.1 0 0" rpy="0 0 0" />
+        <axis xyz="0 0 1" />
+    </joint>
+
+
+
+    <!-- Front right Leg -->
+    <link name="pan_front_right">
+         <inertial>
+            <origin xyz="0.05 0 0" rpy="0 0 0"/>
+            <mass value="3.0"/> <!--0.8for the structure+ pan-actuator and IL actuator -->
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Black" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/steeringPivot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="inner_strut_front_right">
+        <inertial>
+            <origin xyz="0.2 0 0" rpy="0 0 0"/>
+            <mass value="1.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Yellow" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/innerStrut.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="knee_front_right">
+        <inertial>
+            <origin xyz="0.1 0.05 0" rpy="0 0 0"/>
+            <mass value="3.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Black" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/knee.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="outer_strut_front_right">
+        <inertial>
+            <origin xyz="0.2 0 0" rpy="0 0 0"/>
+            <mass value="2.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Yellow" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/outerStrut.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="wheel_upper_front_right">
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="2.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Black" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/steeringUnit.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="wheel_lower_front_right">
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="5.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Black" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/driveUnit.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="wheel_front_right">
+        <visual>
+            <material name="Black" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/wheel.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="inner_leg_front_right">
+         <inertial>
+            <origin xyz="0.2 0 0" rpy="0 0 0"/>
+            <mass value="4.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Yellow" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/innerLegInt.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="outer_leg_front_right">
+        <inertial>
+            <origin xyz="0.2 0 0" rpy="0 0 0"/>
+            <mass value="4.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Yellow" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/outerLegInt.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="wheel_end_point_link_front_right" />
+    <link name="force_torque_sensor_link_front_right" />
+
+
+
+    <joint name="alpha_front_right" type="revolute">
+        <parent link="body"/>
+        <child link="pan_front_right"/>
+        <origin xyz="0.4 -0.4 0" rpy="0 0 -0.7854" />
+        <axis xyz="0 0 1" />
+	<limit lower="-1.5707963268" upper="2.181661565" effort="1" velocity="0.0872664626"/>
+    </joint>
+    <joint name="beta_front_right" type="revolute">
+        <parent link="pan_front_right"/>
+        <child link="inner_strut_front_right"/>
+        <origin xyz="0.1375 0 0" rpy="-1.570796 0 0" />
+        <axis xyz="0 0 1" />
+        <limit lower="-0.872664626" upper="0.2967059728" effort="1" velocity="0.034906585"/>
+    </joint>
+    <joint name="beta1_fake_front_right" type="revolute">
+        <parent link="inner_strut_front_right"/>
+        <child link="knee_front_right"/>
+        <origin xyz="0.4 0 0" rpy="0 0 0" />
+        <axis xyz="0 0 1" />
+        <limit lower="-0.297" upper="1.038" effort="1" velocity="0.034906585"/>
+        <mimic joint="beta_front_right" multiplier="-1" offset="0"/>
+    </joint>
+    <joint name="beta2_fake_front_right" type="revolute">
+        <parent link="pan_front_right"/>
+        <child link="inner_leg_front_right"/>
+        <origin xyz="0.05 0 0.15155" rpy="-1.570796 0 0" />
+        <axis xyz="0 0 1" />
+        <limit lower="-1.038" upper="0.297" effort="1" velocity="0.034906585"/>
+        <mimic joint="beta_front_right" multiplier="1" offset="0"/>
+    </joint>
+    <joint name="gamma_front_right" type="revolute">
+        <parent link="knee_front_right"/>
+        <child link="outer_strut_front_right"/>
+        <origin xyz="0.045 0 0" rpy="0 0 0.130550" />
+        <axis xyz="0 0 1" />
+        <limit lower="-0.0174532925" upper="1.308996939" effort="1" velocity="0.034906585"/>
+    </joint>
+    <joint name="gamma1_fake_front_right" type="revolute">
+        <parent link="outer_strut_front_right"/>
+        <child link="wheel_upper_front_right"/>
+        <origin xyz="0.4 0 0" rpy="0 0 -0.130550" />
+        <axis xyz="0 0 1" />
+        <limit lower="-1.286" upper="0.087" effort="1" velocity="0.034906585"/>
+        <mimic joint="gamma_front_right" multiplier="-1" offset="0"/>
+    </joint>
+    <joint name="gamma2_fake_front_right" type="revolute">
+        <parent link="knee_front_right"/>
+        <child link="outer_leg_front_right"/>
+        <origin xyz="0.13 -0.127 0" rpy="0 0 0.130550" />
+        <axis xyz="0 0 1" />
+        <limit lower="-0.087" upper="1.286" effort="1" velocity="0.034906585"/>
+        <mimic joint="gamma_front_right" multiplier="1" offset="0"/>
+    </joint>
+    <joint name="phi_front_right" type="revolute">
+        <parent link="wheel_upper_front_right"/>
+        <child link="wheel_lower_front_right"/>
+        <origin xyz="0.04302 0.355 0" rpy="1.570796 0 0" />
+        <axis xyz="0 0 1" />
+        <limit lower="-2.8797932658" upper="2.8797932658" effort="1" velocity="0.436332313"/>
+    </joint>
+    <joint name="omega_front_right" type="continuous">
+        <parent link="wheel_lower_front_right"/>
+        <child link="wheel_front_right"/>
+        <origin xyz="0 0 0" rpy="0 -1.570796 0" />
+        <axis xyz="0 0 1" />
+        <limit effort="1" velocity="0.78539816339"/>
+    </joint>
+    <joint name="wheel_end_point_front_right" type="fixed">
+        <parent link="wheel_lower_front_right"/>
+        <child link="wheel_end_point_link_front_right"/>
+        <origin xyz="0 0 -0.2" rpy="0 0 0" />
+        <axis xyz="0 0 1" />
+    </joint>
+    <joint name="force_torque_sensor_front_right" type="fixed">
+        <parent link="wheel_lower_front_right"/>
+        <child link="force_torque_sensor_link_front_right"/>
+        <origin xyz="0.1 0 0" rpy="0 0 0" />
+        <axis xyz="0 0 1" />
+    </joint>
+
+
+
+    <!-- Rear left Leg -->
+    <link name="pan_rear_left">
+         <inertial>
+            <origin xyz="0.05 0 0" rpy="0 0 0"/>
+            <mass value="3.0"/> <!--0.8for the structure+ pan-actuator and IL actuator -->
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Black" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/steeringPivot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="inner_strut_rear_left">
+        <inertial>
+            <origin xyz="0.2 0 0" rpy="0 0 0"/>
+            <mass value="1.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Yellow" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/innerStrut.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="knee_rear_left">
+        <inertial>
+            <origin xyz="0.1 0.05 0" rpy="0 0 0"/>
+            <mass value="3.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Black" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/knee.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="outer_strut_rear_left">
+        <inertial>
+            <origin xyz="0.2 0 0" rpy="0 0 0"/>
+            <mass value="2.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Yellow" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/outerStrut.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="wheel_upper_rear_left">
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="2.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Black" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/steeringUnit.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="wheel_lower_rear_left">
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="5.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Black" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/driveUnit.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="wheel_rear_left">
+        <visual>
+            <material name="Black" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/wheel.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="inner_leg_rear_left">
+         <inertial>
+            <origin xyz="0.2 0 0" rpy="0 0 0"/>
+            <mass value="4.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Yellow" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/innerLegInt.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="outer_leg_rear_left">
+        <inertial>
+            <origin xyz="0.2 0 0" rpy="0 0 0"/>
+            <mass value="4.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Yellow" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/outerLegInt.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="wheel_end_point_link_rear_left" />
+    <link name="force_torque_sensor_link_rear_left" />
+
+
+
+    <joint name="alpha_rear_left" type="revolute">
+        <parent link="body"/>
+        <child link="pan_rear_left"/>
+        <origin xyz="-0.4 0.4 0" rpy="0 0 2.356194" />
+        <axis xyz="0 0 1" />
+        <limit lower="-1.5707963268" upper="2.181661565" effort="1" velocity="0.0872664626"/>
+    </joint>
+    <joint name="beta_rear_left" type="revolute">
+        <parent link="pan_rear_left"/>
+        <child link="inner_strut_rear_left"/>
+        <origin xyz="0.1375 0 0" rpy="-1.570796 0 0" />
+        <axis xyz="0 0 1" />
+        <limit lower="-0.872664626" upper="0.2967059728" effort="1" velocity="0.034906585"/>
+    </joint>
+    <joint name="beta1_fake_rear_left" type="revolute">
+        <parent link="inner_strut_rear_left"/>
+        <child link="knee_rear_left"/>
+        <origin xyz="0.4 0 0" rpy="0 0 0" />
+        <axis xyz="0 0 1" />
+        <limit lower="-0.297" upper="1.038" effort="1" velocity="0.034906585"/>
+        <mimic joint="beta_rear_left" multiplier="-1" offset="0"/>
+    </joint>
+    <joint name="beta2_fake_rear_left" type="revolute">
+        <parent link="pan_rear_left"/>
+        <child link="inner_leg_rear_left"/>
+        <origin xyz="0.05 0 0.15155" rpy="-1.570796 0 0" />
+        <axis xyz="0 0 1" />
+        <limit lower="-1.038" upper="0.297" effort="1" velocity="0.034906585"/>
+        <mimic joint="beta_rear_left" multiplier="1" offset="0"/>
+    </joint>
+    <joint name="gamma_rear_left" type="revolute">
+        <parent link="knee_rear_left"/>
+        <child link="outer_strut_rear_left"/>
+        <origin xyz="0.045 0 0" rpy="0 0 0.130550" />
+        <axis xyz="0 0 1" />
+        <limit lower="-0.0174532925" upper="1.308996939" effort="1" velocity="0.034906585"/>
+    </joint>
+    <joint name="gamma1_fake_rear_left" type="revolute">
+        <parent link="outer_strut_rear_left"/>
+        <child link="wheel_upper_rear_left"/>
+        <origin xyz="0.4 0 0" rpy="0 0 -0.130550" />
+        <axis xyz="0 0 1" />
+        <limit lower="-1.286" upper="0.087" effort="1" velocity="0.034906585"/>
+        <mimic joint="gamma_rear_left" multiplier="-1" offset="0"/>
+    </joint>
+    <joint name="gamma2_fake_rear_left" type="revolute">
+        <parent link="knee_rear_left"/>
+        <child link="outer_leg_rear_left"/>
+        <origin xyz="0.13 -0.127 0" rpy="0 0 0.130550" />
+        <axis xyz="0 0 1" />
+        <limit lower="-0.087" upper="1.286" effort="1" velocity="0.034906585"/>
+        <mimic joint="gamma_rear_left" multiplier="1" offset="0"/>
+    </joint>
+    <joint name="phi_rear_left" type="revolute">
+        <parent link="wheel_upper_rear_left"/>
+        <child link="wheel_lower_rear_left"/>
+        <origin xyz="0.04302 0.355 0" rpy="1.570796 0 0" />
+        <axis xyz="0 0 1" />
+        <limit lower="-2.8797932658" upper="2.8797932658" effort="1" velocity="0.436332313"/>
+    </joint>
+    <joint name="omega_rear_left" type="continuous">
+        <parent link="wheel_lower_rear_left"/>
+        <child link="wheel_rear_left"/>
+        <origin xyz="0 0 0" rpy="0 -1.570796 0" />
+        <axis xyz="0 0 1" />
+        <limit effort="1" velocity="0.78539816339"/>
+    </joint>
+    <joint name="wheel_end_point_rear_left" type="fixed">
+        <parent link="wheel_lower_rear_left"/>
+        <child link="wheel_end_point_link_rear_left"/>
+        <origin xyz="0 0 -0.2" rpy="0 0 0" />
+        <axis xyz="0 0 1" />
+    </joint>
+    <joint name="force_torque_sensor_rear_left" type="fixed">
+        <parent link="wheel_lower_rear_left"/>
+        <child link="force_torque_sensor_link_rear_left"/>
+        <origin xyz="0.1 0 0" rpy="0 0 0" />
+        <axis xyz="0 0 1" />
+    </joint>
+
+
+
+    <!-- Rear right Leg -->
+    <link name="pan_rear_right">
+         <inertial>
+            <origin xyz="0.05 0 0" rpy="0 0 0"/>
+            <mass value="3.0"/> <!--0.8for the structure+ pan-actuator and IL actuator -->
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Black" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/steeringPivot.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="inner_strut_rear_right">
+        <inertial>
+            <origin xyz="0.2 0 0" rpy="0 0 0"/>
+            <mass value="1.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Yellow" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/innerStrut.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="knee_rear_right">
+        <inertial>
+            <origin xyz="0.1 0.05 0" rpy="0 0 0"/>
+            <mass value="3.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Black" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/knee.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="outer_strut_rear_right">
+        <inertial>
+            <origin xyz="0.2 0 0" rpy="0 0 0"/>
+            <mass value="2.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Yellow" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/outerStrut.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="wheel_upper_rear_right">
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="2.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Black" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/steeringUnit.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="wheel_lower_rear_right">
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="5.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Black" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/driveUnit.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="wheel_rear_right">
+        <visual>
+            <material name="Black" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/wheel.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="inner_leg_rear_right">
+         <inertial>
+            <origin xyz="0.2 0 0" rpy="0 0 0"/>
+            <mass value="4.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Yellow" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/innerLegInt.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="outer_leg_rear_right">
+        <inertial>
+            <origin xyz="0.2 0 0" rpy="0 0 0"/>
+            <mass value="4.0"/>
+            <inertia ixx="0"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
+        </inertial>
+        <visual>
+            <material name="Yellow" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="./meshes/outerLegInt.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+    <link name="wheel_end_point_link_rear_right" />
+    <link name="force_torque_sensor_link_rear_right" />
+
+
+
+    <joint name="alpha_rear_right" type="revolute">
+        <parent link="body"/>
+        <child link="pan_rear_right"/>
+        <origin xyz="-0.4 -0.4 0" rpy="0 0 -2.356194" />
+        <axis xyz="0 0 1" />
+        <limit lower="-1.5707963268" upper="2.181661565" effort="1" velocity="0.0872664626"/>
+    </joint>
+    <joint name="beta_rear_right" type="revolute">
+        <parent link="pan_rear_right"/>
+        <child link="inner_strut_rear_right"/>
+        <origin xyz="0.1375 0 0" rpy="-1.570796 0 0" />
+        <axis xyz="0 0 1" />
+        <limit lower="-0.872664626" upper="0.2967059728" effort="1" velocity="0.034906585"/>
+    </joint>
+    <joint name="beta1_fake_rear_right" type="revolute">
+        <parent link="inner_strut_rear_right"/>
+        <child link="knee_rear_right"/>
+        <origin xyz="0.4 0 0" rpy="0 0 0" />
+        <axis xyz="0 0 1" />
+        <limit lower="-0.297" upper="1.038" effort="1" velocity="0.034906585"/>
+        <mimic joint="beta_rear_right" multiplier="-1" offset="0"/>
+    </joint>
+    <joint name="beta2_fake_rear_right" type="revolute">
+        <parent link="pan_rear_right"/>
+        <child link="inner_leg_rear_right"/>
+        <origin xyz="0.05 0 0.15155" rpy="-1.570796 0 0" />
+        <axis xyz="0 0 1" />
+        <limit lower="-1.038" upper="0.297" effort="1" velocity="0.034906585"/>
+        <mimic joint="beta_rear_right" multiplier="1" offset="0"/>
+    </joint>
+    <joint name="gamma_rear_right" type="revolute">
+        <parent link="knee_rear_right"/>
+        <child link="outer_strut_rear_right"/>
+        <origin xyz="0.045 0 0" rpy="0 0 0.130550" />
+        <axis xyz="0 0 1" />
+        <limit lower="-0.0174532925" upper="1.308996939" effort="1" velocity="0.034906585"/>
+    </joint>
+    <joint name="gamma1_fake_rear_right" type="revolute">
+        <parent link="outer_strut_rear_right"/>
+        <child link="wheel_upper_rear_right"/>
+        <origin xyz="0.4 0 0" rpy="0 0 -0.130550" />
+        <axis xyz="0 0 1" />
+        <limit lower="-1.286" upper="0.087" effort="1" velocity="0.034906585"/>
+        <mimic joint="gamma_rear_right" multiplier="-1" offset="0"/>
+    </joint>
+    <joint name="gamma2_fake_rear_right" type="revolute">
+        <parent link="knee_rear_right"/>
+        <child link="outer_leg_rear_right"/>
+        <origin xyz="0.13 -0.127 0" rpy="0 0 0.130550" />
+        <axis xyz="0 0 1" />
+        <limit lower="-0.087" upper="1.286" effort="1" velocity="0.034906585"/>
+        <mimic joint="gamma_rear_right" multiplier="1" offset="0"/>
+    </joint>
+    <joint name="phi_rear_right" type="revolute">
+        <parent link="wheel_upper_rear_right"/>
+        <child link="wheel_lower_rear_right"/>
+        <origin xyz="0.04302 0.355 0" rpy="1.570796 0 0" />
+        <axis xyz="0 0 1" />
+        <limit lower="-2.8797932658" upper="2.8797932658" effort="1" velocity="0.436332313"/>
+    </joint>
+    <joint name="omega_rear_right" type="continuous">
+        <parent link="wheel_lower_rear_right"/>
+        <child link="wheel_rear_right"/>
+        <origin xyz="0 0 0" rpy="0 -1.570796 0" />
+        <axis xyz="0 0 1" />
+        <limit effort="1" velocity="0.78539816339"/>
+    </joint>
+    <joint name="wheel_end_point_rear_right" type="fixed">
+        <parent link="wheel_lower_rear_right"/>
+        <child link="wheel_end_point_link_rear_right"/>
+        <origin xyz="0 0 -0.2" rpy="0 0 0" />
+        <axis xyz="0 0 1" />
+    </joint>
+    <joint name="force_torque_sensor_rear_right" type="fixed">
+        <parent link="wheel_lower_rear_right"/>
+        <child link="force_torque_sensor_link_rear_right"/>
+        <origin xyz="0.1 0 0" rpy="0 0 0" />
+        <axis xyz="0 0 1" />
+    </joint>
+
+
+
+</robot>
