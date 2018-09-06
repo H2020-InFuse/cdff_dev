@@ -1,8 +1,9 @@
 def configuration(parent_package='', top_path=None):
     from numpy.distutils.misc_util import Configuration
-    config = Configuration("cdff_dev", parent_package, top_path)
-    config.add_subpackage("dfpcs")
-    config.add_subpackage("extensions")
+    config = Configuration("dfpcs", parent_package, top_path)
+
+    config.add_subpackage("reconstruction3d")
+
     return config
 
 
