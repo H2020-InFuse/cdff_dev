@@ -106,7 +106,7 @@ class WorldState:
         self.items = dict()
         self.graph_ = cdff_envire.EnvireGraph()
         for filename in urdf_files:
-            cdff_envire.load_urdf(self.graph_, filename)
+            cdff_envire.load_urdf(self.graph_, filename, false,false,true)
         for frame in self.frames.values():
             if not self.graph_.contains_frame(frame):
                 self.graph_.add_frame(frame)

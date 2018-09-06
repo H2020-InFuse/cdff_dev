@@ -92,7 +92,7 @@ struct NoDeleter
 };
 
 void loadURDF(envire::core::EnvireGraph& graph, const std::string& filename,
-              bool load_frames=false, bool load_joints=false)
+              bool load_frames=false, bool load_joints=false, bool load_visuals=false)
 {
     std::shared_ptr<envire::core::EnvireGraph> ptr(&graph, NoDeleter<envire::core::EnvireGraph>());
     std::shared_ptr<urdf::ModelInterface> model = urdf::parseURDFFile(filename);
@@ -106,5 +106,7 @@ void loadURDF(envire::core::EnvireGraph& graph, const std::string& filename,
         loader.loadFrames(*model);
     if(load_joints)
         loader.loadJoints(*model);
+    if (load_visuals)
+        loader.loadVisuals(*model, filename);
 }
 

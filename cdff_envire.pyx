@@ -445,11 +445,11 @@ cdef class EnvireGraph:
             deref(self.thisptr), frame.encode(), item.thisptr)
 
 
-cpdef load_urdf(EnvireGraph graph, str filename, bool load_frames=False, bool load_joints=False):
+cpdef load_urdf(EnvireGraph graph, str filename, bool load_frames=False, bool load_joints=False, bool load_visuals=False):
     if not os.path.exists(filename):
         raise IOError("File '%s' does not exist." % filename)
 
-    _cdff_envire.loadURDF(deref(graph.thisptr), filename.encode(), load_frames, load_joints)
+    _cdff_envire.loadURDF(deref(graph.thisptr), filename.encode(), load_frames, load_joints, load_visuals)
 
 
 cdef class EnvireVisualizer:
