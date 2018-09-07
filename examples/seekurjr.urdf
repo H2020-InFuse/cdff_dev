@@ -1,6 +1,16 @@
 <?xml version="1.0"?>
   <robot name="seekurjr">
-    <link name="body"/>
+    <link name="body">
+        <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <sphere radius="0.5" />
+        </geometry>
+        <material name="Cyan">
+          <color rgba="0 1.0 1.0 1.0"/>
+        </material>
+      </visual>
+    </link>
     <link name="velodyne"/>
     <link name="lower_dynamixel"/>
 
