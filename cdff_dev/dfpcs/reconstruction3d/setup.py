@@ -17,11 +17,10 @@ def configuration(parent_package='', top_path=None):
     ]
 
     cdffpath = load_cdffpath()
-    ctypespath = os.path.join(cdffpath, CTYPESDIR)
 
     autoproj_available = check_autoproj()
     if autoproj_available:
-        make_dfpc(config, cdffpath, ctypespath, extra_compile_args)
+        make_dfpc(config, cdffpath, extra_compile_args)
 
     return config
 
@@ -35,7 +34,7 @@ def check_autoproj():  # TODO refactor with main setup.py
     return autoproj_available
 
 
-def make_dfpc(config, cdffpath, ctypespath, extra_compile_args):
+def make_dfpc(config, cdffpath, extra_compile_args):
     autoproj_current_root = os.environ.get("AUTOPROJ_CURRENT_ROOT", None)
     install_dir = os.path.join(autoproj_current_root, "install")
     config.add_extension(
@@ -44,12 +43,9 @@ def make_dfpc(config, cdffpath, ctypespath, extra_compile_args):
         include_dirs=[
             ".",
             numpy.get_include(),
-            os.path.join(install_dir, "include/CDFF/DFPCs/Reconstruction3D"),
-            # TODO install CI
-            os.path.join(cdffpath, "DFNs"),
-            os.path.join(cdffpath, "DFPCs/Reconstruction3D"),
             os.path.join(cdffpath, "DFPCs"),
-            ctypespath
+            os.path.join(cdffpath, "DFPCs", "Reconstruction3D"),
+            os.path.join(cdffpath, CTYPESDIR),
         ],
         library_dirs=[
             os.path.join(install_dir, "lib")
