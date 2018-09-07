@@ -2670,7 +2670,7 @@ cdef class Array3D_dataReference:
 
     def __setitem__(self, int i, unsigned char v):
         if i >= 66355200:
-            warnings.warn("Maximum size of image is 66355200")
+            warnings.warn("Maximum size of Array3D is 66355200")
             return
         self.thisptr.arr[i] = v
         if self.thisptr.nCount <= <int> i:
@@ -2678,7 +2678,7 @@ cdef class Array3D_dataReference:
 
     def resize(self, int size):
         if size > 66355200:
-            warnings.warn("Maximum size of image is 66355200")
+            warnings.warn("Maximum size of Array3D is 66355200")
             return
         self.thisptr.nCount = size
 
@@ -2698,7 +2698,7 @@ cdef class Frame_metadata_t_errValuesReference:
 
     def __getitem__(self, int i):
         if i >= 3:
-            warnings.warn("Maximum size of image is 3")
+            warnings.warn("Maximum size of error values in frame metadata is 3")
             return
         cdef Frame_error_tReference entry = Frame_error_tReference()
         entry.thisptr = &self.thisptr.arr[i]
@@ -2708,7 +2708,7 @@ cdef class Frame_metadata_t_errValuesReference:
 
     def resize(self, int size):
         if size > 3:
-            warnings.warn("Maximum size of image is 3")
+            warnings.warn("Maximum size of error values in frame metadata is 3")
             return
         self.thisptr.nCount = size
 
