@@ -2617,8 +2617,6 @@ cdef class Array3DReference:
             self.thisptr.depth = _cdff_types.asn1Sccdepth_8U
         elif depth == "depth_8S":
             self.thisptr.depth = _cdff_types.asn1Sccdepth_8S
-        elif depth == "depth_8S":
-            self.thisptr.depth = _cdff_types.asn1Sccdepth_8S
         elif depth == "depth_16U":
             self.thisptr.depth = _cdff_types.asn1Sccdepth_16U
         elif depth == "depth_16S":
