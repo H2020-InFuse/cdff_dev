@@ -151,7 +151,7 @@ class DataFlowControl:
         if self.trigger_ports is None:
             self.trigger_ports = {}
 
-        self.__check_all_nodes_are_triggered()
+        self.__check_all_nodes_are_triggered_once()
         self.__check_trigger_ports_exist()
 
         self.periods_microseconds = {
@@ -159,8 +159,15 @@ class DataFlowControl:
             for node_name, period in self.periods.items()}
         self.last_processed = {node: -1 for node in self.periods.keys()}
 
-    def __check_all_nodes_are_triggered(self):
+    def __check_all_nodes_are_triggered_once(self):
         all_nodes = self._node_facade.node_names()
+        duplicate_triggered_nodes = set(
+            self.periods.keys()).intersection(set(self.trigger_ports.keys()))
+        if duplicate_triggered_nodes:
+            raise ValueError(
+                "Nodes must not be port-triggered and periodically triggered "
+                "at the same time, but the following nodes are: %s"
+                % (duplicate_triggered_nodes,))
         triggered_nodes = set(self.periods.keys()).union(
             set(self.trigger_ports.keys()))
         if set(all_nodes) != set(triggered_nodes):

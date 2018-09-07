@@ -58,6 +58,15 @@ def test_trigger_does_not_exist():
         ValueError, "Trigger port .* does not exist", dfc.setup)
 
 
+def test_triggered_twice():
+    dfc = dataflowcontrol.DataFlowControl(
+        nodes={"linear": LinearDFN()},
+        connections=(("log.x", "linear.x"), ("linear.y", "result.y")),
+        periods={"linear": 0.01}, trigger_ports={"linear": "x"}
+    )
+    assert_raises_regexp(ValueError, "", dfc.setup)
+
+
 def test_smoke_setup():
     dfc = dataflowcontrol.DataFlowControl(
         nodes={"linear": LinearDFN()},
