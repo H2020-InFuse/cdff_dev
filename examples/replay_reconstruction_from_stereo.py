@@ -1,14 +1,35 @@
 import glob
-from cdff_dev import dataflowcontrol, visualization2d
+from cdff_dev import dataflowcontrol, visualization2d, path
+# TODO remove clone from path
+from cdff_dev.dfpcs.reconstruction3d.reconstruction3d import EstimationFromStereo
+
+
+class DfpcAsDfn:  # TODO make this a general solution or find a better one
+    def __init__(self, dfpc):
+        self.dfpc = dfpc
+
+    def __getattr__(self, name):
+        if name.endswith("Input") or name.endswith("Output"):
+            return self.dfpc.__getattr__(name)
+        elif name == "configure":
+            return self.dfpc.setup
+        elif name == "process":
+            return self.dfpc.process
+        else:
+            raise AttributeError("No attribute with name '%s'" % name)
 
 
 def main():
     verbose = 2
+    reconstruction3d = EstimationFromStereo()
+    # TODO install configuration files?
+    config_filename = path.load_cdffpath() + "/Tests/ConfigurationFiles/DFPCs/Reconstruction3D/DfpcRegistrationFromStereo_conf_DlrHcru.yaml"
+    reconstruction3d.set_configuration_file(config_filename)
     nodes = {
-        # TODO
+        "reconstruction3d": DfpcAsDfn(reconstruction3d)
     }
     periods = {
-        # TODO
+        "reconstruction3d": 1.0  # TODO
     }
     connections = (
         ("/hcru0.pose_cov", "result.pose"),
