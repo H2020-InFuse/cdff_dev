@@ -6,16 +6,16 @@ cimport _cdff_types
 cdef extern from "Reconstruction3DInterface.hpp" namespace "CDFF::DFPC":
     cdef cppclass Reconstruction3DInterface:
         Reconstruction3DInterface()
-        void run()
-        void setConfigurationFile(string)
-        void setup()
+        void run() except +
+        void setConfigurationFile(string) except +
+        void setup() except +
 
-        void leftImageInput(_cdff_types.asn1SccFrame data)
-        void rightImageInput(_cdff_types.asn1SccFrame data)
+        void leftImageInput(_cdff_types.asn1SccFrame data) except +
+        void rightImageInput(_cdff_types.asn1SccFrame data) except +
 
-        _cdff_types.asn1SccPointcloud pointCloudOutput()
-        _cdff_types.asn1SccPose poseOutput()
-        bool successOutput()
+        _cdff_types.asn1SccPointcloud pointCloudOutput() except +
+        _cdff_types.asn1SccPose poseOutput() except +
+        bool successOutput() except +
 
 
 cdef extern from "AdjustmentFromStereo.hpp" namespace "CDFF::DFPC::Reconstruction3D":
