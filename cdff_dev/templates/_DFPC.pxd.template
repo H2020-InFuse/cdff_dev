@@ -8,20 +8,20 @@ cimport _cdff_types
 cdef extern from "{{ desc["name"] }}Interface.hpp" namespace "CDFF::DFPC":
     cdef cppclass {{ desc["name"] }}Interface:
         {{ desc["name"] }}Interface()
-        void run()
-        void setConfigurationFile(string)
-        void setup()
+        void run() except +
+        void setConfigurationFile(string) except +
+        void setup() except +
 
         {% for input_port in desc["input_ports"] %}
-        void {{ input_port["name"] }}Input({{ type_registry.get_info(input_port["type"]).cython_type() }} data)
+        void {{ input_port["name"] }}Input({{ type_registry.get_info(input_port["type"]).cython_type() }} data) except +
         {% endfor %}
 
         {% for output_port in desc["output_ports"] %}
-        {{ type_registry.get_info(output_port["type"]).cython_type() }} {{ output_port["name"] }}Output()
+        {{ type_registry.get_info(output_port["type"]).cython_type() }} {{ output_port["name"] }}Output() except +
         {% endfor %}
 
         {% for operation in desc["operations"] %}
-        {{ type_registry.get_info(operation["output_type"]).cython_type() }} {{ operation["name"] }}({% for arg in operation["inputs"] %}{{ arg["type"] }} {{ arg["name"] }}{{ ", " if not loop.last }}{% endfor %})
+        {{ type_registry.get_info(operation["output_type"]).cython_type() }} {{ operation["name"] }}({% for arg in operation["inputs"] %}{{ arg["type"] }} {{ arg["name"] }}{{ ", " if not loop.last }}{% endfor %}) except +
         {% endfor %}
 {% for class_name in desc["implementations"] %}
 
