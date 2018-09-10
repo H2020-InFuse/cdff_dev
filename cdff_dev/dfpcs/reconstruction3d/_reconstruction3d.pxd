@@ -18,7 +18,6 @@ cdef extern from "Reconstruction3DInterface.hpp" namespace "CDFF::DFPC":
         bool successOutput()
 
 
-"""
 cdef extern from "AdjustmentFromStereo.hpp" namespace "CDFF::DFPC::Reconstruction3D":
     cdef cppclass AdjustmentFromStereo(Reconstruction3DInterface):
         pass
@@ -52,4 +51,3 @@ cdef extern from "RegistrationFromStereo.hpp" namespace "CDFF::DFPC::Reconstruct
 cdef extern from "SparseRegistrationFromStereo.hpp" namespace "CDFF::DFPC::Reconstruction3D":
     cdef cppclass SparseRegistrationFromStereo(Reconstruction3DInterface):
         pass
-"""

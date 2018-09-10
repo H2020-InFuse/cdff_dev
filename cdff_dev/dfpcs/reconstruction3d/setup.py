@@ -43,15 +43,36 @@ def make_dfpc(config, cdffpath, extra_compile_args):
         include_dirs=[
             ".",
             numpy.get_include(),
+            # TODO find automatically
+            os.path.join(install_dir, "include", "pcl-1.8"),
+            os.path.join(install_dir, "include", "eigen3"),
+            # TODO move to installation folder:
+            os.path.join(cdffpath, "Common"),
+            os.path.join(cdffpath, "Common", "Converters"),
+            os.path.join(cdffpath, "Common", "Types", "C"),
+            os.path.join(cdffpath, "Common", "Types", "CPP"),
+            os.path.join(cdffpath, "DFNs"),
             os.path.join(cdffpath, "DFPCs"),
             os.path.join(cdffpath, "DFPCs", "Reconstruction3D"),
-            os.path.join(cdffpath, CTYPESDIR),
+            os.path.join(cdffpath, "Tools"),
+            os.path.join(cdffpath, "CC"),
         ],
         library_dirs=[
-            os.path.join(install_dir, "lib")
+            os.path.join(install_dir, "lib"),
+            # TODO find yaml-cpp
+            # TODO move to installation folder:
+            os.path.join(cdffpath, "build"),
+            # for cdff_types
+            os.path.join(cdffpath, "build", "Common", "Types"),
+            # for cdff_helpers
+            os.path.join(cdffpath, "build", "Common", "Helpers"),
+            # for cdff_opencv_visualizer, cdff_pcl_visualizer
+            os.path.join(cdffpath, "build", "Common", "Visualizers"),
+            # for dfpc_configurator
+            os.path.join(cdffpath, "build", "DFPCs"),
         ],
-        libraries=["base-types", "envire_core", "envire_urdf",
-                   "urdfdom_model", "envire_visualizer_interface"],
+        libraries=["cdff_types", "cdff_helpers", "cdff_opencv_visualizer",
+                   "cdff_pcl_visualizer"],
         define_macros=[("NDEBUG",)],
         extra_compile_args=extra_compile_args
     )
