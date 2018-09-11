@@ -4,6 +4,7 @@ cimport reconstruction3d
 from cython.operator cimport dereference as deref
 from libcpp cimport bool
 from libcpp.string cimport string
+from libc.string cimport memcpy
 cimport cdff_types
 cimport _cdff_types
 
@@ -42,6 +43,7 @@ cdef class AdjustmentFromStereo:
     def pointCloudOutput(self):
         cdef cdff_types.Pointcloud out = cdff_types.Pointcloud()
         out.thisptr[0] = self.thisptr.pointCloudOutput()
+        memcpy(out.thisptr, &self.thisptr.pointCloudOutput(), sizeof(out.thisptr[0]))
         return out
 
     def poseOutput(self):
@@ -88,6 +90,7 @@ cdef class DenseRegistrationFromStereo:
     def pointCloudOutput(self):
         cdef cdff_types.Pointcloud out = cdff_types.Pointcloud()
         out.thisptr[0] = self.thisptr.pointCloudOutput()
+        memcpy(out.thisptr, &self.thisptr.pointCloudOutput(), sizeof(out.thisptr[0]))
         return out
 
     def poseOutput(self):
@@ -134,6 +137,7 @@ cdef class EstimationFromStereo:
     def pointCloudOutput(self):
         cdef cdff_types.Pointcloud out = cdff_types.Pointcloud()
         out.thisptr[0] = self.thisptr.pointCloudOutput()
+        memcpy(out.thisptr, &self.thisptr.pointCloudOutput(), sizeof(out.thisptr[0]))
         return out
 
     def poseOutput(self):
@@ -180,6 +184,7 @@ cdef class ReconstructionFromMotion:
     def pointCloudOutput(self):
         cdef cdff_types.Pointcloud out = cdff_types.Pointcloud()
         out.thisptr[0] = self.thisptr.pointCloudOutput()
+        memcpy(out.thisptr, &self.thisptr.pointCloudOutput(), sizeof(out.thisptr[0]))
         return out
 
     def poseOutput(self):
@@ -226,6 +231,7 @@ cdef class ReconstructionFromStereo:
     def pointCloudOutput(self):
         cdef cdff_types.Pointcloud out = cdff_types.Pointcloud()
         out.thisptr[0] = self.thisptr.pointCloudOutput()
+        memcpy(out.thisptr, &self.thisptr.pointCloudOutput(), sizeof(out.thisptr[0]))
         return out
 
     def poseOutput(self):
@@ -272,6 +278,7 @@ cdef class RegistrationFromStereo:
     def pointCloudOutput(self):
         cdef cdff_types.Pointcloud out = cdff_types.Pointcloud()
         out.thisptr[0] = self.thisptr.pointCloudOutput()
+        memcpy(out.thisptr, &self.thisptr.pointCloudOutput(), sizeof(out.thisptr[0]))
         return out
 
     def poseOutput(self):
@@ -318,6 +325,7 @@ cdef class SparseRegistrationFromStereo:
     def pointCloudOutput(self):
         cdef cdff_types.Pointcloud out = cdff_types.Pointcloud()
         out.thisptr[0] = self.thisptr.pointCloudOutput()
+        memcpy(out.thisptr, &self.thisptr.pointCloudOutput(), sizeof(out.thisptr[0]))
         return out
 
     def poseOutput(self):

@@ -13,9 +13,9 @@ cdef extern from "Reconstruction3DInterface.hpp" namespace "CDFF::DFPC":
         void leftImageInput(_cdff_types.asn1SccFrame data) except +
         void rightImageInput(_cdff_types.asn1SccFrame data) except +
 
-        _cdff_types.asn1SccPointcloud pointCloudOutput() except +
-        _cdff_types.asn1SccPose poseOutput() except +
-        bool successOutput() except +
+        _cdff_types.asn1SccPointcloud& pointCloudOutput() except +
+        _cdff_types.asn1SccPose& poseOutput() except +
+        bool& successOutput() except +
 
 
 cdef extern from "AdjustmentFromStereo.hpp" namespace "CDFF::DFPC::Reconstruction3D":
