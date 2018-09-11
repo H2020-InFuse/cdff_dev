@@ -17,7 +17,7 @@ cdef extern from "{{ desc["name"] }}Interface.hpp" namespace "CDFF::DFN":
         {% endfor %}
 
         {% for output_port in desc["output_ports"] %}
-        {{ type_registry.get_info(output_port["type"]).cython_type() }} {{ output_port["name"] }}Output() except +
+        {{ type_registry.get_info(output_port["type"]).cython_type() }}& {{ output_port["name"] }}Output() except +
         {% endfor %}
 {% for class_name in desc["implementations"] %}
 

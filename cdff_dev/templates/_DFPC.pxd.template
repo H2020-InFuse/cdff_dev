@@ -17,11 +17,11 @@ cdef extern from "{{ desc["name"] }}Interface.hpp" namespace "CDFF::DFPC":
         {% endfor %}
 
         {% for output_port in desc["output_ports"] %}
-        {{ type_registry.get_info(output_port["type"]).cython_type() }} {{ output_port["name"] }}Output() except +
+        {{ type_registry.get_info(output_port["type"]).cython_type() }}& {{ output_port["name"] }}Output() except +
         {% endfor %}
 
         {% for operation in desc["operations"] %}
-        {{ type_registry.get_info(operation["output_type"]).cython_type() }} {{ operation["name"] }}({% for arg in operation["inputs"] %}{{ arg["type"] }} {{ arg["name"] }}{{ ", " if not loop.last }}{% endfor %}) except +
+        {{ type_registry.get_info(operation["output_type"]).cython_type() }}& {{ operation["name"] }}({% for arg in operation["inputs"] %}{{ arg["type"] }} {{ arg["name"] }}{{ ", " if not loop.last }}{% endfor %}) except +
         {% endfor %}
 {% for class_name in desc["implementations"] %}
 
