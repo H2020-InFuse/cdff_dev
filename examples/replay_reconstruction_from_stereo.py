@@ -14,7 +14,7 @@ class DfpcAsDfn:  # TODO make this a general solution or find a better one
         elif name == "configure":
             return self.dfpc.setup
         elif name == "process":
-            return self.dfpc.process
+            return self.dfpc.run
         else:
             raise AttributeError("No attribute with name '%s'" % name)
 
@@ -23,7 +23,7 @@ def main():
     verbose = 2
     reconstruction3d = EstimationFromStereo()
     # TODO install configuration files?
-    config_filename = path.load_cdffpath() + "/Tests/ConfigurationFiles/DFPCs/Reconstruction3D/DfpcRegistrationFromStereo_conf_DlrHcru.yaml"
+    config_filename = path.load_cdffpath() + "/Tests/ConfigurationFiles/DFPCs/Reconstruction3D/DfpcEstimationFromStereo_DlrHcru.yaml"
     reconstruction3d.set_configuration_file(config_filename)
     nodes = {
         "reconstruction3d": DfpcAsDfn(reconstruction3d)
@@ -53,7 +53,7 @@ def main():
     ]
     # Note that the logfiles are not in the repository because they are too
     # large. Ask Alexander Fabisch about it.
-    log_folder = "logs/converted/"
+    log_folder = "logs/DLR_20180724/"
     logfiles = [
         [log_folder + "recording_20180724-135036_hcru0_pose_cov_%09d.msg" % i for i in range(5)],
         #sorted(glob.glob(log_folder + "recording_20180724-135036_hcru0_pose_cov_*.msg")),
