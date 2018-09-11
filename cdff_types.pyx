@@ -561,6 +561,9 @@ cdef class Pose:
         self.thisptr = new _cdff_types.asn1SccPose()
         self.delete_thisptr = True
 
+    def __str__(self):
+        return "{type: Pose, pos: %s, orient: %s}" % (self.pos, self.orient)
+
     @property
     def pos(self):
         cdef Vector3d pos = Vector3d()
