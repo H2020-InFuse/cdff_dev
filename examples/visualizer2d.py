@@ -10,6 +10,7 @@ import glob
 
 
 dfc = dataflowcontrol.DataFlowControl(nodes={}, periods={}, connections=[])
+dfc.setup()
 
 logfiles = [
     sorted(glob.glob("test/test_data/logs/xsens_imu_*.msg")),

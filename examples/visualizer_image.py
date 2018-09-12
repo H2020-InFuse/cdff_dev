@@ -2,6 +2,7 @@ from cdff_dev import dataflowcontrol, visualization2d
 
 
 dfc = dataflowcontrol.DataFlowControl(nodes={}, periods={}, connections=[])
+dfc.setup()
 
 logfiles = [["test/test_data/logs/frames.msg"]]
 stream_names = ["/camera1.frame"]
