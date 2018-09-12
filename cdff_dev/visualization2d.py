@@ -3,8 +3,6 @@ import threading
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import numpy as np
-#import matplotlib
-#matplotlib.use("Qt4Agg")
 import matplotlib.pyplot as plt
 from matplotlib import animation
 from matplotlib.ticker import ScalarFormatter
@@ -108,6 +106,9 @@ class MatplotlibVisualizerApplication:
         # display plotting window
         try:
             plt.show()
+            #matplotlib.interactive(True)
+            #plt.draw()
+            #plt.pause(0.001)
         except AttributeError:
             pass
         plt.close()
@@ -152,17 +153,10 @@ def animate(i, line, ax, vdh, images=None, ax_images=None, plot_frequency=75):
         plt.legend(handles=line, labels=data_labels, fancybox=False,
                    frameon=True, loc="best")
 
-    print("redraw?")
     if redraw and images and ax_images:
-        print("yes!")
         for image, image_data in zip(images, vdh.images):
             if image_data is not None:
-                print(image_data    )
                 image.set_data(image_data)
-            else:
-                print("none")
-    else:
-        print("no!")
 
     # The best solution for displaying "animated" tick labels.
     # A better solution would be to selectively only redraw these labels,
@@ -472,7 +466,6 @@ def main(dfc, vdh, log_files, stream_names, image_stream_name, stream_aliases,
     control_panel = ControlPanelExpert(typenames)
     vdh.set_control_panel(control_panel)
 
-    dfc.setup()
     dfc.set_visualization(vdh)
 
     control_panel.show_controls(stream_names, log_iterator, dfc, stream_aliases)
