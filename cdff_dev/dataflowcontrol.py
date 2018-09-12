@@ -34,6 +34,9 @@ class DataFlowControl:
         replayed. If any DFN takes longer than allowed, the whole processing
         network will be delayed and slower than real time.
 
+    stream_aliases : dict, optional (default: {})
+        Mapping from original stream names to their aliases if they have any.
+
     verbose : int, optional (default: 0)
         Verbosity level
 
