@@ -42,6 +42,9 @@ class DataFlowControl:
 
     Attributes
     ----------
+    visualizations : list
+        Registered visualizations.
+
     node_statistics_ : NodeStatistics
         Store runtime data about nodes that can be used for analysis of the
         network.
@@ -78,7 +81,7 @@ class DataFlowControl:
         self.stream_aliases = stream_aliases
         self.verbose = verbose
 
-        self.visualization = None
+        self.visualizations_ = []
         self.node_statistics_ = None
         self.output_ports_ = None
         self.input_ports_ = None
@@ -117,7 +120,7 @@ class DataFlowControl:
             Visualization of replayed log samples or results of processing
             steps
         """
-        self.visualization = visualization
+        self.visualizations_.append(visualization)
 
     def register_world_state(self, world_state):
         """Register a world state representation.
@@ -323,9 +326,8 @@ class DataFlowControl:
 
     def _push_input(self, output_port, sample, timestamp):
         """Push input to given port."""
-        if self.visualization is not None:
-            self.visualization.report_node_output(
-                output_port, sample, timestamp)
+        for visualization in self.visualizations_:
+            visualization.report_node_output(output_port, sample, timestamp)
 
         if output_port in self.connection_map_:
             for input_port in self.connection_map_[output_port]:
