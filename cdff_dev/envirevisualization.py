@@ -3,7 +3,7 @@ import time
 import warnings
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from . import logloader, typefromdict
+from . import typefromdict
 from . import dataflowcontrol
 import cdff_envire
 import cdff_types
@@ -23,7 +23,7 @@ class EnvireVisualizerApplication:
     center_frame : str, optional (default: first in lexical order)
         Frame that represents the center of visualization
     """
-    def __init__(self, frames, urdf_files=[], center_frame=None):
+    def __init__(self, frames, urdf_files=(), center_frame=None):
         self.app = QApplication(sys.argv)
         self.visualization = EnvireVisualization(
             frames, urdf_files, center_frame)
@@ -77,11 +77,13 @@ class EnvireVisualization(dataflowcontrol.VisualizationBase):
     center_frame : str, optional (default: first in lexical order)
         Frame that represents the center of visualization
     """
-    def __init__(self, frames, urdf_files=[], center_frame=None):
+    def __init__(self, frames, urdf_files=(), center_frame=None):
         self.world_state_ = WorldState(frames, urdf_files)
         self.visualizer = cdff_envire.EnvireVisualizer()
         if center_frame is None:
             center_frame = sorted(frames.values())[0]
+        if not self.world_state_.graph_.contains_frame(center_frame):
+            self.world_state_.graph_.add_frame(center_frame)
         self.visualizer.display_graph(self.world_state_.graph_, center_frame)
         self.visualizer.show()
 
