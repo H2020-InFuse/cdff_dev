@@ -2651,8 +2651,28 @@ cdef class Array3DReference:
         shape[0] = <np.npy_intp> self.thisptr.rows
         shape[1] = <np.npy_intp> self.thisptr.cols
         shape[2] = <np.npy_intp> self.thisptr.channels
+
+        array_type = dtype
+
+        if <int> self.thisptr.depth == <int> _cdff_types.asn1Sccdepth_8U:
+            array_type = np.NPY_UINT8
+        elif <int> self.thisptr.depth == <int> _cdff_types.asn1Sccdepth_8S:
+            array_type = np.NPY_INT8
+        elif <int> self.thisptr.depth == <int> _cdff_types.asn1Sccdepth_16U:
+            array_type = np.NPY_UINT16
+        elif <int> self.thisptr.depth == <int> _cdff_types.asn1Sccdepth_16S:
+            array_type = np.NPY_INT16
+        elif <int> self.thisptr.depth == <int> _cdff_types.asn1Sccdepth_32S:
+            array_type = np.NPY_INT32
+        elif <int> self.thisptr.depth == <int> _cdff_types.asn1Sccdepth_32F:
+            array_type = np.NPY_FLOAT32
+        elif <int> self.thisptr.depth == <int> _cdff_types.asn1Sccdepth_64F:
+            array_type = np.NPY_FLOAT64
+        else:
+            raise ValueError("Unknown depth: %d" % <int> self.thisptr.depth)
+
         return np.PyArray_SimpleNewFromData(
-            3, shape, np.NPY_UINT8, <void*> self.thisptr.data.arr)
+            3, shape, array_type, <void*> self.thisptr.data.arr)
 
 
 cdef class Array3D_dataReference:
