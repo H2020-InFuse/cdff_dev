@@ -3,6 +3,8 @@ import threading
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import numpy as np
+#import matplotlib
+#matplotlib.use("Qt4Agg")
 import matplotlib.pyplot as plt
 from matplotlib import animation
 from matplotlib.ticker import ScalarFormatter
@@ -15,8 +17,11 @@ import cdff_types
 
 class MatplotlibVisualizerApplication:
     def show_controls(self, dfc, logfiles, stream_names,
-                      image_stream_names=[], image_shape=(0, 0)):
+                      image_stream_names=(), image_shape=(0, 0),
+                      stream_aliases=None):
         # TODO start everything in main thread
+        if stream_aliases is None:
+            stream_aliases = {}
 
         self.vdh = VisualizationDataHandler(image_stream_names)
 
@@ -95,7 +100,8 @@ class MatplotlibVisualizerApplication:
         # begin log replay on a separate thread in order to run concurrently
         thread = threading.Thread(
             target=main,
-            args=(dfc, self.vdh, logfiles, stream_names, image_stream_names))
+            args=(dfc, self.vdh, logfiles, stream_names, image_stream_names,
+                  stream_aliases))
         thread.start()
 
     def exec_(self):
@@ -146,10 +152,17 @@ def animate(i, line, ax, vdh, images=None, ax_images=None, plot_frequency=75):
         plt.legend(handles=line, labels=data_labels, fancybox=False,
                    frameon=True, loc="best")
 
+    print("redraw?")
     if redraw and images and ax_images:
+        print("yes!")
         for image, image_data in zip(images, vdh.images):
             if image_data is not None:
+                print(image_data    )
                 image.set_data(image_data)
+            else:
+                print("none")
+    else:
+        print("no!")
 
     # The best solution for displaying "animated" tick labels.
     # A better solution would be to selectively only redraw these labels,
@@ -297,7 +310,7 @@ class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
     self.type: string
         Contains the current user-selected sample type
     """
-    def __init__(self, image_stream_names=[]):
+    def __init__(self, image_stream_names=()):
         self.time_list = []
         self.source_dict = {}
         self.list_assigner = ListAssigner()
@@ -446,7 +459,8 @@ class VisualizationDataHandler(dataflowcontrol.VisualizationBase):
         file_.close()
 
 
-def main(dfc, vdh, log_files, stream_names, image_stream_name=None, verbose=0):
+def main(dfc, vdh, log_files, stream_names, image_stream_name, stream_aliases,
+         verbose=0):
     typenames = logloader.summarize_logfiles(log_files)
     if verbose:
         print("Streams: %s" % stream_names)
@@ -461,7 +475,7 @@ def main(dfc, vdh, log_files, stream_names, image_stream_name=None, verbose=0):
     dfc.setup()
     dfc.set_visualization(vdh)
 
-    control_panel.show_controls(stream_names, log_iterator, dfc)
+    control_panel.show_controls(stream_names, log_iterator, dfc, stream_aliases)
     control_panel.exec_()
 
 
@@ -512,7 +526,7 @@ class ControlPanelExpert:
         self.type = None
         self.remove_outlier = False
 
-    def show_controls(self, stream_names, log_iterator, dfc):
+    def show_controls(self, stream_names, log_iterator, dfc, stream_aliases):
         """Show control window to replay log file.
 
         Parameters
@@ -525,10 +539,15 @@ class ControlPanelExpert:
 
         dfc : DataFlowControl
             Configured processing and data fusion logic
+
+        stream_aliases : dict, optional (default: {})
+            Mapping from original stream names to their aliases if they have
+            any.
         """
         # splits args between image log data and other
         self.control_window = ControlPanelMainWindow(
-            Step, self, self.stream_dict, stream_names, log_iterator, dfc)
+            Step, self, self.stream_dict, stream_names, log_iterator, dfc,
+            stream_aliases)
         self.control_window.show()
 
     def exec_(self):
@@ -541,7 +560,8 @@ class ControlPanelExpert:
 
 class ControlPanelMainWindow(QMainWindow):
     """Instantiation of Qt window and Control Panel classes."""
-    def __init__(self, work, ctrl_pnl_expert, stream_dict, stream_names, log_iterator, dfc):
+    def __init__(self, work, ctrl_pnl_expert, stream_dict, stream_names,
+                 log_iterator, dfc, stream_aliases):
         super(ControlPanelMainWindow, self).__init__()
         self.worker = Worker(work, log_iterator, dfc)
         self.worker.start()
@@ -551,7 +571,8 @@ class ControlPanelMainWindow(QMainWindow):
         self.setMinimumSize(400, 310)
 
         central_widget = ControlPanelWidget(
-            self.worker, ctrl_pnl_expert, stream_dict, stream_names)
+            self.worker, ctrl_pnl_expert, stream_dict, stream_names,
+            stream_aliases)
 
         controller = ControlPanelController(
             central_widget, self.worker, ctrl_pnl_expert)
@@ -580,11 +601,16 @@ class ControlPanelWidget(QWidget):
 
     stream_names : list
         List of stream names available to be replayed
+
+    stream_aliases : dict, optional (default: {})
+        Mapping from original stream names to their aliases if they have any.
     """
-    def __init__(self, worker, ctrl_pnl_expert, stream_dict, stream_names):
+    def __init__(self, worker, ctrl_pnl_expert, stream_dict, stream_names,
+                 stream_aliases):
         super(ControlPanelWidget, self).__init__()
         self.stream_names = stream_names
         self.stream_dict = stream_dict
+        self.stream_aliases = stream_aliases
         self.ctrl_pnl_expert = ctrl_pnl_expert
         self.worker = worker
 
@@ -654,7 +680,9 @@ class ControlPanelWidget(QWidget):
         # Stream select
         self.stream_edit = QComboBox()
         self.stream_edit.addItem("Select stream...")
-        self.stream_edit.addItems(self.stream_names)
+        stream_names = [self.stream_aliases.get(sn, sn)
+                        for sn in self.stream_names]
+        self.stream_edit.addItems(stream_names)
         self.stream_edit.currentIndexChanged.connect(
             self.controller.set_stream)
         layout_sub_2.addWidget(self.stream_edit)
