@@ -5,6 +5,32 @@ import numpy
 from cdff_dev.path import load_cdffpath
 
 
+cdffpath = load_cdffpath()
+DEFAULT_INCLUDE_DIRS = [
+    ".",
+    numpy.get_include(),
+    # TODO move to installation folder:
+    os.path.join(cdffpath, "Common"),
+    os.path.join(cdffpath, "Common", "Converters"),
+    os.path.join(cdffpath, "Common", "Types", "C"),
+    os.path.join(cdffpath, "Common", "Types", "CPP"),
+    os.path.join(cdffpath, "DFNs"),
+    os.path.join(cdffpath, "DFPCs"),
+    os.path.join(cdffpath, "Tools"),
+    os.path.join(cdffpath, "CC"),
+]
+DEFAULT_LIBRARY_DIRS = [
+    # TODO move to installation folder:
+    os.path.join(cdffpath, "build"),
+    os.path.join(cdffpath, "build", "Common", "Types"),
+    os.path.join(cdffpath, "build", "Common", "Helpers"),
+    os.path.join(cdffpath, "build", "Common", "Visualizers"),
+    os.path.join(cdffpath, "build", "DFNs"),
+    os.path.join(cdffpath, "build", "DFPCs"),
+    os.path.join(cdffpath, "build", "CC"),
+] + list(glob.glob(os.path.join(cdffpath, "build", "DFNs", "*")))
+
+
 def configuration(parent_package='', top_path=None):
     from numpy.distutils.misc_util import Configuration
     config = Configuration("dfpcs", parent_package, top_path)
@@ -17,7 +43,6 @@ def configuration(parent_package='', top_path=None):
         "-Wno-cpp", "-Wno-unused-function"
     ]
 
-    cdffpath = load_cdffpath()
 
     autoproj_available = check_autoproj()
     if autoproj_available:
@@ -43,35 +68,17 @@ def make_reconstruction3d(config, cdffpath, extra_compile_args):
         "reconstruction3d",
         sources=["reconstruction3d.pyx"],
         include_dirs=[
-            ".",
-            numpy.get_include(),
+            os.path.join(cdffpath, "DFPCs", "Reconstruction3D"),
             # TODO find automatically
             os.path.join(install_dir, "include", "pcl-1.8"),
             os.path.join(install_dir, "include", "eigen3"),
-            # TODO move to installation folder:
-            os.path.join(cdffpath, "Common"),
-            os.path.join(cdffpath, "Common", "Converters"),
-            os.path.join(cdffpath, "Common", "Types", "C"),
-            os.path.join(cdffpath, "Common", "Types", "CPP"),
-            os.path.join(cdffpath, "DFNs"),
-            os.path.join(cdffpath, "DFPCs"),
-            os.path.join(cdffpath, "DFPCs", "Reconstruction3D"),
-            os.path.join(cdffpath, "Tools"),
-            os.path.join(cdffpath, "CC"),
-        ],
+        ] + DEFAULT_INCLUDE_DIRS,
         library_dirs=[
-            os.path.join(install_dir, "lib"),
             # TODO find yaml-cpp, opencv, pcl, boost-system
+            os.path.join(install_dir, "lib"),
             # TODO move to installation folder:
-            os.path.join(cdffpath, "build"),
-            os.path.join(cdffpath, "build", "Common", "Types"),
-            os.path.join(cdffpath, "build", "Common", "Helpers"),
-            os.path.join(cdffpath, "build", "Common", "Visualizers"),
-            os.path.join(cdffpath, "build", "DFNs"),
-            os.path.join(cdffpath, "build", "DFPCs"),
             os.path.join(cdffpath, "build", "DFPCs", "Reconstruction3D"),
-            os.path.join(cdffpath, "build", "CC"),
-        ] + list(glob.glob(os.path.join(cdffpath, "build", "DFNs", "*"))),
+        ] + DEFAULT_LIBRARY_DIRS,
         libraries=[
             # make sure that libraries used in other libraries are linked last!
             # for example: an implementation must be linked before its interface
