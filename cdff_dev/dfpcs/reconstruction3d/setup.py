@@ -130,6 +130,12 @@ def make_dfpc(config, cdffpath, extra_compile_args):
             "feature_extraction_3d",
             "shot_descriptor_3d",
             "feature_description_3d",
+            "cartesian_system_transform",
+            "point_cloud_transform",
+            "neighbour_point_average",
+            "point_cloud_assembly",
+            "hu_invariants",
+            "primitive_matching",
 
             "cdff_types",
             "cdff_helpers",
