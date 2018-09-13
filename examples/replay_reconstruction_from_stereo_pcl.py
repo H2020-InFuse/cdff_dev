@@ -2,7 +2,7 @@ import glob
 import numpy as np
 from cdff_dev import dataflowcontrol, logloader, path, envirevisualization
 # TODO remove clone from path
-from cdff_dev.dfpcs.reconstruction3d.reconstruction3d import EstimationFromStereo
+from cdff_dev.dfpcs.reconstruction3d import EstimationFromStereo
 import cdff_envire
 
 
