@@ -1,10 +1,7 @@
 import glob
-import numpy as np
-from cdff_dev import dataflowcontrol, logloader, path, envirevisualization, cvvisualizer, replay
-# TODO remove clone from path
-from cdff_dev.dfpcs.reconstruction3d.reconstruction3d import EstimationFromStereo
-import cdff_envire
-from PyQt4.QtGui import QApplication
+from cdff_dev import dataflowcontrol, logloader, path, cvvisualizer, replay
+from cdff_dev.dfpcs.reconstruction3d import EstimationFromStereo
+EstimationFromStereoDFN = dataflowcontrol.create_dfn_from_dfpc(EstimationFromStereo)
 
 
 class DfpcAsDfn:  # TODO make this a general solution or find a better one
@@ -50,12 +47,12 @@ class DfpcAsDfn:  # TODO make this a general solution or find a better one
 
 def main():
     verbose = 0
-    reconstruction3d = EstimationFromStereo()
+    reconstruction3d = EstimationFromStereoDFN()
     # TODO install configuration files?
     config_filename = path.load_cdffpath() + "/Tests/ConfigurationFiles/DFPCs/Reconstruction3D/DfpcEstimationFromStereo_DlrHcru.yaml"
     reconstruction3d.set_configuration_file(config_filename)
     nodes = {
-        "reconstruction3d": DfpcAsDfn(reconstruction3d)
+        "reconstruction3d": reconstruction3d
     }
     trigger_ports = {
         "reconstruction3d": "rightImage"
@@ -63,9 +60,6 @@ def main():
     connections = (
         ("/hcru0/pt_stereo_rect/left.image", "reconstruction3d.leftImage"),
         ("/hcru0/pt_stereo_rect/right.image", "reconstruction3d.rightImage"),
-
-        #("/hcru0/pt_stereo_rect/left.image", "result.leftImage"),
-        #("/hcru0/pt_stereo_rect/right.image", "result.rightImage"),
 
         ("reconstruction3d.pointCloud", "result.pointCloud"),
         ("reconstruction3d.pose", "result.pose"),
@@ -84,9 +78,7 @@ def main():
     # large. Ask Alexander Fabisch about it.
     log_folder = "logs/DLR_20180724/"
     logfiles = [
-        #[log_folder + "recording_20180724-135036_hcru0_pt_stereo_rect_left_image_%09d.msg" % i for i in range(2)],
         sorted(glob.glob(log_folder + "recording_20180724-135036_hcru0_pt_stereo_rect_left_image_*.msg")),
-        #[log_folder + "recording_20180724-135036_hcru0_pt_stereo_rect_right_image_%09d.msg" % i for i in range(2)],
         sorted(glob.glob(log_folder + "recording_20180724-135036_hcru0_pt_stereo_rect_right_image_*.msg")),
     ]
     log_iterator = logloader.replay_files(logfiles, stream_names)
