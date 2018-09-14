@@ -182,14 +182,16 @@ def configure(logs, stream_names):
     nodes = {
         "transformer": Transformer(),
         "evaluation": EvaluationDFN(),
-        "trajectory": Trajectory(),
+        "trajectory_gt": Trajectory(),
+        "trajectory_dgps": Trajectory(),
     }
     periods = {
         # frequency of odometry: 0.01
         # frequency of gps: 0.05
         "transformer": 0.01,
         "evaluation": 1.0, # TODO
-        "trajectory": 0.01,
+        "trajectory_dgps": 1.0,
+        "trajectory_gt": 1.0,
     }
     connections = (
         # inputs to transformer
@@ -201,13 +203,15 @@ def configure(logs, stream_names):
         ("transformer.groundTruth2origin", "evaluation.groundTruth2origin"),
 
         # inputs to trajectory
-        ("transformer.groundTruth2origin", "trajectory.pose"),
+        ("transformer.groundTruth2origin", "trajectory_gt.pose"),
+        ("transformer.dgps2origin", "trajectory_dgps.pose"),
 
         # outputs, this is necessary so register the output port in the dfc
         ("evaluation.error", "result.error"),
-        ("trajectory.pos","result.trajectory"),
+        ("trajectory_dgps.pos","result.trajectory_dgps"),
+        ("trajectory_gt.pos","result.trajectory_gt"),
     )
-    frames = {"trajectory.pos": "origin"}
+    frames = {"trajectory_dgps.pos": "origin", "trajectory_gt.pos": "origin"}
 
     urdf_files = [
         # git clone git@git.hb.dfki.de:facilitators/bundle-sherpa_tt.git
