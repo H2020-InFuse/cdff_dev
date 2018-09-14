@@ -1,5 +1,6 @@
 from collections import defaultdict
 from abc import ABCMeta, abstractmethod
+import inspect
 import time
 import warnings
 
@@ -512,3 +513,83 @@ class TextVisualization(VisualizationBase):
         print("  Timestamp: %s" % timestamp)
         print("  Port: %s" % port_name)
         print("  Sample: %s" % sample)
+
+
+def isdfn(cls, verbose=0):
+    """Check if given class is a DFN."""
+    result = _check_method(cls, "set_configuration_file", verbose)
+    result &= _check_method(cls, "configure", verbose)
+    result &= _check_method(cls, "process", verbose)
+    return result
+
+
+def isdfpc(cls, verbose=0):
+    """Check if a given class is a DFPC."""
+    result = _check_method(cls, "set_configuration_file", verbose)
+    result &= _check_method(cls, "setup", verbose)
+    result &= _check_method(cls, "run", verbose)
+    return result
+
+
+def _check_method(cls, name, verbose=0):
+    if not hasattr(cls, name):
+        if verbose >= 1:
+            print("Class does not have %s()" % name)
+        return False
+    return True
+
+
+def create_dfn_from_dfpc(dfpc_class):
+    """Create DFN adapter for DFPC.
+
+    This is required so that a DFPC can be used in DataFlowControl.
+
+    Parameters
+    ----------
+    dfpc_class : Class
+        DFPC class
+
+    Returns
+    -------
+    cls : Class
+        DFN class
+    """
+    clsname = dfpc_class.__name__ + "DFN"
+
+    def __init__(self):
+        self.dfpc = dfpc_class()
+
+    def set_configuration_file(self, filename):
+        self.dfpc.set_configuration_file(filename)
+
+    def configure(self):
+        self.dfpc.setup()
+
+    def process(self):
+        self.dfpc.run()
+
+    methods = {
+        "__init__": __init__,
+        "set_configuration_file": set_configuration_file,
+        "configure": configure,
+        "process": process
+    }
+
+    def isinput(member):
+        return hasattr(member, "__name__") and member.__name__.endswith("Input")
+    inputs = inspect.getmembers(dfpc_class, predicate=isinput)
+    for name, _ in inputs:
+        def route_method(self, data):
+            getattr(self.dfpc, name)(data)
+        methods[name] = route_method
+
+    def isoutput(member):
+        return hasattr(member, "__name__") and member.__name__.endswith("Output")
+    outputs = inspect.getmembers(dfpc_class, predicate=isoutput)
+    for name, _ in outputs:
+        def route_method(self):
+            return getattr(self.dfpc, name)
+        methods[name] = route_method
+
+    cls = type(clsname, (), methods)
+    return cls
