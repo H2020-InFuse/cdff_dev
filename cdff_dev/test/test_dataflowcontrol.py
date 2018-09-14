@@ -9,6 +9,9 @@ class LinearDFN:
         self.b = 1.0
         self.x = 0.0
 
+    def set_configuration_file(self, filename):
+        pass
+
     def configure(self):
         pass
 
@@ -25,6 +28,9 @@ class LinearDFN:
 class SquareDFN:
     def __init__(self):
         self.x = 0.0
+
+    def set_configuration_file(self, filename):
+        pass
 
     def configure(self):
         pass
@@ -168,6 +174,16 @@ def test_dfc_port_triggered():
     assert_equal(vis.data["linear.y"][0], 201.0)
     assert_in("square.y", vis.data)
     assert_equal(vis.data["square.y"][0], 40401.0)
+
+
+def test_dfc_detects_node_that_is_not_dfn():
+    class NoDFN:
+        pass
+    nodes = {
+        "nodfn": NoDFN()
+    }
+    dfc = dataflowcontrol.DataFlowControl(nodes, (), periods={"nodfn": 1.0})
+    assert_raises_regexp(ValueError, "is not a DFN", dfc.setup)
 
 
 def test_dfc_periodic_realtime():

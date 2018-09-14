@@ -371,7 +371,9 @@ class NodeFacade:
         self.verbose = verbose
 
     def configure_all(self):
-        for node in self.nodes.values():
+        for name, node in self.nodes.items():
+            if not isdfn(node):
+                raise ValueError("'%s' is not a DFN." % name)
             node.configure()
 
     def register_graph(self, graph):
