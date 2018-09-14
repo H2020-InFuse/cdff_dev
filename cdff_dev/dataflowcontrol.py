@@ -578,19 +578,21 @@ def create_dfn_from_dfpc(dfpc_class):
     }
 
     def isinput(member):
-        return hasattr(member, "__name__") and member.__name__.endswith("Input")
+        return (hasattr(member, "__name__") and
+                member.__name__.endswith("Input"))
     inputs = inspect.getmembers(dfpc_class, predicate=isinput)
     for name, _ in inputs:
-        def route_method(self, data):
+        def route_method(self, data, name=name):
             getattr(self.dfpc, name)(data)
         methods[name] = route_method
 
     def isoutput(member):
-        return hasattr(member, "__name__") and member.__name__.endswith("Output")
+        return (hasattr(member, "__name__") and
+                member.__name__.endswith("Output"))
     outputs = inspect.getmembers(dfpc_class, predicate=isoutput)
-    for name, _ in outputs:
-        def route_method(self):
-            return getattr(self.dfpc, name)
+    for name, fun in outputs:
+        def route_method(self, name=name):
+            return getattr(self.dfpc, name)()
         methods[name] = route_method
 
     cls = type(clsname, (), methods)

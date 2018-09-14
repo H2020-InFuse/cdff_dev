@@ -249,14 +249,21 @@ def test_dfn_adapter():
             self.configured = True
         def run(self):
             self.executed = True
+        def aInput(self, data):
+            self.a = data
+        def bOutput(self):
+            return self.a
 
     assert_true(dataflowcontrol.isdfpc(DFPC))
     DFPCDFN = dataflowcontrol.create_dfn_from_dfpc(DFPC)
     assert_true(dataflowcontrol.isdfn(DFPCDFN))
     dfn = DFPCDFN()
     dfn.set_configuration_file("testfile")
-    dfn.configure()
-    dfn.process()
     assert_equal(dfn.dfpc.filename, "testfile")
+    dfn.configure()
     assert_true(dfn.dfpc.configured)
+    dfn.aInput(5)
+    dfn.process()
     assert_true(dfn.dfpc.executed)
+    b = dfn.bOutput()
+    assert_equal(b, 5)
