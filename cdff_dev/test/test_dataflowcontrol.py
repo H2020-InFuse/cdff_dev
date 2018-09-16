@@ -45,6 +45,26 @@ class SquareDFN:
         return self.y
 
 
+class SquareDFPC:
+    def __init__(self):
+        self.x = 0.0
+
+    def set_configuration_file(self, filename):
+        pass
+
+    def setup(self):
+        pass
+
+    def xInput(self, x):
+        self.x = x
+
+    def run(self):
+        self.y = self.x ** 2
+
+    def yOutput(self):
+        return self.y
+
+
 def test_wrong_stream_name_pattern():
     dfc = dataflowcontrol.DataFlowControl(
         nodes={"linear": LinearDFN()},
@@ -267,3 +287,48 @@ def test_dfn_adapter():
     assert_true(dfn.dfpc.executed)
     b = dfn.bOutput()
     assert_equal(b, 5)
+
+
+def test_wrap_dfpc():
+    dfpc = SquareDFPC()
+    dfn = dataflowcontrol.wrap_dfpc_as_dfn(dfpc)
+    assert_true(dataflowcontrol.isdfn(dfn))
+    dfn.configure()
+    dfn.xInput(5)
+    dfn.process()
+    sq = dfn.yOutput()
+    assert_equal(sq, 25)
+
+
+def test_dfc_converts_dfpc():
+    nodes = {
+        "linear": LinearDFN(),
+        "square": SquareDFPC()
+    }
+    trigger_ports = {
+        "linear": "x",
+        "square": "x"
+    }
+    connections = (
+        ("log.x", "linear.x"),
+        ("linear.y", "square.x"),
+        ("square.y", "result.y")
+    )
+    dfc = dataflowcontrol.DataFlowControl(
+        nodes, connections, trigger_ports=trigger_ports)
+    dfc.setup()
+    assert_equal(len(dfc.input_ports_), 2)
+    assert_equal(len(dfc.output_ports_), 2)
+    assert_equal(len(dfc.log_ports_), 1)
+    assert_equal(len(dfc.result_ports_), 1)
+    assert_equal(len(dfc.connection_map_), 3)
+
+    vis = dataflowcontrol.NoVisualization()
+    dfc.set_visualization(vis)
+    for i in range(101):
+        dfc.process_sample(timestamp=i, stream_name="log.x", sample=i)
+    dfc.process(timestamp=102)
+    assert_in("linear.y", vis.data)
+    assert_equal(vis.data["linear.y"][0], 201.0)
+    assert_in("square.y", vis.data)
+    assert_equal(vis.data["square.y"][0], 40401.0)

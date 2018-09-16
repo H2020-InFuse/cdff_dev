@@ -1,7 +1,6 @@
 import glob
 from cdff_dev import dataflowcontrol, logloader, path, cvvisualizer, replay
 from cdff_dev.dfpcs.reconstruction3d import EstimationFromStereo
-EstimationFromStereoDFN = dataflowcontrol.create_dfn_from_dfpc(EstimationFromStereo)
 
 
 class DfpcAsDfn:  # TODO make this a general solution or find a better one
@@ -47,7 +46,7 @@ class DfpcAsDfn:  # TODO make this a general solution or find a better one
 
 def main():
     verbose = 0
-    reconstruction3d = EstimationFromStereoDFN()
+    reconstruction3d = EstimationFromStereo()
     # TODO install configuration files?
     config_filename = path.load_cdffpath() + "/Tests/ConfigurationFiles/DFPCs/Reconstruction3D/DfpcEstimationFromStereo_DlrHcru.yaml"
     reconstruction3d.set_configuration_file(config_filename)

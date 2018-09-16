@@ -371,10 +371,13 @@ class NodeFacade:
         self.verbose = verbose
 
     def configure_all(self):
-        for name, node in self.nodes.items():
-            if not isdfn(node):
-                raise ValueError("'%s' is not a DFN." % name)
-            node.configure()
+        for name in sorted(self.nodes.keys()):
+            if not isdfn(self.nodes[name]):
+                if isdfpc(self.nodes[name]):
+                    self.nodes[name] = wrap_dfpc_as_dfn(self.nodes[name])
+                else:
+                    raise ValueError("'%s' is not a DFN." % name)
+            self.nodes[name].configure()
 
     def register_graph(self, graph):
         """Assign EnviRe graph to a node with the name 'transformer'.
@@ -541,6 +544,23 @@ def _check_method(cls, name, verbose=0):
     return True
 
 
+def wrap_dfpc_as_dfn(dfpc):
+    """Wrap DFPC with DFN interface.
+
+    Parameters
+    ----------
+    dfpc : DFPC
+        DFPC object
+
+    Returns
+    -------
+    dfn : DFN
+        DFPC with DFN adapter
+    """
+    cls = create_dfn_from_dfpc(dfpc.__class__)
+    return cls(dfpc=dfpc)
+
+
 def create_dfn_from_dfpc(dfpc_class):
     """Create DFN adapter for DFPC.
 
@@ -558,8 +578,8 @@ def create_dfn_from_dfpc(dfpc_class):
     """
     clsname = dfpc_class.__name__ + "DFN"
 
-    def __init__(self):
-        self.dfpc = dfpc_class()
+    def __init__(self, dfpc=dfpc_class()):
+        self.dfpc = dfpc
 
     def set_configuration_file(self, filename):
         self.dfpc.set_configuration_file(filename)
