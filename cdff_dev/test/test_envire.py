@@ -353,3 +353,16 @@ def test_envire_urdf_load():
     assert_true(g.contains_frame("body"))
     assert_true(g.contains_frame("lower_dynamixel"))
     assert_true(g.contains_edge("body", "lower_dynamixel"))
+
+
+def test_envire_load_meshes():
+    g = cdff_envire.EnvireGraph()
+    cdff_envire.load_urdf(
+        g, "test/test_data/urdf_sherpa_meshes_LQ/sherpa_tt.urdf",
+        load_visuals=True)
+    assert_equal(g.num_vertices(), 45)
+    assert_equal(g.num_edges(), 2 * 44)
+    assert_true(g.contains_frame("body"))
+    assert_equal(g.get_total_item_count("body"), 1)
+    assert_true(g.contains_frame("outer_leg_rear_right"))
+    assert_equal(g.get_total_item_count("outer_leg_rear_right"), 1)

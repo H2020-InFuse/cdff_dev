@@ -106,7 +106,7 @@ void loadURDF(envire::core::EnvireGraph& graph, const std::string& filename,
         loader.loadFrames(*model);
     if(load_joints)
         loader.loadJoints(*model);
-    if (load_visuals)
+    if(load_visuals)
         loader.loadVisuals(*model, filename);
 }
 
