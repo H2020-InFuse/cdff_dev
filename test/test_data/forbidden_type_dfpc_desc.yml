@@ -5,7 +5,7 @@ dfns:
     - name: Node2
 input_ports:
     - name: blub
-      type: asn1SccMap
+      type: asn1SccVisualPointFeatureVector2D
       doc: "A type that is not allowed"
       connections:
         - dfn: Node1

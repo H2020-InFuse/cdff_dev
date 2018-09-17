@@ -80,5 +80,6 @@ def test_forbidden_type():
     with EnsureCleanup(tmp_folder) as ec:
         cdffpath = load_cdffpath()
         assert_raises_regexp(
-            TypeError, "Type 'asn1SccMap' is not allowed.",
+            TypeError,
+            "Type 'asn1SccVisualPointFeatureVector2D' is not allowed.",
             write_dfpc, node, cdffpath, tmp_folder)
