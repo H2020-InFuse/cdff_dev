@@ -78,6 +78,7 @@ def make_reconstruction3d(config, cdffpath, extra_compile_args):
         library_dirs=[
             # TODO find yaml-cpp, opencv, pcl, boost-system
             os.path.join(install_dir, "lib"),
+            "/usr/local/lib",
             # TODO move to installation folder:
             os.path.join(cdffpath, "build", "DFPCs", "Reconstruction3D"),
         ] + DEFAULT_LIBRARY_DIRS,
