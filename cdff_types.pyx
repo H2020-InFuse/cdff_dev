@@ -2646,13 +2646,11 @@ cdef class Array3DReference:
         data.thisptr = &self.thisptr.data
         return data
 
-    def array_reference(self, dtype=None):
+    def array_reference(self):
         cdef np.npy_intp shape[3]
         shape[0] = <np.npy_intp> self.thisptr.rows
         shape[1] = <np.npy_intp> self.thisptr.cols
         shape[2] = <np.npy_intp> self.thisptr.channels
-
-        array_type = dtype
 
         if <int> self.thisptr.depth == <int> _cdff_types.asn1Sccdepth_8U:
             array_type = np.NPY_UINT8
