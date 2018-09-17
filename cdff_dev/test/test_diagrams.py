@@ -10,6 +10,9 @@ class LinearDFN:
         self.b = 1.0
         self.x = 0.0
 
+    def set_configuration_file(self, filename):
+        pass
+
     def configure(self):
         pass
 
@@ -26,6 +29,9 @@ class LinearDFN:
 class SquareDFN:
     def __init__(self):
         self.x = 0.0
+
+    def set_configuration_file(self, filename):
+        pass
 
     def configure(self):
         pass
