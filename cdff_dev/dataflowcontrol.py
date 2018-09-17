@@ -372,8 +372,8 @@ class NodeFacade:
 
     def configure_all(self):
         for name in sorted(self.nodes.keys()):
-            if not isdfn(self.nodes[name]):
-                if isdfpc(self.nodes[name]):
+            if not isdfn(self.nodes[name], verbose=self.verbose):
+                if isdfpc(self.nodes[name], verbose=self.verbose):
                     self.nodes[name] = wrap_dfpc_as_dfn(self.nodes[name])
                 else:
                     raise ValueError("'%s' is not a DFN." % name)
