@@ -71,7 +71,9 @@ def make_reconstruction3d(config, cdffpath, extra_compile_args):
             os.path.join(cdffpath, "DFPCs", "Reconstruction3D"),
             # TODO find automatically
             os.path.join(install_dir, "include", "pcl-1.8"),
+            "/usr/local/include/pcl-1.8",
             os.path.join(install_dir, "include", "eigen3"),
+            "/usr/local/include/eigen3",
         ] + DEFAULT_INCLUDE_DIRS,
         library_dirs=[
             # TODO find yaml-cpp, opencv, pcl, boost-system
