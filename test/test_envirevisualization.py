@@ -8,6 +8,9 @@ class LaserFilterDummyDFN:
     def __init__(self):
         self.scanSample = cdff_types.LaserScan()
 
+    def set_configuration_file(self, filename):
+        pass
+
     def configure(self):
         pass
 
@@ -30,6 +33,9 @@ class LaserFilterDummyDFN:
 class PointcloudBuilderDummyDFN:
     def __init__(self):
         self.pointcloud = cdff_types.Pointcloud()
+
+    def set_configuration_file(self, filename):
+        pass
 
     def configure(self):
         pass
