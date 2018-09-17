@@ -33,9 +33,9 @@ RUN mkdir -p -m 700 /root/.ssh/ && \
 
 # Prepare non-interactive autoproj setup with CI user
 WORKDIR /tmp/infuse
-COPY config.yml /tmp/infuse/.autoproj/
 RUN wget http://www.rock-robotics.org/autoproj_bootstrap --directory-prefix=/tmp/infuse/
-RUN AUTOPROJ_BOOTSTRAP_IGNORE_NONEMPTY_DIR=1 ruby autoproj_bootstrap git https://cdff-dev:cdff-dev@gitlab.spaceapplications.com/InFuse/cdff-buildconf.git branch=cdff_dev
+COPY config.yml /tmp/
+RUN AUTOPROJ_BOOTSTRAP_IGNORE_NONEMPTY_DIR=1 ruby autoproj_bootstrap git https://cdff-dev:cdff-dev@gitlab.spaceapplications.com/InFuse/cdff-buildconf.git branch=cdff_dev --seed-config=/tmp/config.yml
 COPY 00_ci_user.yml /tmp/infuse/autoproj/overrides.d/
 COPY manifest /tmp/infuse/autoproj/
 

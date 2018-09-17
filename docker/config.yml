@@ -1,6 +1,6 @@
 ---
 ruby_executable: "/usr/bin/ruby2.3"
-gems_install_path: "/tmp/infuse/.autoproj/config.yml"
+gems_install_path: "/root/.autoproj/gems"
 prefer_indep_over_os_packages: false
 osdeps_mode: none  # all
 reused_autoproj_installations: []
