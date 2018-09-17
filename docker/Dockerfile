@@ -55,26 +55,17 @@ COPY pcl_registration-1.8.pc pcl_features-1.8.pc pcl_2d-1.8.pc /tmp/infuse/insta
 
 # Install direct dependencies of CDFF_dev
 RUN source env.sh && autoproj build \
-  && mv /tmp/infuse/cdff/CDFF/Common/Types /tmp/ \
-  && mv /tmp/infuse/cdff/CDFF/DFNs/DFNCommonInterface.hpp /tmp/ \
-  && mv /tmp/infuse/cdff/CDFF/DFPCs/DFPCCommonInterface.hpp /tmp/ \
-  && rm -rf /tmp/infuse/cdff/ \
-  && mkdir -p /tmp/infuse/cdff/CDFF/Common/ \
-  && mkdir -p /tmp/infuse/cdff/CDFF/DFNs/ \
-  && mkdir -p /tmp/infuse/cdff/CDFF/DFPCs/ \
-  && mv /tmp/Types /tmp/infuse/cdff/CDFF/Common/ \
-  && mv /tmp/DFNCommonInterface.hpp /tmp/infuse/cdff/CDFF/DFNs/ \
-  && mv /tmp/DFPCCommonInterface.hpp /tmp/infuse/cdff/CDFF/DFPCs/ \
+  && rm -rf /tmp/infuse/cdff/CDFF/.git \
   && rm -rf /tmp/infuse/autoproj \
   && rm -rf /tmp/infuse/base \
   && rm -rf /tmp/infuse/control \
   && rm -rf /tmp/infuse/envire \
-  && rm -rf /tmp/infuse/gui \
-  && rm -rf /tmp/infuse/simulation \
-  && rm -rf /tmp/infuse/external \
-  && rm -rf /tmp/infuse/tools \
   && rm -rf /tmp/infuse/esrocos \
+  && rm -rf /tmp/infuse/external \
+  && rm -rf /tmp/infuse/gui \
   && rm -rf /tmp/infuse/infuse \
+  && rm -rf /tmp/infuse/simulation \
+  && rm -rf /tmp/infuse/tools \
   && rm /tmp/infuse/autoproj_bootstrap
 
 # Reset git configuration
@@ -83,5 +74,5 @@ RUN rm /root/.gitconfig
 WORKDIR /
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
-LABEL version="1.8.7"
+LABEL version="1.8.8"
 LABEL description="Image providing the dependencies of CDFF-dev for continuous integration"
