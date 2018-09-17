@@ -1312,3 +1312,16 @@ def test_map():
         "{type: Map, time_stamp: {type: Time, microseconds: 11}, "
         "type: map_DEM, scale: 55, rows: 25, cols: 26, channels: 27, "
         "depth: depth_8U, row_size: 28}")
+
+
+def test_map_array_reference():
+    m = cdff_types.Map()
+    m.metadata.scale = 0.1
+    m.data.rows = 100
+    m.data.cols = 100
+    m.data.channels = 1
+    m.data.row_size = 0
+    m.data.depth = "depth_32F"
+    data = m.data.array_reference()
+    assert_array_equal(data.shape, (100, 100, 1))
+    assert_equal(data.dtype, np.float32)
