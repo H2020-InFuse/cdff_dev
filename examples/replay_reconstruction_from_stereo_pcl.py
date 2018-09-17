@@ -1,3 +1,4 @@
+import os
 import glob
 import numpy as np
 from cdff_dev import dataflowcontrol, logloader, path, envirevisualization
@@ -8,8 +9,10 @@ import cdff_envire
 def main():
     verbose = 0
     reconstruction3d = EstimationFromStereo()
-    # TODO install configuration files?
-    config_filename = path.load_cdffpath() + "/Tests/ConfigurationFiles/DFPCs/Reconstruction3D/DfpcEstimationFromStereo_DlrHcru.yaml"
+    config_filename = os.path.join(
+        path.load_cdffpath(),
+        "Tests/ConfigurationFiles/DFPCs/Reconstruction3D/"
+        "DfpcEstimationFromStereo_DlrHcru.yaml")
     reconstruction3d.set_configuration_file(config_filename)
     nodes = {
         "reconstruction3d": reconstruction3d
@@ -50,7 +53,7 @@ def main():
 
     app = envirevisualization.EnvireVisualizerApplication(
         frames={
-            "reconstruction3d.pointCloud": "data",
+            "reconstruction3d.pointCloud": "camera",
         },
         urdf_files=[],
         center_frame="center"
@@ -58,10 +61,9 @@ def main():
     graph = app.visualization.world_state_.graph_
     t = cdff_envire.Transform()
     t.transform.translation.fromarray(np.array([0, 0, 1.5]))
-    #t.transform.orientation.fromarray(np.array([7.07106781e-01, 7.07106781e-01, 4.32978028e-17, -4.32978028e-17]))
     #pr.quaternion_xyzw_from_wxyz(pr.quaternion_from_matrix(pr.matrix_from_euler_xyz([pi, 0, pi / 2]).dot(pr.matrix_from_euler_xyz([0, pi / 2, pi / 4]))))
     t.transform.orientation.fromarray(np.array([0.27059805,  0.65328148, -0.65328148,  0.27059805]))
-    graph.add_transform("data", "center", t)
+    graph.add_transform("camera", "center", t)
 
     app.show_controls(log_iterator, dfc)
     app.exec_()

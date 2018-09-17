@@ -1,54 +1,16 @@
+import os
 import glob
 from cdff_dev import dataflowcontrol, logloader, path, cvvisualizer, replay
 from cdff_dev.dfpcs.reconstruction3d import EstimationFromStereo
 
 
-class DfpcAsDfn:  # TODO make this a general solution or find a better one
-    def __init__(self, dfpc):
-        self.dfpc = dfpc
-
-    def configure(self):
-        self.dfpc.setup()
-
-    def process(self):
-        self.dfpc.run()
-
-    def leftImageInput(self, data):
-        self.dfpc.leftImageInput(data)
-
-    def rightImageInput(self, data):
-        self.dfpc.rightImageInput(data)
-
-    def pointCloudOutput(self):
-        data = self.dfpc.pointCloudOutput()
-        return data
-
-    def poseOutput(self):
-        data = self.dfpc.poseOutput()
-        return data
-
-    def successOutput(self):
-        data = self.dfpc.successOutput()
-        return data
-
-    """ # TODO better meta programming... create class on the fly
-    def __getattr__(self, name):
-        if name.endswith("Input") or name.endswith("Output"):
-            return self.dfpc.__getattr__(name)
-        elif name == "configure":
-            return self.dfpc.setup
-        elif name == "process":
-            return self.dfpc.run
-        else:
-            raise AttributeError("No attribute with name '%s'" % name)
-    """
-
-
 def main():
     verbose = 0
     reconstruction3d = EstimationFromStereo()
-    # TODO install configuration files?
-    config_filename = path.load_cdffpath() + "/Tests/ConfigurationFiles/DFPCs/Reconstruction3D/DfpcEstimationFromStereo_DlrHcru.yaml"
+    config_filename = os.path.join(
+        path.load_cdffpath(),
+        "Tests/ConfigurationFiles/DFPCs/Reconstruction3D/"
+        "DfpcEstimationFromStereo_DlrHcru.yaml")
     reconstruction3d.set_configuration_file(config_filename)
     nodes = {
         "reconstruction3d": reconstruction3d
