@@ -43,7 +43,7 @@ class DataFlowControl:
 
     Attributes
     ----------
-    visualizations : list
+    visualizations_ : list
         Registered visualizations.
 
     node_statistics_ : NodeStatistics
