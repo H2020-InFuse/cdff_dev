@@ -2,6 +2,7 @@ import os
 import glob
 import warnings
 import numpy
+from subprocess import Popen, PIPE
 from cdff_dev.path import load_cdffpath
 
 
@@ -60,28 +61,102 @@ def check_autoproj():  # TODO refactor with main setup.py
     return autoproj_available
 
 
+def get_include_dirs(libraries):
+    output = pkgconfig("--cflags-only-I", libraries)
+    # Remove -I
+    return list(map(lambda dir: dir[2:], output.split()))
+
+
+def get_library_dirs(libraries):
+    output = pkgconfig("--libs-only-L", libraries)
+    # Remove -L
+    return list(map(lambda dir: dir[2:], output.split()))
+
+
+def get_libraries(libraries):
+    output = pkgconfig("--libs", libraries)
+    # Remove -l
+    return list(map(lambda dir: dir[2:], output.split()))
+
+
+def pkgconfig(arg, libraries):
+    p = Popen(["pkg-config", arg] + libraries,
+              stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    output, err = p.communicate()
+    if err:
+        raise IOError(err.decode("utf-8"))
+    return output.decode("utf-8")
+
+
+def find_ceres():
+    return find_library("ceres")
+
+
+def find_boost_system():
+    return find_library("boost_system", "boost/system")
+
+
+def find_library(name, expected_include_path=None):
+    if expected_include_path is None:
+        expected_include_path = name
+    lib_install_dir = None
+    if check_autoproj():
+        autoproj_current_root = os.environ.get("AUTOPROJ_CURRENT_ROOT", None)
+        install_dir = os.path.join(autoproj_current_root, "install")
+        if os.path.exists(os.path.join(
+                install_dir, "include", expected_include_path)):
+            lib_install_dir = os.path.join(install_dir)
+    if lib_install_dir is None:
+        if os.path.exists("/usr/local/include/" + expected_include_path):
+            lib_install_dir = "/usr/local"
+        elif os.path.exists("/usr/include/" + expected_include_path):
+            lib_install_dir = "/usr"
+        else:
+            raise RuntimeError("Could not find Ceres")
+    return {
+        "include_dirs": [os.path.join(lib_install_dir, "include",
+                                      expected_include_path)],
+        "library_dirs": [os.path.join(lib_install_dir, "lib")],
+        "libraries": [name]
+    }
+
+
 def make_reconstruction3d(config, cdffpath, extra_compile_args):
-    autoproj_current_root = os.environ.get("AUTOPROJ_CURRENT_ROOT", None)
-    install_dir = os.path.join(autoproj_current_root, "install")
+    libraries = ["opencv", "eigen3", "yaml-cpp"]
+    libraries += list(map(
+        lambda lib: lib + "-1.8",
+        ["pcl_common", "pcl_features", "pcl_search", "pcl_filters",
+         "pcl_visualization", "pcl_io", "pcl_ml", "pcl_octree",
+         "pcl_outofcore", "pcl_kdtree", "pcl_tracking", "pcl_stereo",
+         "pcl_recognition", "pcl_registration", "pcl_people", "pcl_keypoints",
+         "pcl_surface", "pcl_segmentation", "pcl_sample_consensus",
+         "pcl_stereo"]))
+
+    # use pkg-config for external dependencies
+    dep_inc_dirs = get_include_dirs(libraries)
+    dep_lib_dirs = get_library_dirs(libraries)
+    dep_libs = get_libraries(libraries)
+
+    ceres_info = find_ceres()
+    dep_inc_dirs += ceres_info["include_dirs"]
+    dep_lib_dirs += ceres_info["library_dirs"]
+    dep_libs += ceres_info["libraries"]
+
+    boost_system_info = find_boost_system()
+    dep_inc_dirs += boost_system_info["include_dirs"]
+    dep_lib_dirs += boost_system_info["library_dirs"]
+    dep_libs += boost_system_info["libraries"]
 
     config.add_extension(
         "reconstruction3d",
         sources=["reconstruction3d.pyx"],
         include_dirs=[
             os.path.join(cdffpath, "DFPCs", "Reconstruction3D"),
-            # TODO find automatically
-            os.path.join(install_dir, "include", "pcl-1.8"),
-            "/usr/local/include/pcl-1.8",
-            os.path.join(install_dir, "include", "eigen3"),
-            "/usr/local/include/eigen3",
-        ] + DEFAULT_INCLUDE_DIRS,
+        ] + DEFAULT_INCLUDE_DIRS + dep_inc_dirs,
         library_dirs=[
-            # TODO find yaml-cpp, opencv, pcl, boost-system
-            os.path.join(install_dir, "lib"),
-            "/usr/local/lib",
             # TODO move to installation folder:
             os.path.join(cdffpath, "build", "DFPCs", "Reconstruction3D"),
-        ] + DEFAULT_LIBRARY_DIRS,
+        ] + DEFAULT_LIBRARY_DIRS + dep_lib_dirs,
         libraries=[
             # make sure that libraries used in other libraries are linked last!
             # for example: an implementation must be linked before its interface
@@ -156,43 +231,7 @@ def make_reconstruction3d(config, cdffpath, extra_compile_args):
             "converters_opencv",
 
             "cc_core_lib",
-
-            "pcl_common",
-            "pcl_features",
-            "pcl_search",
-            "pcl_filters",
-            "pcl_visualization",
-            "pcl_io",
-            "pcl_ml",
-            "pcl_io_ply",
-            "pcl_octree",
-            "pcl_outofcore",
-            "pcl_kdtree",
-            "pcl_tracking",
-            "pcl_stereo",
-            "pcl_recognition",
-            "pcl_registration",
-            "pcl_people",
-            "pcl_keypoints",
-            "pcl_surface",
-            "pcl_segmentation",
-            "pcl_sample_consensus",
-            "pcl_stereo",
-
-            "yaml-cpp",
-
-            "boost_system",
-
-            "ceres",
-
-            "opencv_imgcodecs",
-            "opencv_highgui",
-            "opencv_imgcodecs",
-            "opencv_features2d",
-            "opencv_imgproc",
-            "opencv_calib3d",
-            "opencv_core",
-        ],
+        ] + dep_libs,
         define_macros=[("NDEBUG",)],
         extra_compile_args=extra_compile_args
     )
