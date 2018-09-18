@@ -106,9 +106,6 @@ class MatplotlibVisualizerApplication:
         # display plotting window
         try:
             plt.show()
-            #matplotlib.interactive(True)
-            #plt.draw()
-            #plt.pause(0.001)
         except AttributeError:
             pass
         plt.close()
