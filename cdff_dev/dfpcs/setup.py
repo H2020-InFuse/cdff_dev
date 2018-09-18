@@ -242,7 +242,6 @@ def make_reconstruction3d(config, cdffpath, extra_compile_args):
     ]
     dfpc_deps = find_dependencies_of(
         dfpc_libraries, cdffpath, blacklist=("pcl", "vtk", "verdict"))
-    print(dfpc_deps)
 
     config.add_extension(
         "reconstruction3d",
