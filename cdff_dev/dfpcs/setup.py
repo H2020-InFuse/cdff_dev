@@ -145,6 +145,8 @@ def make_reconstruction3d(config, cdffpath, extra_compile_args):
             "point_cloud_assembly",
             "hu_invariants",
             "primitive_matching",
+            "octree",
+            "voxelization",
 
             "cdff_types",
             "cdff_helpers",
