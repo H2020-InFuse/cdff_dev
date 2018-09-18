@@ -121,6 +121,90 @@ def find_library(name, expected_include_path=None):
     }
 
 
+def find_dependencies_of(libraries, cdffpath, recursive=True, blacklist=(),
+                         cmake_cache=None, verbose=0):
+    """Find dependencies of libraries.
+
+    Parameters
+    ----------
+    libraries : list
+        Names of libraries
+
+    cdffpath : str
+        Path to CDFF
+
+    recursive : bool, optional (default: True)
+        Search recursively
+
+    blacklist : list, optional (default: ())
+        Libraries that will be ignored
+
+    Returns
+    -------
+    dependencies : list
+        All dependencies. If parsed recursively, dependencies of dependencies
+        come after dependencies. All libraries occur only once.
+    """
+    if cmake_cache is None:
+        with open(os.path.join(cdffpath, "build", "CMakeCache.txt")) as f:
+            cmake_cache = f.read()
+
+    dependencies = []
+    for library in libraries:
+        if verbose >= 2:
+            print("library: %s" % library)
+
+        new_deps = _search_cmake_cache(library, cmake_cache)
+
+        if verbose >= 2:
+            print("direct dependencies: %s" % new_deps)
+
+        filtered_deps = _apply_blacklist(new_deps, blacklist)
+
+        if verbose >= 2:
+            print("filtered direct dependencies: %s" % filtered_deps)
+
+        if recursive:
+            filtered_deps += find_dependencies_of(
+                filtered_deps, cdffpath, recursive, blacklist, cmake_cache)
+        dependencies += filtered_deps
+
+    return _only_last_occurence(dependencies)
+
+
+def _apply_blacklist(new_deps, blacklist):
+    filtered_deps = []
+    for dep in new_deps:
+        ok = True
+        for blacklisted in blacklist:
+            if dep.startswith(blacklisted):
+                ok = False
+                break
+        if ok:
+            filtered_deps.append(dep)
+    return filtered_deps
+
+
+def _search_cmake_cache(library, cmake_cache=None):
+    # search for a line similar to this one:
+    # shot_descriptor_3d_LIB_DEPENDS:STATIC=general;feature_description_3d;...
+    start = os.linesep + library + "_LIB_DEPENDS:STATIC="
+    start_idx = cmake_cache.find(start) + len(start)
+    end_idx = cmake_cache.find(os.linesep, start_idx)
+    dependencies = cmake_cache[start_idx:end_idx].replace(
+        "general;", "").split(";")[:-1]
+    return dependencies
+
+
+def _only_last_occurence(dependencies):
+    unique = []
+    for dep in dependencies:
+        if dep in unique:
+            unique.remove(dep)
+        unique.append(dep)
+    return unique
+
+
 def make_reconstruction3d(config, cdffpath, extra_compile_args):
     libraries = ["opencv", "eigen3", "yaml-cpp"]
     libraries += list(map(
@@ -147,6 +231,19 @@ def make_reconstruction3d(config, cdffpath, extra_compile_args):
     dep_lib_dirs += boost_system_info["library_dirs"]
     dep_libs += boost_system_info["libraries"]
 
+    dfpc_libraries = [
+        "adjustment_from_stereo",
+        "dense_registration_from_stereo",
+        "sparse_registration_from_stereo",
+        "reconstruction_from_motion",
+        "reconstruction_from_stereo",
+        "registration_from_stereo",
+        "estimation_from_stereo",
+    ]
+    dfpc_deps = find_dependencies_of(
+        dfpc_libraries, cdffpath, blacklist=("pcl", "vtk", "verdict"))
+    print(dfpc_deps)
+
     config.add_extension(
         "reconstruction3d",
         sources=["reconstruction3d.pyx"],
@@ -157,81 +254,9 @@ def make_reconstruction3d(config, cdffpath, extra_compile_args):
             # TODO move to installation folder:
             os.path.join(cdffpath, "build", "DFPCs", "Reconstruction3D"),
         ] + DEFAULT_LIBRARY_DIRS + dep_lib_dirs,
-        libraries=[
-            # make sure that libraries used in other libraries are linked last!
-            # for example: an implementation must be linked before its interface
-            # TODO recursively parse CMakeCache.txt for <lib name>_LIB_DEPENDS
-
-            "adjustment_from_stereo",
-            "dense_registration_from_stereo",
-            "sparse_registration_from_stereo",
-            "reconstruction_from_motion",
-            "reconstruction_from_stereo",
-            "registration_from_stereo",
-            "estimation_from_stereo",
-            "reconstruction_3d",
-
-            "dfpc_configurator",
-            "dfns_builder",
-
-            "fundamental_matrix_ransac",
-            "fundamental_matrix_computation",
-            "disparity_mapping",
-            "hirschmuller_disparity_mapping",
-            "scanline_optimization",
-            "stereoReconstruction",
-            "transform_3d_estimation_ceres",
-            "transform_3d_estimation",
-            "registration_icp_cc",
-            "registration_icp_3d",
-            "registration_3d",
-            "svd_decomposition",
-            "bundle_adjustment",
-            "flann_matcher",
-            "feature_matching_2d",
-            "iterative_pnp_solver",
-            "perspective_n_point_solving",
-            "image_undistortion_rectification",
-            "image_undistortion",
-            "image_filtering",
-            "convolution_filter",
-            "depth_filtering",
-            "ransac_3d",
-            "icp_3d",
-            "feature_matching_3d",
-            "ceres_adjustment",
-            "essential_matrix_decomposition",
-            "cameras_transform_estimation",
-            "orb_descriptor",
-            "feature_description_2d",
-            "triangulation",
-            "point_cloud_reconstruction_2d_to_3d",
-            "orb_detector_descriptor",
-            "harris_detector_2d",
-            "feature_extraction_2d",
-            "transform_3d_estimation_least_squares_minimization",
-            "harris_detector_3d",
-            "feature_extraction_3d",
-            "shot_descriptor_3d",
-            "feature_description_3d",
-            "cartesian_system_transform",
-            "point_cloud_transform",
-            "neighbour_point_average",
-            "point_cloud_assembly",
-            "hu_invariants",
-            "primitive_matching",
-            "octree",
-            "voxelization",
-
-            "cdff_types",
-            "cdff_helpers",
-            "cdff_opencv_visualizer",
-            "cdff_pcl_visualizer",
-            "cdff_logger",
-            "converters_opencv",
-
-            "cc_core_lib",
-        ] + dep_libs,
+        # make sure that libraries used in other libraries are linked last!
+        # for example: an implementation must be linked before its interface
+        libraries=dfpc_libraries + dfpc_deps + dep_libs,
         define_macros=[("NDEBUG",)],
         extra_compile_args=extra_compile_args
     )
