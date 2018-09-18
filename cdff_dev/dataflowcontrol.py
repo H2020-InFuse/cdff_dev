@@ -112,8 +112,8 @@ class DataFlowControl:
         self._configure_connections()
         self._last_timestamp = None
 
-    def set_visualization(self, visualization):
-        """Set visualization.
+    def register_visualization(self, visualization):
+        """Register visualization.
 
         Parameters
         ----------
@@ -353,6 +353,9 @@ class DataFlowControl:
         if (node_name in self.trigger_ports and
                 port_name in self.trigger_ports[node_name]):
             self._process_node(node_name, timestamp)
+
+    # for backward compatibility
+    set_visualization = register_visualization
 
 
 class NodeFacade:
