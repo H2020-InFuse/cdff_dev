@@ -38,8 +38,29 @@ def summarize_logfile(filename):
     n_samples : dict
         Mapping from stream names to number of samples
     """
-    log = load_log(filename)
-    return summarize_log(log)
+    n_samples = {}
+    typenames = {}
+    with open(filename, "rb") as f:
+        unpacker = msgpack.Unpacker(file_like=f, encoding="utf8")
+        n_keys = unpacker.read_map_header()
+        for i in range(n_keys):
+            key = unpacker.unpack()
+            if key.endswith(".meta"):
+                stream_name = key[:-5]
+                n_meta_keys = unpacker.read_map_header()
+                for j in range(n_meta_keys):
+                    meta_key = unpacker.unpack()
+                    if meta_key == "type":
+                        typenames[stream_name] = unpacker.unpack()
+                    elif meta_key == "timestamps":
+                        n_samples[stream_name] = unpacker.read_array_header()
+                        for k in range(n_samples[stream_name]):
+                            unpacker.skip()
+                    else:
+                        unpacker.skip()
+            else:
+                unpacker.skip()
+    return typenames, n_samples
 
 
 def summarize_logfiles(filename_groups, only_first_of_group=True):
