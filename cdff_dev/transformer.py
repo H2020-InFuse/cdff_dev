@@ -24,6 +24,9 @@ class EnvireDFN:
         self.graph_ = None
         self._timestamp = 0
 
+    def set_configuration_file(self):
+        pass
+
     def configure(self):
         pass
 
