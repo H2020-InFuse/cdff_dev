@@ -1,5 +1,5 @@
 import numpy as np
-from cdff_dev import envirevisualization, logloader, dataflowcontrol
+from cdff_dev import qtgui, envirevisualization, logloader, dataflowcontrol
 import cdff_types
 from nose.tools import assert_true
 
@@ -74,7 +74,7 @@ def test_step():
     log = logloader.load_log("test/test_data/logs/test_log.msg")
     stream_names = ["/hokuyo.scans", "/dynamixel.transforms"]
 
-    step = envirevisualization.Step(logloader.replay(stream_names, log), dfc)
+    step = qtgui.Step(logloader.replay(stream_names, log), dfc)
     stopped = False
     try:
         while True:
