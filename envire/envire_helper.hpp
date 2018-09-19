@@ -43,7 +43,6 @@ public:
         {
             if (loader->createEnvireItem(itemname, item))
             {
-                printf("created %s\n",itemname.c_str());
                 typename envire::core::Item<_ItemData>::Ptr typedPtr = boost::dynamic_pointer_cast< typename envire::core::Item<_ItemData> >(item);
                 typedPtr->setData(*content);
                 typedPtr->contentsChanged();
