@@ -23,7 +23,7 @@ cdef extern from "{{ desc["name"] }}Interface.hpp" namespace "CDFF::DFPC":
         {% for operation in desc["operations"] %}
         {{ type_registry.get_info(operation["output_type"]).cython_type() }}& {{ operation["name"] }}({% for arg in operation["inputs"] %}{{ arg["type"] }} {{ arg["name"] }}{{ ", " if not loop.last }}{% endfor %}) except +
         {% endfor %}
-{% for class_name in desc["implementations"] %}
+{% for class_name in implementations %}
 
 
 cdef extern from "{{ class_name }}.hpp" namespace "CDFF::DFPC::{{ desc["name"] }}":

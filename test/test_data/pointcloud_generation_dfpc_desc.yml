@@ -1,23 +1,12 @@
 name: PointcloudGeneration
 doc: Generate a pointcloud.
-dfns:
-    - name: TiltScan
-    - name: LaserFilter
 input_ports:
     - name: lidar2D
       type: asn1SccLaserScan
       doc: "Point cloud taken from a 2D LIDAR sensor"
-      connections:
-        - dfn: LaserFilter
-          port: scanSamples
     - name: dyamixelDynamicTf
       type: asn1SccRigidBodyState
       doc: "Dynamic transformation between body and 2D laser frame"
-      connections: 
-        - dfn: LaserFilter
-          port: laser2BodyTf
-        - dfn: TiltScan
-          port: laser2Body
 output_ports:
     - name: pointcloudAvailable
       type: bool
@@ -32,11 +21,39 @@ operations:
           type: int
       output_type: asn1SccPointcloud
       doc : "Delivers the current pointcloud even if not finished the complete sweep"
-internal_connections:
-    - from:
-        dfn: LaserFilter
-        port: scanSamples
-      to:
-        dfn: TiltScan
-        port: laserScan
-
+implementations:
+    - name: PointcloudGenerationImplementation
+      dfns:
+          - dfn_id: tilt_scan
+            type: TiltScan
+            implementation: TiltScan
+            activation:
+                type: input_triggered
+                value: scanSamples
+          - dfn_id: laser_filter
+            type: LaserFilter
+            implementation: LaserFilter
+            activation:
+                type: input_triggered
+                value: laserScan
+      internal_connections:
+          - from:
+              dfn_id: laser_filter
+              port: filteredScan
+            to:
+              dfn_id: tilt_scan
+              port: laserScan
+      input_connections:
+          - dfpc_input: lidar2D
+            dfn_id: laser_filter
+            port: scanSamples
+          - dfpc_input: dyamixelDynamicTf
+            dfn_id: laser_filter
+            port: laser2BodyTf
+          - dfpc_input: dyamixelDynamicTf
+            dfn_id: tilt_scan
+            port: laser2Body
+      output_connections:
+          - dfpc_output: pointcloudAvailable
+            dfn_id: tilt_scan
+            port: pointcloudAvailable

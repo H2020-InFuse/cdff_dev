@@ -8,7 +8,7 @@ from libcpp.string cimport string
 cimport cdff_types
 cimport _cdff_types
 {% endif %}
-{% for class_name in desc["implementations"] %}
+{% for class_name in implementations %}
 
 
 cdef class {{ class_name }}:

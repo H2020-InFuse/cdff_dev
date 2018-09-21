@@ -2,6 +2,7 @@ import warnings
 import os
 import jinja2
 import glob
+from .description_files import validate_node, validate_dfpc
 
 
 # TODO refactor: move type info to some other file
@@ -123,9 +124,9 @@ class ASN1TypeInfo(object):
             filenames.extend(glob.glob(pattern))
         return filenames
 
-    def _handle_taste_types(asn1_type):
+    @classmethod
+    def _handle_taste_types(cls, asn1_type):
         return asn1_type.replace('-', '_')
-
 
     def has_cdfftype(self):
         return True
@@ -159,21 +160,6 @@ class TypeRegistry(object):
                 return self.cache[typename]
         else:
             raise TypeError("Type '%s' is not allowed." % typename)
-
-
-class DFNDescriptionException(Exception):
-    def __init__(self, msg):
-        super(Exception, self).__init__(msg)
-
-
-class DFPCDescriptionException(Exception):
-    def __init__(self, msg):
-        super(Exception, self).__init__(msg)
-
-
-class PortDescriptionException(Exception):
-    def __init__(self, msg):
-        super(Exception, self).__init__(msg)
 
 
 # TODO refactor write_dfn / write_dfpc
@@ -212,15 +198,17 @@ def write_dfn(node, cdffpath,
     implementation_files = []
     for implementation in node["implementations"]:
         implementation_files.extend(
-            write_class(node, type_registry, "Node", implementation,
-                        target_folder=src_dir))
-    cython_files = write_cython(node, type_registry, "Node",
-                                target_folder=python_dir)
+            write_class(
+                node, type_registry, "Node", implementation,
+                target_folder=src_dir))
+    cython_files = write_cython(
+        node, node["implementations"], type_registry, "Node",
+        target_folder=python_dir)
     return interface_files + implementation_files + cython_files
 
 
-def write_dfpc(dfpc, cdffpath,
-               output, source_folder=".", python_folder="python"):
+def write_dfpc(dfpc, cdffpath, output, source_folder=".",
+               python_folder="python"):
     """Generate code templates for a data fusion processing compound (DFPC).
 
     Parameters
@@ -251,152 +239,17 @@ def write_dfpc(dfpc, cdffpath,
         dfpc, type_registry, "DFPCInterface",
         "%sInterface" % dfpc["name"], target_folder=src_dir,
         force_overwrite=True)
-    implementation_files = write_class(
-        dfpc, type_registry, "DFPCImplementation", dfpc["name"],
-        target_folder=src_dir)
-    dfpc["implementations"] = [dfpc["name"]]
-    cython_files = write_cython(dfpc, type_registry, "DFPC",
-                                target_folder=python_dir)
+    implementation_files = []
+    for implementation in dfpc["implementations"]:
+        implementation_files.extend(
+            write_class(
+                dfpc, type_registry, "DFPCImplementation",
+                implementation["name"], target_folder=src_dir))
+    implementation_names = [impl["name"] for impl in dfpc["implementations"]]
+    cython_files = write_cython(
+        dfpc, implementation_names, type_registry, "DFPC",
+        target_folder=python_dir)
     return interface_files + implementation_files + cython_files
-
-
-def validate_node(node):
-    """Validate node description.
-
-    Raises a DFNDescriptionException if validation is not
-    successful.
-
-    A validated node contains:
-    - name
-    - input_ports
-    - output_ports
-    - implementations
-
-    Parameters
-    ----------
-    node : dict
-        Node description
-
-    Returns
-    -------
-    validated_node : dict
-        Validated node description
-    """
-    validated_node = {}
-    validated_node.update(node)
-
-    if "name" not in node:
-        raise DFNDescriptionException(
-            "DFN description has no attribute 'name'.")
-
-    _validate_ports(validated_node)
-
-    if "implementations" not in node:
-        validated_node["implementations"] = [node["name"]]
-
-    return validated_node
-
-
-def validate_dfpc(dfpc):
-    """Validate DFPC description.
-
-    Raises a DFNDescriptionException if validation is not
-    successful.
-
-    A validated DFPC contains:
-    - name
-    - input_ports
-    - output_ports
-    - ...
-
-    Parameters
-    ----------
-    dfpc : dict
-        DFPC description
-
-    Returns
-    -------
-    validated_dfpc : dict
-        Validated DFPC description
-    """
-    validated_dfpc = {}
-    validated_dfpc.update(dfpc)
-
-    if "name" not in dfpc:
-        raise DFPCDescriptionException(
-            "DFPC description has no attribute 'name'.")
-
-    _validate_ports(validated_dfpc)
-    _validate_dfpc_port_connections(validated_dfpc)
-    _validate_dfpc_operations(validated_dfpc)
-    _validate_dfpc_internal_connections(validated_dfpc)
-
-    return validated_dfpc
-
-
-def _validate_ports(desc):
-    if "input_ports" not in desc:
-        desc["input_ports"] = []
-
-    if "output_ports" not in desc:
-        desc["output_ports"] = []
-
-    for port in desc["input_ports"] + desc["output_ports"]:
-        if "name" not in port:
-            raise PortDescriptionException("Port has no name: %s" % port)
-        if "type" not in port:
-            raise PortDescriptionException("Port has no type: %s" % port)
-
-
-def _validate_dfpc_port_connections(desc):
-    for port in desc["input_ports"] + desc["output_ports"]:
-        if "connections" not in port or len(port["connections"]) == 0:
-            raise PortDescriptionException(
-                "Port has no connections: %s" % port)
-
-
-def _validate_dfpc_operations(desc):
-    if "operations" not in desc:
-        desc["operations"] = []
-        return
-
-    for op in desc["operations"]:
-        if "name" not in op:
-            raise DFPCDescriptionException("Operation has no name: %s" % op)
-        if "output_type" not in op:
-            op["output_type"] = "void"
-
-        if "inputs" not in op:
-            op["inputs"] = []
-        for inp in op["inputs"]:
-            if "name" not in inp:
-                raise DFPCDescriptionException(
-                    "Input of operation '%s' has no name: %s"
-                    % (op["name"], inp))
-            if "type" not in inp:
-                raise DFPCDescriptionException(
-                    "Input '%s' of operation '%s' has no type"
-                    % (inp["name"], op["name"]))
-
-
-def _validate_dfpc_internal_connections(desc):
-    if "internal_connections" not in desc:
-        desc["internal_connections"] = []
-
-    for conn in desc["internal_connections"]:
-        if "from" not in conn:
-            raise DFPCDescriptionException(
-                "No 'from' in connection: %s" % conn)
-        if "to" not in conn:
-            raise DFPCDescriptionException("No 'to' in connection: %s" % conn)
-
-        for port in [conn["from"], conn["to"]]:
-            if "dfn" not in port:
-                raise DFPCDescriptionException(
-                    "No DFN is specified in connection: %s" % conn)
-            if "port" not in port:
-                raise DFPCDescriptionException(
-                    "No port is specified in connection: %s" % conn)
 
 
 def _prepare_output_directory(output, source_folder, python_folder):
@@ -467,7 +320,7 @@ def write_class(desc, type_registry, template_base, class_name,
     return write_result(result, force_overwrite)
 
 
-def write_cython(desc, type_registry, template_base,
+def write_cython(desc, implementations, type_registry, template_base,
                  target_folder="python", namespace_prefix="dfn_ci"):
     """Write Python binding based on Cython.
 
@@ -475,6 +328,9 @@ def write_cython(desc, type_registry, template_base,
     ----------
     desc : dict
         Component description
+
+    implementations : list
+        Names of implementations
 
     type_registry : TypeRegistry
         Registry for type information
@@ -505,14 +361,14 @@ def write_cython(desc, type_registry, template_base,
             import_cdfftypes = True
 
     pxd_file = render(
-        "Declaration.pxd", desc=desc,
+        "Declaration.pxd", desc=desc, implementations=implementations,
         namespace_prefix=namespace_prefix)
     target = os.path.join(target_folder, pxd_filename)
     result[target] = pxd_file
 
     _pxd_file = render(
-        "_%s.pxd" % template_base, desc=desc, type_registry=type_registry,
-        import_cdfftypes=import_cdfftypes)
+        "_%s.pxd" % template_base, desc=desc, implementations=implementations,
+        type_registry=type_registry, import_cdfftypes=import_cdfftypes)
     target = os.path.join(target_folder, _pxd_filename)
     result[target] = _pxd_file
 
@@ -531,9 +387,9 @@ def write_cython(desc, type_registry, template_base,
         operations = ""
 
     pyx_file = render(
-        "%s.pyx" % template_base, desc=desc, import_cdfftypes=import_cdfftypes,
-        input_ports=input_ports, output_ports=output_ports,
-        operations=operations)
+        "%s.pyx" % template_base, desc=desc, implementations=implementations,
+        import_cdfftypes=import_cdfftypes, input_ports=input_ports,
+        output_ports=output_ports, operations=operations)
 
     target = os.path.join(target_folder, pyx_filename)
     result[target] = pyx_file
