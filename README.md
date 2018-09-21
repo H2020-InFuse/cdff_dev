@@ -44,6 +44,7 @@ It also requires the Python 3 interpreter, the Python 3 headers, the Python
 * Cython
 * NumPy
 * msgpack-python
+* pandas
 * pydot
 * PyQt 4
 
