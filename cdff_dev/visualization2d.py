@@ -9,7 +9,7 @@ from matplotlib.ticker import ScalarFormatter
 from matplotlib.widgets import SpanSelector
 from matplotlib.colors import NoNorm
 from . import logloader, dataflowcontrol
-from .envirevisualization import Worker, Step  # TODO move to another file
+from .qtgui import Worker, Step
 import cdff_types
 
 

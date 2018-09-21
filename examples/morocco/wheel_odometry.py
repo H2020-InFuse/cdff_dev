@@ -111,14 +111,6 @@ class EvaluationDFN:
         print("[Evaluation] position error: %.2f" % self.error)
 
 
-def main():
-    logs, stream_names = convert_logs()
-    app, dfc = configure(logs, stream_names)
-
-    from cdff_dev.diagrams import save_graph_png
-    save_graph_png(dfc, "wheel_odometry.png")
-
-
 class Trajectory:
     def __init__(self):
         self.rbs = None
@@ -145,17 +137,6 @@ class Trajectory:
 
             for d in range(3):
                 self.output[d] = self.pos[d]
-
-
-def main():
-    logs, stream_names = convert_logs()
-    app, dfc = configure(logs, stream_names)
-
-    from cdff_dev.diagrams import save_graph_png
-    save_graph_png(dfc, "wheel_odometry.png")
-
-    app.exec_()
-    evaluate(dfc)
 
 
 def convert_logs():
@@ -267,12 +248,6 @@ def configure(logs, stream_names):
     t.transform.translation.fromarray(np.array([0.3, 0.0, -0.53]))
     t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.26067301, -0.96542715]))
 
-    #t.transform.translation.fromarray(np.array([0.0, 0.0, 0.0]))
-    #t.transform.translation.fromarray(np.array([0.3, 0.0, -0.53]))
-    #t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.26067301, -0.96542715]))
-    #t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
-    #t.transform.orientation.fromarray(np.array([  0.        ,  0.25881905,  0., 0.96592583]))
-    #t.transform.orientation.fromarray(np.array([2.58819045e-01,   1.58480958e-17,   9.65925826e-01, -5.91458986e-17]))
     graph.add_transform("dgps0", "origin", t)
     graph.add_transform("dgps", "body", t)
 
@@ -298,6 +273,17 @@ def evaluate(dfc):
     plt.legend()
 
     plt.show()
+
+
+def main():
+    logs, stream_names = convert_logs()
+    app, dfc = configure(logs, stream_names)
+
+    from cdff_dev.diagrams import save_graph_png
+    save_graph_png(dfc, "wheel_odometry.png")
+
+    app.exec_()
+    evaluate(dfc)
 
 
 if __name__ == "__main__":

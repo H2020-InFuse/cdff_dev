@@ -926,10 +926,10 @@ def test_rigid_body_state_str():
     assert_equal.__self__.maxDiff = None
     assert_equal(
         str(rbs),
-        "{type: RigidBodyState, timestamp={type: Time, microseconds: 0, "
-        "usec_per_sec: 0}, sourceFrame=source, targetFrame=target, "
-        "pos={type: Vector3d, data=[0.00, 0.00, 0.00]}, orient={type: "
-        "Quaterniond, data=[x=0.00, y=0.00, z=0.00, w=0.00]}, ...}")
+        "{type: RigidBodyState, timestamp={type: Time, microseconds: 0}, "
+        "sourceFrame=source, targetFrame=target, pos={type: Vector3d, "
+        "data=[0.00, 0.00, 0.00]}, orient={type: Quaterniond, "
+        "data=[x=0.00, y=0.00, z=0.00, w=0.00]}, ...}")
 
 
 def test_rigid_body_state_get_set_position():
