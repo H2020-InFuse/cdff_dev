@@ -547,6 +547,22 @@ cdef class Quaterniond:
         for i in range(4):
             self.thisptr.arr[i] = array[i]
 
+    def conjugate(self):
+        conj = Quaterniond()
+        conj[0] = -self.thisptr.arr[0]
+        conj[1] = -self.thisptr.arr[1]
+        conj[2] = -self.thisptr.arr[2]
+        conj[3] = self.thisptr.arr[3]
+        return conj
+
+    def __mul__(self, Quaterniond other):
+        cdef Quaterniond result = Quaterniond()
+        result[0] = self[3] * other[0] + other[3] * self[0] + self[1] * other[2] - self[2] * other[1]
+        result[1] = self[3] * other[1] + other[3] * self[1] + self[2] * other[0] - self[0] * other[2]
+        result[2] = self[3] * other[2] + other[3] * self[2] + self[0] * other[1] - self[1] * other[0]
+        result[3] = self[3] * other[3] - self[0] * other[0] - self[1] * other[1] - self[2] * other[2]
+        return result
+
 
 cdef class Pose:
     def __cinit__(self):

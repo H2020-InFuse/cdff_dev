@@ -17,15 +17,18 @@ class Transformer(transformer.EnvireDFN):
         super(Transformer, self).__init__()
         self.imu_initialized = False
         self.start_pos = np.zeros(3)
+        self.start_orient = cdff_types.Quaterniond()
+        self.current_pos = np.zeros(3)
+        self.current_orient = cdff_types.Quaterniond()
 
     def groundTruth2dgps0Input(self, data):
         if not self.imu_initialized:
-            self.start_pos = data.pos.toarray()
-            self.start_orient = data.orient.toarray()
+            self.start_pos[:] = data.pos.toarray()
+            self.start_orient.fromarray(data.orient.toarray())
 
             t = cdff_types.RigidBodyState()
             t.pos.fromarray(self.start_pos)
-            t.orient.fromarray(self.start_orient)
+            t.orient = self.start_orient
             t.source_frame = "dgps0"
             t.target_frame = "start"
             t.timestamp.microseconds = self._timestamp
@@ -34,10 +37,12 @@ class Transformer(transformer.EnvireDFN):
             self.imu_initialized = True
 
         t = cdff_types.RigidBodyState()
-        p, q = data.pos.toarray(), data.orient.toarray()
-        p, q = _subtract_pose(p, q, self.start_pos, self.start_orient)
+        self.current_pos[:] = data.pos.toarray()
+        self.current_orient.fromarray(data.orient.toarray())
+        p, q = _subtract_pose(self.current_pos, self.current_orient,
+                              self.start_pos, self.start_orient)
         t.pos.fromarray(p)
-        t.orient.fromarray(q)
+        t.orient = q
         t.source_frame = "ground_truth"
         t.target_frame = "dgps0"
         t.timestamp.microseconds = self._timestamp
@@ -60,20 +65,9 @@ class Transformer(transformer.EnvireDFN):
 
 def _subtract_pose(p1, q1, p2, q2):
     p = p1 - p2
-    q = _quaternion_product(q1, _quaternion_inverse(q2))
-    return p, q
-
-
-def _quaternion_inverse(q):
     # quaternion conjugate is the inverse for unit quaternions
-    return np.array([-q[0], -q[1], -q[2], q[3]])
-
-
-def _quaternion_product(q1, q2):
-    q = np.empty(4)
-    q[:3] = q1[-1] * q2[:3] + q2[-1] * q1[:3] + np.cross(q1[:3], q2[:3])
-    q[-1] = q1[-1] * q2[-1] - np.dot(q1[:3], q2[:3])
-    return q
+    q = q1 * q2.conjugate()
+    return p, q
 
 
 class EvaluationDFN:
