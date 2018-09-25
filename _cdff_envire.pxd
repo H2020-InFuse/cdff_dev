@@ -72,6 +72,9 @@ cdef extern from "base/Eigen.hpp" namespace "base":
         double x()
         double y()
         double z()
+        Quaterniond conjugate()
+        Quaterniond inverse()
+        Quaterniond product "operator*"(Quaterniond&)
 
 
 cdef extern from "base/TransformWithCovariance.hpp" namespace "base":

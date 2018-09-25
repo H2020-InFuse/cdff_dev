@@ -231,6 +231,21 @@ cdef class Quaterniond:
         self.thisptr[0] = _cdff_envire.Quaterniond(
             array[3], array[0], array[1], array[2])
 
+    def conjugate(self):
+        cdef Quaterniond conj = Quaterniond()
+        conj.thisptr[0] =  self.thisptr.conjugate()
+        return conj
+
+    def inverse(self):
+        cdef Quaterniond inv = Quaterniond()
+        inv.thisptr[0] =  self.thisptr.inverse()
+        return inv
+
+    def __mul__(Quaterniond self, Quaterniond other):
+        cdef Quaterniond result = Quaterniond()
+        result.thisptr[0] = self.thisptr.product(deref(other.thisptr))
+        return result
+
 
 cdef class TransformWithCovariance:
     def __cinit__(self):
