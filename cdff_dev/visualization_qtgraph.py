@@ -111,6 +111,14 @@ class ImageVisualization(dataflowcontrol.VisualizationBase):
                 raise ValueError("Impossible number of channels: %d"
                                  % image.ndim)
 
+            if sample.metadata.mode == "mode_GRAY":
+                image = image.reshape(image.shape[0], image.shape[1])
+            elif sample.metadata.mode not in [
+                    "mode_RGB", "mode_RGBA", "mode_BGR", "mode_BGRA",
+                    "mode_HSV", "mode_HLS", "mode_YUV", "mode_UYVY"]:
+                raise ValueError("Don't know how to handle mode '%s'"
+                                 % sample.metadata.mode)
+
             kwargs = dict()
             if sample.data.depth == "depth_8U":
                 kwargs["autoLevels"] = False
