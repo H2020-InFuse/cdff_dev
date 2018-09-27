@@ -2217,19 +2217,7 @@ cdef class Frame:
         return data
 
     def array_reference(self, dtype=None):
-        cdef np.npy_intp shape2[2]
-        cdef np.npy_intp shape3[3]
-        if self.thisptr.data.channels > 1:
-            shape3[0] = <np.npy_intp> self.thisptr.data.rows
-            shape3[1] = <np.npy_intp> self.thisptr.data.cols
-            shape3[2] = <np.npy_intp> self.thisptr.data.channels
-            return np.PyArray_SimpleNewFromData(
-                3, shape3, np.NPY_UINT8, <void*> self.thisptr.data.data.arr)
-        else:
-            shape2[0] = <np.npy_intp> self.thisptr.data.rows
-            shape2[1] = <np.npy_intp> self.thisptr.data.cols
-            return np.PyArray_SimpleNewFromData(
-                2, shape2, np.NPY_UINT8, <void*> self.thisptr.data.data.arr)
+        return self.data.array_reference()
 
 
 cdef class Frame_metadata_tReference:
