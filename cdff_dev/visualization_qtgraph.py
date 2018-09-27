@@ -102,6 +102,7 @@ class ImageVisualization(dataflowcontrol.VisualizationBase):
     def report_node_output(self, port_name, sample, timestamp):
         if port_name == self.stream_name:
             image = sample.data.array_reference().copy()
+
             if image.ndim == 2:
                 image = image.T
             elif image.ndim == 3:
@@ -109,13 +110,16 @@ class ImageVisualization(dataflowcontrol.VisualizationBase):
             else:
                 raise ValueError("Impossible number of channels: %d"
                                  % image.ndim)
+
             kwargs = dict()
             if sample.data.depth == "depth_8U":
                 kwargs["autoLevels"] = False
                 kwargs["levels"] = (0.0, 255.0)
             elif sample.data.depth == "depth_32F":
                 kwargs["autoLevels"] = True
+                # TODO bug: second depth image is not shown
             else:
                 raise ValueError("Unknown depth '%s'" % sample.data.depth)
+
             self.image_view.setImage(image, **kwargs)
 
