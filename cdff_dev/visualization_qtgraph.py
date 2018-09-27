@@ -125,9 +125,7 @@ class ImageVisualization(dataflowcontrol.VisualizationBase):
                 kwargs["levels"] = (0.0, 255.0)
             elif sample.data.depth == "depth_32F":
                 kwargs["autoLevels"] = True
-                # TODO bug: second depth image is not shown
             else:
                 raise ValueError("Unknown depth '%s'" % sample.data.depth)
 
             self.image_view.setImage(image, **kwargs)
-
