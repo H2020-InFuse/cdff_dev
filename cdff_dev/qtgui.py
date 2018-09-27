@@ -2,7 +2,7 @@ import sys
 import time
 from PyQt4.QtGui import (QApplication, QMainWindow, QMenuBar, QWidget,
                          QPushButton, QLabel, QDoubleSpinBox, QSpinBox,
-                         QVBoxLayout)
+                         QVBoxLayout, QHBoxLayout)
 from PyQt4.QtCore import QThread, pyqtSignal
 from . import typefromdict
 
@@ -21,8 +21,11 @@ class ReplayMainWindow(QMainWindow):
         self.menu_bar = QMenuBar()
         self.setMenuBar(self.menu_bar)
 
-        self.central_widget = ReplayControlWidget(self.worker)
-        self.setCentralWidget(self.central_widget)
+        self.central_widget_ = ReplayControlWidget(self.worker)
+        self.setCentralWidget(self.central_widget_)
+
+    def add_widget(self, widget):
+        self.central_widget_.add_widget(widget)
 
     def closeEvent(self, QCloseEvent):
         self.worker.quit()
@@ -30,45 +33,50 @@ class ReplayMainWindow(QMainWindow):
 
 class ReplayControlWidget(QWidget):
     """Contains buttons etc."""
-
     def __init__(self, worker):
         super(ReplayControlWidget, self).__init__()
 
-        layout = QVBoxLayout()
-        self.setLayout(layout)
+        self.control_layout = QVBoxLayout()
 
         self.step_button = QPushButton("Step")
         self.step_button.clicked.connect(worker.step)
-        layout.addWidget(self.step_button)
+        self.control_layout.addWidget(self.step_button)
 
         self.play_button = QPushButton("Play")
         self.play_button.clicked.connect(worker.play)
-        layout.addWidget(self.play_button)
+        self.control_layout.addWidget(self.play_button)
 
         self.pause_button = QPushButton("Pause")
         self.pause_button.clicked.connect(worker.pause)
-        layout.addWidget(self.pause_button)
+        self.control_layout.addWidget(self.pause_button)
 
-        layout.addWidget(QLabel("Break between samples:"))
+        self.control_layout.addWidget(QLabel("Break between samples:"))
         self.break_edit = QDoubleSpinBox()
         self.break_edit.setValue(worker.break_length_)
         self.break_edit.setMinimum(0.0)
         self.break_edit.setMaximum(sys.float_info.max)
-        self.break_edit.setSingleStep(0.01)
-        layout.addWidget(self.break_edit)
+        self.break_edit.setSingleStep(0.001)
+        self.control_layout.addWidget(self.break_edit)
 
         self.break_update_button = QPushButton("Update Break")
         self.break_update_button.clicked.connect(self.update_break)
-        layout.addWidget(self.break_update_button)
+        self.control_layout.addWidget(self.break_update_button)
 
-        layout.addWidget(QLabel("Current sample:"))
+        self.control_layout.addWidget(QLabel("Current sample:"))
         self.step_info = QSpinBox()
         self.step_info.setMaximum(2000000000)
         self.step_info.setEnabled(False)
-        layout.addWidget(self.step_info)
+        self.control_layout.addWidget(self.step_info)
+
+        self.main_layout = QHBoxLayout()
+        self.main_layout.addLayout(self.control_layout)
+        self.setLayout(self.main_layout)
 
         self.worker = worker
         self.worker.step_done.connect(self.step_info.setValue)
+
+    def add_widget(self, widget):
+        self.main_layout.addWidget(widget)
 
     def update_break(self):
         text = self.break_edit.text()

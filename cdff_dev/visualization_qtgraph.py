@@ -79,9 +79,9 @@ class ImageVisualizerApplication:
         dfc : DataFlowControl
             Configured processing and data fusion logic
         """
+        self.control_window = qtgui.ReplayMainWindow(qtgui.Step, iterator, dfc)
         self.visualization = ImageVisualization(self.stream_name)
         dfc.register_visualization(self.visualization)
-        self.control_window = qtgui.ReplayMainWindow(qtgui.Step, iterator, dfc)
         self.control_window.show()
 
     def exec_(self):
@@ -96,8 +96,8 @@ class ImageVisualizerApplication:
 class ImageVisualization(dataflowcontrol.VisualizationBase):
     def __init__(self, stream_name):
         self.stream_name = stream_name
-        self.image_view = pg.ImageView(name=self.stream_name)
-        self.image_view.show()
+        self.image_view_ = pg.ImageView(name=self.stream_name)
+        self.image_view_.show()
 
     def report_node_output(self, port_name, sample, timestamp):
         if port_name == self.stream_name:
@@ -128,4 +128,4 @@ class ImageVisualization(dataflowcontrol.VisualizationBase):
             else:
                 raise ValueError("Unknown depth '%s'" % sample.data.depth)
 
-            self.image_view.setImage(image, **kwargs)
+            self.image_view_.setImage(image, **kwargs)
