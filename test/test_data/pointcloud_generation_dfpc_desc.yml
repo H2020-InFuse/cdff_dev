@@ -11,9 +11,6 @@ output_ports:
     - name: pointcloudAvailable
       type: bool
       doc: "Is the pointcloud available?"
-      connections:
-        dfn: TiltScan
-        port: pointcloudAvailable
 operations:
     - name: "getPointcloud"
       inputs:
