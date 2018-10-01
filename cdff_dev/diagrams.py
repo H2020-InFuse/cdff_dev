@@ -25,7 +25,8 @@ def save_graph_png(dfc, filename):
 
 def save_network_graph_as_png(
         filename, nodes, node_inputs, node_outputs, network_inputs,
-        network_outputs, connections, periods=None, trigger_ports=None):
+        network_outputs, connections, periods=None, trigger_ports=None,
+        verbose=0):
     """Save network graph as PNG.
 
     Parameters
@@ -57,6 +58,9 @@ def save_network_graph_as_png(
 
     trigger_ports : dict, optional (default: {})
         Mapping from node names to trigger ports
+
+    verbose : int, optional (default: 0)
+        Verbosity level
     """
     if periods is None:
         periods = dict()
