@@ -21,9 +21,31 @@ class EnvireDFN:
         Graph that stores and provides transformations
     """
     def __init__(self, verbose=0):
-        self.graph_ = None
+        self._graph = None
         self._timestamp = 0
         self.verbose = verbose
+
+    def _set_graph_(self, graph):
+        self._graph = graph
+        if graph is not None:
+            self.initialize_graph(graph)
+
+    def _get_graph_(self):
+        return self._graph
+
+    graph_ = property(_get_graph_, _set_graph_)
+
+    def initialize_graph(self, graph):
+        """Initialize graph.
+
+        This method will be called after the graph object has been set.
+        It can be used to add frames and static transformations.
+
+        Parameters
+        ----------
+        graph : EnvireGraph
+            New graph object
+        """
 
     def set_configuration_file(self):
         pass
