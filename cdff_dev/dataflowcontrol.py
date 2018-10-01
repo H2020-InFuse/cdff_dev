@@ -51,22 +51,20 @@ class DataFlowControl:
         network.
 
     output_ports_ : dict, optional (default: {})
-        A dictionary with node names as keys and dictionaries as values. The
-        values represent a dictionary that maps from port names (without
-        node prefix) to the corresponding function of the node implementation.
+        A dictionary with node names as keys and a set of output port names
+        (without node prefix) as values.
 
     input_ports_ : dict, optional (default: {})
-        A dictionary with node names as keys and dictionaries as values. The
-        values represent a dictionary that maps from port names (without
-        node prefix) to the corresponding function of the node implementation.
+        A dictionary with node names as keys and a set of input port names
+        (without node prefix) as values.
 
     log_ports_ : dict
-        A dictionary with node names as keys and port names (without
-        node prefix) as values.
+        A dictionary with node names as keys and a set of log port names
+        (without node prefix) as values.
 
     result_ports_ : dict
-        A dictionary with node names as keys and port names (without
-        node prefix) as values.
+        A dictionary with node names as keys and a set of result port names
+        (without node prefix) as values.
 
     connection_map_ : list
         A list of pairs of output node and connected input node. Full names
@@ -135,10 +133,10 @@ class DataFlowControl:
 
     def _cache_ports(self):
         """Cache setters and getters for ports."""
-        self.output_ports_ = defaultdict(list)
-        self.input_ports_ = defaultdict(list)
-        self.log_ports_ = defaultdict(list)
-        self.result_ports_ = defaultdict(list)
+        self.output_ports_ = defaultdict(set)
+        self.input_ports_ = defaultdict(set)
+        self.log_ports_ = defaultdict(set)
+        self.result_ports_ = defaultdict(set)
 
         for output_port, input_port in self.connections:
             input_port = self._check_stream_name(input_port)
@@ -147,16 +145,16 @@ class DataFlowControl:
             node_name, port_name, port_exists = self._node_facade.check_port(
                 output_port, "Output")
             if port_exists:
-                self.output_ports_[node_name].append(port_name)
+                self.output_ports_[node_name].add(port_name)
             else:
-                self.log_ports_[node_name].append(port_name)
+                self.log_ports_[node_name].add(port_name)
 
             node_name, port_name, port_exists = self._node_facade.check_port(
                 input_port, "Input")
             if port_exists:
-                self.input_ports_[node_name].append(port_name)
+                self.input_ports_[node_name].add(port_name)
             else:
-                self.result_ports_[node_name].append(port_name)
+                self.result_ports_[node_name].add(port_name)
 
     def _configure_triggers(self):
         """Check and save periods for nodes."""

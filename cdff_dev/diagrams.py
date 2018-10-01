@@ -121,7 +121,6 @@ def save_network_graph_as_png(
 
 
 def _add_ports_to_cluster(node_name, ports, cluster, output=True):
-    ports = set(ports)
     for port in ports:
         port_name = node_name + "." + port
         port_node = pydot.Node(__display_name(port_name), style="filled",
