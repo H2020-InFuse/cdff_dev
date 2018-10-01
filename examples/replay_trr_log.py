@@ -12,26 +12,16 @@ class Transformer(transformer.EnvireDFN):
         self.ground_truth_initialized = False
         self._graph = None
 
-    def _set_graph_(self, graph):
-        self._graph = graph
-        if graph is not None:
-            self._initialize_static_transformations()
-
-    def _get_graph_(self):
-        return self._graph
-
-    graph_ = property(_get_graph_, _set_graph_)
-
-    def _initialize_static_transformations(self):
+    def initialize_graph(self, graph):
         t = cdff_envire.Transform()
         t.transform.translation.fromarray(np.array([0.0, 0.0, 0.442]))
         t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
-        self._graph.add_transform("body", "velodyne_plane_fixed", t)
+        graph.add_transform("body", "velodyne_plane_fixed", t)
 
         t = cdff_envire.Transform()
         t.transform.translation.fromarray(np.array([-0.12889, -0.01697, 0.09081]))
         t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.06540328, 0.99785891]))
-        self._graph.add_transform("velodyne_plane_moving", "velodyne", t)
+        graph.add_transform("velodyne_plane_moving", "velodyne", t)
 
 
     def wheelOdometryInput(self, data):

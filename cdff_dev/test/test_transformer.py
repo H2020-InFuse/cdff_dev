@@ -9,8 +9,16 @@ class Transformer(transformer.EnvireDFN):
     def __init__(self):
         super(Transformer, self).__init__()
         self.graph_ = cdff_envire.EnvireGraph()
-        self.graph_.add_frame("B")
-        self.graph_.add_frame("C")
+
+    def initialize_graph(self, graph):
+        graph.add_frame("B")
+        graph.add_frame("C")
+        graph.add_frame("D")
+        graph.add_frame("E")
+
+        t = cdff_envire.Transform()
+        t.transform.translation.fromarray(np.array([4, 3, 4], dtype=np.float))
+        graph.add_transform("D", "E", t)
 
     def A2BInput(self, data):
         self._set_transform(data)
@@ -23,6 +31,9 @@ class Transformer(transformer.EnvireDFN):
 
     def D2AOutput(self):
         return self._get_transform("D", "A")
+
+    def D2EOutput(self):
+        return self._get_transform("D", "E")
 
 
 def test_add_get_transformations():
@@ -52,3 +63,14 @@ def test_add_get_transformations():
     assert_equal(D2A.pos[0], -9)
     assert_equal(D2A.pos[1], -9)
     assert_equal(D2A.pos[2], -9)
+
+
+def test_static_transformations():
+    transformer = Transformer()
+
+    D2E = transformer.D2EOutput()
+    assert_equal(D2E.source_frame, "D")
+    assert_equal(D2E.target_frame, "E")
+    assert_equal(D2E.pos[0], 4)
+    assert_equal(D2E.pos[1], 3)
+    assert_equal(D2E.pos[2], 4)
