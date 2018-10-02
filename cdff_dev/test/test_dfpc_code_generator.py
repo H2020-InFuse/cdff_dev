@@ -140,6 +140,7 @@ def test_validate_missing_output_type_is_void():
             "doc": "",
             "operations": [
                 {"name": "dummy",
+                 "doc": "",
                  "inputs": [
                      {"name": "bla",
                       "type": "double"}
@@ -151,11 +152,25 @@ def test_validate_missing_output_type_is_void():
     assert_equal(validated_dfpc["operations"][0]["output_type"], "void")
 
 
+def test_validate_missing_operation_doc():
+    dfpc = {"name": "Dummy",
+            "doc": "",
+            "operations": [
+                {"name": "dummy",
+                 "output_type": "double"
+                }
+            ]}
+    assert_raises_regex(
+        DFPCDescriptionException, "Operation has no documentation",
+        validate_dfpc, dfpc)
+
+
 def test_validate_missing_input_name():
     dfpc = {"name": "Dummy",
             "doc": "",
             "operations": [
                 {"name": "dummy",
+                 "doc": "",
                  "inputs": [
                      {"type": "double"}
                  ]
@@ -171,6 +186,7 @@ def test_validate_missing_input_type():
             "doc": "",
             "operations": [
                 {"name": "dummy",
+                 "doc": "",
                  "inputs": [
                      {"name": "bla"}
                  ]

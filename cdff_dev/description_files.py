@@ -123,6 +123,9 @@ def _validate_dfpc_operations(desc):
     for op in desc["operations"]:
         if "name" not in op:
             raise DFPCDescriptionException("Operation has no name: %s" % op)
+        if "doc" not in op:
+            raise DFPCDescriptionException(
+                "Operation has no documentation: %s" % op)
         if "output_type" not in op:
             op["output_type"] = "void"
 
