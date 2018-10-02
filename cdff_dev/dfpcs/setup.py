@@ -26,6 +26,7 @@ DEFAULT_LIBRARY_DIRS = [
     os.path.join(cdffpath, "build", "Common", "Types"),
     os.path.join(cdffpath, "build", "Common", "Helpers"),
     os.path.join(cdffpath, "build", "Common", "Visualizers"),
+    os.path.join(cdffpath, "build", "Common", "Validators"),
     os.path.join(cdffpath, "build", "DFNs"),
     os.path.join(cdffpath, "build", "DFPCs"),
     os.path.join(cdffpath, "build", "CC"),
