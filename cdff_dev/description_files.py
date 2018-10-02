@@ -95,7 +95,7 @@ def validate_dfpc(dfpc):
 
 def _validate_doc(desc):
     if "doc" not in desc:
-        desc["doc"] = "TODO add documentation"
+        raise DFPCDescriptionException("Entry 'doc' for DFPC is missing.")
 
 
 def _validate_ports(desc):
