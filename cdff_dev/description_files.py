@@ -110,6 +110,9 @@ def _validate_ports(desc):
             raise PortDescriptionException("Port has no name: %s" % port)
         if "type" not in port:
             raise PortDescriptionException("Port has no type: %s" % port)
+        if "doc" not in port:
+            raise PortDescriptionException(
+                "Port has no documentation: %s" % port)
 
 
 def _validate_dfpc_operations(desc):

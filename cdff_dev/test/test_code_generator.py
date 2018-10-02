@@ -49,3 +49,13 @@ def test_validate_missing_port_type():
     assert_raises_regexp(
         PortDescriptionException, "Port has no type",
         validate_node, node)
+
+
+def test_validate_missing_port_doc():
+    node = {"name": "Dummy",
+            "input_ports": [
+                {"name": "port1", "type": "double"}
+            ]}
+    assert_raises_regexp(
+        PortDescriptionException, "Port has no doc",
+        validate_node, node)
