@@ -22,13 +22,13 @@ implementations:
     - name: PointcloudGenerationImplementation
       dfns:
           - dfn_id: tilt_scan
-            type: TiltScan
+            name: TiltScan
             implementation: TiltScan
             activation:
                 type: input_triggered
                 value: scanSamples
           - dfn_id: laser_filter
-            type: LaserFilter
+            name: LaserFilter
             implementation: LaserFilter
             activation:
                 type: input_triggered

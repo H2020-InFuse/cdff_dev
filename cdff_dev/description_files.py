@@ -161,9 +161,9 @@ def _validate_dfns(implementation):
     for dfn in implementation["dfns"]:
         if "dfn_id" not in dfn:
             raise DFPCDescriptionException("dfn_id is missing")
-        if "type" not in dfn:
+        if "name" not in dfn:
             raise DFPCDescriptionException(
-                "Type of DFN '%s' is missing" % dfn["dfn_id"])
+                "Name of DFN '%s' is missing" % dfn["dfn_id"])
         if "implementation" not in dfn:
             raise DFPCDescriptionException(
                 "Implementation of DFN '%s' is missing" % dfn["dfn_id"])

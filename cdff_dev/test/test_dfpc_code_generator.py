@@ -40,7 +40,7 @@ FULLDFPC = {
             "dfns": [
                 {
                     "dfn_id": "dummyDFN1",
-                    "type": "DummyDFN",
+                    "name": "DummyDFN",
                     "implementation": "MyDummyDFN",
                     "activation": {
                         "type": "input_triggered",
@@ -49,7 +49,7 @@ FULLDFPC = {
                 },
                 {
                     "dfn_id": "dummyDFN2",
-                    "type": "DummyDFN",
+                    "name": "DummyDFN",
                     "implementation": "MyDummyDFN",
                     "activation": {
                         "type": "input_triggered",
@@ -227,7 +227,7 @@ def test_validate_missing_dfn_type():
         ]
     }
     assert_raises_regex(
-        DFPCDescriptionException, "Type of DFN 'dummy' is missing",
+        DFPCDescriptionException, "Name of DFN 'dummy' is missing",
         validate_dfpc, dfpc)
 
 
@@ -240,7 +240,7 @@ def test_validate_missing_dfn_implementation():
              "dfns": [
                  {
                      "dfn_id": "dummy",
-                     "type": "DummyDFN"
+                     "name": "DummyDFN"
                  }
              ]}
         ]
@@ -259,7 +259,7 @@ def test_validate_missing_dfn_activation():
              "dfns": [
                  {
                      "dfn_id": "dummy",
-                     "type": "DummyDFN",
+                     "name": "DummyDFN",
                      "implementation": "A"
                  }
              ]}
@@ -279,7 +279,7 @@ def test_validate_missing_dfn_activation_type():
              "dfns": [
                  {
                      "dfn_id": "dummy",
-                     "type": "DummyDFN",
+                     "name": "DummyDFN",
                      "implementation": "A",
                      "activation": {
                          "value": "bla"
@@ -302,7 +302,7 @@ def test_validate_unknown_dfn_activation_type():
              "dfns": [
                  {
                      "dfn_id": "dummy",
-                     "type": "DummyDFN",
+                     "name": "DummyDFN",
                      "implementation": "A",
                      "activation": {
                          "type": "murks",
@@ -328,7 +328,7 @@ def test_validate_missing_dfn_activation_value():
              "dfns": [
                  {
                      "dfn_id": "dummy",
-                     "type": "DummyDFN",
+                     "name": "DummyDFN",
                      "implementation": "A",
                      "activation": {
                          "type": "input_triggered"
