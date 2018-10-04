@@ -242,15 +242,15 @@ def save_chunks(chunks, filename_prefix):
             msgpack.pack(chunk, f, encoding="utf8")
 
 
-def print_stream_info(log):
+def print_stream_info(filename):
     """Print meta information about streams.
 
     Parameters
     ----------
-    log : dict
-        Log data
+    filename : str
+        Name of the logfile
     """
-    typenames, n_samples = summarize_log(log)
+    typenames, n_samples = summarize_logfile(filename)
     stream_names = list(typenames.keys())
     stream_meta_data = [(sn, typenames[sn], str(n_samples[sn]).rjust(14))
                         for sn in stream_names]
