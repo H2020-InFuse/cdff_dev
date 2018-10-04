@@ -122,7 +122,7 @@ def summarize_log(log):
     return typenames, n_samples
 
 
-def chunk_logfile(filename, stream_name, chunk_size):
+def chunk_and_save_logfile(filename, stream_name, chunk_size):
     """Split large logfile.
 
     Parameters

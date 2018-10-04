@@ -114,3 +114,34 @@ def test_replay_files():
         last_timestamp = timestamp
 
     assert_equal(sample_counter, 300 + 300)
+
+
+def test_chunk_replay_log():
+    filename = "test/test_data/logs/test_log.msg"
+    stream = "/dynamixel.transforms"
+    logloader.chunk_and_save_logfile(filename, stream, 100)
+    try:
+        log = logloader.load_log(filename)
+        full_iterator = logloader.replay([stream], log)
+        chunk_iterator = logloader.replay_files(
+            [sorted(glob.glob("test/test_data/logs/test_log_*.msg"))],
+            [stream])
+        while True:
+            try:
+                t_actual, sn_actual, tn_actual, s_actual = next(full_iterator)
+                t, sn, tn, s = next(chunk_iterator)
+                assert_equal(t, t_actual)
+                assert_equal(sn, sn_actual)
+                assert_equal(tn, tn_actual)
+                assert_equal(s["timestamp"]["microseconds"],
+                             s_actual["timestamp"]["microseconds"])
+                assert_equal(s["pos"], s_actual["pos"])
+                assert_equal(s["orient"], s_actual["orient"])
+            except StopIteration:
+                assert_raises(StopIteration, next, full_iterator)
+                assert_raises(StopIteration, next, chunk_iterator)
+                break
+    finally:
+        filenames = glob.glob("test/test_data/logs/test_log_*.msg")
+        for filename in filenames:
+            os.remove(filename)

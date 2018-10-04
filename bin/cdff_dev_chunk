@@ -7,7 +7,7 @@ from cdff_dev import logloader
 
 def main():
     args = parse_args()
-    logloader.chunk_logfile(args.filename, args.stream_name, args.chunk_size)
+    logloader.chunk_and_save_logfile(args.filename, args.stream_name, args.chunk_size)
 
 
 def parse_args():
