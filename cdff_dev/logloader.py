@@ -142,20 +142,34 @@ def chunk_and_save_logfile(filename, stream_name, chunk_size):
             stream_name.replace("/", "_").replace(".", "_")
     with open(filename, "rb") as f:
         with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as m:
-            metadata = _extract_metastreams(m, stream_name)
+            metadata = _extract_metastreams(m, [stream_name])
             metastream = metadata[stream_name + ".meta"]
             m.seek(0)
             _chunk_and_save(
                 stream_name, chunk_size, m, metastream, output_filename)
 
 
-def _extract_metastreams(m, stream=None):
+def _extract_stream_positions(m, streams=None):
+    positions = dict()
+    u = msgpack.Unpacker(m, encoding="utf8")
+    for _ in range(u.read_map_header()):
+        key = u.unpack()
+        if not key.endswith(".meta") and (streams is None or key in streams):
+            n_samples = u.read_array_header()
+            positions[key] = u.tell()
+            for _ in range(n_samples):
+                u.skip()
+        else:
+            u.skip()
+    return positions
+
+
+def _extract_metastreams(m, streams=None):
     metastreams = dict()
     u = msgpack.Unpacker(m, encoding="utf8")
     for _ in range(u.read_map_header()):
         key = u.unpack()
-        if key.endswith(".meta") and (stream is None or
-                                      key == stream + ".meta"):
+        if key.endswith(".meta") and (streams is None or key[:-5] in streams):
             metastreams[key] = u.unpack()
         else:
             u.skip()
@@ -330,6 +344,78 @@ def replay(stream_names, log, verbose=0):
             streams, meta_streams, stream_names, current_stream,
             current_sample_indices[current_stream])
         yield timestamp, stream_name, typename, sample
+
+
+def replay_logfile(filename, stream_names, verbose=0):
+    """Generator that yields samples of a logfile in correct temporal order.
+
+    Parameters
+    ----------
+    filename : str
+        Name of the logfile
+
+    stream_names : list
+        Names of the streams
+
+    verbose : int, optional (default: 0)
+        Verbosity level
+
+    Returns
+    -------
+    current_timestamp : int
+        Current time in microseconds
+
+    stream_name : str
+        Name of the currently active stream
+
+    typename : str
+        Name of the data type of the stream
+
+    sample : dict
+        Current sample
+    """
+    with open(filename, "rb") as f:
+        with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as m:
+            metadata = _extract_metastreams(m, stream_names)
+            m.seek(0)
+            print(stream_names)
+            current_positions = _extract_stream_positions(m, stream_names)
+
+            meta_streams = [metadata[name + ".meta"] for name in stream_names]
+
+            print(current_positions)
+
+            n_streams = len(stream_names)
+            current_sample_indices = [-1] * n_streams
+
+            u = msgpack.Unpacker(m, encoding="utf8")
+            while True:
+                current_stream, _ = _next_timestamp(
+                    meta_streams, current_sample_indices)
+                if current_stream is None:
+                    return
+
+                if verbose >= 2:
+                    print("[replay] Selected stream #%d '%s'"
+                          % (current_stream, stream_names[current_stream]))
+
+                current_sample_indices[current_stream] += 1
+                if verbose >= 2:
+                    print("[replay] Stream indices: %s"
+                          % (current_sample_indices,))
+
+                current_stream_name = stream_names[current_stream]
+                current_sample_idx = current_sample_indices[current_stream]
+                timestamp = meta_streams[current_stream]["timestamps"][
+                    current_sample_idx]
+                typename = meta_streams[current_stream]["type"]
+                m.seek(current_positions[current_stream_name])
+                try:
+                    sample = u.unpack()
+                except msgpack.exceptions.OutOfData:
+                    raise StopIteration()
+                current_positions[current_stream_name] = u.tell()
+                yield timestamp, current_stream_name, typename, sample
 
 
 def replay_files(filename_groups, stream_names, verbose=0):
@@ -548,7 +634,7 @@ def _next_timestamp(meta_streams, current_sample_indices):
 
     Parameters
     ----------
-    meta_streams : dict
+    meta_streams : list of dicts
         Meta data streams, must contain a field "timestamps" with a list of
         timestamps
 

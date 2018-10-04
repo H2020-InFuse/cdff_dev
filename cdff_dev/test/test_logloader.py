@@ -145,3 +145,15 @@ def test_chunk_replay_log():
         filenames = glob.glob("test/test_data/logs/test_log_*.msg")
         for filename in filenames:
             os.remove(filename)
+
+
+def test_replay_filename():
+    filename = "test/test_data/logs/test_log.msg"
+    streams = [#"/hokuyo.state", "/dynamixel.state",
+               "/dynamixel.transforms", "/hokuyo.scans"]
+    log_iterator = logloader.replay_logfile(filename, streams)
+    stream_counter = {key: 0 for key in streams}
+    for timestamp, stream_name, typename, sample in log_iterator:
+        stream_counter[stream_name] += 1
+        print(stream_counter[stream_name], timestamp, stream_name, typename)
+    print(stream_counter)
