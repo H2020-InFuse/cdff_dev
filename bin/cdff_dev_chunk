@@ -7,12 +7,7 @@ from cdff_dev import logloader
 
 def main():
     args = parse_args()
-    log = logloader.load_log(args.filename)
-    chunks = logloader.chunk_log(log, args.stream_name, args.chunk_size)
-    output_filename = args.filename
-    if output_filename.endswith(".msg"):
-        output_filename = output_filename[:-4]
-    logloader.save_chunks(chunks, output_filename)
+    logloader.chunk_logfile(args.filename, args.stream_name, args.chunk_size)
 
 
 def parse_args():

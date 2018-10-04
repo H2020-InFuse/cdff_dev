@@ -1,6 +1,7 @@
 import os
 import math
 import warnings
+import mmap
 import msgpack
 
 
@@ -119,6 +120,70 @@ def summarize_log(log):
         typenames[stream_name] = log[stream_name + ".meta"]["type"]
         n_samples[stream_name] = len(log[stream_name])
     return typenames, n_samples
+
+
+def chunk_logfile(filename, stream_name, chunk_size):
+    """Split large logfile.
+
+    Parameters
+    ----------
+    filename : str
+        Name of the logfile
+
+    stream_name : str
+        Name of the stream that will be extracted
+
+    chunk_size : int
+        Maximum size of each chunk
+    """
+    output_filename = filename
+    if output_filename.endswith(".msg"):
+        output_filename = output_filename[:-4]
+    with open(filename, "rb") as f:
+        with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as m:
+            metadata = _extract_metastreams(m, stream_name)
+            metastream = metadata[stream_name + ".meta"]
+            m.seek(0)
+            _chunk_and_save(
+                stream_name, chunk_size, m, metastream, output_filename)
+
+
+def _extract_metastreams(m, stream=None):
+    metastreams = dict()
+    u = msgpack.Unpacker(m, encoding="utf8")
+    for _ in range(u.read_map_header()):
+        key = u.unpack()
+        if key.endswith(".meta") and (stream is None or
+                                      key == stream + ".meta"):
+            metastreams[key] = u.unpack()
+        else:
+            u.skip()
+    return metastreams
+
+
+def _chunk_and_save(stream_name, chunk_size, m, metastream, output_filename):
+    u = msgpack.Unpacker(m, encoding="utf8")
+    file_counter = 0
+    for _ in range(u.read_map_header()):
+        key = u.unpack()
+        if not key.endswith(".meta") and key == stream_name:
+            n_samples = u.read_array_header()
+            for i in range(0, n_samples, chunk_size):
+                lo, hi = i, min(i + chunk_size, n_samples)
+                sliced_samples = [u.unpack() for _ in range(lo, hi)]
+                sliced_metadata = dict()
+                sliced_metadata["type"] = metastream["type"]
+                sliced_metadata["timestamps"] = metastream["timestamps"][lo:hi]
+                outfilename = output_filename + "_%09d.msg" % file_counter
+                with open(outfilename, "wb") as f:
+                    p = msgpack.Packer(encoding="utf8")
+                    f.write(
+                        p.pack_map_pairs(
+                            ((stream_name, sliced_samples),
+                             (stream_name + ".meta", sliced_metadata))))
+                file_counter += 1
+        else:
+            u.skip()
 
 
 def chunk_log(log, stream_name, chunk_size):
