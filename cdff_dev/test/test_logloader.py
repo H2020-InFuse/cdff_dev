@@ -116,6 +116,29 @@ def test_replay_files():
     assert_equal(sample_counter, 300 + 300)
 
 
+def test_replay_join():
+    log_iterators = [
+        logloader.replay_logfile(
+            "test/test_data/logs/xsens_imu_00.msg",
+            ["/xsens_imu.calibrated_sensors"]
+        ),
+        logloader.replay_logfile(
+            "test/test_data/logs/dynamixel_0.msg",
+            ["/dynamixel.transforms"]
+        )
+    ]
+    log_iterator = logloader.replay_join(log_iterators)
+    stream_counter = {key: 0 for key in ["/xsens_imu.calibrated_sensors",
+                                         "/dynamixel.transforms"]}
+    last_timestamp = float("-inf")
+    for t, sn, tn, s in log_iterator:
+        stream_counter[sn] += 1
+        assert_less_equal(last_timestamp, t)
+        last_timestamp = t
+    for counter in stream_counter.values():
+        assert_equal(counter, 100)
+
+
 def test_chunk_replay_log():
     filename = "test/test_data/logs/test_log.msg"
     stream = "/dynamixel.transforms"
