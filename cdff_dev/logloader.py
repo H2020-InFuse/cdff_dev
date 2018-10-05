@@ -26,6 +26,9 @@ def load_log(filename):
     return streams
 
 
+load_logfile = load_log
+
+
 def summarize_logfile(filename):
     """Extract summary of log file.
 
@@ -44,8 +47,8 @@ def summarize_logfile(filename):
     """
     n_samples = {}
     typenames = {}
-    with open(filename, "rb") as f:
-        unpacker = msgpack.Unpacker(file_like=f, encoding="utf8")
+    with _mmap_readfile(filename) as m:
+        unpacker = msgpack.Unpacker(file_like=m, encoding="utf8")
         n_keys = unpacker.read_map_header()
         for i in range(n_keys):
             key = unpacker.unpack()
@@ -143,6 +146,7 @@ def chunk_and_save_logfile(filename, stream_name, chunk_size):
     if output_filename.endswith(".msg"):
         output_filename = output_filename[:-4] + \
             stream_name.replace("/", "_").replace(".", "_")
+
     with _mmap_readfile(filename) as m:
         metadata = _extract_metastreams(m, [stream_name])
         metastream = metadata[stream_name + ".meta"]
@@ -151,39 +155,12 @@ def chunk_and_save_logfile(filename, stream_name, chunk_size):
             stream_name, chunk_size, m, metastream, output_filename)
 
 
-def _extract_stream_positions(m, streams=None):
-    positions = dict()
-    u = msgpack.Unpacker(m, encoding="utf8")
-    for _ in range(u.read_map_header()):
-        key = u.unpack()
-        if not key.endswith(".meta") and (streams is None or key in streams):
-            n_samples = u.read_array_header()
-            positions[key] = u.tell()
-            for _ in range(n_samples):
-                u.skip()
-        else:
-            u.skip()
-    return positions
-
-
-def _extract_metastreams(m, streams=None):
-    metastreams = dict()
-    u = msgpack.Unpacker(m, encoding="utf8")
-    for _ in range(u.read_map_header()):
-        key = u.unpack()
-        if key.endswith(".meta") and (streams is None or key[:-5] in streams):
-            metastreams[key] = u.unpack()
-        else:
-            u.skip()
-    return metastreams
-
-
 def _chunk_and_save(stream_name, chunk_size, m, metastream, output_filename):
     u = msgpack.Unpacker(m, encoding="utf8")
     file_counter = 0
     for _ in range(u.read_map_header()):
         key = u.unpack()
-        if not key.endswith(".meta") and key == stream_name:
+        if key == stream_name:
             n_samples = u.read_array_header()
             for i in range(0, n_samples, chunk_size):
                 lo, hi = i, min(i + chunk_size, n_samples)
@@ -389,42 +366,6 @@ def replay(stream_names, log, verbose=0):
         yield timestamp, stream_name, typename, sample
 
 
-def replay_join(log_iterators):
-    """Generator that joins multiple log iterators.
-
-    Parameters
-    ----------
-    log_iterators : list
-        List of log iterators that should be joined
-
-    Returns
-    -------
-    current_timestamp : int
-        Current time in microseconds
-
-    stream_name : str
-        Name of the currently active stream
-
-    typename : str
-        Name of the data type of the stream
-
-    sample : dict
-        Current sample
-    """
-    next_samples = [next(log_iterator) for log_iterator in log_iterators]
-    while True:
-        next_timestamps = [next_sample[0] for next_sample in next_samples]
-        if all(map(math.isinf, next_timestamps)):
-            return
-        log_iterator_idx, _ = _argmin(next_timestamps)
-        yield next_samples[log_iterator_idx]
-        try:
-            next_samples[log_iterator_idx] = next(
-                log_iterators[log_iterator_idx])
-        except StopIteration:
-            next_samples[log_iterator_idx] = (float("inf"), None, None, None)
-
-
 def replay_logfile(filename, stream_names, verbose=0):
     """Generator that yields samples of a logfile in correct temporal order.
 
@@ -458,19 +399,8 @@ def replay_logfile(filename, stream_names, verbose=0):
     """
     index_filename = filename + ".cdff_idx"
     with _mmap_readfile(filename) as m:
-        if os.path.exists(index_filename):
-            with open(index_filename, "rb") as index_file:
-                index_data = pickle.load(index_file)
-                metadata = index_data["metadata"]
-                current_positions = index_data["positions"]
-        else:
-            metadata = _extract_metastreams(m, stream_names)
-            m.seek(0)
-            current_positions = _extract_stream_positions(m, stream_names)
-            with open(index_filename, "wb") as index_file:
-                pickle.dump(
-                    {"metadata": metadata, "positions": current_positions},
-                    index_file)
+        current_positions, metadata = _cache_load_index(
+            index_filename, stream_names, m, verbose)
 
         meta_streams = [metadata[name + ".meta"] for name in stream_names]
 
@@ -502,6 +432,28 @@ def replay_logfile(filename, stream_names, verbose=0):
             sample = u.unpack()
             current_positions[current_stream_name] += u.tell()
             yield timestamp, current_stream_name, typename, sample
+
+
+def _cache_load_index(index_filename, stream_names, m, verbose):
+    if os.path.exists(index_filename):
+        if verbose >= 2:
+            print("Loading cached log index from '%s'" % index_filename)
+        with open(index_filename, "rb") as index_file:
+            index_data = pickle.load(index_file)
+            metadata = index_data["metadata"]
+            current_positions = index_data["positions"]
+    else:
+        if verbose:
+            print("Building log index...")
+        metadata = _extract_metastreams(m, stream_names)
+        m.seek(0)
+        current_positions = _extract_stream_positions(m, stream_names)
+        with open(index_filename, "wb") as index_file:
+            index = {"metadata": metadata, "positions": current_positions}
+            pickle.dump(index, index_file)
+        if verbose:
+            print("Saving cache to '%s'" % index_file)
+    return current_positions, metadata
 
 
 def replay_files(filename_groups, stream_names, verbose=0):
@@ -545,6 +497,42 @@ def replay_files(filename_groups, stream_names, verbose=0):
         timestamp, stream_name, typename, sample = groups[
             current_group].next_sample()
         yield timestamp, stream_name, typename, sample
+
+
+def replay_join(log_iterators):
+    """Generator that joins multiple log iterators.
+
+    Parameters
+    ----------
+    log_iterators : list
+        List of log iterators that should be joined
+
+    Returns
+    -------
+    current_timestamp : int
+        Current time in microseconds
+
+    stream_name : str
+        Name of the currently active stream
+
+    typename : str
+        Name of the data type of the stream
+
+    sample : dict
+        Current sample
+    """
+    next_samples = [next(log_iterator) for log_iterator in log_iterators]
+    while True:
+        next_timestamps = [next_sample[0] for next_sample in next_samples]
+        if all(map(math.isinf, next_timestamps)):
+            return
+        log_iterator_idx, _ = _argmin(next_timestamps)
+        yield next_samples[log_iterator_idx]
+        try:
+            next_samples[log_iterator_idx] = next(
+                log_iterators[log_iterator_idx])
+        except StopIteration:
+            next_samples[log_iterator_idx] = (float("inf"), None, None, None)
 
 
 class LogfileGroup:
@@ -735,6 +723,33 @@ def _mmap_readfile(filename):
     with open(filename, "rb") as f:
         with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as m:
             yield m
+
+
+def _extract_metastreams(m, streams=None):
+    metastreams = dict()
+    u = msgpack.Unpacker(m, encoding="utf8")
+    for _ in range(u.read_map_header()):
+        key = u.unpack()
+        if key.endswith(".meta") and (streams is None or key[:-5] in streams):
+            metastreams[key] = u.unpack()
+        else:
+            u.skip()
+    return metastreams
+
+
+def _extract_stream_positions(m, streams=None):
+    positions = dict()
+    u = msgpack.Unpacker(m, encoding="utf8")
+    for _ in range(u.read_map_header()):
+        key = u.unpack()
+        if not key.endswith(".meta") and (streams is None or key in streams):
+            n_samples = u.read_array_header()
+            positions[key] = u.tell()
+            for _ in range(n_samples):
+                u.skip()
+        else:
+            u.skip()
+    return positions
 
 
 def _next_timestamp(meta_streams, current_sample_indices):
