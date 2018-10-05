@@ -4,6 +4,7 @@ import warnings
 import mmap
 import pprint
 import pickle
+import contextlib
 import msgpack
 
 
@@ -142,13 +143,12 @@ def chunk_and_save_logfile(filename, stream_name, chunk_size):
     if output_filename.endswith(".msg"):
         output_filename = output_filename[:-4] + \
             stream_name.replace("/", "_").replace(".", "_")
-    with open(filename, "rb") as f:
-        with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as m:
-            metadata = _extract_metastreams(m, [stream_name])
-            metastream = metadata[stream_name + ".meta"]
-            m.seek(0)
-            _chunk_and_save(
-                stream_name, chunk_size, m, metastream, output_filename)
+    with _mmap_readfile(filename) as m:
+        metadata = _extract_metastreams(m, [stream_name])
+        metastream = metadata[stream_name + ".meta"]
+        m.seek(0)
+        _chunk_and_save(
+            stream_name, chunk_size, m, metastream, output_filename)
 
 
 def _extract_stream_positions(m, streams=None):
@@ -312,21 +312,20 @@ def print_sample(filename, stream_name, sample_index):
 def _extract_sample_from_logfile(filename, stream_name, sample_index):
     if sample_index < 0:
         raise ValueError("sample_index must be at least 0")
-    with open(filename, "rb") as f:
-        with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as m:
-            u = msgpack.Unpacker(m, encoding="utf8")
-            for _ in range(u.read_map_header()):
-                key = u.unpack()
-                if key == stream_name:
-                    n_samples = u.read_array_header()
-                    if sample_index >= n_samples:
-                        raise ValueError("Maximum sample_index is %d"
-                                         % (n_samples - 1))
-                    for _ in range(sample_index):
-                        u.skip()
-                    return u.unpack()
-                else:
+    with _mmap_readfile(filename) as m:
+        u = msgpack.Unpacker(m, encoding="utf8")
+        for _ in range(u.read_map_header()):
+            key = u.unpack()
+            if key == stream_name:
+                n_samples = u.read_array_header()
+                if sample_index >= n_samples:
+                    raise ValueError("Maximum sample_index is %d"
+                                     % (n_samples - 1))
+                for _ in range(sample_index):
                     u.skip()
+                return u.unpack()
+            else:
+                u.skip()
     return None
 
 
@@ -458,52 +457,51 @@ def replay_logfile(filename, stream_names, verbose=0):
         Current sample
     """
     index_filename = filename + ".cdff_idx"
-    with open(filename, "rb") as f:
-        with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as m:
-            if os.path.exists(index_filename):
-                with open(index_filename, "rb") as index_file:
-                    index_data = pickle.load(index_file)
-                    metadata = index_data["metadata"]
-                    current_positions = index_data["positions"]
-            else:
-                metadata = _extract_metastreams(m, stream_names)
-                m.seek(0)
-                current_positions = _extract_stream_positions(m, stream_names)
-                with open(index_filename, "wb") as index_file:
-                    pickle.dump(
-                        {"metadata": metadata, "positions": current_positions},
-                        index_file)
+    with _mmap_readfile(filename) as m:
+        if os.path.exists(index_filename):
+            with open(index_filename, "rb") as index_file:
+                index_data = pickle.load(index_file)
+                metadata = index_data["metadata"]
+                current_positions = index_data["positions"]
+        else:
+            metadata = _extract_metastreams(m, stream_names)
+            m.seek(0)
+            current_positions = _extract_stream_positions(m, stream_names)
+            with open(index_filename, "wb") as index_file:
+                pickle.dump(
+                    {"metadata": metadata, "positions": current_positions},
+                    index_file)
 
-            meta_streams = [metadata[name + ".meta"] for name in stream_names]
+        meta_streams = [metadata[name + ".meta"] for name in stream_names]
 
-            n_streams = len(stream_names)
-            current_sample_indices = [-1] * n_streams
+        n_streams = len(stream_names)
+        current_sample_indices = [-1] * n_streams
 
-            while True:
-                current_stream, _ = _next_timestamp(
-                    meta_streams, current_sample_indices)
-                if current_stream is None:
-                    return
+        while True:
+            current_stream, _ = _next_timestamp(
+                meta_streams, current_sample_indices)
+            if current_stream is None:
+                return
 
-                if verbose >= 2:
-                    print("[replay] Selected stream #%d '%s'"
-                          % (current_stream, stream_names[current_stream]))
+            if verbose >= 2:
+                print("[replay] Selected stream #%d '%s'"
+                      % (current_stream, stream_names[current_stream]))
 
-                current_sample_indices[current_stream] += 1
-                if verbose >= 2:
-                    print("[replay] Stream indices: %s"
-                          % (current_sample_indices,))
+            current_sample_indices[current_stream] += 1
+            if verbose >= 2:
+                print("[replay] Stream indices: %s"
+                      % (current_sample_indices,))
 
-                current_stream_name = stream_names[current_stream]
-                current_sample_idx = current_sample_indices[current_stream]
-                timestamp = meta_streams[current_stream]["timestamps"][
-                    current_sample_idx]
-                typename = meta_streams[current_stream]["type"]
-                m.seek(current_positions[current_stream_name])
-                u = msgpack.Unpacker(m, encoding="utf8")
-                sample = u.unpack()
-                current_positions[current_stream_name] += u.tell()
-                yield timestamp, current_stream_name, typename, sample
+            current_stream_name = stream_names[current_stream]
+            current_sample_idx = current_sample_indices[current_stream]
+            timestamp = meta_streams[current_stream]["timestamps"][
+                current_sample_idx]
+            typename = meta_streams[current_stream]["type"]
+            m.seek(current_positions[current_stream_name])
+            u = msgpack.Unpacker(m, encoding="utf8")
+            sample = u.unpack()
+            current_positions[current_stream_name] += u.tell()
+            yield timestamp, current_stream_name, typename, sample
 
 
 def replay_files(filename_groups, stream_names, verbose=0):
@@ -715,6 +713,28 @@ class LogfileGroup:
         return _extract_sample(
             self.streams, self.meta_streams, self.group_stream_names,
             self.next_stream, self.current_sample_indices[self.next_stream])
+
+
+@contextlib.contextmanager
+def _mmap_readfile(filename):
+    """Memory-map logfile for reading.
+
+    Memory-mapping helps accessing a large log file on hard disk without
+    reading the entire file.
+
+    Parameters
+    ----------
+    filename : str
+        Name of the logfile
+
+    Returns
+    -------
+    m : mmap
+        Memory-mapped file
+    """
+    with open(filename, "rb") as f:
+        with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as m:
+            yield m
 
 
 def _next_timestamp(meta_streams, current_sample_indices):
