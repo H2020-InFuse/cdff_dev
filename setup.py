@@ -152,6 +152,7 @@ if __name__ == "__main__":
         scripts=[os.path.join("bin", "dfn_template_generator"),
                  os.path.join("bin", "dfpc_template_generator"),
                  os.path.join("bin", "cdff_dev_loginfo"),
+                 os.path.join("bin", "cdff_dev_logshow"),
                  os.path.join("bin", "cdff_dev_chunk"),
                  os.path.join("bin", "pyspace_export"),
                  os.path.join("bin", "dfpc_diagram")],
