@@ -1,5 +1,5 @@
-from cdff_dev.code_generator import (
-    validate_node, DFNDescriptionException, PortDescriptionException)
+from cdff_dev.description_files import validate_node, DFNDescriptionException, \
+    PortDescriptionException
 from nose.tools import assert_raises_regexp, assert_in
 
 

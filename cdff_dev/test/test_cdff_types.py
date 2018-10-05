@@ -746,6 +746,13 @@ def test_quaterniond_fromarray():
     assert_array_equal(v1, v2)
 
 
+def test_quaternion_conjugate_product():
+    q = cdff_types.Quaterniond()
+    q.fromarray(np.array([0.13155995, 0.32178034, 0.73673994, 0.57996866]))
+    assert_array_almost_equal(
+        (q * q.conjugate()).toarray(), np.array([0.0, 0.0, 0.0, 1.0]))
+
+
 def test_transform_pose():
     p = cdff_types.Pose()
 

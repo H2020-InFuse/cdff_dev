@@ -17,45 +17,102 @@ def save_graph_png(dfc, filename):
     filename : str
         Name of the output file (should have a '.png' ending)
     """
-    graph = pydot.Dot(graph_type="digraph")
+    save_network_graph_as_png(
+        filename, dfc.nodes.keys(), dfc.input_ports_, dfc.output_ports_,
+        dfc.log_ports_, dfc.result_ports_, dfc.connections, dfc.periods,
+        dfc.trigger_ports)
 
+
+def save_network_graph_as_png(
+        filename, nodes, node_inputs, node_outputs, network_inputs,
+        network_outputs, connections, periods=None, trigger_ports=None,
+        verbose=0):
+    """Save network graph as PNG.
+
+    Parameters
+    ----------
+    filename : str
+        Name of the PNG file
+
+    nodes : list
+        List of nodes
+
+    node_inputs : dict
+        Mapping from node names to list of input port names
+
+    node_outputs : dict
+        Mapping from node names to list of output port names
+
+    network_inputs : dict
+        Mapping from node names to list of network input names
+
+    network_outputs : dict
+        Mapping from node names to list of network output names
+
+    connections : list
+        List of pairs of input port 'node.input_port' and output port
+        'node.output_port'
+
+    periods : dict, optional (default: {})
+        Mapping from node names to trigger periods
+
+    trigger_ports : dict, optional (default: {})
+        Mapping from node names to trigger ports
+
+    verbose : int, optional (default: 0)
+        Verbosity level
+    """
+    if periods is None:
+        periods = dict()
+    if trigger_ports is None:
+        trigger_ports = dict()
+
+    graph = pydot.Dot(graph_type="digraph")
     fillcolor = "#555555"
-    for node_name in dfc.nodes.keys():
-        if node_name in dfc.periods:
+
+    for node_name in nodes:
+        if verbose:
+            print(node_name)
+            print("inputs: %s" % ", ".join(node_inputs[node_name]))
+            print("outputs: %s" % ", ".join(node_outputs[node_name]))
+
+        if node_name in periods:
             label = "cycle time: %.3f s" % _microseconds_to_seconds(
-                dfc.periods[node_name])
-        elif node_name in dfc.trigger_ports:
-            label = "triggered on %s" % dfc.trigger_ports[node_name]
+                periods[node_name])
+        elif node_name in trigger_ports:
+            label = "triggered on %s" % trigger_ports[node_name]
         else:
             label = "no trigger"
         cluster = pydot.Cluster(__display_name(node_name), label=label)
         component_node = pydot.Node(
             __display_name(node_name), style="filled", fillcolor=fillcolor)
         cluster.add_node(component_node)
-        _add_ports_to_cluster(node_name, dfc.input_ports_[node_name], cluster,
-                              output=False)
-        _add_ports_to_cluster(node_name, dfc.output_ports_[node_name], cluster)
+        _add_ports_to_cluster(
+            node_name, node_inputs[node_name], cluster, output=False)
+        _add_ports_to_cluster(
+            node_name, node_outputs[node_name], cluster, output=True)
         graph.add_subgraph(cluster)
 
     fillcolor = "#bb5555"
-    for node_name in dfc.log_ports_.keys():
+    for node_name in network_inputs.keys():
         cluster = pydot.Cluster(__display_name(node_name), label="")
         component_node = pydot.Node(
             __display_name(node_name), style="filled", fillcolor=fillcolor)
         cluster.add_node(component_node)
-        _add_ports_to_cluster(node_name, dfc.log_ports_[node_name], cluster)
+        _add_ports_to_cluster(
+            node_name, network_inputs[node_name], cluster, output=True)
         graph.add_subgraph(cluster)
 
-    for node_name in dfc.result_ports_.keys():
+    for node_name in network_outputs.keys():
         cluster = pydot.Cluster(__display_name(node_name), label="")
         component_node = pydot.Node(
             __display_name(node_name), style="filled", fillcolor=fillcolor)
         cluster.add_node(component_node)
-        _add_ports_to_cluster(node_name, dfc.result_ports_[node_name], cluster,
-                              output=False)
+        _add_ports_to_cluster(
+            node_name, network_outputs[node_name], cluster, output=False)
         graph.add_subgraph(cluster)
 
-    for output_port, input_port in dfc.connections:
+    for output_port, input_port in connections:
         connection_edge = pydot.Edge(
             __display_name(output_port), __display_name(input_port), penwidth=3)
         graph.add_edge(connection_edge)

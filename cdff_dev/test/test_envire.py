@@ -1,6 +1,8 @@
+import os
+loglevel = os.environ.get("GLOG_minloglevel", default="3")
+os.environ["GLOG_minloglevel"] = loglevel
 import cdff_envire
 import cdff_types
-import os
 import re
 import numpy as np
 from nose.tools import assert_equal, assert_not_equal, \
@@ -136,6 +138,20 @@ def test_norms():
 def test_quaterniond_ctor():
     q = cdff_envire.Quaterniond(w=1.0, x=0.0, y=0.0, z=0.0)
     assert_equal(str(q), "[real=1.00, im=(0.00, 0.00, 0.00)]")
+
+
+def test_quaternion_conjugate_product():
+    q = cdff_envire.Quaterniond(
+        w=0.57996866, x=0.13155995, y=0.32178034, z=0.73673994)
+    assert_array_almost_equal(
+        (q * q.conjugate()).toarray(), np.array([0.0, 0.0, 0.0, 1.0]))
+
+
+def test_quaternion_inverse_product():
+    q = cdff_envire.Quaterniond(
+        w=0.57996866, x=0.13155995, y=0.32178034, z=0.73673994)
+    assert_array_almost_equal(
+        (q * q.inverse()).toarray(), np.array([0.0, 0.0, 0.0, 1.0]))
 
 
 def test_transform_with_cov_ctor():

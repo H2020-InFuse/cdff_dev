@@ -1,7 +1,7 @@
 from libcpp cimport bool
 from cython.operator cimport dereference as deref
 cimport _{{ desc["name"].lower() }}
-{% for class_name in desc["implementations"] %}
+{% for class_name in implementations %}
 
 
 cdef class {{ class_name }}:

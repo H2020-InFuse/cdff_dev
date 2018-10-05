@@ -13,7 +13,7 @@ hide_stderr = True
 def test_generate_files():
     with open("test/test_data/pointcloud_generation_dfpc_desc.yml", "r") as f:
         node = yaml.load(f)
-    tmp_folder = "test/test_output/dfpc_ci_PointcloudGeneration"
+    tmp_folder = "test/test_output/dfpc_ci_PointcloudGeneration_test_files"
     with EnsureCleanup(tmp_folder) as ec:
         cdffpath = load_cdffpath()
         filenames = write_dfpc(node, cdffpath, tmp_folder)
@@ -25,9 +25,15 @@ def test_generate_files():
         assert_true(os.path.exists(os.path.join(
             tmp_folder, "PointcloudGenerationInterface.cpp")))
         assert_true(os.path.exists(os.path.join(
-            tmp_folder, "PointcloudGeneration.hpp")))
+            tmp_folder, "PointcloudGenerationImplementation.hpp")))
         assert_true(os.path.exists(os.path.join(
-            tmp_folder, "PointcloudGeneration.cpp")))
+            tmp_folder, "PointcloudGenerationImplementation.cpp")))
+        assert_true(os.path.exists(os.path.join(
+            tmp_folder, "python", "_pointcloudgeneration.pxd")))
+        assert_true(os.path.exists(os.path.join(
+            tmp_folder, "python", "pointcloudgeneration.pxd")))
+        assert_true(os.path.exists(os.path.join(
+            tmp_folder, "python", "pointcloudgeneration.pyx")))
 
 
 def test_compile():
@@ -49,16 +55,16 @@ def test_compile():
                 tmp_folder, "python", node["name"].lower() + ".pyx"),
             implementation=map(
                 lambda filename: os.path.join(tmp_folder, filename),
-                ["PointcloudGeneration.cpp",
+                ["PointcloudGenerationImplementation.cpp",
                  "PointcloudGenerationInterface.cpp"]),
             sourcedir=tmp_folder, incdirs=incdirs,
             compiler_flags=[], library_dirs=[], libraries=[],
             includes=[]
         )
 
-        from pointcloudgeneration import PointcloudGeneration
+        from pointcloudgeneration import PointcloudGenerationImplementation
 
-        pg = PointcloudGeneration()
+        pg = PointcloudGenerationImplementation()
 
         pg.setup()
 

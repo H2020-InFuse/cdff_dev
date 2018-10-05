@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+import argparse
+import yaml
+from cdff_dev import diagrams, description_files
+
+def main():
+    args = parse_args()
+    with open(args.yaml_file_path, 'r') as f:
+        dfpc_desc = yaml.load(f)
+    dfpc_desc = description_files.validate_dfpc(dfpc_desc)
+
+    for implementation in dfpc_desc['implementations']:
+        nodes = [dfn['dfn_id'] for dfn in implementation['dfns']]
+
+        connections = []
+
+        node_inputs, node_outputs = {}, {}
+        for node in nodes:
+            node_inputs[node] = []
+            node_outputs[node] = []
+
+        for connection in implementation['internal_connections']:
+            node_inputs[connection['to']['dfn_id']].append(
+                connection['to']['port'])
+            node_outputs[connection['from']['dfn_id']].append(
+                connection['from']['port'])
+            connections.append(
+                (connection['from']['dfn_id'] + '.' + connection['from']['port'],
+                 connection['to']['dfn_id'] + '.' + connection['to']['port']))
+
+        for connection in implementation['input_connections']:
+            node_inputs[connection['dfn_id']].append(connection['port'])
+            connections.append(
+                ("input." + connection['dfpc_input'],
+                 connection['dfn_id'] + '.' + connection['port']))
+
+        for connection in implementation['output_connections']:
+            node_outputs[connection['dfn_id']].append(connection['port'])
+            connections.append(
+                (connection['dfn_id'] + '.' + connection['port'],
+                 "output." + connection['dfpc_output']))
+
+        dfpc_inputs = [
+            input_port['name'] for input_port in dfpc_desc['input_ports']]
+        dfpc_outputs = [
+            input_port['name'] for input_port in dfpc_desc['output_ports']]
+
+        filename = implementation['name'] + '.png'
+        diagrams.save_network_graph_as_png(
+            filename, nodes, node_inputs, node_outputs,
+            {"input": dfpc_inputs}, {"output": dfpc_outputs},
+            connections)
+        print("Done! Saved output to '%s'." % filename)
+
+def parse_args():
+    argparser = argparse.ArgumentParser(description="DFPC diagram plotter")
+    argparser.add_argument(
+        "yaml_file_path", type=str, help="DFPC yaml description file")
+    args = argparser.parse_args()
+    return args
+
+if __name__ == '__main__':
+    main()

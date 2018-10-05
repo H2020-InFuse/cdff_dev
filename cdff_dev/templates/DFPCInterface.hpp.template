@@ -55,8 +55,7 @@ namespace DFPC
             {% endfor %}
              * @return {{ operation["output_type"] }}
              */
-            virtual const {{ operation["output_type"] }}& {{ operation["name"] }}(
-                {% for arg in operation["inputs"] %}{{ arg["type"] }} {{ arg["name"] }}{{ ", " if not loop.last }}{% endfor %}) = 0;
+            virtual const {{ operation["output_type"] }}& {{ operation["name"] }}({% for arg in operation["inputs"] %}{{ arg["type"] }} {{ arg["name"] }}{{ ", " if not loop.last }}{% endfor %}) = 0;
             {% endfor %}
 
         protected:
