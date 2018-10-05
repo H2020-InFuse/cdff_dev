@@ -394,6 +394,9 @@ def replay(stream_names, log, verbose=0):
 def replay_logfile(filename, stream_names, verbose=0):
     """Generator that yields samples of a logfile in correct temporal order.
 
+    This is a memory-efficient version. It won't load the whole logfile at
+    once.
+
     Parameters
     ----------
     filename : str
@@ -423,17 +426,13 @@ def replay_logfile(filename, stream_names, verbose=0):
         with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as m:
             metadata = _extract_metastreams(m, stream_names)
             m.seek(0)
-            print(stream_names)
             current_positions = _extract_stream_positions(m, stream_names)
 
             meta_streams = [metadata[name + ".meta"] for name in stream_names]
 
-            print(current_positions)
-
             n_streams = len(stream_names)
             current_sample_indices = [-1] * n_streams
 
-            u = msgpack.Unpacker(m, encoding="utf8")
             while True:
                 current_stream, _ = _next_timestamp(
                     meta_streams, current_sample_indices)
@@ -455,11 +454,9 @@ def replay_logfile(filename, stream_names, verbose=0):
                     current_sample_idx]
                 typename = meta_streams[current_stream]["type"]
                 m.seek(current_positions[current_stream_name])
-                try:
-                    sample = u.unpack()
-                except msgpack.exceptions.OutOfData:
-                    raise StopIteration()
-                current_positions[current_stream_name] = u.tell()
+                u = msgpack.Unpacker(m, encoding="utf8")
+                sample = u.unpack()
+                current_positions[current_stream_name] += u.tell()
                 yield timestamp, current_stream_name, typename, sample
 
 
