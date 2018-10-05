@@ -47,7 +47,7 @@ def summarize_logfile(filename):
     """
     n_samples = {}
     typenames = {}
-    with _mmap_readfile(filename) as m:
+    with mmap_readfile(filename) as m:
         unpacker = msgpack.Unpacker(file_like=m, encoding="utf8")
         n_keys = unpacker.read_map_header()
         for i in range(n_keys):
@@ -147,7 +147,7 @@ def chunk_and_save_logfile(filename, stream_name, chunk_size):
         output_filename = output_filename[:-4] + \
             stream_name.replace("/", "_").replace(".", "_")
 
-    with _mmap_readfile(filename) as m:
+    with mmap_readfile(filename) as m:
         metadata = _extract_metastreams(m, [stream_name])
         metastream = metadata[stream_name + ".meta"]
         m.seek(0)
@@ -289,7 +289,7 @@ def print_sample(filename, stream_name, sample_index):
 def _extract_sample_from_logfile(filename, stream_name, sample_index):
     if sample_index < 0:
         raise ValueError("sample_index must be at least 0")
-    with _mmap_readfile(filename) as m:
+    with mmap_readfile(filename) as m:
         u = msgpack.Unpacker(m, encoding="utf8")
         for _ in range(u.read_map_header()):
             key = u.unpack()
@@ -397,10 +397,9 @@ def replay_logfile(filename, stream_names, verbose=0):
     sample : dict
         Current sample
     """
-    index_filename = filename + ".cdff_idx"
-    with _mmap_readfile(filename) as m:
-        current_positions, metadata = _cache_load_index(
-            index_filename, stream_names, m, verbose)
+    with mmap_readfile(filename) as m:
+        current_positions, metadata = build_index(filename, m, stream_names,
+                                                  verbose)
 
         meta_streams = [metadata[name + ".meta"] for name in stream_names]
 
@@ -434,7 +433,8 @@ def replay_logfile(filename, stream_names, verbose=0):
             yield timestamp, current_stream_name, typename, sample
 
 
-def _cache_load_index(index_filename, stream_names, m, verbose):
+def build_index(filename, m, stream_names=None, verbose=0):
+    index_filename = filename + ".cdff_idx"
     if os.path.exists(index_filename):
         if verbose >= 2:
             print("Loading cached log index from '%s'" % index_filename)
@@ -452,7 +452,7 @@ def _cache_load_index(index_filename, stream_names, m, verbose):
             index = {"metadata": metadata, "positions": current_positions}
             pickle.dump(index, index_file)
         if verbose:
-            print("Saving cache to '%s'" % index_file)
+            print("Saving cache to '%s'" % index_filename)
     return current_positions, metadata
 
 
@@ -704,7 +704,7 @@ class LogfileGroup:
 
 
 @contextlib.contextmanager
-def _mmap_readfile(filename):
+def mmap_readfile(filename):
     """Memory-map logfile for reading.
 
     Memory-mapping helps accessing a large log file on hard disk without

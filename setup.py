@@ -154,6 +154,7 @@ if __name__ == "__main__":
                  os.path.join("bin", "cdff_dev_loginfo"),
                  os.path.join("bin", "cdff_dev_logshow"),
                  os.path.join("bin", "cdff_dev_chunk"),
+                 os.path.join("bin", "cdff_dev_build_log_index"),
                  os.path.join("bin", "pyspace_export"),
                  os.path.join("bin", "dfpc_diagram")],
         packages=['cdff_dev'],
