@@ -391,6 +391,22 @@ def replay(stream_names, log, verbose=0):
         yield timestamp, stream_name, typename, sample
 
 
+def replay_join(log_iterators):
+    """TODO"""
+    next_samples = [next(log_iterator) for log_iterator in log_iterators]
+    while True:
+        next_timestamps = [next_sample[0] for next_sample in next_samples]
+        if all(map(math.isinf, next_timestamps)):
+            return
+        log_iterator_idx, _ = _argmin(next_timestamps)
+        yield next_samples[log_iterator_idx]
+        try:
+            next_samples[log_iterator_idx] = next(
+                log_iterators[log_iterator_idx])
+        except StopIteration:
+            next_samples[log_iterator_idx] = (float("inf"), None, None, None)
+
+
 def replay_logfile(filename, stream_names, verbose=0):
     """Generator that yields samples of a logfile in correct temporal order.
 
