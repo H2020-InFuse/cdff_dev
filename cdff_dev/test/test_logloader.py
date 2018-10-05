@@ -1,6 +1,7 @@
 from cdff_dev import logloader, testing
 from nose.tools import (assert_in, assert_equal, assert_almost_equal,
-                        assert_true, assert_raises, assert_less_equal)
+                        assert_true, assert_raises, assert_less_equal,
+                        assert_dict_equal)
 import math
 import glob
 import tempfile
@@ -15,6 +16,26 @@ def test_load_log():
     assert_in("/dynamixel.transforms.meta", log)
     assert_in("/hokuyo.scans", log)
     assert_in("/hokuyo.scans.meta", log)
+
+
+def test_extract_sample_index_negative():
+    assert_raises(
+        ValueError, logloader._extract_sample_from_logfile,
+        "test/test_data/logs/test_log.msg", "/hokuyo.scans", -1)
+
+
+def test_extract_sample_index_too_large():
+    assert_raises(
+        ValueError, logloader._extract_sample_from_logfile,
+        "test/test_data/logs/test_log.msg", "/hokuyo.scans", 3611)
+
+
+def test_extract_sample():
+    log = logloader.load_log("test/test_data/logs/test_log.msg")
+    actual_sample = log["/hokuyo.scans"][3]
+    sample = logloader._extract_sample_from_logfile(
+        "test/test_data/logs/test_log.msg", "/hokuyo.scans", 3)
+    assert_dict_equal(actual_sample, sample)
 
 
 def test_summarize_logfile():

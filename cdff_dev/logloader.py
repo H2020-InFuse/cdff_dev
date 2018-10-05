@@ -302,17 +302,16 @@ def print_sample(filename, stream_name, sample_index):
     sample_index : int
         Index of the sample
     """
-    sample = _extract_sample_from_log(filename, stream_name, sample_index)
-    if sample_index < 0:
-        raise ValueError("sample_index must be at least 0")
+    sample = _extract_sample_from_logfile(filename, stream_name, sample_index)
     if sample is None:
         print("Could not find sample.")
         return
     pprint.pprint(sample)
 
 
-def _extract_sample_from_log(filename, stream_name, sample_index):  # TODO unit test
-    sample = None
+def _extract_sample_from_logfile(filename, stream_name, sample_index):
+    if sample_index < 0:
+        raise ValueError("sample_index must be at least 0")
     with open(filename, "rb") as f:
         with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as m:
             u = msgpack.Unpacker(m, encoding="utf8")
@@ -325,11 +324,10 @@ def _extract_sample_from_log(filename, stream_name, sample_index):  # TODO unit 
                                          % (n_samples - 1))
                     for _ in range(sample_index):
                         u.skip()
-                    sample = u.unpack()
-                    break
+                    return u.unpack()
                 else:
                     u.skip()
-    return sample
+    return None
 
 
 def replay(stream_names, log, verbose=0):
@@ -393,7 +391,27 @@ def replay(stream_names, log, verbose=0):
 
 
 def replay_join(log_iterators):
-    """TODO"""
+    """Generator that joins multiple log iterators.
+
+    Parameters
+    ----------
+    log_iterators : list
+        List of log iterators that should be joined
+
+    Returns
+    -------
+    current_timestamp : int
+        Current time in microseconds
+
+    stream_name : str
+        Name of the currently active stream
+
+    typename : str
+        Name of the data type of the stream
+
+    sample : dict
+        Current sample
+    """
     next_samples = [next(log_iterator) for log_iterator in log_iterators]
     while True:
         next_timestamps = [next_sample[0] for next_sample in next_samples]
@@ -442,7 +460,6 @@ def replay_logfile(filename, stream_names, verbose=0):
     index_filename = filename + ".cdff_idx"
     with open(filename, "rb") as f:
         with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as m:
-            # TODO command line output
             if os.path.exists(index_filename):
                 with open(index_filename, "rb") as index_file:
                     index_data = pickle.load(index_file)
