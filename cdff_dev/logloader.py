@@ -2,6 +2,7 @@ import os
 import math
 import warnings
 import mmap
+import pprint
 import msgpack
 
 
@@ -284,6 +285,50 @@ def print_stream_info(filename):
                 line += smd[i].ljust(MAXLENGTHS[i])
         print(line)
     print("=" * 80)
+
+
+def print_sample(filename, stream_name, sample_index):
+    """Print individual sample from stream.
+
+    Parameters
+    ----------
+    filename : str
+        Name of the logfile
+
+    stream_name : str
+        Names of the stream
+
+    sample_index : int
+        Index of the sample
+    """
+    sample = _extract_sample_from_log(filename, stream_name, sample_index)
+    if sample_index < 0:
+        raise ValueError("sample_index must be at least 0")
+    if sample is None:
+        print("Could not find sample.")
+        return
+    pprint.pprint(sample)
+
+
+def _extract_sample_from_log(filename, stream_name, sample_index):  # TODO unit test
+    sample = None
+    with open(filename, "rb") as f:
+        with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as m:
+            u = msgpack.Unpacker(m, encoding="utf8")
+            for _ in range(u.read_map_header()):
+                key = u.unpack()
+                if key == stream_name:
+                    n_samples = u.read_array_header()
+                    if sample_index >= n_samples:
+                        raise ValueError("Maximum sample_index is %d"
+                                         % (n_samples - 1))
+                    for _ in range(sample_index):
+                        u.skip()
+                    sample = u.unpack()
+                    break
+                else:
+                    u.skip()
+    return sample
 
 
 def replay(stream_names, log, verbose=0):
