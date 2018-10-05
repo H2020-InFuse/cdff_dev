@@ -238,6 +238,11 @@ cdef class Frame_attrib_tReference:
     cdef _cdff_types.asn1SccFrame_attrib_t* thisptr
 
 
+cdef class FramePair:
+    cdef _cdff_types.asn1SccFramePair* thisptr
+    cdef bool delete_thisptr
+
+
 cdef class Array3DReference:
     cdef _cdff_types.asn1SccArray3D* thisptr
 
