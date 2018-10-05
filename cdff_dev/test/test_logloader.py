@@ -149,11 +149,29 @@ def test_chunk_replay_log():
 
 def test_replay_filename():
     filename = "test/test_data/logs/test_log.msg"
-    streams = [#"/hokuyo.state", "/dynamixel.state",
-               "/dynamixel.transforms", "/hokuyo.scans"]
+    streams = ["/dynamixel.transforms", "/hokuyo.scans"]
     log_iterator = logloader.replay_logfile(filename, streams)
     stream_counter = {key: 0 for key in streams}
-    for timestamp, stream_name, typename, sample in log_iterator:
-        stream_counter[stream_name] += 1
-        print(stream_counter[stream_name], timestamp, stream_name, typename)
-    print(stream_counter)
+    log = logloader.load_log(filename)
+    actual_iterator = logloader.replay(streams, log)
+    for t, sn, tn, s in log_iterator:
+        stream_counter[sn] += 1
+        t_actual, sn_actual, tn_actual, s_actual = next(actual_iterator)
+        assert_equal(t, t_actual)
+        assert_equal(sn, sn_actual)
+        assert_equal(tn, tn_actual)
+        if sn == "/dynamixel.transforms":
+            assert_equal(s["timestamp"]["microseconds"],
+                         s_actual["timestamp"]["microseconds"])
+            assert_equal(s["pos"], s_actual["pos"])
+            assert_equal(s["orient"], s_actual["orient"])
+            assert_equal(s["sourceFrame"], s_actual["sourceFrame"])
+            assert_equal(s["targetFrame"], s_actual["targetFrame"])
+        else:
+            assert_equal(s["ranges"], s_actual["ranges"])
+            assert_equal(s["ref_time"]["microseconds"],
+                         s_actual["ref_time"]["microseconds"])
+            assert_equal(s["speed"], s_actual["speed"])
+            assert_equal(s["angular_resolution"], s_actual["angular_resolution"])
+    for stream_name in streams:
+        assert_equal(len(log[stream_name]), stream_counter[stream_name])
