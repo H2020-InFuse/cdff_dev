@@ -138,7 +138,8 @@ def chunk_and_save_logfile(filename, stream_name, chunk_size):
     """
     output_filename = filename
     if output_filename.endswith(".msg"):
-        output_filename = output_filename[:-4]
+        output_filename = output_filename[:-4] + \
+            stream_name.replace("/", "_").replace(".", "_")
     with open(filename, "rb") as f:
         with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as m:
             metadata = _extract_metastreams(m, stream_name)
