@@ -10,7 +10,7 @@ def main():
 
 
 def parse_args():
-    argparser = argparse.ArgumentParser(description="Print log info")
+    argparser = argparse.ArgumentParser(description="Build log index")
     argparser.add_argument(
         "filename", type=str, help="Name of the logfile")
     args = argparser.parse_args()
