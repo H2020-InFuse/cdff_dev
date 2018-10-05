@@ -3,6 +3,7 @@ import math
 import warnings
 import mmap
 import pprint
+import pickle
 import msgpack
 
 
@@ -438,11 +439,23 @@ def replay_logfile(filename, stream_names, verbose=0):
     sample : dict
         Current sample
     """
+    index_filename = filename + ".cdff_idx"
     with open(filename, "rb") as f:
         with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as m:
-            metadata = _extract_metastreams(m, stream_names)
-            m.seek(0)
-            current_positions = _extract_stream_positions(m, stream_names)
+            # TODO command line output
+            if os.path.exists(index_filename):
+                with open(index_filename, "rb") as index_file:
+                    index_data = pickle.load(index_file)
+                    metadata = index_data["metadata"]
+                    current_positions = index_data["positions"]
+            else:
+                metadata = _extract_metastreams(m, stream_names)
+                m.seek(0)
+                current_positions = _extract_stream_positions(m, stream_names)
+                with open(index_filename, "wb") as index_file:
+                    pickle.dump(
+                        {"metadata": metadata, "positions": current_positions},
+                        index_file)
 
             meta_streams = [metadata[name + ".meta"] for name in stream_names]
 

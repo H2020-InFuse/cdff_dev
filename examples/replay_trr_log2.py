@@ -124,27 +124,22 @@ def main():
     #log_folder = "/home/dfki.uni-bremen.de/afabisch/logs/20180926-1521.1/"
     #log_folder = "/media/afabisch/TOSHIBA EXT/Datasets/20180927_sherpa_and_hcru_log/20180927-1752.2/"
     #log_folder = "/media/afabisch/TOSHIBA EXT/Datasets/20180927_sherpa_and_hcru_log/20180927-1756.1/"
-    log_folder = "/home/dfki.uni-bremen.de/afabisch/Research/projects/ongoing/EU-OG3_InFUSE_18488/documentation/experiments/20180927_sherpa_and_hcru_log/20180927-1752.2/"
-    log_iterator = logloader.replay_files(
-        [
-         sorted(glob.glob(log_folder + "sherpa_tt_mcs_Logger_InFuse.msg")),
-         sorted(glob.glob(log_folder + "body_joint_Logger_InFuse.msg")),
-         ##sorted(glob.glob(log_folder + "sherpa_tt_slam_Logger_InFuse.msg")),
-         sorted(glob.glob(log_folder + "sherpa_tt_slam_Logger_InFuse_slam_filter_output_*.msg")),
-         #sorted(glob.glob(log_filder + "sherpa_tt_slam_Logger_InFuse_slam_converter_cloud_*.msg")),
-         #sorted(glob.glob(log_folder + "dgps_Logger_InFuse.msg")),
-         ##sorted(glob.glob(log_folder + "velodyne_lidar_Logger_InFuse.msg")),
-         #sorted(glob.glob(log_folder + "velodyne_lidar_Logger_InFuse_velodyne_lidar_laser_scans_*.msg")),
-        ],
-        stream_names=[
-            "/mcs_sensor_processing.rigid_body_state_out",
-            "/body_joint.body_joint_samples",
-            "/slam_filter.output",
-            #"/slam_converter.cloud",
-            #"/dgps.imu_pose",
-            #"/velodyne_lidar.laser_scans",
-        ]
-    )
+    #log_folder = "/home/dfki.uni-bremen.de/afabisch/Research/projects/ongoing/EU-OG3_InFUSE_18488/documentation/experiments/20180927_sherpa_and_hcru_log/20180927-1752.2/"
+    log_folder = "/home/dfki.uni-bremen.de/afabisch/Research/projects/ongoing/EU-OG3_InFUSE_18488/documentation/experiments/20180927_sherpa_and_hcru_log/20180927-1756.1/"
+    log_iterator = logloader.replay_join([
+        logloader.replay_logfile(
+            log_folder + "sherpa_tt_mcs_Logger_InFuse.msg",
+            ["/mcs_sensor_processing.rigid_body_state_out"]
+        ),
+        logloader.replay_logfile(
+            log_folder + "body_joint_Logger_InFuse.msg",
+            ["/body_joint.body_joint_samples"]
+        ),
+        logloader.replay_logfile(
+            log_folder + "sherpa_tt_slam_Logger_InFuse.msg",
+            ["/slam_filter.output"]
+        )
+    ])
     app.show_controls(log_iterator, dfc)
     app.exec_()
 
