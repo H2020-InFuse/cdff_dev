@@ -398,10 +398,14 @@ def replay_logfile(filename, stream_names, verbose=0):
         Current sample
     """
     with mmap_readfile(filename) as m:
-        current_positions, metadata = build_index(filename, m, stream_names,
-                                                  verbose)
+        current_positions, metadata = build_index(filename, m, verbose)
 
-        meta_streams = [metadata[name + ".meta"] for name in stream_names]
+        try:
+            meta_streams = [metadata[name + ".meta"] for name in stream_names]
+        except KeyError:
+            raise ValueError(
+                "Mismatch between stream names %s and actual streams %s"
+                % (stream_names, current_positions.keys()))
 
         n_streams = len(stream_names)
         current_sample_indices = [-1] * n_streams
@@ -433,7 +437,7 @@ def replay_logfile(filename, stream_names, verbose=0):
             yield timestamp, current_stream_name, typename, sample
 
 
-def build_index(filename, m, stream_names=None, verbose=0):
+def build_index(filename, m, verbose=0):
     index_filename = filename + ".cdff_idx"
     if os.path.exists(index_filename):
         if verbose >= 2:
@@ -445,9 +449,9 @@ def build_index(filename, m, stream_names=None, verbose=0):
     else:
         if verbose:
             print("Building log index...")
-        metadata = _extract_metastreams(m, stream_names)
+        metadata = _extract_metastreams(m)
         m.seek(0)
-        current_positions = _extract_stream_positions(m, stream_names)
+        current_positions = _extract_stream_positions(m)
         with open(index_filename, "wb") as index_file:
             index = {"metadata": metadata, "positions": current_positions}
             pickle.dump(index, index_file)
