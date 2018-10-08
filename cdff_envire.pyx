@@ -13,6 +13,7 @@ import os
 np.import_array()  # must be here because we use the NumPy C API
 
 
+
 cdef class Time:
     def __cinit__(self):
         self.thisptr = NULL
@@ -468,6 +469,8 @@ cpdef load_urdf(EnvireGraph graph, str filename, bool load_frames=False, bool lo
 
     _cdff_envire.loadURDF(deref(graph.thisptr), filename.encode(), load_frames, load_joints, load_visuals)
 
+cpdef x_init_threads():
+    _cdff_envire.xInitThreads()
 
 cdef class EnvireVisualizer:
     cdef _cdff_envire.EnvireVisualizerInterface* thisptr
