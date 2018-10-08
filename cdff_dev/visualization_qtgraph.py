@@ -1,57 +1,19 @@
 import sys
 import numpy as np
 from PyQt4.QtGui import QApplication
-import pyqtgraph as pg
+from PyQt4.QtGui import QImage
+from PyQt4.QtGui import QLabel
+from PyQt4.QtGui import QPixmap
+import PyQt4.QtCore as QtCore
+from PyQt4.QtCore import Qt
+#import pyqtgraph as pg
 from . import dataflowcontrol, qtgui
+import cv2
+import pprint
+import cdff_envire
+from PIL import Image
 
-
-# monkey-patching ImageItem.getHistogram for Python 3
-def ImageItem_getHistogram(self, bins='auto', step='auto', targetImageSize=200,
-                           targetHistogramSize=500, **kwds):
-    """Returns x and y arrays containing the histogram values for the current image.
-    For an explanation of the return format, see numpy.histogram().
-
-    The *step* argument causes pixels to be skipped when computing the histogram to save time.
-    If *step* is 'auto', then a step is chosen such that the analyzed data has
-    dimensions roughly *targetImageSize* for each axis.
-
-    The *bins* argument and any extra keyword arguments are passed to
-    np.histogram(). If *bins* is 'auto', then a bin number is automatically
-    chosen based on the image characteristics:
-
-    * Integer images will have approximately *targetHistogramSize* bins,
-      with each bin having an integer width.
-    * All other types will have *targetHistogramSize* bins.
-
-    This method is also used when automatically computing levels.
-    """
-    if self.image is None:
-        return None, None
-    if step == 'auto':
-        # modification: cast to int
-        step = (int(np.ceil(self.image.shape[0] / targetImageSize)),
-                int(np.ceil(self.image.shape[1] / targetImageSize)))
-    if np.isscalar(step):
-        step = (step, step)
-    stepData = self.image[::step[0], ::step[1]]
-
-    if bins == 'auto':
-        if stepData.dtype.kind in "ui":
-            mn = stepData.min()
-            mx = stepData.max()
-            step = np.ceil((mx - mn) / 500.)
-            bins = np.arange(mn, mx + 1.01 * step, step, dtype=np.int)
-            if len(bins) == 0:
-                bins = [mn, mx]
-        else:
-            bins = 500
-
-    kwds['bins'] = bins
-    hist = np.histogram(stepData, **kwds)
-
-    return hist[1][:-1], hist[0]
-pg.ImageItem.getHistogram = ImageItem_getHistogram
-
+#http://doc.qt.io/qt-5/qtwidgets-widgets-imageviewer-example.html#
 
 class ImageVisualizerApplication:
     """Qt Application with image visualizer.
@@ -61,10 +23,13 @@ class ImageVisualizerApplication:
     stream_name : str
         Name of the stream that will be displayed
     """
+
     def __init__(self, stream_name):
+        cdff_envire.x_init_threads()
         self.app = QApplication(sys.argv)
         self.stream_name = stream_name
-        self.control_window = None
+        self.control_window = None                
+
 
     def show_controls(self, iterator, dfc):
         """Show control window to replay log file.
@@ -96,36 +61,81 @@ class ImageVisualizerApplication:
 class ImageVisualization(dataflowcontrol.VisualizationBase):
     def __init__(self, stream_name):
         self.stream_name = stream_name
-        self.image_view_ = pg.ImageView(name=self.stream_name)
+        self.image = QImage()
+        self.image_view_ = QLabel("test")
+        #self.image_view_.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)                                                                                                                                   
+        self.image_view_.resize(640,480)                                                                                                                                 
+        #self.image_view_.setAlignment(QtCore.AlignCenter)   
+
+        #self.image_view_.setPixmap(QPixmap.fromImage(self.image))
         self.image_view_.show()
+        #self.image_lock = threading.Lock()
+        #self.image_view_.moveToThread(QApplication.instance().thread())
 
     def report_node_output(self, port_name, sample, timestamp):
         if port_name == self.stream_name:
-            image = sample.data.array_reference().copy()
+            imagecopy = sample.data.array_reference().copy()
 
-            if image.ndim == 2:
-                image = image.T
-            elif image.ndim == 3:
-                image = image.transpose(1, 0, 2)
-            else:
-                raise ValueError("Impossible number of channels: %d"
-                                 % image.ndim)
 
-            if sample.metadata.mode == "mode_GRAY":
-                image = image.reshape(image.shape[0], image.shape[1])
-            elif sample.metadata.mode not in [
-                    "mode_RGB", "mode_RGBA", "mode_BGR", "mode_BGRA",
-                    "mode_HSV", "mode_HLS", "mode_YUV", "mode_UYVY"]:
-                raise ValueError("Don't know how to handle mode '%s'"
-                                 % sample.metadata.mode)
+            #img = cv2.Mat(sample.data.rows,sample.data.cols,cv2.CV_8UC1)
+            #img.data = image.__array_interface__['data']
+            
+            rgbimage = cv2.cvtColor(imagecopy, cv2.COLOR_GRAY2RGB)
+            resized_image = cv2.resize(rgbimage, (320, 240)) 
+            #bytergbimage = cv2.convertTo(resized_image,cv2.CV_8UC3)
+            cv2.imshow('image',resized_image)
 
-            kwargs = dict()
-            if sample.data.depth == "depth_8U":
-                kwargs["autoLevels"] = False
-                kwargs["levels"] = (0.0, 255.0)
-            elif sample.data.depth == "depth_32F":
-                kwargs["autoLevels"] = True
-            else:
-                raise ValueError("Unknown depth '%s'" % sample.data.depth)
+            print (resized_image.dtype)
+            
+            #img = Image.fromarray(resized_image, 'RGB')
+            #img.show()
 
-            self.image_view_.setImage(image, **kwargs)
+            #cv2.waitKey(1)
+
+            # if image.ndim == 2:
+            #     image = image.T
+            # elif image.ndim == 3:
+            #     image = image.transpose(1, 0, 2).copy()
+            # else:
+            #     raise ValueError("Impossible number of channels: %d"
+            #                      % image.ndim)
+
+            # if sample.metadata.mode == "mode_GRAY":
+            #     #rgbimage = np.dstack(image,image)
+            #     #rgbimage = np.dstack(rgbimage,image)
+            #     image = image.reshape(image.shape[0], image.shape[1])
+            #     #format = QImage.Format_Grayscale8
+            # elif sample.metadata.mode not in [
+            #         "mode_RGB", "mode_RGBA", "mode_BGR", "mode_BGRA",
+            #         "mode_HSV", "mode_HLS", "mode_YUV", "mode_UYVY"]:
+            #     raise ValueError("Don't know how to handle mode '%s'"
+            #                      % sample.metadata.mode)
+
+            # # if sample.data.channels == 3
+
+            # # if sample.data.depth == "depth_8U":
+                
+            # # elif sample.data.depth == "depth_32F":
+
+            # # else:
+            # #     raise ValueError("Unknown depth '%s'" % sample.data.depth)
+            # self.image_view_ = QLabel("test")
+            # self.image_view_.resize(640,400)   
+            # #https://stackoverflow.com/questions/48639185/pyqt5-qimage-from-numpy-array
+            #self.image = QImage(rgbimage,rgbimage.shape[1],rgbimage.shape[0],format)
+
+            self.image = QImage(rgbimage,sample.data.rows,sample.data.cols,QImage.Format_RGB888)
+            #self.image.load("test.png")
+            #imageWindowGlob.setPixmap(QPixmap.fromImage(self.image))
+            #self.image_view_.setPixmap(QPixmap.fromImage(self.image))
+            #self.image_view_.moveToThread(QApplication.instance().thread())
+            #self.image_view_.emit(QtCore.SIGNAL('setPixmap(QImage)'), self.image)
+            pixmap = QPixmap.fromImage(self.image)
+            pixmap = pixmap.scaled(320, 240, Qt.KeepAspectRatio)
+            #pixmap = pixmap.scaled(640,400, Qt.KeepAspectRatio)
+            QtCore.QMetaObject.invokeMethod( self.image_view_, "setPixmap", QtCore.Q_ARG( QPixmap , pixmap ) )
+
+            self.image_view_.show()
+            
+
+            #self.image_view_.setImage(image, **kwargs)

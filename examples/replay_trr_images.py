@@ -25,13 +25,13 @@ def main():
     # Note that the logfiles are not in the repository because they are too
     # large. Ask Alexander Fabisch about it.
     #log_folder = "/home/dfki.uni-bremen.de/afabisch/logs/20180926_sherpa_hcru/"
-    log_folder = "/media/afabisch/TOSHIBA EXT/Datasets/20180927_sherpa_and_hcru_log/converted/"
+    log_folder = "/media/planthaber/TOSHIBA EXT/Datasets/20180927_sherpa_and_hcru_log/converted_small/"
     #prefix = "recording_20180927-175146_sherpaTT_integration"
-    prefix = "recording_20180927-175540_sherpaTT_integration"
+    prefix = "recording_20180927-175146_sherpaTT_integration"
     logfiles = [
-        #sorted(glob.glob(log_folder + prefix + "_hcru1_pt_stereo_rect_left_image_*.msg")),
+        sorted(glob.glob(log_folder + prefix + "_hcru1_pt_stereo_rect_left_image_*.msg")),
         #sorted(glob.glob(log_folder + prefix + "_hcru1_pt_stereo_rect_right_image_*.msg")),
-        sorted(glob.glob(log_folder + prefix + "_hcru1_pt_color_left_image_*.msg")),
+        #sorted(glob.glob(log_folder + prefix + "_hcru1_pt_color_left_image_*.msg")),
         #sorted(glob.glob(log_folder + prefix + "_hcru1_pt_stereo_sgm_depth_*.msg")),
     ]
     if len(logfiles[0]) == 0:
@@ -44,7 +44,7 @@ def main():
     dfc.setup()
 
     app = visualization_qtgraph.ImageVisualizerApplication(
-        "/hcru1/pt_color/left.image")
+        "/hcru1/pt_stereo_rect/left.image")
     app.show_controls(log_iterator, dfc)
     app.exec_()
 
