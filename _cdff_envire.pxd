@@ -167,6 +167,7 @@ cdef extern from "envire_helper.hpp":
         EnvireGraph& graph, const string& frame, _ItemData* contentPtr) except +
     void loadURDF(EnvireGraph& graph, const string& filename, bool load_frames,
                   bool load_joints, bool load_visuals) except +
+    bool xInitThreads()
 
 
 # EnviRe visualizer
