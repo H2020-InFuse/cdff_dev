@@ -1,6 +1,7 @@
 from cdff_dev import logloader, testing
 from nose.tools import (assert_in, assert_equal, assert_almost_equal,
-                        assert_true, assert_raises, assert_less_equal)
+                        assert_true, assert_raises, assert_less_equal,
+                        assert_dict_equal)
 import math
 import glob
 import tempfile
@@ -15,6 +16,26 @@ def test_load_log():
     assert_in("/dynamixel.transforms.meta", log)
     assert_in("/hokuyo.scans", log)
     assert_in("/hokuyo.scans.meta", log)
+
+
+def test_extract_sample_index_negative():
+    assert_raises(
+        ValueError, logloader._extract_sample_from_logfile,
+        "test/test_data/logs/test_log.msg", "/hokuyo.scans", -1)
+
+
+def test_extract_sample_index_too_large():
+    assert_raises(
+        ValueError, logloader._extract_sample_from_logfile,
+        "test/test_data/logs/test_log.msg", "/hokuyo.scans", 3611)
+
+
+def test_extract_sample():
+    log = logloader.load_log("test/test_data/logs/test_log.msg")
+    actual_sample = log["/hokuyo.scans"][3]
+    sample = logloader._extract_sample_from_logfile(
+        "test/test_data/logs/test_log.msg", "/hokuyo.scans", 3)
+    assert_dict_equal(actual_sample, sample)
 
 
 def test_summarize_logfile():
@@ -114,3 +135,87 @@ def test_replay_files():
         last_timestamp = timestamp
 
     assert_equal(sample_counter, 300 + 300)
+
+
+def test_replay_join():
+    log_iterators = [
+        logloader.replay_logfile(
+            "test/test_data/logs/xsens_imu_00.msg",
+            ["/xsens_imu.calibrated_sensors"]
+        ),
+        logloader.replay_logfile(
+            "test/test_data/logs/dynamixel_0.msg",
+            ["/dynamixel.transforms"]
+        )
+    ]
+    log_iterator = logloader.replay_join(log_iterators)
+    stream_counter = {key: 0 for key in ["/xsens_imu.calibrated_sensors",
+                                         "/dynamixel.transforms"]}
+    last_timestamp = float("-inf")
+    for t, sn, tn, s in log_iterator:
+        stream_counter[sn] += 1
+        assert_less_equal(last_timestamp, t)
+        last_timestamp = t
+    for counter in stream_counter.values():
+        assert_equal(counter, 100)
+
+
+def test_chunk_replay_log():
+    filename = "test/test_data/logs/test_log.msg"
+    stream = "/dynamixel.transforms"
+    logloader.chunk_and_save_logfile(filename, stream, 100)
+    try:
+        log = logloader.load_log(filename)
+        full_iterator = logloader.replay([stream], log)
+        chunk_iterator = logloader.replay_files(
+            [sorted(glob.glob("test/test_data/logs/test_log_*.msg"))],
+            [stream])
+        while True:
+            try:
+                t_actual, sn_actual, tn_actual, s_actual = next(full_iterator)
+                t, sn, tn, s = next(chunk_iterator)
+                assert_equal(t, t_actual)
+                assert_equal(sn, sn_actual)
+                assert_equal(tn, tn_actual)
+                assert_equal(s["timestamp"]["microseconds"],
+                             s_actual["timestamp"]["microseconds"])
+                assert_equal(s["pos"], s_actual["pos"])
+                assert_equal(s["orient"], s_actual["orient"])
+            except StopIteration:
+                assert_raises(StopIteration, next, full_iterator)
+                assert_raises(StopIteration, next, chunk_iterator)
+                break
+    finally:
+        filenames = glob.glob("test/test_data/logs/test_log_*.msg")
+        for filename in filenames:
+            os.remove(filename)
+
+
+def test_replay_filename():
+    filename = "test/test_data/logs/test_log.msg"
+    streams = ["/dynamixel.transforms", "/hokuyo.scans"]
+    log_iterator = logloader.replay_logfile(filename, streams)
+    stream_counter = {key: 0 for key in streams}
+    log = logloader.load_log(filename)
+    actual_iterator = logloader.replay(streams, log)
+    for t, sn, tn, s in log_iterator:
+        stream_counter[sn] += 1
+        t_actual, sn_actual, tn_actual, s_actual = next(actual_iterator)
+        assert_equal(t, t_actual)
+        assert_equal(sn, sn_actual)
+        assert_equal(tn, tn_actual)
+        if sn == "/dynamixel.transforms":
+            assert_equal(s["timestamp"]["microseconds"],
+                         s_actual["timestamp"]["microseconds"])
+            assert_equal(s["pos"], s_actual["pos"])
+            assert_equal(s["orient"], s_actual["orient"])
+            assert_equal(s["sourceFrame"], s_actual["sourceFrame"])
+            assert_equal(s["targetFrame"], s_actual["targetFrame"])
+        else:
+            assert_equal(s["ranges"], s_actual["ranges"])
+            assert_equal(s["ref_time"]["microseconds"],
+                         s_actual["ref_time"]["microseconds"])
+            assert_equal(s["speed"], s_actual["speed"])
+            assert_equal(s["angular_resolution"], s_actual["angular_resolution"])
+    for stream_name in streams:
+        assert_equal(len(log[stream_name]), stream_counter[stream_name])
