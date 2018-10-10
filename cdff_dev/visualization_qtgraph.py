@@ -1,19 +1,52 @@
 import sys
 import numpy as np
+from PyQt4.QtCore import SIGNAL
+from PyQt4.QtCore import SLOT
+from PyQt4.QtCore import QMutex
+
 from PyQt4.QtGui import QApplication
 from PyQt4.QtGui import QImage
-from PyQt4.QtGui import QLabel
-from PyQt4.QtGui import QPixmap
-import PyQt4.QtCore as QtCore
-from PyQt4.QtCore import Qt
-#import pyqtgraph as pg
+from PyQt4.QtGui import QPainter
+from PyQt4.QtOpenGL import QGLWidget
+
 from . import dataflowcontrol, qtgui
 import cv2
-import pprint
 import cdff_envire
-from PIL import Image
 
 #http://doc.qt.io/qt-5/qtwidgets-widgets-imageviewer-example.html#
+# https://stackoverflow.com/questions/10307245/how-to-display-the-frames-of-a-video-via-qt-gui-application
+# https://stackoverflow.com/questions/1242005/what-is-the-most-efficient-way-to-display-decoded-video-frames-in-qt/2671834#2671834
+#https://stackoverflow.com/questions/33201384/pyqt-opengl-drawing-simple-scenes
+#https://doc.qt.io/archives/qq/qq26-pyqtdesigner.html
+
+class ImageDisplay (QGLWidget):
+    
+    __pyqtSignals__ = ("imageUpdated()")
+
+    def __init__(self, parent = None):
+        QGLWidget.__init__(self, parent)
+        self.connect(self, SIGNAL("imageUpdated()"),self,SLOT("update()"))
+        self.image = QImage()
+        self.mutex = QMutex()
+ 
+    #overload paint event
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.SmoothPixmapTransform, 1)
+        self.mutex.lock()
+        painter.drawImage(self.rect(), self.image)
+        self.mutex.unlock()
+    
+    #set image (thread save)
+    def setImage(self, newimage):
+        self.mutex.lock()
+        self.image = newimage
+        self.mutex.unlock()
+        #calling update via signal/slot (decouples threading)
+        self.emit(SIGNAL("imageUpdated()"))
+        
+
+
 
 class ImageVisualizerApplication:
     """Qt Application with image visualizer.
@@ -28,7 +61,7 @@ class ImageVisualizerApplication:
         cdff_envire.x_init_threads()
         self.app = QApplication(sys.argv)
         self.stream_name = stream_name
-        self.control_window = None                
+        self.control_window = None   
 
 
     def show_controls(self, iterator, dfc):
@@ -44,6 +77,7 @@ class ImageVisualizerApplication:
         dfc : DataFlowControl
             Configured processing and data fusion logic
         """
+
         self.control_window = qtgui.ReplayMainWindow(qtgui.Step, iterator, dfc)
         self.visualization = ImageVisualization(self.stream_name)
         dfc.register_visualization(self.visualization)
@@ -57,85 +91,51 @@ class ImageVisualizerApplication:
         self.app.exec_()
 
 
-# TODO dependencies: python3-pyqtgraph (python3-pyqt4.qtopengl for 3D)
 class ImageVisualization(dataflowcontrol.VisualizationBase):
     def __init__(self, stream_name):
         self.stream_name = stream_name
-        self.image = QImage()
-        self.image_view_ = QLabel("test")
-        #self.image_view_.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)                                                                                                                                   
-        self.image_view_.resize(640,480)                                                                                                                                 
-        #self.image_view_.setAlignment(QtCore.AlignCenter)   
+        self.image = QImage("main")
+        self.image_widget = ImageDisplay()
+        self.image_widget.show()
 
-        #self.image_view_.setPixmap(QPixmap.fromImage(self.image))
-        self.image_view_.show()
-        #self.image_lock = threading.Lock()
-        #self.image_view_.moveToThread(QApplication.instance().thread())
+    def convertToUInt8RGB(self, sample):
+        imagecopy = sample.data.array_reference().astype(np.uint8) #.copy()
+        if sample.metadata.mode=="mode_GRAY":
+            rgbimage = cv2.cvtColor(imagecopy, cv2.COLOR_GRAY2RGB)
+        elif sample.metadata.mode=="mode_RGB":
+            rgbimage = imagecopy
+        elif sample.metadata.mode=="mode_RGBA":
+            rgbimage = cv2.cvtColor(imagecopy, cv2.COLOR_RGBA2RGB)
+        elif sample.metadata.mode=="mode_BGR":
+            rgbimage = cv2.cvtColor(imagecopy, cv2.COLOR_BGR2RGB)
+        elif sample.metadata.mode=="mode_BGRA":
+            rgbimage = cv2.cvtColor(imagecopy, cv2.COLOR_BGRA2RGB)
+        elif sample.metadata.mode=="mode_HSV":
+            rgbimage = cv2.cvtColor(imagecopy, cv2.COLOR_HSV2RGB)
+        elif sample.metadata.mode=="mode_HLS":
+            rgbimage = cv2.cvtColor(imagecopy, cv2.COLOR_HLS2RGB)
+        elif sample.metadata.mode=="mode_YUV":
+            rgbimage = cv2.cvtColor(imagecopy, cv2.COLOR_YUV2RGB)
+        elif sample.metadata.mode not in ["mode_UYVY"]:
+                raise ValueError("Don't know how to handle mode '%s'"
+                                % sample.metadata.mode)
+        return rgbimage
+
 
     def report_node_output(self, port_name, sample, timestamp):
         if port_name == self.stream_name:
-            imagecopy = sample.data.array_reference().copy()
 
+            #copy the array as uint8
+            imagecopy = self.convertToUInt8RGB(sample)
 
-            #img = cv2.Mat(sample.data.rows,sample.data.cols,cv2.CV_8UC1)
-            #img.data = image.__array_interface__['data']
-            
-            rgbimage = cv2.cvtColor(imagecopy, cv2.COLOR_GRAY2RGB)
-            resized_image = cv2.resize(rgbimage, (320, 240)) 
-            #bytergbimage = cv2.convertTo(resized_image,cv2.CV_8UC3)
-            cv2.imshow('image',resized_image)
-
-            print (resized_image.dtype)
-            
-            #img = Image.fromarray(resized_image, 'RGB')
-            #img.show()
-
-            #cv2.waitKey(1)
-
-            # if image.ndim == 2:
-            #     image = image.T
+            #TODO: still needed?
             # elif image.ndim == 3:
             #     image = image.transpose(1, 0, 2).copy()
             # else:
             #     raise ValueError("Impossible number of channels: %d"
             #                      % image.ndim)
 
-            # if sample.metadata.mode == "mode_GRAY":
-            #     #rgbimage = np.dstack(image,image)
-            #     #rgbimage = np.dstack(rgbimage,image)
-            #     image = image.reshape(image.shape[0], image.shape[1])
-            #     #format = QImage.Format_Grayscale8
-            # elif sample.metadata.mode not in [
-            #         "mode_RGB", "mode_RGBA", "mode_BGR", "mode_BGRA",
-            #         "mode_HSV", "mode_HLS", "mode_YUV", "mode_UYVY"]:
-            #     raise ValueError("Don't know how to handle mode '%s'"
-            #                      % sample.metadata.mode)
+            self.image = QImage(imagecopy,sample.data.cols,sample.data.rows,QImage.Format_RGB888)
+            self.image_widget.setImage(self.image)
 
-            # # if sample.data.channels == 3
-
-            # # if sample.data.depth == "depth_8U":
-                
-            # # elif sample.data.depth == "depth_32F":
-
-            # # else:
-            # #     raise ValueError("Unknown depth '%s'" % sample.data.depth)
-            # self.image_view_ = QLabel("test")
-            # self.image_view_.resize(640,400)   
-            # #https://stackoverflow.com/questions/48639185/pyqt5-qimage-from-numpy-array
-            #self.image = QImage(rgbimage,rgbimage.shape[1],rgbimage.shape[0],format)
-
-            self.image = QImage(rgbimage,sample.data.rows,sample.data.cols,QImage.Format_RGB888)
-            #self.image.load("test.png")
-            #imageWindowGlob.setPixmap(QPixmap.fromImage(self.image))
-            #self.image_view_.setPixmap(QPixmap.fromImage(self.image))
-            #self.image_view_.moveToThread(QApplication.instance().thread())
-            #self.image_view_.emit(QtCore.SIGNAL('setPixmap(QImage)'), self.image)
-            pixmap = QPixmap.fromImage(self.image)
-            pixmap = pixmap.scaled(320, 240, Qt.KeepAspectRatio)
-            #pixmap = pixmap.scaled(640,400, Qt.KeepAspectRatio)
-            QtCore.QMetaObject.invokeMethod( self.image_view_, "setPixmap", QtCore.Q_ARG( QPixmap , pixmap ) )
-
-            self.image_view_.show()
             
-
-            #self.image_view_.setImage(image, **kwargs)
