@@ -52,7 +52,7 @@ def main():
              "/hcru1/pt_color/left/image",
              "/hcru1/pt_stereo_sgm/depth"]
         )
-        for filename in group_pattern(prefix_path, "*.msg")
+        for filename in group_pattern(prefix_path, "_0*.msg")
     ])
 
     dfc = dataflowcontrol.DataFlowControl(
