@@ -451,7 +451,11 @@ def build_index(filename, m, verbose=0):
             print("Building log index...")
         metadata = _extract_metastreams(m)
         m.seek(0)
-        current_positions = _extract_stream_positions(m)
+        try:
+            current_positions = _extract_stream_positions(m)
+        except msgpack.UnpackValueError as e:
+            raise IOError("Could not build index for file '%s'. Reason: %s"
+                          % (filename, e))
         with open(index_filename, "wb") as index_file:
             index = {"metadata": metadata, "positions": current_positions}
             pickle.dump(index, index_file)
