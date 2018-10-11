@@ -1,5 +1,5 @@
 import glob
-from cdff_dev import dataflowcontrol, logloader, visualization_qtgraph
+from cdff_dev import dataflowcontrol, logloader, imagevisualization
 
 
 def main():
@@ -43,8 +43,8 @@ def main():
         verbose=verbose)
     dfc.setup()
 
-    app = visualization_qtgraph.ImageVisualizerApplication(
-        "/hcru1/pt_stereo_rect/left.image")
+    #app = imagevisualization.ImageVisualizerApplication("/hcru1/pt_color/left.image")
+    app = imagevisualization.ImageVisualizerApplication("/hcru1/pt_stereo_rect/left.image")
     app.show_controls(log_iterator, dfc)
     app.exec_()
 
