@@ -96,6 +96,7 @@ class ImageVisualization(dataflowcontrol.VisualizationBase):
         self.stream_name = stream_name
         self.image = QImage("main")
         self.image_widget = ImageDisplay()
+        self.image_widget.setWindowTitle(stream_name)
         self.image_widget.show()
 
     def convertToUInt8RGB(self, sample):
@@ -126,6 +127,11 @@ class ImageVisualization(dataflowcontrol.VisualizationBase):
         if port_name == self.stream_name:
 
             #copy the array as uint8
+
+            #image = sample.data.array_reference().transpose(1, 0, 2).copy()
+            #image = sample.data.array_reference().copy()
+            #cv2.imshow("image", image)
+
             imagecopy = self.convertToUInt8RGB(sample)
 
             #TODO: still needed?
