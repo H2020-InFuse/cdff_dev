@@ -7,7 +7,7 @@ from PyQt4.QtCore import QMutex
 from PyQt4.QtGui import QApplication
 from PyQt4.QtGui import QImage
 from PyQt4.QtGui import QPainter
-from PyQt4.QtOpenGL import QGLWidget
+from PyQt4.QtGui import QWidget
 
 from . import dataflowcontrol, qtgui
 import cv2
@@ -19,12 +19,12 @@ import cdff_envire
 #https://stackoverflow.com/questions/33201384/pyqt-opengl-drawing-simple-scenes
 #https://doc.qt.io/archives/qq/qq26-pyqtdesigner.html
 
-class ImageDisplay (QGLWidget):
+class ImageDisplay (QWidget):
     
     __pyqtSignals__ = ("imageUpdated()")
 
     def __init__(self, parent = None):
-        QGLWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
         self.connect(self, SIGNAL("imageUpdated()"),self,SLOT("update()"))
         self.image = QImage()
         self.mutex = QMutex()
