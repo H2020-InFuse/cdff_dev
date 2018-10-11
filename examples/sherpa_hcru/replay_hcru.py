@@ -1,4 +1,5 @@
 import glob
+import os
 from cdff_dev import dataflowcontrol, logloader, imagevisualization
 
 
@@ -25,18 +26,34 @@ def main():
     # Note that the logfiles are not in the repository because they are too
     # large. Ask Alexander Fabisch about it.
     #log_folder = "/home/dfki.uni-bremen.de/afabisch/logs/20180926_sherpa_hcru/"
-    log_folder = "/media/planthaber/TOSHIBA EXT/Datasets/20180927_sherpa_and_hcru_log/converted_small/"
+    #log_folder = "/media/planthaber/TOSHIBA EXT/Datasets/20180927_sherpa_and_hcru_log/converted_small/"
+    log_folder = "/media/afabisch/TOSHIBA EXT/Datasets/20180927_sherpa_and_hcru_log/converted2/"
     #prefix = "recording_20180927-175146_sherpaTT_integration"
     prefix = "recording_20180927-175146_sherpaTT_integration"
-    logfiles = [
-        sorted(glob.glob(log_folder + prefix + "_hcru1_pt_stereo_rect_left_image_*.msg")),
-        #sorted(glob.glob(log_folder + prefix + "_hcru1_pt_stereo_rect_right_image_*.msg")),
-        #sorted(glob.glob(log_folder + prefix + "_hcru1_pt_color_left_image_*.msg")),
-        #sorted(glob.glob(log_folder + prefix + "_hcru1_pt_stereo_sgm_depth_*.msg")),
-    ]
-    if len(logfiles[0]) == 0:
-        exit()
-    log_iterator = logloader.replay_files(logfiles, stream_names)
+
+    prefix_path = os.path.join(log_folder, prefix)
+
+    def group_pattern(prefix_path, pattern):
+        files = glob.glob(prefix_path + pattern)
+        if len(files) == 0:
+            dirname = os.sep.join(prefix_path.split(os.sep)[:-1])
+            if not os.path.exists(dirname):
+                raise ValueError("Directory '%s' does not exist" % dirname)
+            actual_files = glob.glob(dirname + "*")
+            raise ValueError("Could not find any matching files, only found %s"
+                             % actual_files)
+        return sorted(files)
+
+    log_iterator = logloader.replay_join([
+        logloader.replay_logfile(
+            filename,
+            ["/hcru1/pt_stereo_rect/left/image",
+             "/hcru1/pt_stereo_rect/right/image",
+             "/hcru1/pt_color/left/image",
+             "/hcru1/pt_stereo_sgm/depth"]
+        )
+        for filename in group_pattern(prefix_path, "*.msg")
+    ])
 
     dfc = dataflowcontrol.DataFlowControl(
         nodes={}, connections=connections, stream_aliases=stream_aliases,
