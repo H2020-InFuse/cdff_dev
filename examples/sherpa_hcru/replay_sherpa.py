@@ -69,11 +69,8 @@ def main():
 
     # Note that the logfiles are not in the repository because they are too
     # large. Ask Alexander Fabisch about it.
-    #log_folder = "/home/dfki.uni-bremen.de/afabisch/logs/20180926-1521.1/"
-    #log_folder = "/media/afabisch/TOSHIBA EXT/Datasets/20180927_sherpa_and_hcru_log/20180927-1752.2/"
-    #log_folder = "/media/afabisch/TOSHIBA EXT/Datasets/20180927_sherpa_and_hcru_log/20180927-1756.1/"
-    #log_folder = "/home/dfki.uni-bremen.de/afabisch/Research/projects/ongoing/EU-OG3_InFUSE_18488/documentation/experiments/20180927_sherpa_and_hcru_log/20180927-1752.2/"
-    log_folder = "/home/dfki.uni-bremen.de/afabisch/Research/projects/ongoing/EU-OG3_InFUSE_18488/documentation/experiments/20180927_sherpa_and_hcru_log/20180927-1756.1/"
+    #log_folder = os.path.expanduser("~") + "/Research/projects/ongoing/EU-OG3_InFUSE_18488/documentation/experiments/20180927_sherpa_and_hcru_log/20180927-1752.2/"
+    log_folder = os.path.expanduser("~") + "/Research/projects/ongoing/EU-OG3_InFUSE_18488/documentation/experiments/20180927_sherpa_and_hcru_log/20180927-1756.1/"
     log_iterator = logloader.replay_join([
         logloader.replay_logfile(
             os.path.join(log_folder, "sherpa_tt_mcs_Logger_InFuse.msg"),
