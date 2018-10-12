@@ -37,7 +37,7 @@ class ImageDisplay (QWidget):
         painter.drawImage(self.rect(), self.image)
         self.mutex.unlock()
     
-    #set image (thread save)
+    #set image (thread safe)
     def setImage(self, newimage):
         self.mutex.lock()
         self.image = newimage
@@ -100,7 +100,9 @@ class ImageVisualization(dataflowcontrol.VisualizationBase):
         self.image_widget.show()
 
     def convertToUInt8RGB(self, sample):
-        imagecopy = sample.data.array_reference().astype(np.uint8) #.copy()
+        #TODO scale values?
+        #copy the array as uint8
+        imagecopy = sample.data.array_reference().astype(np.uint8)
         if sample.metadata.mode=="mode_GRAY":
             rgbimage = cv2.cvtColor(imagecopy, cv2.COLOR_GRAY2RGB)
         elif sample.metadata.mode=="mode_RGB":
@@ -126,22 +128,8 @@ class ImageVisualization(dataflowcontrol.VisualizationBase):
     def report_node_output(self, port_name, sample, timestamp):
         if port_name == self.stream_name:
 
-            #copy the array as uint8
-
-            #image = sample.data.array_reference().transpose(1, 0, 2).copy()
-            #image = sample.data.array_reference().copy()
-            #cv2.imshow("image", image)
-
             imagecopy = self.convertToUInt8RGB(sample)
-
-            #TODO: still needed?
-            # elif image.ndim == 3:
-            #     image = image.transpose(1, 0, 2).copy()
-            # else:
-            #     raise ValueError("Impossible number of channels: %d"
-            #                      % image.ndim)
-
             self.image = QImage(imagecopy,sample.data.cols,sample.data.rows,QImage.Format_RGB888)
             self.image_widget.setImage(self.image)
 
-            
+
