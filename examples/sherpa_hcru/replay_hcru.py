@@ -25,10 +25,7 @@ def main():
     }
     # Note that the logfiles are not in the repository because they are too
     # large. Ask Alexander Fabisch about it.
-    #log_folder = "/home/dfki.uni-bremen.de/afabisch/logs/20180926_sherpa_hcru/"
-    #log_folder = "/media/planthaber/TOSHIBA EXT/Datasets/20180927_sherpa_and_hcru_log/converted_small/"
-    log_folder = "/media/afabisch/TOSHIBA EXT/Datasets/20180927_sherpa_and_hcru_log/converted2/"
-    #prefix = "recording_20180927-175146_sherpaTT_integration"
+    log_folder = os.path.expanduser("~") + "/Research/projects/ongoing/EU-OG3_InFUSE_18488/documentation/experiments/20180927_sherpa_and_hcru_log/converted2"
     prefix = "recording_20180927-175146_sherpaTT_integration"
 
     prefix_path = os.path.join(log_folder, prefix)
