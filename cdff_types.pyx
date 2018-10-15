@@ -2269,21 +2269,29 @@ cdef class FramePair:
 
     baseline = property(_get_baseline, _set_baseline)
 
-    @property
-    def left(self):
+    def _set_left(self, Frame left):
+        self.thisptr.left = deref(left.thisptr)
+
+    def _get_left(self):
         cdef Frame left = Frame()
         del left.thisptr
         left.thisptr = &self.thisptr.left
         left.delete_thisptr = False
         return left
 
-    @property
-    def right(self):
+    left = property(_get_left, _set_left)
+
+    def _set_right(self, Frame right):
+        self.thisptr.right = deref(right.thisptr)
+
+    def _get_right(self):
         cdef Frame right = Frame()
         del right.thisptr
         right.thisptr = &self.thisptr.right
         right.delete_thisptr = False
         return right
+
+    right = property(_get_right, _set_right)
 
 
 cdef class Frame_metadata_tReference:
