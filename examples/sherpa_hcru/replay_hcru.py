@@ -25,7 +25,7 @@ def main():
     }
     # Note that the logfiles are not in the repository because they are too
     # large. Ask Alexander Fabisch about it.
-    log_folder = os.path.expanduser("~") + "/dfki/research/projects/ongoing/EU-OG3_InFUSE_18488/documentation/experiments/20180927_sherpa_and_hcru_log/converted2"
+    log_folder = "logs/sherpa_hcru"
     prefix = "recording_20180927-175146_sherpaTT_integration"
 
     prefix_path = os.path.join(log_folder, prefix)
@@ -57,10 +57,10 @@ def main():
         verbose=verbose)
     dfc.setup()
 
-    #app = imagevisualization.ImageVisualizerApplication("/hcru1/pt_stereo_rect/left.image")
+    app = imagevisualization.ImageVisualizerApplication("/hcru1/pt_stereo_rect/left.image")
     #app = imagevisualization.ImageVisualizerApplication("/hcru1/pt_stereo_rect/right.image")
     #app = imagevisualization.ImageVisualizerApplication("/hcru1/pt_color/left.image")
-    app = imagevisualization.ImageVisualizerApplication("/hcru1/pt_stereo_sgm.depth")
+    #app = imagevisualization.ImageVisualizerApplication("/hcru1/pt_stereo_sgm.depth", (0.0, 3.0))
     app.show_controls(log_iterator, dfc)
     app.exec_()
 
