@@ -173,10 +173,8 @@ def _validate_dfns(implementation):
         if "implementation" not in dfn:
             raise DFPCDescriptionException(
                 "Implementation of DFN '%s' is missing" % dfn["dfn_id"])
-        if "activation" not in dfn:
-            raise DFPCDescriptionException(
-                "Activation of DFN '%s' is missing" % dfn["dfn_id"])
-        _validate_dfn_activation(dfn["activation"], dfn["dfn_id"])
+        if "activation" in dfn:
+            _validate_dfn_activation(dfn["activation"], dfn["dfn_id"])
         dfn_ids.append(dfn["dfn_id"])
     return dfn_ids
 

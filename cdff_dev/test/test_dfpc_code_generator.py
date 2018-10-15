@@ -266,26 +266,6 @@ def test_validate_missing_dfn_implementation():
         validate_dfpc, dfpc)
 
 
-def test_validate_missing_dfn_activation():
-    dfpc = {
-        "name": "Dummy",
-        "doc": "",
-        "implementations": [
-            {"name": "DummyImpl",
-             "dfns": [
-                 {
-                     "dfn_id": "dummy",
-                     "name": "DummyDFN",
-                     "implementation": "A"
-                 }
-             ]}
-        ]
-    }
-    assert_raises_regex(
-        DFPCDescriptionException, "Activation of DFN 'dummy' is missing",
-        validate_dfpc, dfpc)
-
-
 def test_validate_missing_dfn_activation_type():
     dfpc = {
         "name": "Dummy",
