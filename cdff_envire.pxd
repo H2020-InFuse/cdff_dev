@@ -2,7 +2,6 @@ from libcpp.string cimport string
 from libcpp cimport bool
 cimport _cdff_envire
 
-cdef xInitThreads
 
 cdef class Time:
     cdef _cdff_envire.Time* thisptr
