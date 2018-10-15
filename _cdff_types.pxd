@@ -557,6 +557,11 @@ cdef extern from "Frame.h":
     cdef cppclass asn1SccFrame_attrib_t:
         asn1SccT_String name
         asn1SccT_String data
+    cdef cppclass asn1SccFramePair:
+        uint32_t msgVersion
+        double baseline
+        asn1SccFrame left
+        asn1SccFrame right
 
 
 cdef extern from "Map.h":

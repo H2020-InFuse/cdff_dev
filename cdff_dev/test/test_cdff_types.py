@@ -1269,6 +1269,22 @@ def test_frame():
     assert_equal(frame.intrinsic.sensor_id, "camera5")
 
 
+def test_framepair():
+    framepair = cdff_types.FramePair()
+
+    framepair.msg_version = 7
+    assert_equal(framepair.msg_version, 7)
+
+    framepair.baseline = 10.0
+    assert_equal(framepair.baseline, 10.0)
+
+    framepair.left.msg_version = 41
+    framepair.right.msg_version = 51
+
+    assert_equal(framepair.left.msg_version, 41)
+    assert_equal(framepair.right.msg_version, 51)
+
+
 def test_map():
     map = cdff_types.Map()
 

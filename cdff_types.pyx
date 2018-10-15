@@ -2236,6 +2236,56 @@ cdef class Frame:
         return self.data.array_reference()
 
 
+cdef class FramePair:
+    def __cinit__(self):
+        self.thisptr = NULL
+        self.delete_thisptr = False
+
+    def __dealloc__(self):
+        if self.thisptr != NULL and self.delete_thisptr:
+            del self.thisptr
+
+    def __init__(self):
+        self.thisptr = new _cdff_types.asn1SccFramePair()
+        self.delete_thisptr = True
+
+    def __str__(self):
+        # TODO
+        return str("{type: FramePair}")
+
+    def _get_msg_version(self):
+        return self.thisptr.msgVersion
+
+    def _set_msg_version(self, uint32_t msg_version):
+        self.thisptr.msgVersion = msg_version
+
+    msg_version = property(_get_msg_version, _set_msg_version)
+
+    def _get_baseline(self):
+        return self.thisptr.baseline
+
+    def _set_baseline(self, double baseline):
+        self.thisptr.baseline = baseline
+
+    baseline = property(_get_baseline, _set_baseline)
+
+    @property
+    def left(self):
+        cdef Frame left = Frame()
+        del left.thisptr
+        left.thisptr = &self.thisptr.left
+        left.delete_thisptr = False
+        return left
+
+    @property
+    def right(self):
+        cdef Frame right = Frame()
+        del right.thisptr
+        right.thisptr = &self.thisptr.right
+        right.delete_thisptr = False
+        return right
+
+
 cdef class Frame_metadata_tReference:
     def __cinit__(self):
         self.thisptr = NULL
