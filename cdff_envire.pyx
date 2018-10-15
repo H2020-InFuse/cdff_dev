@@ -13,7 +13,6 @@ import os
 np.import_array()  # must be here because we use the NumPy C API
 
 
-
 cdef class Time:
     def __cinit__(self):
         self.thisptr = NULL
