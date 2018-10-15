@@ -11,12 +11,7 @@
 #include <envire_core/items/Item.hpp>
 #include <envire_core/util/Demangle.hpp>
 #include <boost/pointer_cast.hpp>
-#include <X11/Xlib.h>
 
-static bool xInitThreads(){
-    XInitThreads();
-    return true;
-}
 
 template <class _ItemData>
 unsigned getItemCount(
