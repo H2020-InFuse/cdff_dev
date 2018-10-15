@@ -1,4 +1,5 @@
 import os
+import glob
 import math
 import warnings
 import mmap
@@ -462,6 +463,35 @@ def build_index(filename, m, verbose=0):
         if verbose:
             print("Saving cache to '%s'" % index_filename)
     return current_positions, metadata
+
+
+def group_pattern(prefix_path, pattern):
+    """Get group of logfiles in lexicographical order.
+
+    Parameters
+    ----------
+    prefix_path : str
+        Prefix for the path of the logfiles
+
+    pattern : str
+        Pattern that should be matched to find logfiles
+
+    Returns
+    -------
+    filenames : list
+        List of logfiles, ordered lexicographically
+    """
+    files = glob.glob(prefix_path + pattern)
+    if len(files) == 0:
+        if prefix_path.endswith(os.sep):
+            prefix_path = prefix_path[:-1]  # remove trailing '/'
+        dirname = os.sep.join(prefix_path.split(os.sep)[:-1])
+        if not os.path.exists(dirname):
+            raise ValueError("Directory '%s' does not exist" % dirname)
+        actual_files = glob.glob(os.path.join(dirname, "*"))
+        raise ValueError("Could not find any matching files, only found %s"
+                         % actual_files)
+    return list(sorted(files))
 
 
 def replay_files(filename_groups, stream_names, verbose=0):

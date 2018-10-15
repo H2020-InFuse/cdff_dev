@@ -1,7 +1,7 @@
 from cdff_dev import logloader, testing
 from nose.tools import (assert_in, assert_equal, assert_almost_equal,
                         assert_true, assert_raises, assert_less_equal,
-                        assert_dict_equal)
+                        assert_dict_equal, assert_raises_regexp)
 import math
 import glob
 import tempfile
@@ -219,3 +219,26 @@ def test_replay_filename():
             assert_equal(s["angular_resolution"], s_actual["angular_resolution"])
     for stream_name in streams:
         assert_equal(len(log[stream_name]), stream_counter[stream_name])
+
+
+def test_group_pattern():
+    filenames = logloader.group_pattern(
+        "test/test_data/logs/", "xsens_imu_*.msg")
+    assert_equal(
+        filenames,
+        ["test/test_data/logs/xsens_imu_00.msg",
+         "test/test_data/logs/xsens_imu_01.msg",
+         "test/test_data/logs/xsens_imu_02.msg"])
+
+
+def test_group_pattern_directory_not_found():
+    assert_raises_regexp(
+        ValueError, "Directory .* does not exist", logloader.group_pattern,
+        "does_not_exist/xsens_imu_", "*.msg")
+
+
+def test_group_pattern_files_not_found():
+    assert_raises_regexp(
+        ValueError, "Could not find any matching files, only found \[.*\]",
+        logloader.group_pattern, "test/test_data/logs/does_not_exist",
+        "_*.msg")
