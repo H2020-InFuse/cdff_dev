@@ -47,6 +47,7 @@ It also requires the Python 3 interpreter, the Python 3 headers, the Python
 * pandas
 * pydot
 * PyQt 4
+* OpenCV
 
 On Ubuntu 16.04 you can install those requirements as follow:
 
