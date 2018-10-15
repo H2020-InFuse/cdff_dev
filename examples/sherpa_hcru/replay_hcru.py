@@ -1,6 +1,6 @@
-import glob
-import msgpack
 import os
+import msgpack
+import numpy as np
 from cdff_dev import dataflowcontrol, logloader, imagevisualization
 import cdff_types
 
@@ -10,7 +10,8 @@ class MergeFramePairDFN:
         self.left_camera_info_stream = left_camera_info_stream
         self.right_camera_info_stream = right_camera_info_stream
         self.config_filename = None
-        self.camera_configs = None
+        self.left_config = {}
+        self.right_config = {}
         self.left_image = None
         self.right_image = None
         self.pair = cdff_types.FramePair()
@@ -22,8 +23,16 @@ class MergeFramePairDFN:
         with open(self.config_filename, "rb") as f:
             self.camera_configs = msgpack.unpack(
                 f, encoding="utf8", use_list=False)
-            self.pair.baseline = self.camera_configs[
-                self.right_camera_info_stream]["baseline"]
+            self.left_config = self.camera_configs[
+                self.left_camera_info_stream]
+            self.right_config = self.camera_configs[
+                self.right_camera_info_stream]
+            self.pair.baseline = self.right_config["baseline"]
+
+            ###### TODO remove
+            print(self.left_config)
+            print(self.right_config)
+            ######
 
     def leftImageInput(self, data):
         self.left_image = data
@@ -34,6 +43,24 @@ class MergeFramePairDFN:
     def process(self):
         self.pair.left = self.left_image
         self.pair.right = self.right_image
+
+        self.pair.left.intrinsic.dist_coeffs.fromarray(
+            np.array(self.left_config["intrinsic"]["distCoeffs"]))
+        self.pair.left.intrinsic.camera_matrix.from_array(  # TODO from_array
+            np.array(self.left_config["intrinsic"]["cameraMatrix"]))
+        self.pair.left.intrinsic.camera_model = self.left_config[
+            "intrinsic"]["cameraModel"]
+
+        self.pair.right.intrinsic.dist_coeffs.fromarray(
+            np.array(self.right_config["intrinsic"]["distCoeffs"]))
+        self.pair.right.intrinsic.camera_matrix.from_array(
+            np.array(self.right_config["intrinsic"]["cameraMatrix"]))
+        self.pair.right.intrinsic.camera_model = self.right_config[
+            "intrinsic"]["cameraModel"]
+
+        ###### TODO remove
+        print(self.left_image)
+        ######
 
     def pairOutput(self):
         return self.pair
