@@ -41,7 +41,7 @@ def test_vector2d_str():
     v = cdff_types.Vector2d()
     v[0] = 0.0
     v[1] = 1.0
-    assert_equal(str(v), "{type: Vector2d, data: [0.00, 1.00]}")
+    assert_equal(str(v), "{type: Vector2d, data: [0, 1]}")
 
 
 def test_vector2d_get_item():
@@ -102,7 +102,7 @@ def test_vector3d_str():
     v[0] = 0.0
     v[1] = 1.0
     v[2] = 2.0
-    assert_equal(str(v), "{type: Vector3d, data: [0.00, 1.00, 2.00]}")
+    assert_equal(str(v), "{type: Vector3d, data: [0, 1, 2]}")
 
 
 def test_vector3d_get_item():
@@ -170,7 +170,7 @@ def test_vector4d_str():
     v[1] = 1.0
     v[2] = 2.0
     v[3] = 3.0
-    assert_equal(str(v), "{type: Vector4d, data: [0.00, 1.00, 2.00, 3.00]}")
+    assert_equal(str(v), "{type: Vector4d, data: [0, 1, 2, 3]}")
 
 
 def test_vector4d_get_item():
@@ -247,7 +247,7 @@ def test_vector6d_str():
     v[4] = 4.0
     v[5] = 5.0
     assert_equal(
-        str(v), "{type: Vector6d, data: [0.00, 1.00, 2.00, 3.00, 4.00, 5.00]}")
+        str(v), "{type: Vector6d, data: [0, 1, 2, 3, 4, 5]}")
 
 
 def test_vector6d_get_item():
@@ -335,7 +335,7 @@ def test_vectorXd_str():
     v[4] = 4.0
     v[5] = 5.0
     assert_equal(
-        str(v), "{type: VectorXd, data: [0.00, 1.00, 2.00, 3.00, 4.00, 5.00]}")
+        str(v), "{type: VectorXd, data: [0, 1, 2, 3, 4, 5]}")
 
 
 def test_vectorXd_get_item():
@@ -943,7 +943,7 @@ def test_rigid_body_state_str():
         str(rbs),
         "{type: RigidBodyState, timestamp={type: Time, microseconds: 0}, "
         "sourceFrame=source, targetFrame=target, pos={type: Vector3d, "
-        "data: [0.00, 0.00, 0.00]}, orient={type: Quaterniond, "
+        "data: [0, 0, 0]}, orient={type: Quaterniond, "
         "data: {x: 0, y: 0, z: 0, w: 0}}, ...}")
 
 
@@ -1009,8 +1009,8 @@ def test_joint_state_get_set_position():
     js.position = 5.0
     assert_equal(js.position, 5.0)
     assert_equal(
-        str(js), "{type: JointState, position: 5.00, speed: 0.00, "
-        "effort: 0.00, raw: 0.00, acceleration: 0.00}")
+        str(js), "{type: JointState, position: 5, speed: 0, "
+        "effort: 0, raw: 0, acceleration: 0}")
 
 
 def test_joint_state_get_set_speed():
@@ -1018,8 +1018,8 @@ def test_joint_state_get_set_speed():
     js.speed = 5.0
     assert_equal(js.speed, 5.0)
     assert_equal(
-        str(js), "{type: JointState, position: 0.00, speed: 5.00, "
-        "effort: 0.00, raw: 0.00, acceleration: 0.00}")
+        str(js), "{type: JointState, position: 0, speed: 5, "
+        "effort: 0, raw: 0, acceleration: 0}")
 
 
 def test_joint_state_get_set_effort():
@@ -1027,8 +1027,8 @@ def test_joint_state_get_set_effort():
     js.effort = 5.0
     assert_equal(js.effort, 5.0)
     assert_equal(
-        str(js), "{type: JointState, position: 0.00, speed: 0.00, "
-        "effort: 5.00, raw: 0.00, acceleration: 0.00}")
+        str(js), "{type: JointState, position: 0, speed: 0, "
+        "effort: 5, raw: 0, acceleration: 0}")
 
 
 def test_joint_state_get_set_raw():
@@ -1036,8 +1036,8 @@ def test_joint_state_get_set_raw():
     js.raw = 5.0
     assert_equal(js.raw, 5.0)
     assert_equal(
-        str(js), "{type: JointState, position: 0.00, speed: 0.00, "
-        "effort: 0.00, raw: 5.00, acceleration: 0.00}")
+        str(js), "{type: JointState, position: 0, speed: 0, "
+        "effort: 0, raw: 5, acceleration: 0}")
 
 
 def test_joint_state_get_set_acceleration():
@@ -1045,8 +1045,8 @@ def test_joint_state_get_set_acceleration():
     js.acceleration = 5.0
     assert_equal(js.acceleration, 5.0)
     assert_equal(
-        str(js), "{type: JointState, position: 0.00, speed: 0.00, "
-        "effort: 0.00, raw: 0.00, acceleration: 5.00}")
+        str(js), "{type: JointState, position: 0, speed: 0, "
+        "effort: 0, raw: 0, acceleration: 5}")
 
 
 def test_joints_get_set_time():

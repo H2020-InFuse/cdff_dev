@@ -56,7 +56,7 @@ class MergeFramePairDFN:
 
         ###### TODO remove
         import yaml, pprint
-        pprint.pprint(yaml.load(str(self.pair)), depth=4)
+        pprint.pprint(yaml.load(str(self.pair)), width=100, depth=7, compact=True)
         ######
 
     def _fill_frame_metadata(self, frame, metadata):

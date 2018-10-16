@@ -67,7 +67,7 @@ cdef class Vector2d:
         return 2
 
     def __str__(self):
-        return str("{type: Vector2d, data: [%.2f, %.2f]}"
+        return str("{type: Vector2d, data: [%g, %g]}"
                    % (self.thisptr.arr[0], self.thisptr.arr[1]))
 
     def __array__(self, dtype=None):
@@ -119,7 +119,7 @@ cdef class Vector3d:
         return 3
 
     def __str__(self):
-        return str("{type: Vector3d, data: [%.2f, %.2f, %.2f]}"
+        return str("{type: Vector3d, data: [%g, %g, %g]}"
                    % (self.thisptr.arr[0], self.thisptr.arr[1],
                       self.thisptr.arr[2]))
 
@@ -172,7 +172,7 @@ cdef class Vector4d:
         return 4
 
     def __str__(self):
-        return str("{type: Vector4d, data: [%.2f, %.2f, %.2f, %.2f]}"
+        return str("{type: Vector4d, data: [%g, %g, %g, %g]}"
                    % (self.thisptr.arr[0], self.thisptr.arr[1],
                       self.thisptr.arr[2], self.thisptr.arr[3]))
 
@@ -225,7 +225,7 @@ cdef class Vector6d:
         return 6
 
     def __str__(self):
-        return ("{type: Vector6d, data: [%.2f, %.2f, %.2f, %.2f, %.2f, %.2f]}"
+        return ("{type: Vector6d, data: [%g, %g, %g, %g, %g, %g]}"
                 % (self.thisptr.arr[0], self.thisptr.arr[1],
                    self.thisptr.arr[2], self.thisptr.arr[3],
                    self.thisptr.arr[4], self.thisptr.arr[5]))
@@ -281,7 +281,7 @@ cdef class VectorXd:
 
     def __str__(self):
         return str("{type: VectorXd, data: [%s]}"
-                   % ", ".join(["%.2f" % self.thisptr.arr[i]
+                   % ", ".join(["%g" % self.thisptr.arr[i]
                                 for i in range(self.thisptr.nCount)]))
 
     def __array__(self, dtype=None):
@@ -1354,8 +1354,8 @@ cdef class JointState:
 
     def __str__(self):
         return str(
-            "{type: JointState, position: %.2f, speed: %.2f, "
-            "effort: %.2f, raw: %.2f, acceleration: %.2f}"
+            "{type: JointState, position: %g, speed: %g, "
+            "effort: %g, raw: %g, acceleration: %g}"
             % (self.thisptr.position, self.thisptr.speed,
                self.thisptr.effort, self.thisptr.raw,
                self.thisptr.acceleration))
