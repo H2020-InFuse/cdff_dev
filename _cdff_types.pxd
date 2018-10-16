@@ -207,6 +207,9 @@ cdef extern from "Pointcloud.h":
         asn1SccPointCloud_Metadata metadata
         asn1SccPointCloud_Data data
 
+    cdef uint32_t pointCloud_Version
+    cdef void asn1SccPointcloud_Initialize(asn1SccPointcloud*)
+
 
 cdef extern from "LaserScan.h":
     cdef uint32_t maxLaserScanSize
@@ -437,6 +440,7 @@ cdef extern from "Array3D.h":
         asn1SccArray3D_depth_t depth
         uint32_t rowSize
         asn1SccArray3D_data data
+    cdef uint32_t array3D_Version
     cdef cppclass asn1SccArray3D_data:
         int nCount
         unsigned char[66355200] arr
@@ -524,6 +528,8 @@ cdef extern from "Frame.h":
         asn1SccFrame_intrinsic_t intrinsic
         asn1SccFrame_extrinsic_t extrinsic
         asn1SccArray3D data
+    cdef uint32_t frame_Version
+    cdef void asn1SccFrame_Initialize(asn1SccFrame*)
     cdef cppclass asn1SccFrame_metadata_t:
         uint32_t msgVersion
         asn1SccTime timeStamp
@@ -557,11 +563,13 @@ cdef extern from "Frame.h":
     cdef cppclass asn1SccFrame_attrib_t:
         asn1SccT_String name
         asn1SccT_String data
+
     cdef cppclass asn1SccFramePair:
         uint32_t msgVersion
         double baseline
         asn1SccFrame left
         asn1SccFrame right
+    cdef void asn1SccFramePair_Initialize(asn1SccFramePair*)
 
 
 cdef extern from "Map.h":
@@ -580,6 +588,8 @@ cdef extern from "Map.h":
         uint32_t msgVersion
         asn1SccMap_metadata_t metadata
         asn1SccArray3D data
+    cdef uint32_t map_Version
+    cdef void asn1SccMap_Initialize(asn1SccMap*)
     cdef cppclass asn1SccMap_metadata_t:
         uint32_t msgVersion
         asn1SccTime timeStamp

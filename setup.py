@@ -74,7 +74,7 @@ def configuration(parent_package='', top_path=None):
     cdffpath = load_cdffpath()
     ctypespath = os.path.join(cdffpath, CTYPESDIR)
 
-    make_cdff_types(config, ctypespath, extra_compile_args)
+    make_cdff_types(config, cdffpath, ctypespath, extra_compile_args)
     if autoproj_available:
         make_cdff_envire(config, ctypespath, extra_compile_args)
 
@@ -92,7 +92,7 @@ def check_autoproj():
     return autoproj_available
 
 
-def make_cdff_types(config, ctypespath, extra_compile_args):
+def make_cdff_types(config, cdffpath, ctypespath, extra_compile_args):
     config.add_extension(
         "cdff_types",
         sources=["cdff_types.pyx"],
@@ -101,8 +101,8 @@ def make_cdff_types(config, ctypespath, extra_compile_args):
             numpy.get_include(),
             ctypespath
         ],
-        library_dirs=[],
-        libraries=[],
+        library_dirs=[os.path.join(cdffpath, "build", "Common", "Types")],
+        libraries=["cdff_types"],
         define_macros=[("NDEBUG",)],
         extra_compile_args=extra_compile_args
     )

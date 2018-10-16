@@ -815,6 +815,7 @@ def test_create_pointcloud():
     pcl.metadata.time_stamp.microseconds = 0
     assert_equal(pcl.metadata.time_stamp.microseconds, 0)
 
+    assert_equal(pcl.metadata.msg_version, 1)
     pcl.metadata.msg_version = 5
     assert_equal(pcl.metadata.msg_version, 5)
 
@@ -1181,6 +1182,7 @@ def test_image():
 def test_frame():
     frame = cdff_types.Frame()
 
+    assert_equal(frame.msg_version, 1)
     frame.msg_version = 41
     assert_equal(frame.msg_version, 41)
 
@@ -1196,6 +1198,7 @@ def test_frame():
     frame.data.depth = "depth_32F"
     assert_equal(frame.data.depth, "depth_32F")
 
+    assert_equal(frame.data.msg_version, 1)
     frame.data.msg_version = 4
     assert_equal(frame.data.msg_version, 4)
 
@@ -1301,6 +1304,7 @@ def test_framepair_str_to_yaml_smoke():
 def test_map():
     map = cdff_types.Map()
 
+    assert_equal(map.msg_version, 0)
     map.msg_version = 42
     assert_equal(map.msg_version, 42)
 
@@ -1327,6 +1331,7 @@ def test_map():
     assert_array_equal(map.metadata.pose_fixed_frame_map_frame.data.translation,
                        np.array([1.2, 3.4, 5.6]))
 
+    assert_equal(map.data.msg_version, 1)
     map.data.msg_version = 44
     assert_equal(map.data.msg_version, 44)
 

@@ -1009,6 +1009,8 @@ cdef class Pointcloud:
     def __init__(self):
         self.thisptr = new _cdff_types.asn1SccPointcloud()
         self.delete_thisptr = True
+        _cdff_types.asn1SccPointcloud_Initialize(self.thisptr)
+        self.thisptr.metadata.msgVersion = _cdff_types.pointCloud_Version
 
     @property
     def metadata(self):
@@ -2215,6 +2217,9 @@ cdef class Frame:
     def __init__(self):
         self.thisptr = new _cdff_types.asn1SccFrame()
         self.delete_thisptr = True
+        _cdff_types.asn1SccFrame_Initialize(self.thisptr)
+        self.thisptr.msgVersion = _cdff_types.frame_Version
+        self.thisptr.data.msgVersion = _cdff_types.array3D_Version
 
     def __str__(self):
         return str(
@@ -2271,6 +2276,7 @@ cdef class FramePair:
     def __init__(self):
         self.thisptr = new _cdff_types.asn1SccFramePair()
         self.delete_thisptr = True
+        _cdff_types.asn1SccFramePair_Initialize(self.thisptr)
 
     def __str__(self):
         return ("{type: FramePair, msg_version: %d, baseline: %g, "
@@ -2961,6 +2967,9 @@ cdef class Map:
     def __init__(self):
         self.thisptr = new _cdff_types.asn1SccMap()
         self.delete_thisptr = True
+        _cdff_types.asn1SccMap_Initialize(self.thisptr)
+        self.thisptr.msgVersion = _cdff_types.map_Version
+        self.thisptr.data.msgVersion = _cdff_types.array3D_Version
 
     def __str__(self):
         return ("{type: Map, metadata: %s, data: %s}"
