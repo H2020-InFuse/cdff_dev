@@ -6,9 +6,13 @@ import cdff_types
 
 
 class MergeFramePairDFN:
-    def __init__(self, left_camera_info_stream, right_camera_info_stream):
+    def __init__(self, left_camera_info_stream, right_camera_info_stream,
+                 left_is_main_camera=True, verbose=0):
         self.left_camera_info_stream = left_camera_info_stream
         self.right_camera_info_stream = right_camera_info_stream
+        self.left_is_main_camera = left_is_main_camera
+        self.verbose = verbose
+
         self.config_filename = None
         self.left_config = {}
         self.right_config = {}
@@ -27,12 +31,16 @@ class MergeFramePairDFN:
                 self.left_camera_info_stream]
             self.right_config = self.camera_configs[
                 self.right_camera_info_stream]
-            self.pair.baseline = self.right_config["baseline"]
+            if self.left_is_main_camera:
+                self.pair.baseline = self.right_config["baseline"]
+            else:
+                self.pair.baseline = self.left_config["baseline"]
 
-            ###### TODO remove
+        if self.verbose:
+            print("[MergeFramePairDFN] Left camera configuration:")
             print(self.left_config)
+            print("[MergeFramePairDFN] Right camera configuration:")
             print(self.right_config)
-            ######
 
     def leftImageInput(self, data):
         self.left_image = data
@@ -47,17 +55,11 @@ class MergeFramePairDFN:
         self._fill_frame_metadata(self.pair.left, self.left_config)
         self._fill_frame_metadata(self.pair.right, self.right_config)
 
-        self.pair.right.intrinsic.dist_coeffs.fromarray(
-            np.array(self.right_config["intrinsic"]["distCoeffs"]))
-        self.pair.right.intrinsic.camera_matrix.fromarray(
-            np.array(self.right_config["intrinsic"]["cameraMatrix"]))
-        self.pair.right.intrinsic.camera_model = self.right_config[
-            "intrinsic"]["cameraModel"]
-
-        ###### TODO remove
-        import yaml, pprint
-        pprint.pprint(yaml.load(str(self.pair)), width=100, depth=7, compact=True)
-        ######
+        if self.verbose:
+            import yaml, pprint
+            str_repr = str(self.pair)
+            py_repr = yaml.load(str_repr)
+            pprint.pprint(py_repr, width=80, depth=4, compact=True)
 
     def _fill_frame_metadata(self, frame, metadata):
         frame.intrinsic.dist_coeffs.fromarray(
@@ -92,7 +94,8 @@ def main():
 
     merge_frame_pair = MergeFramePairDFN(
         left_camera_info_stream="/hcru1/pt_stereo_rect/left/camera_info",
-        right_camera_info_stream="/hcru1/pt_stereo_rect/right/camera_info"
+        right_camera_info_stream="/hcru1/pt_stereo_rect/right/camera_info",
+        left_is_main_camera=True, verbose=1
     )
     merge_frame_pair.set_configuration_file(prefix_path + "_camera.msg")
 
@@ -115,16 +118,6 @@ def main():
         "/hcru1/pt_color/left/image": "/hcru1/pt_color/left.image",
         "/hcru1/pt_stereo_sgm/depth": "/hcru1/pt_stereo_sgm.depth",
     }
-
-    """
-    Die Daten werden bei uns immer mit Bezug auf die linke Kamera
-    weiterverarbeitet. D.h. der Frame camera_right existiert nur "implizit"
-    anhand der extrinsischen Kalibrierung unter /camera_info.
-
-    In unserer Pipeline verwenden wir das rechte Bild nur für die
-    Tiefenbildberechnung. Alles andere wird mit der linken Kamera erledigt
-    (Features für Visual Odometry, Tag detection, etc.).
-    """
 
     log_iterator = logloader.replay_join([
         logloader.replay_logfile(
