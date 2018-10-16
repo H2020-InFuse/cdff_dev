@@ -701,7 +701,7 @@ def test_quaterniond_str():
     v[2] = 2.0
     v[3] = 3.0
     assert_equal(
-        str(v), "{type: Quaterniond, data: [x=0.00, y=1.00, z=2.00, w=3.00]}")
+        str(v), "{type: Quaterniond, data: {x: 0, y: 1, z: 2, w: 3}}")
 
 
 def test_quaterniond_get_item():
@@ -944,7 +944,7 @@ def test_rigid_body_state_str():
         "{type: RigidBodyState, timestamp={type: Time, microseconds: 0}, "
         "sourceFrame=source, targetFrame=target, pos={type: Vector3d, "
         "data: [0.00, 0.00, 0.00]}, orient={type: Quaterniond, "
-        "data: [x=0.00, y=0.00, z=0.00, w=0.00]}, ...}")
+        "data: {x: 0, y: 0, z: 0, w: 0}}, ...}")
 
 
 def test_rigid_body_state_get_set_position():
