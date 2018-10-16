@@ -332,3 +332,48 @@ def test_dfc_converts_dfpc():
     assert_equal(vis.data["linear.y"][0], 201.0)
     assert_in("square.y", vis.data)
     assert_equal(vis.data["square.y"][0], 40401.0)
+
+
+class MultiLinearDFN:
+    def __init__(self):
+        self.w = 2.0
+        self.b = 1.0
+        self.x = 0.0
+
+    def set_configuration_file(self, filename):
+        pass
+
+    def configure(self):
+        pass
+
+    def xInput(self, x):
+        self.x = x
+
+    def process(self):
+        self.y = self.w * self.x + self.b
+
+    def yOutput(self):
+        return self.y
+
+    def zOutput(self):
+        return self.y
+
+
+def test_dfc_collects_all_output_ports():
+    nodes = {
+        "linear": MultiLinearDFN(),
+        "square": SquareDFPC()
+    }
+    trigger_ports = {
+        "linear": "x",
+        "square": "x"
+    }
+    connections = (
+        ("log.x", "linear.x"),
+        ("linear.y", "square.x"),
+        ("square.y", "result.y")
+    )
+    dfc = dataflowcontrol.DataFlowControl(
+        nodes, connections, trigger_ports=trigger_ports)
+    dfc.setup()
+    assert_equal(dfc.output_ports_["linear"], {"y", "z"})

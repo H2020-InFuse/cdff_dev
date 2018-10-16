@@ -108,9 +108,6 @@ def main():
     connections = (
         ("/hcru1/pt_stereo_rect/left.image", "merge_frame_pair.leftImage"),
         ("/hcru1/pt_stereo_rect/right.image", "merge_frame_pair.rightImage"),
-        ("/hcru1/pt_color/left.image", "result.rgbImage"),
-        ("/hcru1/pt_stereo_sgm.depth", "result.depthImage"),
-        ("merge_frame_pair.pair", "result.pair"),
     )
     stream_aliases = {
         "/hcru1/pt_stereo_rect/left/image": "/hcru1/pt_stereo_rect/left.image",

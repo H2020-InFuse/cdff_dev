@@ -138,6 +138,10 @@ class DataFlowControl:
         self.log_ports_ = defaultdict(set)
         self.result_ports_ = defaultdict(set)
 
+        for node_name in self.nodes.keys():
+            for port_name in self._node_facade.output_ports(node_name):
+                self.output_ports_[node_name].add(port_name)
+
         for output_port, input_port in self.connections:
             input_port = self._check_stream_name(input_port)
             output_port = self._check_stream_name(output_port)
@@ -145,7 +149,7 @@ class DataFlowControl:
             node_name, port_name, port_exists = self._node_facade.check_port(
                 output_port, "Output")
             if port_exists:
-                self.output_ports_[node_name].add(port_name)
+                assert port_name in self.output_ports_[node_name]
             else:
                 self.log_ports_[node_name].add(port_name)
 
@@ -414,6 +418,10 @@ class NodeFacade:
             if self.verbose >= 1:
                 print(node_name + ".set_time(time) not implemented")
 
+    def output_ports(self, node_name):
+        result = inspect.getmembers(self.nodes[node_name], predicate=isoutput)
+        return [port_name.replace("Output", "") for port_name, _ in result]
+
     def check_port(self, port, port_type):
         if port_type not in ["Input", "Output"]:
             raise ValueError("port_type must be either 'Input' or 'Output'")
@@ -598,23 +606,29 @@ def create_dfn_from_dfpc(dfpc_class):
         "process": process
     }
 
-    def isinput(member):
-        return (hasattr(member, "__name__") and
-                member.__name__.endswith("Input"))
     inputs = inspect.getmembers(dfpc_class, predicate=isinput)
     for name, _ in inputs:
         def route_method(self, data, name=name):
             getattr(self.dfpc, name)(data)
+        route_method.__name__ = name
         methods[name] = route_method
 
-    def isoutput(member):
-        return (hasattr(member, "__name__") and
-                member.__name__.endswith("Output"))
     outputs = inspect.getmembers(dfpc_class, predicate=isoutput)
     for name, fun in outputs:
         def route_method(self, name=name):
             return getattr(self.dfpc, name)()
+        route_method.__name__ = name
         methods[name] = route_method
 
     cls = type(clsname, (), methods)
     return cls
+
+
+def isinput(member):
+    return (hasattr(member, "__name__") and
+            member.__name__.endswith("Input"))
+
+
+def isoutput(member):
+    return (hasattr(member, "__name__") and
+            member.__name__.endswith("Output"))

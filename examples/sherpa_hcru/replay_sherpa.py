@@ -56,7 +56,6 @@ def main():
         connections=(
             ("/mcs_sensor_processing.rigid_body_state_out", "transformer.wheelOdometry"),
             ("/body_joint.body_joint_samples", "transformer.bodyJoint"),
-            ("transformer.odometryTrajectory", "result.odometryTrajectory"),
         ),
         periods={"transformer": 1},
         real_time=False,
