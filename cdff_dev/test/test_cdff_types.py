@@ -1344,9 +1344,9 @@ def test_map():
 
     assert_equal(
         str(map),
-        "{type: Map, time_stamp: {type: Time, microseconds: 11}, "
-        "type: map_DEM, scale: 55, rows: 25, cols: 26, channels: 27, "
-        "depth: depth_8U, row_size: 28}")
+        "{type: Map, metadata: {time_stamp: {type: Time, microseconds: 11}, "
+        "type: map_DEM, scale: 55}, data: {rows: 25, cols: 26, channels: 27, "
+        "depth: depth_8U, row_size: 28}}")
 
 
 def test_map_array_reference():

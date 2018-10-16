@@ -2253,8 +2253,10 @@ cdef class FramePair:
         self.delete_thisptr = True
 
     def __str__(self):
-        # TODO
-        return str("{type: FramePair}")
+        return ("{type: FramePair, msg_version: %d, baseline: %g, "
+                "left: %s, right: %s}"
+                % (self.thisptr.msgVersion, self.thisptr.baseline,
+                   self.left, self.right))
 
     def _get_msg_version(self):
         return self.thisptr.msgVersion
@@ -2306,9 +2308,9 @@ cdef class Frame_metadata_tReference:
 
     def __str__(self):
         # TODO err_values, attributes
-        return (("{type: Frame_metadata_t, msg_version: %d, time_stamp: %s, "
-                 "received_time: %s, pixel_model: %s, pixel_coeffs: %s, "
-                 "err_values: ..., attributes: ..., mode: %s, status: %s}")
+        return ("{msg_version: %d, time_stamp: %s, received_time: %s, "
+                "pixel_model: %s, pixel_coeffs: %s, err_values: ..., "
+                "attributes: ..., mode: %s, status: %s}"
                 % (self.thisptr.msgVersion, self.time_stamp,
                    self.received_time, self.pixel_model, self.pixel_coeffs,
                    self.mode, self.status))
@@ -2576,8 +2578,8 @@ cdef class Frame_intrinsic_tReference:
         pass
 
     def __str__(self):
-        return ("{type: Frame_intrinsic_t, msg_version: %d, sensor_id: %s, "
-                "camera_matrix: %s, camera_model: %s, dist_coeffs: %s}"
+        return ("{msg_version: %d, sensor_id: %s, camera_matrix: %s, "
+                "camera_model: %s, dist_coeffs: %s}"
                 % (self.thisptr.msgVersion, self.sensor_id, self.camera_matrix,
                    self.camera_model, self.dist_coeffs))
 
@@ -2700,7 +2702,7 @@ cdef class Array3DReference:
         pass
 
     def __str__(self):
-        return ("{type: Array3D, rows: %d, cols: %d, channels: %d, depth: %s, "
+        return ("{rows: %d, cols: %d, channels: %d, depth: %s, "
                 "row_size: %d}"
                 % (self.rows, self.cols, self.channels, self.depth,
                    self.row_size))
@@ -2937,8 +2939,8 @@ cdef class Map:
         self.delete_thisptr = True
 
     def __str__(self):
-        # TODO
-        return str("{type: Map, %s, %s}" % (self.metadata, self.data))
+        return ("{type: Map, metadata: %s, data: %s}"
+                % (self.metadata, self.data))
 
     def _get_msg_version(self):
         return self.thisptr.msgVersion
@@ -2970,7 +2972,7 @@ cdef class Map_metadata_tReference:
 
     def __str__(self):
         # TODO err_values, pose_fixed_frame_map_frame
-        return ("time_stamp: %s, type: %s, scale: %g"
+        return ("{time_stamp: %s, type: %s, scale: %g}"
                 % (self.time_stamp, self.type, self.scale))
 
     def _get_msg_version(self):
