@@ -44,12 +44,8 @@ class MergeFramePairDFN:
         self.pair.left = self.left_image
         self.pair.right = self.right_image
 
-        self.pair.left.intrinsic.dist_coeffs.fromarray(
-            np.array(self.left_config["intrinsic"]["distCoeffs"]))
-        self.pair.left.intrinsic.camera_matrix.fromarray(
-            np.array(self.left_config["intrinsic"]["cameraMatrix"]))
-        self.pair.left.intrinsic.camera_model = self.left_config[
-            "intrinsic"]["cameraModel"]
+        self._fill_frame_metadata(self.pair.left, self.left_config)
+        self._fill_frame_metadata(self.pair.right, self.right_config)
 
         self.pair.right.intrinsic.dist_coeffs.fromarray(
             np.array(self.right_config["intrinsic"]["distCoeffs"]))
@@ -62,6 +58,23 @@ class MergeFramePairDFN:
         import yaml, pprint
         pprint.pprint(yaml.load(str(self.pair)), depth=4)
         ######
+
+    def _fill_frame_metadata(self, frame, metadata):
+        frame.intrinsic.dist_coeffs.fromarray(
+            np.array(metadata["intrinsic"]["distCoeffs"]))
+        frame.intrinsic.camera_matrix.fromarray(
+            np.array(metadata["intrinsic"]["cameraMatrix"]))
+        frame.intrinsic.camera_model = metadata["intrinsic"]["cameraModel"]
+
+        frame.extrinsic.pose_fixed_frame_robot_frame.data.translation.fromarray(
+            np.zeros(3))
+        frame.extrinsic.pose_fixed_frame_robot_frame.data.orientation.fromarray(
+            np.array([0, 0, 0, 1], dtype=np.float))
+
+        frame.extrinsic.pose_robot_frame_sensor_frame.data.translation.fromarray(
+            np.zeros(3))
+        frame.extrinsic.pose_robot_frame_sensor_frame.data.orientation.fromarray(
+            np.array([0, 0, 0, 1], dtype=np.float))
 
     def pairOutput(self):
         return self.pair
@@ -102,6 +115,16 @@ def main():
         "/hcru1/pt_color/left/image": "/hcru1/pt_color/left.image",
         "/hcru1/pt_stereo_sgm/depth": "/hcru1/pt_stereo_sgm.depth",
     }
+
+    """
+    Die Daten werden bei uns immer mit Bezug auf die linke Kamera
+    weiterverarbeitet. D.h. der Frame camera_right existiert nur "implizit"
+    anhand der extrinsischen Kalibrierung unter /camera_info.
+
+    In unserer Pipeline verwenden wir das rechte Bild nur für die
+    Tiefenbildberechnung. Alles andere wird mit der linken Kamera erledigt
+    (Features für Visual Odometry, Tag detection, etc.).
+    """
 
     log_iterator = logloader.replay_join([
         logloader.replay_logfile(

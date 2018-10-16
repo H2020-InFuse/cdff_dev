@@ -90,6 +90,7 @@ class ImageWidget(QWidget):
         self.connect(self, SIGNAL("imageUpdated()"), self, SLOT("update()"))
         self.image = QImage()
         self.mutex = QMutex()
+        self._size_initialized = False
 
     #overload paint event
     def paintEvent(self, event):
@@ -97,6 +98,11 @@ class ImageWidget(QWidget):
         painter.setRenderHint(QPainter.SmoothPixmapTransform, 1)
         self.mutex.lock()
         painter.drawImage(self.rect(), self.image)
+        if not self._size_initialized and self.image.width() > 0:
+            self.setMinimumSize(
+                self.image.width() // 4, self.image.height() // 4)
+            self.resize(self.image.width() // 2, self.image.height() // 2)
+            self._size_initialized = True
         self.mutex.unlock()
 
     #set image (thread safe)
@@ -149,7 +155,6 @@ class ImagePairVisualization(dataflowcontrol.VisualizationBase):
         self.widget.setWindowTitle(stream_name)
         self.widget.show()
 
-
     def report_node_output(self, port_name, sample, timestamp):
         if port_name == self.stream_name:
             for i, img in enumerate([sample.left, sample.right]):
@@ -163,12 +168,14 @@ class ImagePairVisualization(dataflowcontrol.VisualizationBase):
 class ImagePairWidget(QWidget):
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
-        self.left_widget = ImageWidget(self)
-        self.right_widget = ImageWidget(self)
+        # to let the widgets resize themselves, we don't set the parent widget
+        self.left_widget = ImageWidget()
+        self.right_widget = ImageWidget()
         self.layout = QHBoxLayout()
         self.layout.addWidget(self.left_widget)
         self.layout.addWidget(self.right_widget)
         self.setLayout(self.layout)
+        self.resize(200, 100)
 
     def setImages(self, newimages):
         self.left_widget.setImage(newimages[0])
