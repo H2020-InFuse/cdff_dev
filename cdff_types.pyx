@@ -67,7 +67,7 @@ cdef class Vector2d:
         return 2
 
     def __str__(self):
-        return str("{type: Vector2d, data=[%.2f, %.2f]}"
+        return str("{type: Vector2d, data: [%.2f, %.2f]}"
                    % (self.thisptr.arr[0], self.thisptr.arr[1]))
 
     def __array__(self, dtype=None):
@@ -119,7 +119,7 @@ cdef class Vector3d:
         return 3
 
     def __str__(self):
-        return str("{type: Vector3d, data=[%.2f, %.2f, %.2f]}"
+        return str("{type: Vector3d, data: [%.2f, %.2f, %.2f]}"
                    % (self.thisptr.arr[0], self.thisptr.arr[1],
                       self.thisptr.arr[2]))
 
@@ -172,7 +172,7 @@ cdef class Vector4d:
         return 4
 
     def __str__(self):
-        return str("{type: Vector4d, data=[%.2f, %.2f, %.2f, %.2f]}"
+        return str("{type: Vector4d, data: [%.2f, %.2f, %.2f, %.2f]}"
                    % (self.thisptr.arr[0], self.thisptr.arr[1],
                       self.thisptr.arr[2], self.thisptr.arr[3]))
 
@@ -225,10 +225,10 @@ cdef class Vector6d:
         return 6
 
     def __str__(self):
-        return str("{type: Vector6d, data=[%.2f, %.2f, %.2f, %.2f, %.2f, %.2f]}"
-                   % (self.thisptr.arr[0], self.thisptr.arr[1],
-                      self.thisptr.arr[2], self.thisptr.arr[3],
-                      self.thisptr.arr[4], self.thisptr.arr[5]))
+        return ("{type: Vector6d, data: [%.2f, %.2f, %.2f, %.2f, %.2f, %.2f]}"
+                % (self.thisptr.arr[0], self.thisptr.arr[1],
+                   self.thisptr.arr[2], self.thisptr.arr[3],
+                   self.thisptr.arr[4], self.thisptr.arr[5]))
 
     def __array__(self, dtype=None):
         cdef np.npy_intp shape[1]
@@ -280,7 +280,7 @@ cdef class VectorXd:
         return self.thisptr.nCount
 
     def __str__(self):
-        return str("{type: VectorXd, data=[%s]}"
+        return str("{type: VectorXd, data: [%s]}"
                    % ", ".join(["%.2f" % self.thisptr.arr[i]
                                 for i in range(self.thisptr.nCount)]))
 
@@ -338,7 +338,7 @@ cdef class Matrix2d:
         return 2
 
     def __str__(self):
-        return str("{type: Matrix2d, data=[?]}") # TODO print content
+        return str("{type: Matrix2d, data: [?]}") # TODO print content
 
     def __array__(self, dtype=None):
         return self.toarray().astype(dtype)
@@ -396,7 +396,8 @@ cdef class Matrix3d:
         return 3
 
     def __str__(self):
-        return str("{type: Matrix3d, data=[?]}") # TODO print content
+        return ("{type: Matrix3d, data: [[%g, %g, %g], [%g, %g, %g], "
+                "[%g, %g, %g]]}" % tuple(self.toarray().ravel()))
 
     def __array__(self, dtype=None):
         return self.toarray().astype(dtype)
@@ -454,7 +455,11 @@ cdef class Matrix6d:
         return 6
 
     def __str__(self):
-        return str("{type: Matrix6d, data=[?]}") # TODO print content
+        return ("{type: Matrix6d, data: [[%g, %g, %g, %g, %g, %g], "
+                "[%g, %g, %g, %g, %g, %g], [%g, %g, %g, %g, %g, %g], "
+                "[%g, %g, %g, %g, %g, %g], [%g, %g, %g, %g, %g, %g], "
+                "[%g, %g, %g, %g, %g, %g]]}"
+                % tuple(self.toarray().ravel()))
 
     def __array__(self, dtype=None):
         return self.toarray().astype(dtype)
@@ -512,7 +517,7 @@ cdef class Quaterniond:
         return 4
 
     def __str__(self):
-        return str("{type: Quaterniond, data=[x=%.2f, y=%.2f, z=%.2f, w=%.2f]}"
+        return str("{type: Quaterniond, data: [x=%.2f, y=%.2f, z=%.2f, w=%.2f]}"
                    % (self.thisptr.arr[0], self.thisptr.arr[1],
                       self.thisptr.arr[2], self.thisptr.arr[3]))
 
@@ -604,6 +609,13 @@ cdef class TransformWithCovariance_MetadataReference:
     def __dealloc__(self):
         pass
 
+    def __str__(self):
+        return ("{msg_version: %d, producer_id: %s, parent_frame_id: %s, "
+                "parent_time: %s, child_frame_id: %s, child_time: %s}"
+                % (self.thisptr.msgVersion, self.producer_id,
+                   self.parent_frame_id, self.parent_time, self.child_frame_id,
+                   self.child_time))
+
     def _get_msg_version(self):
         return self.thisptr.msgVersion
 
@@ -679,6 +691,10 @@ cdef class TransformWithCovariance_DataReference:
     def __dealloc__(self):
         pass
 
+    def __str__(self):
+        return ("{translation: %s, orientation: %s, cov: %s}"
+                % (self.translation, self.orientation, self.cov))
+
     @property
     def translation(self):
         cdef Vector3d translation = Vector3d()
@@ -716,6 +732,10 @@ cdef class TransformWithCovariance:
     def __init__(self):
         self.thisptr = new _cdff_types.asn1SccTransformWithCovariance()
         self.delete_thisptr = True
+
+    def __str__(self):
+        return ("{metadata: %s, data: %s}"
+                % (self.metadata, self.data))
 
     @property
     def metadata(self):
@@ -2653,8 +2673,12 @@ cdef class Frame_extrinsic_tReference:
         pass
 
     def __str__(self):
-        # TODO
-        return "{type: Frame_extrinsic_t}"
+        return ("{msg_version: %d, has_fixed_transform: %s, "
+                "pose_robot_frame_sensor_frame: %s, "
+                "pose_fixed_frame_robot_frame: %s}"
+                % (self.msg_version, self.has_fixed_transform,
+                   self.pose_robot_frame_sensor_frame,
+                   self.pose_fixed_frame_robot_frame))
 
     def _get_msg_version(self):
         return self.thisptr.msgVersion

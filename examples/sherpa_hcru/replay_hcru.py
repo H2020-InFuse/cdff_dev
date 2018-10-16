@@ -59,7 +59,8 @@ class MergeFramePairDFN:
             "intrinsic"]["cameraModel"]
 
         ###### TODO remove
-        print(self.pair)
+        import yaml, pprint
+        pprint.pprint(yaml.load(str(self.pair)), depth=4)
         ######
 
     def pairOutput(self):

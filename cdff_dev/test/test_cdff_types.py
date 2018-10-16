@@ -40,7 +40,7 @@ def test_vector2d_str():
     v = cdff_types.Vector2d()
     v[0] = 0.0
     v[1] = 1.0
-    assert_equal(str(v), "{type: Vector2d, data=[0.00, 1.00]}")
+    assert_equal(str(v), "{type: Vector2d, data: [0.00, 1.00]}")
 
 
 def test_vector2d_get_item():
@@ -101,7 +101,7 @@ def test_vector3d_str():
     v[0] = 0.0
     v[1] = 1.0
     v[2] = 2.0
-    assert_equal(str(v), "{type: Vector3d, data=[0.00, 1.00, 2.00]}")
+    assert_equal(str(v), "{type: Vector3d, data: [0.00, 1.00, 2.00]}")
 
 
 def test_vector3d_get_item():
@@ -169,7 +169,7 @@ def test_vector4d_str():
     v[1] = 1.0
     v[2] = 2.0
     v[3] = 3.0
-    assert_equal(str(v), "{type: Vector4d, data=[0.00, 1.00, 2.00, 3.00]}")
+    assert_equal(str(v), "{type: Vector4d, data: [0.00, 1.00, 2.00, 3.00]}")
 
 
 def test_vector4d_get_item():
@@ -246,7 +246,7 @@ def test_vector6d_str():
     v[4] = 4.0
     v[5] = 5.0
     assert_equal(
-        str(v), "{type: Vector6d, data=[0.00, 1.00, 2.00, 3.00, 4.00, 5.00]}")
+        str(v), "{type: Vector6d, data: [0.00, 1.00, 2.00, 3.00, 4.00, 5.00]}")
 
 
 def test_vector6d_get_item():
@@ -334,7 +334,7 @@ def test_vectorXd_str():
     v[4] = 4.0
     v[5] = 5.0
     assert_equal(
-        str(v), "{type: VectorXd, data=[0.00, 1.00, 2.00, 3.00, 4.00, 5.00]}")
+        str(v), "{type: VectorXd, data: [0.00, 1.00, 2.00, 3.00, 4.00, 5.00]}")
 
 
 def test_vectorXd_get_item():
@@ -418,7 +418,7 @@ def test_matrix2d_str():
     v[0, 1] = 2.0
     v[1, 1] = 3.0
     assert_equal(
-        str(v), "{type: Matrix2d, data=[?]}")
+        str(v), "{type: Matrix2d, data: [?]}")
 
 
 def test_matrix2d_get_item():
@@ -503,7 +503,7 @@ def test_matrix3d_str():
     v[1, 2] = 7.0
     v[2, 2] = 8.0
     assert_equal(
-        str(v), "{type: Matrix3d, data=[?]}")
+        str(v), "{type: Matrix3d, data: [[0, 3, 6], [1, 4, 7], [2, 5, 8]]}")
 
 
 def test_matrix3d_get_item():
@@ -609,7 +609,14 @@ def test_matrix6d_str():
         for j in range(6):
             v[i, j] = i * 6.0 + j
     assert_equal(
-        str(v), "{type: Matrix6d, data=[?]}")
+        str(v),
+        "{type: Matrix6d, data: "
+        "[[0, 1, 2, 3, 4, 5], "
+        "[6, 7, 8, 9, 10, 11], "
+        "[12, 13, 14, 15, 16, 17], "
+        "[18, 19, 20, 21, 22, 23], "
+        "[24, 25, 26, 27, 28, 29], "
+        "[30, 31, 32, 33, 34, 35]]}")
 
 
 def test_matrix6d_get_item():
@@ -693,7 +700,7 @@ def test_quaterniond_str():
     v[2] = 2.0
     v[3] = 3.0
     assert_equal(
-        str(v), "{type: Quaterniond, data=[x=0.00, y=1.00, z=2.00, w=3.00]}")
+        str(v), "{type: Quaterniond, data: [x=0.00, y=1.00, z=2.00, w=3.00]}")
 
 
 def test_quaterniond_get_item():
@@ -935,8 +942,8 @@ def test_rigid_body_state_str():
         str(rbs),
         "{type: RigidBodyState, timestamp={type: Time, microseconds: 0}, "
         "sourceFrame=source, targetFrame=target, pos={type: Vector3d, "
-        "data=[0.00, 0.00, 0.00]}, orient={type: Quaterniond, "
-        "data=[x=0.00, y=0.00, z=0.00, w=0.00]}, ...}")
+        "data: [0.00, 0.00, 0.00]}, orient={type: Quaterniond, "
+        "data: [x=0.00, y=0.00, z=0.00, w=0.00]}, ...}")
 
 
 def test_rigid_body_state_get_set_position():
