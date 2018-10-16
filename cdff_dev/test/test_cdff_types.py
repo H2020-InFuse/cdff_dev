@@ -1,4 +1,5 @@
 import numpy as np
+import yaml
 import cdff_types
 from nose.tools import (assert_equal, assert_regexp_matches, assert_true,
                         assert_false)
@@ -1290,6 +1291,11 @@ def test_framepair():
 
     assert_equal(framepair.left.msg_version, 41)
     assert_equal(framepair.right.msg_version, 51)
+
+
+def test_framepair_str_to_yaml_smoke():
+    framepair = cdff_types.FramePair()
+    yaml.load(str(framepair))
 
 
 def test_map():
