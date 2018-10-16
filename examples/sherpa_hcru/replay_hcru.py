@@ -46,20 +46,20 @@ class MergeFramePairDFN:
 
         self.pair.left.intrinsic.dist_coeffs.fromarray(
             np.array(self.left_config["intrinsic"]["distCoeffs"]))
-        self.pair.left.intrinsic.camera_matrix.from_array(  # TODO from_array
+        self.pair.left.intrinsic.camera_matrix.fromarray(
             np.array(self.left_config["intrinsic"]["cameraMatrix"]))
         self.pair.left.intrinsic.camera_model = self.left_config[
             "intrinsic"]["cameraModel"]
 
         self.pair.right.intrinsic.dist_coeffs.fromarray(
             np.array(self.right_config["intrinsic"]["distCoeffs"]))
-        self.pair.right.intrinsic.camera_matrix.from_array(
+        self.pair.right.intrinsic.camera_matrix.fromarray(
             np.array(self.right_config["intrinsic"]["cameraMatrix"]))
         self.pair.right.intrinsic.camera_model = self.right_config[
             "intrinsic"]["cameraModel"]
 
         ###### TODO remove
-        print(self.left_image)
+        print(self.pair)
         ######
 
     def pairOutput(self):
