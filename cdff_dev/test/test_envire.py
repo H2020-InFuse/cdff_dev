@@ -382,3 +382,9 @@ def test_envire_load_meshes():
     assert_equal(g.get_total_item_count("body"), 1)
     assert_true(g.contains_frame("outer_leg_rear_right"))
     assert_equal(g.get_total_item_count("outer_leg_rear_right"), 1)
+
+
+def test_missing_frame():
+    g = cdff_envire.EnvireGraph()
+    assert_raises_regexp(RuntimeError, "Frame . doesn't exist",
+                         g.contains_edge, "A", "B")

@@ -129,13 +129,13 @@ cdef extern from "envire_core/graph/EnvireGraph.hpp" namespace "envire::core":
         EnvireGraph(const EnvireGraph&)
         void addFrame(string) except +
         void removeFrame(string) except +
-        bool containsFrame(string)
+        bool containsFrame(string) except +
         #void disconnectFrame(string)
-        bool containsEdge(string, string)
+        bool containsEdge(string, string) except +
         void addTransform(string, string, Transform) except +
-        void updateTransform(string, string, Transform)
+        void updateTransform(string, string, Transform) except +
         Transform getTransform(string, string) except +
-        void removeTransform(string, string)
+        void removeTransform(string, string) except +
 
         unsigned num_vertices()
         unsigned num_edges()
@@ -143,7 +143,7 @@ cdef extern from "envire_core/graph/EnvireGraph.hpp" namespace "envire::core":
         void saveToFile(string)
         void loadFromFile(string)
 
-        void clearFrame(string)
+        void clearFrame(string) except +
         bool containsItems[T](string)
         unsigned getItemCount[T](string)
         unsigned getTotalItemCount(string)
