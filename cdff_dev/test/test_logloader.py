@@ -242,3 +242,32 @@ def test_group_pattern_files_not_found():
         ValueError, "Could not find any matching files, only found \[.*\]",
         logloader.group_pattern, "test/test_data/logs/does_not_exist",
         "_*.msg")
+
+
+def test_replay_sequence_empty():
+    log_iterator = logloader.replay_sequence([])
+    assert_raises_regexp(
+        ValueError, "Expected at least one log iterator",
+        next, log_iterator)
+
+
+def test_replay_sequence():
+    log_iterator = logloader.replay_sequence([
+        logloader.replay_logfile(filename, ["/xsens_imu.calibrated_sensors"])
+        for filename in logloader.group_pattern(
+            "test/test_data/logs/", "xsens_imu_*.msg")
+    ])
+    n_samples = 0
+    for _, _, _, _ in log_iterator:
+        n_samples += 1
+    assert_equal(n_samples, 300)
+
+
+def test_replay_logfile_sequence():
+    log_iterator = logloader.replay_logfile_sequence(
+        logloader.group_pattern("test/test_data/logs/", "xsens_imu_*.msg"),
+        ["/xsens_imu.calibrated_sensors"])
+    n_samples = 0
+    for _, _, _, _ in log_iterator:
+        n_samples += 1
+    assert_equal(n_samples, 300)

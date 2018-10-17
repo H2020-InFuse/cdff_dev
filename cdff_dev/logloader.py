@@ -573,6 +573,70 @@ def replay_join(log_iterators):
             next_samples[log_iterator_idx] = (float("inf"), None, None, None)
 
 
+def replay_logfile_sequence(filenames, stream_names):
+    """Generator that joins multiple log iterators.
+
+    Parameters
+    ----------
+    filenames : list
+        List of logfiles
+
+    stream_names : list
+        Names of the streams that we want to load
+
+    Returns
+    -------
+    current_timestamp : int
+        Current time in microseconds
+
+    stream_name : str
+        Name of the currently active stream
+
+    typename : str
+        Name of the data type of the stream
+
+    sample : dict
+        Current sample
+    """
+    return replay_sequence(
+        [replay_logfile(filename, stream_names) for filename in filenames])
+
+
+def replay_sequence(log_iterators):
+    """Generator that joins multiple log iterators.
+
+    Parameters
+    ----------
+    log_iterators : list
+        List of log iterators that should be joined sequentially
+
+    Returns
+    -------
+    current_timestamp : int
+        Current time in microseconds
+
+    stream_name : str
+        Name of the currently active stream
+
+    typename : str
+        Name of the data type of the stream
+
+    sample : dict
+        Current sample
+    """
+    if len(log_iterators) == 0:
+        raise ValueError("Expected at least one log iterator")
+
+    log_iterator_idx = 0
+    while log_iterator_idx < len(log_iterators):
+        try:
+            timestamp, stream_name, typename, sample = next(
+                log_iterators[log_iterator_idx])
+            yield timestamp, stream_name, typename, sample
+        except StopIteration:
+            log_iterator_idx += 1
+
+
 class LogfileGroup:
     """A group of logfiles that are actually one log cut into smaller chunks.
 
