@@ -8,6 +8,8 @@ build/
 cdff_types.cpp
 cdff_envire.cpp
 cdff_dev/extensions/gps/conversion.cpp
+# Auxiliary files
+*.cdff_idx
 # Temporary files
 *~
 # CDFF

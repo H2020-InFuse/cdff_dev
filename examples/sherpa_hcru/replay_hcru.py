@@ -1,85 +1,5 @@
 import os
-import msgpack
-import numpy as np
-from cdff_dev import dataflowcontrol, logloader, imagevisualization
-import cdff_types
-
-
-class MergeFramePairDFN:
-    def __init__(self, left_camera_info_stream, right_camera_info_stream,
-                 left_is_main_camera=True, verbose=0):
-        self.left_camera_info_stream = left_camera_info_stream
-        self.right_camera_info_stream = right_camera_info_stream
-        self.left_is_main_camera = left_is_main_camera
-        self.verbose = verbose
-
-        self.config_filename = None
-        self.left_config = {}
-        self.right_config = {}
-        self.left_image = None
-        self.right_image = None
-        self.pair = cdff_types.FramePair()
-
-    def set_configuration_file(self, filename):
-        self.config_filename = filename
-
-    def configure(self):
-        with open(self.config_filename, "rb") as f:
-            self.camera_configs = msgpack.unpack(
-                f, encoding="utf8", use_list=False)
-            self.left_config = self.camera_configs[
-                self.left_camera_info_stream]
-            self.right_config = self.camera_configs[
-                self.right_camera_info_stream]
-            if self.left_is_main_camera:
-                self.pair.baseline = self.right_config["baseline"]
-            else:
-                self.pair.baseline = self.left_config["baseline"]
-
-        if self.verbose:
-            print("[MergeFramePairDFN] Left camera configuration:")
-            print(self.left_config)
-            print("[MergeFramePairDFN] Right camera configuration:")
-            print(self.right_config)
-
-    def leftImageInput(self, data):
-        self.left_image = data
-
-    def rightImageInput(self, data):
-        self.right_image = data
-
-    def process(self):
-        self.pair.left = self.left_image
-        self.pair.right = self.right_image
-
-        self._fill_frame_metadata(self.pair.left, self.left_config)
-        self._fill_frame_metadata(self.pair.right, self.right_config)
-
-        if self.verbose:
-            import yaml, pprint
-            str_repr = str(self.pair)
-            py_repr = yaml.load(str_repr)
-            pprint.pprint(py_repr, width=80, depth=4, compact=True)
-
-    def _fill_frame_metadata(self, frame, metadata):
-        frame.intrinsic.dist_coeffs.fromarray(
-            np.array(metadata["intrinsic"]["distCoeffs"]))
-        frame.intrinsic.camera_matrix.fromarray(
-            np.array(metadata["intrinsic"]["cameraMatrix"]))
-        frame.intrinsic.camera_model = metadata["intrinsic"]["cameraModel"]
-
-        frame.extrinsic.pose_fixed_frame_robot_frame.data.translation.fromarray(
-            np.zeros(3))
-        frame.extrinsic.pose_fixed_frame_robot_frame.data.orientation.fromarray(
-            np.array([0, 0, 0, 1], dtype=np.float))
-
-        frame.extrinsic.pose_robot_frame_sensor_frame.data.translation.fromarray(
-            np.zeros(3))
-        frame.extrinsic.pose_robot_frame_sensor_frame.data.orientation.fromarray(
-            np.array([0, 0, 0, 1], dtype=np.float))
-
-    def pairOutput(self):
-        return self.pair
+from cdff_dev import dataflowcontrol, logloader, imagevisualization, dfnhelpers
 
 
 def main():
@@ -92,7 +12,7 @@ def main():
 
     prefix_path = os.path.join(log_folder, prefix)
 
-    merge_frame_pair = MergeFramePairDFN(
+    merge_frame_pair = dfnhelpers.MergeFramePairDFN(
         left_camera_info_stream="/hcru1/pt_stereo_rect/left/camera_info",
         right_camera_info_stream="/hcru1/pt_stereo_rect/right/camera_info",
         left_is_main_camera=True, verbose=1
@@ -116,16 +36,14 @@ def main():
         "/hcru1/pt_stereo_sgm/depth": "/hcru1/pt_stereo_sgm.depth",
     }
 
-    log_iterator = logloader.replay_join([
-        logloader.replay_logfile(
-            filename,
-            ["/hcru1/pt_stereo_rect/left/image",
-             "/hcru1/pt_stereo_rect/right/image",
-             "/hcru1/pt_color/left/image",
-             "/hcru1/pt_stereo_sgm/depth"]
-        )
-        for filename in logloader.group_pattern(prefix_path, "_0*.msg")
-    ])
+    # TODO show frames in envire visualizer
+
+    log_iterator = logloader.replay_logfile_sequence(
+        logloader.group_pattern(prefix_path, "_0*.msg"),
+        ["/hcru1/pt_stereo_rect/left/image",
+         "/hcru1/pt_stereo_rect/right/image",
+         "/hcru1/pt_color/left/image",
+         "/hcru1/pt_stereo_sgm/depth"])
 
     dfc = dataflowcontrol.DataFlowControl(
         nodes=nodes, connections=connections, trigger_ports=trigger_ports,
