@@ -2,7 +2,7 @@ from cdff_dev import transformer
 import cdff_envire
 import cdff_types
 import numpy as np
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_true, assert_almost_equal
 
 
 class Transformer(transformer.EnvireDFN):
@@ -74,3 +74,34 @@ def test_static_transformations():
     assert_equal(D2E.pos[0], 4)
     assert_equal(D2E.pos[1], 3)
     assert_equal(D2E.pos[2], 4)
+
+
+def test_config():
+    transformer = Transformer()
+    transformer.set_configuration_file("test/test_data/transformer_config.msg")
+    transformer.configure()
+
+    graph = transformer.graph_
+
+    assert_true(graph.contains_frame("config_sherpaTT_body"))
+    assert_true(graph.contains_frame("config_imu"))
+    assert_true(graph.contains_frame("config_tcp_base"))
+    assert_true(graph.contains_frame("config_tcp"))
+    assert_true(graph.contains_frame("config_camera_left"))
+    assert_true(graph.contains_frame("config_camera_color"))
+    assert_true(graph.contains_frame("config_velodyne"))
+
+    assert_true(graph.contains_edge("config_sherpaTT_body", "config_imu"))
+    assert_true(graph.contains_edge("config_imu", "config_tcp_base"))
+    assert_true(graph.contains_edge("config_tcp_base", "config_tcp"))
+    assert_true(graph.contains_edge("config_tcp", "config_camera_left"))
+    assert_true(graph.contains_edge("config_tcp", "config_camera_color"))
+
+    t = graph.get_transform("config_sherpaTT_body", "config_camera_left")
+    assert_almost_equal(t.transform.translation[0], -0.045)
+    assert_almost_equal(t.transform.translation[1], 0.62)
+    assert_almost_equal(t.transform.translation[2], 0.2621)
+    assert_equal(t.transform.orientation.toarray()[0], 0.85782960320932)
+    assert_equal(t.transform.orientation.toarray()[1], 0.006085361255164068)
+    assert_equal(t.transform.orientation.toarray()[2], -0.009559094197543583)
+    assert_equal(t.transform.orientation.toarray()[3], -0.5138092680696382)

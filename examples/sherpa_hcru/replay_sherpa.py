@@ -7,11 +7,6 @@ import cdff_envire
 
 
 class Transformer(transformer.EnvireDFN):
-    def __init__(self):
-        super(Transformer, self).__init__()
-        self.ground_truth_initialized = False
-        self._graph = None
-
     def initialize_graph(self, graph):
         t = cdff_envire.Transform()
         t.transform.translation.fromarray(np.array([0.0, 0.0, 0.442]))
@@ -23,6 +18,10 @@ class Transformer(transformer.EnvireDFN):
         t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.06540328, 0.99785891]))
         graph.add_transform("velodyne_plane_moving", "velodyne", t)
 
+        t = cdff_envire.Transform()
+        t.transform.translation.fromarray(np.zeros(3))
+        t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
+        graph.add_transform("config_sherpaTT_body", "body", t)
 
     def wheelOdometryInput(self, data):
         self._set_transform(data, frame_transformation=False)
@@ -51,8 +50,11 @@ def main():
         center_frame="odometry"
     )
 
+    transformer = Transformer()
+    transformer.set_configuration_file(
+        "logs/sherpa_hcru/recording_20180927-175146_sherpaTT_integration_tf.msg")
     dfc = dataflowcontrol.DataFlowControl(
-        nodes={"transformer": Transformer()},
+        nodes={"transformer": transformer},
         connections=(
             ("/mcs_sensor_processing.rigid_body_state_out", "transformer.wheelOdometry"),
             ("/body_joint.body_joint_samples", "transformer.bodyJoint"),

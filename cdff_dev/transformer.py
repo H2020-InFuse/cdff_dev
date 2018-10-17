@@ -1,4 +1,6 @@
 import warnings
+import msgpack
+import numpy as np
 import cdff_envire
 import cdff_types
 
@@ -21,14 +23,19 @@ class EnvireDFN:
         Graph that stores and provides transformations
     """
     def __init__(self, verbose=0):
-        self._graph = None
-        self._timestamp = 0
         self.verbose = verbose
+
+        self._graph = None
+        self._configuration_file = None
+        self._config = None
+        self._timestamp = 0
 
     def _set_graph_(self, graph):
         self._graph = graph
         if graph is not None:
             self.initialize_graph(graph)
+        if self._config is not None:
+            self.initialize_graph_from_config(graph, self._config)
 
     def _get_graph_(self):
         return self._graph
@@ -47,11 +54,52 @@ class EnvireDFN:
             New graph object
         """
 
-    def set_configuration_file(self):
-        pass
+    def initialize_graph_from_config(self, graph, config, prefix="config_"):
+        """Initialize graph with static transformations from configuration.
+
+        Parameters
+        ----------
+        graph : EnvireGraph
+            EnviRe graph that will be initialized
+
+        config : dict
+            Each key is a tuple of names of the source and target frames.
+            Each value is a dict with the entries 'translation' and
+            'rotation'. The rotation is represented by a quaternion in
+            scalar last convention (x, y, z, w).
+
+        prefix : str, optional (default: 'config_')
+            Frame names from the configuration file will be prefixed with this
+            string.
+        """
+        for frames, transformation in config.items():
+            source, target = frames
+            t = cdff_envire.Transform(
+                translation=cdff_envire.Vector3d(
+                    *transformation["translation"]),
+                orientation=cdff_envire.Quaterniond(
+                    *transformation["rotation"])
+            )
+            graph.add_transform(prefix + source, prefix + target, t)
+
+    def set_configuration_file(self, filename):
+        self._configuration_file = filename
 
     def configure(self):
-        pass
+        """Read configuration file and initialize graph if it exists already."""
+        if self._configuration_file is None:
+            return
+
+        if self._configuration_file.endswith(".msg"):
+            with open(self._configuration_file, "rb") as f:
+                self._config = msgpack.unpack(
+                    f, encoding="utf8", use_list=False)
+        else:
+            raise NotImplementedError(
+                "Don't know how to handle the configuration file format.")
+
+        if self._graph is not None:
+            self.initialize_graph_from_config(self._graph, self._config)
 
     def set_time(self, timestamp):
         self._timestamp = timestamp
