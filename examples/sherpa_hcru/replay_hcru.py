@@ -57,10 +57,11 @@ def main():
         verbose=verbose)
     dfc.setup()
 
-    app = imagevisualization.ImageVisualizerApplication("/hcru1/pt_stereo_rect/left.image")
-    #app = imagevisualization.ImageVisualizerApplication("/hcru1/pt_stereo_rect/right.image")
+    #app = imagevisualization.ImageVisualizerApplication("/hcru1/pt_stereo_rect/left.image")
+    app = imagevisualization.ImageVisualizerApplication("/hcru1/pt_stereo_rect/right.image")
     #app = imagevisualization.ImageVisualizerApplication("/hcru1/pt_color/left.image")
-    #app = imagevisualization.ImageVisualizerApplication("/hcru1/pt_stereo_sgm.depth", (0.0, 3.0))
+    #app = imagevisualization.ImageVisualizerApplication("/hcru1/pt_stereo_sgm.depth")
+
     app.show_controls(log_iterator, dfc)
     app.exec_()
 

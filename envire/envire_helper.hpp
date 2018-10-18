@@ -91,22 +91,35 @@ struct NoDeleter
     }
 };
 
-void loadURDF(envire::core::EnvireGraph& graph, const std::string& filename,
-              bool load_frames=false, bool load_joints=false, bool load_visuals=false)
-{
-    std::shared_ptr<envire::core::EnvireGraph> ptr(&graph, NoDeleter<envire::core::EnvireGraph>());
-    std::shared_ptr<urdf::ModelInterface> model = urdf::parseURDFFile(filename);
+class EnvireURDFModel{
 
-    // TODO
-    // everything is attached to iniPose, which is initialized with the current
-    // timestamp, we should at least allow the user to do something else
-    envire::urdf::GraphLoader loader(ptr);
-    loader.loadStructure(*model);
-    if(load_frames)
-        loader.loadFrames(*model);
-    if(load_joints)
-        loader.loadJoints(*model);
-    if(load_visuals)
-        loader.loadVisuals(*model, filename);
-}
+    public:
+    void loadURDF(envire::core::EnvireGraph& graph, const std::string& filename,
+                bool load_frames=false, bool load_joints=false, bool load_visuals=false)
+    {
+        std::shared_ptr<envire::core::EnvireGraph> ptr(&graph, NoDeleter<envire::core::EnvireGraph>());
+        model = urdf::parseURDFFile(filename);
+
+        // TODO
+        // everything is attached to iniPose, which is initialized with the current
+        // timestamp, we should at least allow the user to do something else
+        loader = std::shared_ptr<envire::urdf::GraphLoader>(new envire::urdf::GraphLoader(ptr));
+        loader->loadStructure(*model);
+        if(load_frames)
+            loader->loadFrames(*model);
+        if(load_joints)
+            loader->loadJoints(*model);
+        if(load_visuals)
+            loader->loadVisuals(*model, filename);
+    }
+
+    bool setJointAngle(const std::string &jointName, const float &value){
+        return loader->setJointValue(*model, jointName, value);
+    }
+
+    private:
+        //std::shared_ptr<envire::core::EnvireGraph> enviregraph;
+        std::shared_ptr<urdf::ModelInterface> model;
+        std::shared_ptr<envire::urdf::GraphLoader> loader;
+};
 

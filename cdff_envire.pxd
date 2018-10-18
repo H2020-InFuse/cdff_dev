@@ -32,6 +32,8 @@ cdef class GenericItem:
     cdef _cdff_envire.GenericItem* thisptr
     cdef bool filled
 
+cdef class EnvireURDFModel:
+    cdef _cdff_envire.EnvireURDFModel* thisptr
 
 cdef class EnvireGraph:
     cdef _cdff_envire.EnvireGraph* thisptr
