@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from cdff_dev import logloader, envirevisualization, dataflowcontrol, transformer
 import cdff_types
@@ -6,8 +7,9 @@ import cdff_envire
 import pytransform.rotations as pr
 
 # TODO configuration
-dgps_logfile = "logs/Sherpa/dgps_Logger.log"
-mcs_logfile = "logs/Sherpa/sherpa_tt_mcs_Logger.log"
+log_folder = "logs/Sherpa"
+dgps_logfile = "dgps.msg"
+mcs_logfile = "sherpa_tt_mcs.msg"
 utm_zone = 32  # TODO Utah 12, Germany 32, Morocco 29?
 utm_north = True
 
@@ -173,27 +175,15 @@ class Trajectory:
                 self.output[d] = self.pos[d]
 
 
-def convert_logs():
-    # TODO convert from pocolog to msgpack
-    # TODO find number of samples per stream
-    # TODO chunk logfiles
-
-    # logs/Sherpa/dgps.msg
-    # - /dgps.imu_pose
-    # logs/Sherpa/sherpa_tt_mcs.msg
-    # - /mcs_sensor_processing.rigid_body_state_out
-
-    #logfiles = [["logs/20180829_DFKI_Sherpa/dgps.msg"], ["logs/20180829_DFKI_Sherpa/sherpa_tt_mcs.msg"]]
-    logfiles = [["logs/Sherpa/dgps.msg"], ["logs/Sherpa/sherpa_tt_mcs.msg"]]
-    stream_names = [
-       "/dgps.imu_pose",
-       "/mcs_sensor_processing.rigid_body_state_out",
-    ]
-
-    return logfiles, stream_names
+def replay_logfile_join(log_folder, logfiles):  # shortcut
+    return logloader.replay_join([
+        logloader.replay_logfile(
+            os.path.join(log_folder, filename), stream_name)
+        for filename, stream_name in logfiles
+    ])
 
 
-def configure(logs, stream_names):
+def configure():
     nodes = {
         "transformer": Transformer(),
         "evaluation": EvaluationDFN(),
@@ -233,15 +223,17 @@ def configure(logs, stream_names):
         #"bundle-sherpa_tt/data/sherpa_tt.urdf"  # TODO uncomment
     ]
 
-    log_iterator = logloader.replay_files(logs, stream_names, verbose=0)
+    log_iterator = replay_logfile_join(
+        log_folder,
+        [(mcs_logfile, ["/mcs_sensor_processing.rigid_body_state_out"]),
+         (dgps_logfile, ["/dgps.imu_pose"])]
+    )
 
     app = envirevisualization.EnvireVisualizerApplication(
         frames, urdf_files, center_frame="origin")
     dfc = dataflowcontrol.DataFlowControl(
         nodes, connections, periods, real_time=False)
     dfc.setup()
-
-    # TODO visualize covariance?
 
     app.show_controls(log_iterator, dfc)
 
@@ -266,8 +258,7 @@ def evaluate(dfc):
 
 
 def main():
-    logs, stream_names = convert_logs()
-    app, dfc = configure(logs, stream_names)
+    app, dfc = configure()
 
     from cdff_dev.diagrams import save_graph_png
     save_graph_png(dfc, "wheel_odometry.png")
