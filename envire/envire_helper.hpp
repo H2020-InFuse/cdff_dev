@@ -118,7 +118,6 @@ class EnvireURDFModel{
     }
 
     private:
-        //std::shared_ptr<envire::core::EnvireGraph> enviregraph;
         std::shared_ptr<urdf::ModelInterface> model;
         std::shared_ptr<envire::urdf::GraphLoader> loader;
 };

@@ -384,21 +384,26 @@ cdef class GenericItem:
             raise RuntimeError("Item does not have any content.")
         self.thisptr.setTime(content.thisptr, timestamp)
 
-cdef class EnvireURDFModel:
 
+cdef class EnvireURDFModel:
     def __cinit__(self):
         self.thisptr = new _cdff_envire.EnvireURDFModel()
 
     def __dealloc__(self):
         del self.thisptr
 
-    def load_urdf(self, EnvireGraph graph, str filename, bool load_frames=False, bool load_joints=False, bool load_visuals=False):
+    def load_urdf(self, EnvireGraph graph, str filename,
+                  bool load_frames=False, bool load_joints=False,
+                  bool load_visuals=False):
         if not os.path.exists(filename):
             raise IOError("File '%s' does not exist." % filename)
-        self.thisptr.loadURDF(deref(graph.thisptr), filename.encode(), load_frames, load_joints, load_visuals)
+        self.thisptr.loadURDF(
+            deref(graph.thisptr), filename.encode(), load_frames, load_joints,
+            load_visuals)
 
     def set_joint_angle(self, str jointName, float value):
         return self.thisptr.setJointAngle(jointName.encode(),value)
+
 
 cdef class EnvireGraph:
     def __cinit__(self):
@@ -475,6 +480,7 @@ cdef class EnvireGraph:
     def get_item_count(self, str frame, GenericType item):
         return _cdff_envire.getItemCount(
             deref(self.thisptr), frame.encode(), item.thisptr)
+
 
 cdef class EnvireVisualizer:
     cdef _cdff_envire.EnvireVisualizerInterface* thisptr
