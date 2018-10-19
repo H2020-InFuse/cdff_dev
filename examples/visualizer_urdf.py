@@ -1,14 +1,28 @@
 import sys
+import time
 from PyQt4.QtGui import QApplication
+from cdff_dev.qtgui import Worker
 import cdff_envire
-import _thread, time
 
 
-def set_value(model):
-    val = 0
-    while True:
-        model.set_joint_angle("gamma_rear_left", val)
-        val += 1
+
+class Step:
+    def __init__(self, model):
+        self.model = model
+        self.angle = 0.0
+        self.positive = True
+
+    def __call__(self):
+        self.model.set_joint_angle("gamma_rear_left", self.angle)
+        self.model.set_joint_angle("phi_rear_left", self.angle)
+        if self.positive:
+            self.angle += 1
+            if self.angle >= 90:
+                self.positive = False
+        else:
+            self.angle -= 1
+            if self.angle <= 0:
+                self.positive = True
         time.sleep(1)
 
 
@@ -24,10 +38,10 @@ def main():
 
     vis = cdff_envire.EnvireVisualizer()
 
-    res =  urdfModel.set_joint_angle("phi_rear_left", 1)
-    res =  urdfModel.set_joint_angle("gamma_rear_left", 90)
-
-    _thread.start_new_thread(set_value, (urdfModel,))
+    worker = Worker(Step, urdfModel)
+    worker.started.connect(worker.play)
+    worker.start()
+    app.aboutToQuit.connect(worker.quit)
 
     vis.display_graph(graph, "body")
     vis.show()
