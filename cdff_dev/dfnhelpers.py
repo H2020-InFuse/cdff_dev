@@ -99,15 +99,33 @@ class MergeFramePairDFN:
             np.array(metadata["intrinsic"]["cameraMatrix"]))
         frame.intrinsic.camera_model = metadata["intrinsic"]["cameraModel"]
 
-        frame.extrinsic.pose_fixed_frame_robot_frame.data.translation.fromarray(
-            np.zeros(3))
-        frame.extrinsic.pose_fixed_frame_robot_frame.data.orientation.fromarray(
-            np.array([0, 0, 0, 1], dtype=np.float))
+        if ("extrinsic" in metadata
+                and "pose_fixed_frame_robot_frame" in metadata["extrinsic"]):
+            pose_fixed_frame_robot_frame = \
+                metadata["extrinsic"]["pose_fixed_frame_robot_frame"]
+            frame.extrinsic.pose_fixed_frame_robot_frame.data.translation.fromarray(
+                pose_fixed_frame_robot_frame["data"]["translation"])
+            frame.extrinsic.pose_fixed_frame_robot_frame.data.orientation.fromarray(
+                pose_fixed_frame_robot_frame["data"]["orientation"])
+        else:
+            frame.extrinsic.pose_fixed_frame_robot_frame.data.translation.fromarray(
+                np.zeros(3))
+            frame.extrinsic.pose_fixed_frame_robot_frame.data.orientation.fromarray(
+                np.array([0, 0, 0, 1], dtype=np.float))
 
-        frame.extrinsic.pose_robot_frame_sensor_frame.data.translation.fromarray(
-            np.zeros(3))
-        frame.extrinsic.pose_robot_frame_sensor_frame.data.orientation.fromarray(
-            np.array([0, 0, 0, 1], dtype=np.float))
+        if ("extrinsic" in metadata
+                and "pose_robot_frame_sensor_frame" in metadata["extrinsic"]):
+            pose_robot_frame_sensor_frame = \
+                metadata["extrinsic"]["pose_robot_frame_sensor_frame"]
+            frame.extrinsic.pose_robot_frame_sensor_frame.data.translation.fromarray(
+                pose_robot_frame_sensor_frame["data"]["translation"])
+            frame.extrinsic.pose_robot_frame_sensor_frame.data.orientation.fromarray(
+                pose_robot_frame_sensor_frame["data"]["orientation"])
+        else:
+            frame.extrinsic.pose_robot_frame_sensor_frame.data.translation.fromarray(
+                np.zeros(3))
+            frame.extrinsic.pose_robot_frame_sensor_frame.data.orientation.fromarray(
+                np.array([0, 0, 0, 1], dtype=np.float))
 
     def pairOutput(self):
         return self.pair
