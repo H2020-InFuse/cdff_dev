@@ -36,8 +36,6 @@ def main():
         "/hcru1/pt_stereo_sgm/depth": "/hcru1/pt_stereo_sgm.depth",
     }
 
-    # TODO show frames in envire visualizer
-
     log_iterator = logloader.replay_logfile_sequence(
         logloader.group_pattern(prefix_path, "_0*.msg"),
         ["/hcru1/pt_stereo_rect/left/image",
