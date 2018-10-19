@@ -13,17 +13,21 @@ class Step:
         self.positive = True
 
     def __call__(self):
-        self.model.set_joint_angle("gamma_rear_left", self.angle)
-        self.model.set_joint_angle("phi_rear_left", self.angle)
+        self.model.set_joint_angle("beta1_fake_rear_left", self.angle)
+        self.model.set_joint_angle("beta1_fake_rear_right", self.angle)
+        self.model.set_joint_angle("beta1_fake_front_left", self.angle)
+        self.model.set_joint_angle("beta1_fake_front_right", self.angle)
+
         if self.positive:
-            self.angle += 1
-            if self.angle >= 90:
+            self.angle += 0.01
+            if self.angle >= 1.57:
                 self.positive = False
         else:
-            self.angle -= 1
-            if self.angle <= 0:
+            self.angle -= 0.01
+            if self.angle <= -1.57:
                 self.positive = True
-        time.sleep(1)
+
+        time.sleep(0.001)
 
 
 def main():
