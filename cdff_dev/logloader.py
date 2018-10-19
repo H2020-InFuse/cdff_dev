@@ -574,7 +574,7 @@ def replay_join(log_iterators):
 
 
 def replay_logfile_sequence(filenames, stream_names):
-    """Generator that joins multiple log iterators.
+    """Generator that joins multiple logfiles sequentially.
 
     Parameters
     ----------
@@ -603,7 +603,7 @@ def replay_logfile_sequence(filenames, stream_names):
 
 
 def replay_sequence(log_iterators):
-    """Generator that joins multiple log iterators.
+    """Generator that joins multiple log iterators sequentially.
 
     Parameters
     ----------
