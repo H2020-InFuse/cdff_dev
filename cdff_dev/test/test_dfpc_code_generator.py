@@ -40,7 +40,7 @@ FULLDFPC = {
             "dfns": [
                 {
                     "dfn_id": "dummyDFN1",
-                    "type": "DummyDFN",
+                    "name": "DummyDFN",
                     "implementation": "MyDummyDFN",
                     "activation": {
                         "type": "input_triggered",
@@ -49,7 +49,7 @@ FULLDFPC = {
                 },
                 {
                     "dfn_id": "dummyDFN2",
-                    "type": "DummyDFN",
+                    "name": "DummyDFN",
                     "implementation": "MyDummyDFN",
                     "activation": {
                         "type": "input_triggered",
@@ -101,25 +101,27 @@ def test_validate_missing_name():
 
 def test_validate_missing_doc():
     dfpc = {"name": "Slam"}
-    validated_dfpc = validate_dfpc(dfpc)
-    assert_in("doc", validated_dfpc)
+    assert_raises_regex(
+        DFPCDescriptionException, "Entry 'doc' for DFPC is missing.",
+        validate_dfpc, dfpc)
 
 
 def test_validate_adds_empty_ports():
-    dfpc = {"name": "Slam"}
+    dfpc = {"name": "Slam", "doc": ""}
     validated_dfpc = validate_dfpc(dfpc)
     assert_in("input_ports", validated_dfpc)
     assert_in("output_ports", validated_dfpc)
 
 
 def test_validate_missing_operations():
-    dfpc = {"name": "Dummy"}
+    dfpc = {"name": "Dummy", "doc": ""}
     validated_dfpc = validate_dfpc(dfpc)
     assert_in("operations", validated_dfpc)
 
 
 def test_validate_missing_operation_name():
     dfpc = {"name": "Dummy",
+            "doc": "",
             "operations": [
                 {"inputs": [
                      {"name": "bla",
@@ -135,8 +137,10 @@ def test_validate_missing_operation_name():
 
 def test_validate_missing_output_type_is_void():
     dfpc = {"name": "Dummy",
+            "doc": "",
             "operations": [
                 {"name": "dummy",
+                 "doc": "",
                  "inputs": [
                      {"name": "bla",
                       "type": "double"}
@@ -148,10 +152,25 @@ def test_validate_missing_output_type_is_void():
     assert_equal(validated_dfpc["operations"][0]["output_type"], "void")
 
 
-def test_validate_missing_input_name():
+def test_validate_missing_operation_doc():
     dfpc = {"name": "Dummy",
+            "doc": "",
             "operations": [
                 {"name": "dummy",
+                 "output_type": "double"
+                }
+            ]}
+    assert_raises_regex(
+        DFPCDescriptionException, "Operation has no documentation",
+        validate_dfpc, dfpc)
+
+
+def test_validate_missing_input_name():
+    dfpc = {"name": "Dummy",
+            "doc": "",
+            "operations": [
+                {"name": "dummy",
+                 "doc": "",
                  "inputs": [
                      {"type": "double"}
                  ]
@@ -164,8 +183,10 @@ def test_validate_missing_input_name():
 
 def test_validate_missing_input_type():
     dfpc = {"name": "Dummy",
+            "doc": "",
             "operations": [
                 {"name": "dummy",
+                 "doc": "",
                  "inputs": [
                      {"name": "bla"}
                  ]
@@ -177,7 +198,7 @@ def test_validate_missing_input_type():
 
 
 def test_validate_missing_implementation_name():
-    dfpc = {"name": "Dummy", "implementations": [{}]}
+    dfpc = {"name": "Dummy", "doc": "", "implementations": [{}]}
     assert_raises_regex(
         DFPCDescriptionException,
         "Implementation has no name", validate_dfpc, dfpc)
@@ -186,6 +207,7 @@ def test_validate_missing_implementation_name():
 def test_validate_missing_dfn_list():
     dfpc = {
         "name": "Dummy",
+        "doc": "",
         "implementations": [
             {"name": "DummyImpl"}
         ]
@@ -197,6 +219,7 @@ def test_validate_missing_dfn_list():
 def test_validate_missing_dfn_id():
     dfpc = {
         "name": "Dummy",
+        "doc": "",
         "implementations": [
             {"name": "DummyImpl",
              "dfns": [{}]}
@@ -209,6 +232,7 @@ def test_validate_missing_dfn_id():
 def test_validate_missing_dfn_type():
     dfpc = {
         "name": "Dummy",
+        "doc": "",
         "implementations": [
             {"name": "DummyImpl",
              "dfns": [
@@ -219,19 +243,20 @@ def test_validate_missing_dfn_type():
         ]
     }
     assert_raises_regex(
-        DFPCDescriptionException, "Type of DFN 'dummy' is missing",
+        DFPCDescriptionException, "Name of DFN 'dummy' is missing",
         validate_dfpc, dfpc)
 
 
 def test_validate_missing_dfn_implementation():
     dfpc = {
         "name": "Dummy",
+        "doc": "",
         "implementations": [
             {"name": "DummyImpl",
              "dfns": [
                  {
                      "dfn_id": "dummy",
-                     "type": "DummyDFN"
+                     "name": "DummyDFN"
                  }
              ]}
         ]
@@ -241,34 +266,16 @@ def test_validate_missing_dfn_implementation():
         validate_dfpc, dfpc)
 
 
-def test_validate_missing_dfn_activation():
-    dfpc = {
-        "name": "Dummy",
-        "implementations": [
-            {"name": "DummyImpl",
-             "dfns": [
-                 {
-                     "dfn_id": "dummy",
-                     "type": "DummyDFN",
-                     "implementation": "A"
-                 }
-             ]}
-        ]
-    }
-    assert_raises_regex(
-        DFPCDescriptionException, "Activation of DFN 'dummy' is missing",
-        validate_dfpc, dfpc)
-
-
 def test_validate_missing_dfn_activation_type():
     dfpc = {
         "name": "Dummy",
+        "doc": "",
         "implementations": [
             {"name": "DummyImpl",
              "dfns": [
                  {
                      "dfn_id": "dummy",
-                     "type": "DummyDFN",
+                     "name": "DummyDFN",
                      "implementation": "A",
                      "activation": {
                          "value": "bla"
@@ -285,12 +292,13 @@ def test_validate_missing_dfn_activation_type():
 def test_validate_unknown_dfn_activation_type():
     dfpc = {
         "name": "Dummy",
+        "doc": "",
         "implementations": [
             {"name": "DummyImpl",
              "dfns": [
                  {
                      "dfn_id": "dummy",
-                     "type": "DummyDFN",
+                     "name": "DummyDFN",
                      "implementation": "A",
                      "activation": {
                          "type": "murks",
@@ -310,12 +318,13 @@ def test_validate_unknown_dfn_activation_type():
 def test_validate_missing_dfn_activation_value():
     dfpc = {
         "name": "Dummy",
+        "doc": "",
         "implementations": [
             {"name": "DummyImpl",
              "dfns": [
                  {
                      "dfn_id": "dummy",
-                     "type": "DummyDFN",
+                     "name": "DummyDFN",
                      "implementation": "A",
                      "activation": {
                          "type": "input_triggered"
@@ -332,6 +341,7 @@ def test_validate_missing_dfn_activation_value():
 def test_validate_missing_dfn_input_connections():
     dfpc = {
         "name": "Dummy",
+        "doc": "",
         "implementations": [{"name": "DummyImpl"}]
     }
     validated_dfpc = validate_dfpc(dfpc)
@@ -374,6 +384,7 @@ def test_validate_missing_port_in_input_connections():
 def test_validate_missing_dfn_output_connections():
     dfpc = {
         "name": "Dummy",
+        "doc": "",
         "implementations": [{"name": "DummyImpl"}]
     }
     validated_dfpc = validate_dfpc(dfpc)

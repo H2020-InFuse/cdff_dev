@@ -95,7 +95,7 @@ def validate_dfpc(dfpc):
 
 def _validate_doc(desc):
     if "doc" not in desc:
-        desc["doc"] = "TODO add documentation"
+        raise DFPCDescriptionException("Entry 'doc' for DFPC is missing.")
 
 
 def _validate_ports(desc):
@@ -110,6 +110,9 @@ def _validate_ports(desc):
             raise PortDescriptionException("Port has no name: %s" % port)
         if "type" not in port:
             raise PortDescriptionException("Port has no type: %s" % port)
+        if "doc" not in port:
+            raise PortDescriptionException(
+                "Port has no documentation: %s" % port)
 
 
 def _validate_dfpc_operations(desc):
@@ -120,6 +123,9 @@ def _validate_dfpc_operations(desc):
     for op in desc["operations"]:
         if "name" not in op:
             raise DFPCDescriptionException("Operation has no name: %s" % op)
+        if "doc" not in op:
+            raise DFPCDescriptionException(
+                "Operation has no documentation: %s" % op)
         if "output_type" not in op:
             op["output_type"] = "void"
 
@@ -161,16 +167,14 @@ def _validate_dfns(implementation):
     for dfn in implementation["dfns"]:
         if "dfn_id" not in dfn:
             raise DFPCDescriptionException("dfn_id is missing")
-        if "type" not in dfn:
+        if "name" not in dfn:
             raise DFPCDescriptionException(
-                "Type of DFN '%s' is missing" % dfn["dfn_id"])
+                "Name of DFN '%s' is missing" % dfn["dfn_id"])
         if "implementation" not in dfn:
             raise DFPCDescriptionException(
                 "Implementation of DFN '%s' is missing" % dfn["dfn_id"])
-        if "activation" not in dfn:
-            raise DFPCDescriptionException(
-                "Activation of DFN '%s' is missing" % dfn["dfn_id"])
-        _validate_dfn_activation(dfn["activation"], dfn["dfn_id"])
+        if "activation" in dfn:
+            _validate_dfn_activation(dfn["activation"], dfn["dfn_id"])
         dfn_ids.append(dfn["dfn_id"])
     return dfn_ids
 
