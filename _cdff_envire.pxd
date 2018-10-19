@@ -165,8 +165,11 @@ cdef extern from "envire_helper.hpp":
         EnvireGraph& graph, const string& frame, _ItemData* contentPtr) except +
     unsigned getItemCount[_ItemData](
         EnvireGraph& graph, const string& frame, _ItemData* contentPtr) except +
-    void loadURDF(EnvireGraph& graph, const string& filename, bool load_frames,
-                  bool load_joints, bool load_visuals) except +
+    cdef cppclass EnvireURDFModel:
+        void loadURDF(EnvireGraph& graph, const string& filename,
+                      bool load_frames, bool load_joints,
+                      bool load_visuals) except +
+        bool setJointAngle(const string &jointName, const float &value) except +
 
 
 # EnviRe visualizer
