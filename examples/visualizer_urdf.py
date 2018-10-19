@@ -28,8 +28,8 @@ class Step:
 
 def main():
     graph = cdff_envire.EnvireGraph()
-    urdfModel= cdff_envire.EnvireURDFModel()
-    urdfModel.load_urdf(
+    urdf_model = cdff_envire.EnvireURDFModel()
+    urdf_model.load_urdf(
         graph,
         "test/test_data/urdf_sherpa_meshes_LQ/sherpa_tt.urdf",
         load_visuals=True)
@@ -38,7 +38,7 @@ def main():
 
     vis = cdff_envire.EnvireVisualizer()
 
-    worker = Worker(Step, urdfModel)
+    worker = Worker(Step, urdf_model)
     worker.started.connect(worker.play)
     worker.start()
     app.aboutToQuit.connect(worker.quit)

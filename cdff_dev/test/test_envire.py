@@ -358,14 +358,16 @@ def test_envire_graph_add_item():
 
 def test_envire_urdf_file_does_not_exist():
     g = cdff_envire.EnvireGraph()
+    urdf_model = cdff_envire.EnvireURDFModel()
     assert_raises_regexp(
-        IOError, "File .* does not exist", cdff_envire.load_urdf,
+        IOError, "File .* does not exist", urdf_model.load_urdf,
         g, "does_not_exist.urdf")
 
 
 def test_envire_urdf_load():
     g = cdff_envire.EnvireGraph()
-    cdff_envire.load_urdf(g, "test/test_data/model.urdf")
+    urdf_model = cdff_envire.EnvireURDFModel()
+    urdf_model.load_urdf(g, "test/test_data/model.urdf")
     assert_true(g.contains_frame("body"))
     assert_true(g.contains_frame("lower_dynamixel"))
     assert_true(g.contains_edge("body", "lower_dynamixel"))
@@ -373,7 +375,8 @@ def test_envire_urdf_load():
 
 def test_envire_load_meshes():
     g = cdff_envire.EnvireGraph()
-    cdff_envire.load_urdf(
+    urdf_model = cdff_envire.EnvireURDFModel()
+    urdf_model.load_urdf(
         g, "test/test_data/urdf_sherpa_meshes_LQ/sherpa_tt.urdf",
         load_visuals=True)
     assert_equal(g.num_vertices(), 45)
