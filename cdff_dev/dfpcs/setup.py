@@ -49,6 +49,7 @@ def configuration(parent_package='', top_path=None):
     autoproj_available = check_autoproj()
     if autoproj_available:
         make_reconstruction3d(config, cdffpath, extra_compile_args)
+        make_pointcloudmodellocalisation(config, cdffpath, extra_compile_args)
 
     return config
 
@@ -255,6 +256,56 @@ def make_reconstruction3d(config, cdffpath, extra_compile_args):
         # make sure that libraries used in other libraries are linked last!
         # for example: an implementation must be linked before its interface
         libraries=dfpc_libraries + dep_libs,
+        define_macros=[("NDEBUG",)],
+        extra_compile_args=extra_compile_args
+    )
+
+
+def make_pointcloudmodellocalisation(config, cdffpath, extra_compile_args):
+    libraries = ["opencv", "eigen3", "yaml-cpp"]
+    libraries += list(map(
+        lambda lib: lib + "-1.8",
+        ["pcl_common", "pcl_features", "pcl_search", "pcl_filters",
+         "pcl_visualization", "pcl_io", "pcl_ml", "pcl_octree",
+         "pcl_outofcore", "pcl_kdtree", "pcl_tracking", "pcl_stereo",
+         "pcl_recognition", "pcl_registration", "pcl_people", "pcl_keypoints",
+         "pcl_surface", "pcl_segmentation", "pcl_sample_consensus",
+         "pcl_stereo"]))
+
+    # use pkg-config for external dependencies
+    dep_inc_dirs = get_include_dirs(libraries)
+    dep_lib_dirs = get_library_dirs(libraries)
+    dep_libs = get_libraries(libraries)
+
+    ceres_info = find_ceres()
+    dep_inc_dirs += ceres_info["include_dirs"]
+    dep_lib_dirs += ceres_info["library_dirs"]
+    dep_libs += ceres_info["libraries"]
+
+    boost_system_info = find_boost_system()
+    dep_inc_dirs += boost_system_info["include_dirs"]
+    dep_lib_dirs += boost_system_info["library_dirs"]
+    dep_libs += boost_system_info["libraries"]
+
+    dfpc_libraries = [
+        "dfpc_implementation_features_matching_3d",
+    ]
+    dfpc_deps = find_dependencies_of(
+        dfpc_libraries, cdffpath, blacklist=("pcl", "vtk", "verdict"))
+
+    config.add_extension(
+        "pointcloudmodellocalisation",
+        sources=["pointcloudmodellocalisation.pyx"],
+        include_dirs=[
+            os.path.join(cdffpath, "DFPCs", "PointCloudModelLocalisation"),
+        ] + DEFAULT_INCLUDE_DIRS + dep_inc_dirs,
+        library_dirs=[
+            # TODO move to installation folder:
+            os.path.join(cdffpath, "build", "DFPCs", "PointCloudModelLocalisation"),
+        ] + DEFAULT_LIBRARY_DIRS + dep_lib_dirs,
+        # make sure that libraries used in other libraries are linked last!
+        # for example: an implementation must be linked before its interface
+        libraries=dfpc_libraries + dfpc_deps + dep_libs,
         define_macros=[("NDEBUG",)],
         extra_compile_args=extra_compile_args
     )
