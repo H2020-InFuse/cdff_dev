@@ -199,6 +199,8 @@ def test_pointcloud_to_dict():
     pc.data.colors[0, 0] = 255.0
     pc.data.colors[0, 1] = 255.0
     pc.data.colors[0, 2] = 255.0
+    pc.data.intensity.resize(100)
+    pc.data.intensity[0] = 2
 
     d = typetodict.convert_to_dict(pc)
     assert_equal(d["metadata"]["time_stamp"]["microseconds"], 10)
@@ -211,4 +213,12 @@ def test_pointcloud_to_dict():
     assert_equal(d["metadata"]["is_ordered"], False)
     assert_equal(d["metadata"]["has_fixed_transform"], True)
     assert_equal(len(d["data"]["points"]), 100)
+    assert_equal(d["data"]["points"][0][0], 1.0)
+    assert_equal(d["data"]["points"][0][1], 2.0)
+    assert_equal(d["data"]["points"][0][2], 3.0)
     assert_equal(len(d["data"]["colors"]), 100)
+    assert_equal(d["data"]["colors"][0][0], 255.0)
+    assert_equal(d["data"]["colors"][0][1], 255.0)
+    assert_equal(d["data"]["colors"][0][2], 255.0)
+    assert_equal(len(d["data"]["intensity"]), 100)
+    assert_equal(d["data"]["intensity"][0], 2)
