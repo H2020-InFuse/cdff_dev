@@ -812,9 +812,6 @@ def test_transform_with_covariance():
 def test_create_pointcloud():
     pcl = cdff_types.Pointcloud()
 
-    pcl.metadata.time_stamp.microseconds = 0
-    assert_equal(pcl.metadata.time_stamp.microseconds, 0)
-
     assert_equal(pcl.metadata.msg_version, 1)
     pcl.metadata.msg_version = 5
     assert_equal(pcl.metadata.msg_version, 5)

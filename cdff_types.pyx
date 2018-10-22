@@ -776,12 +776,16 @@ cdef class PointCloud_Data_pointsReference:
     def __dealloc__(self):
         pass
 
-    def __getitem__(self, int i):
-        cdef Vector3d v = Vector3d()
-        del v.thisptr
-        v.delete_thisptr = False
-        v.thisptr = &(self.thisptr.arr[i])
-        return v
+    def __getitem__(self, tuple indices):
+        cdef int i, j
+        i, j = indices
+
+        if i < 0 or i >= self.thisptr.nCount:
+            raise KeyError("index out of range %d" % i)
+        if j < 0 or j >= 3:
+            raise KeyError("index out of range %d" % j)
+
+        return self.thisptr.arr[i].arr[j]
 
     def __setitem__(self, tuple indices, double v):
         cdef int i, j, k
@@ -795,6 +799,10 @@ cdef class PointCloud_Data_pointsReference:
         if j < 0 or j >= 3:
             raise KeyError("index out of range %d" % j)
         self.thisptr.arr[i].arr[j] = v
+
+    @property
+    def shape(self):
+        return (self.thisptr.nCount, 3)
 
     def resize(self, int size):
         self.thisptr.nCount = size
@@ -810,12 +818,16 @@ cdef class PointCloud_Data_colorsReference:
     def __dealloc__(self):
         pass
 
-    def __getitem__(self, int i):
-        cdef Vector3d v = Vector3d()
-        del v.thisptr
-        v.delete_thisptr = False
-        v.thisptr = &(self.thisptr.arr[i])
-        return v
+    def __getitem__(self, tuple indices):
+        cdef int i, j
+        i, j = indices
+
+        if i < 0 or i >= self.thisptr.nCount:
+            raise KeyError("index out of range %d" % i)
+        if j < 0 or j >= 3:
+            raise KeyError("index out of range %d" % j)
+
+        return self.thisptr.arr[i].arr[j]
 
     def __setitem__(self, tuple indices, double v):
         cdef int i, j, k
@@ -829,6 +841,10 @@ cdef class PointCloud_Data_colorsReference:
         if j < 0 or j >= 3:
             raise KeyError("index out of range %d" % j)
         self.thisptr.arr[i].arr[j] = v
+
+    @property
+    def shape(self):
+        return (self.thisptr.nCount, 3)
 
     def resize(self, int size):
         self.thisptr.nCount = size
@@ -854,6 +870,9 @@ cdef class PointCloud_Data_intensityReference:
         if self.thisptr.nCount <= i:
             self.thisptr.nCount = i + 1
         self.thisptr.arr[i] = v
+
+    def __len__(self):
+        return self.thisptr.nCount
 
     def resize(self, int size):
         self.thisptr.nCount = size

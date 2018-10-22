@@ -44,7 +44,7 @@ def _convert_dict(obj):
     fields = _get_fieldnames(obj)
     for f in fields:
         value = getattr(obj, f)
-        if type(value) not in [float, int, str]:
+        if type(value) not in [float, int, str, bool]:
             data[f] = convert_to_dict(value)
         else:
             data[f] = value

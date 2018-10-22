@@ -106,7 +106,7 @@ def test_matrix3_to_dict():
     assert_equal(d[2][2], 9.0)
 
 
-def test_matrix3_to_dict():
+def test_matrix6_to_dict():
     m = cdff_types.Matrix6d()
     m.fromarray(np.eye(6))
     d = typetodict.convert_to_dict(m)
@@ -148,7 +148,7 @@ def test_pose_to_dict():
     assert_equal(d["orient"][3], 1.0)
 
 
-def test_transform_with_covariance():
+def test_transform_with_covariance_to_dict():
     t = cdff_types.TransformWithCovariance()
     t.metadata.producer_id = "A"
     t.metadata.parent_frame_id = "B"
@@ -174,3 +174,41 @@ def test_transform_with_covariance():
     assert_equal(d["data"]["cov"][0][0], 1.0)
     assert_equal(d["data"]["cov"][1][1], 1.0)
     assert_equal(d["data"]["cov"][5][5], 1.0)
+
+
+def test_pointcloud_to_dict():
+    pc = cdff_types.Pointcloud()
+    pc.metadata.time_stamp.microseconds = 10
+    pc.metadata.msg_version = 5
+    pc.metadata.sensor_id = "sensor"
+    pc.metadata.frame_id = "frame"
+    pc.metadata.height = 20
+    pc.metadata.width = 30
+    pc.metadata.is_registered = True
+    pc.metadata.is_ordered = False
+    pc.metadata.has_fixed_transform = True
+    pc.metadata.pose_robot_frame_sensor_frame.data.translation.fromarray(
+        np.array([1.0, 2.0, 3.0]))
+    pc.metadata.pose_fixed_frame_robot_frame.data.translation.fromarray(
+        np.array([1.0, 2.0, 3.0]))
+    pc.data.points.resize(100)
+    pc.data.points[0, 0] = 1.0
+    pc.data.points[0, 1] = 2.0
+    pc.data.points[0, 2] = 3.0
+    pc.data.colors.resize(100)
+    pc.data.colors[0, 0] = 255.0
+    pc.data.colors[0, 1] = 255.0
+    pc.data.colors[0, 2] = 255.0
+
+    d = typetodict.convert_to_dict(pc)
+    assert_equal(d["metadata"]["time_stamp"]["microseconds"], 10)
+    assert_equal(d["metadata"]["msg_version"], 5)
+    assert_equal(d["metadata"]["sensor_id"], "sensor")
+    assert_equal(d["metadata"]["frame_id"], "frame")
+    assert_equal(d["metadata"]["height"], 20)
+    assert_equal(d["metadata"]["width"], 30)
+    assert_equal(d["metadata"]["is_registered"], True)
+    assert_equal(d["metadata"]["is_ordered"], False)
+    assert_equal(d["metadata"]["has_fixed_transform"], True)
+    assert_equal(len(d["data"]["points"]), 100)
+    assert_equal(len(d["data"]["colors"]), 100)
