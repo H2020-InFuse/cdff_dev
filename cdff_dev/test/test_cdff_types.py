@@ -419,7 +419,7 @@ def test_matrix2d_str():
     v[0, 1] = 2.0
     v[1, 1] = 3.0
     assert_equal(
-        str(v), "{type: Matrix2d, data: [?]}")
+        str(v), "{type: Matrix2d, data: [[0, 2], [1, 3]]}")
 
 
 def test_matrix2d_get_item():
@@ -853,20 +853,22 @@ def test_create_pointcloud():
         np.array([1.0, 2.0, 3.0]))
 
     pcl.data.points.resize(100)
-    point = pcl.data.points[0]
-    point[0] = 1.0
-    point[1] = 2.0
-    point[2] = 3.0
+    pcl.data.points[0, 0] = 1.0
+    pcl.data.points[0, 1] = 2.0
+    pcl.data.points[0, 2] = 3.0
     assert_equal(pcl.data.points.size(), 100)
-    assert_array_equal(pcl.data.points[0].toarray(), (1.0, 2.0, 3.0))
+    assert_equal(pcl.data.points[0, 0], 1.0)
+    assert_equal(pcl.data.points[0, 1], 2.0)
+    assert_equal(pcl.data.points[0, 2], 3.0)
 
     pcl.data.colors.resize(100)
-    color = pcl.data.colors[0]
-    color[0] = 255.0
-    color[1] = 255.0
-    color[2] = 255.0
+    pcl.data.colors[0, 0] = 255.0
+    pcl.data.colors[0, 1] = 255.0
+    pcl.data.colors[0, 2] = 255.0
     assert_equal(pcl.data.colors.size(), 100)
-    assert_array_equal(pcl.data.colors[0].toarray(), (255.0, 255.0, 255.0))
+    assert_equal(pcl.data.colors[0, 0], 255.0)
+    assert_equal(pcl.data.colors[0, 1], 255.0)
+    assert_equal(pcl.data.colors[0, 2], 255.0)
 
 
 def test_create_laserscan():
