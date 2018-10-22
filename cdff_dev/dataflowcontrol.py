@@ -81,6 +81,7 @@ class DataFlowControl:
         self.verbose = verbose
 
         self.visualizations_ = []
+        self.loggers_ = []
         self.node_statistics_ = None
         self.output_ports_ = None
         self.input_ports_ = None
@@ -120,6 +121,16 @@ class DataFlowControl:
             steps
         """
         self.visualizations_.append(visualization)
+
+    def register_logger(self, logger):
+        """Register visualization.
+
+        Parameters
+        ----------
+        logger : subclass of LoggerBase
+            Logger for results of processing steps
+        """
+        self.loggers_.append(logger)
 
     def register_world_state(self, world_state):
         """Register a world state representation.
@@ -315,6 +326,8 @@ class DataFlowControl:
 
         outputs = self._pull_output(node_name)
         for port_name, sample in outputs.items():
+            for logger in self.loggers_:
+                logger.report_node_output(port_name, sample, timestamp)
             self._push_input(port_name, sample, timestamp)
 
     def _pull_output(self, node_name):
@@ -527,6 +540,24 @@ class TextVisualization(VisualizationBase):
         print("  Timestamp: %s" % timestamp)
         print("  Port: %s" % port_name)
         print("  Sample: %s" % sample)
+
+
+class LoggerBase(metaclass=ABCMeta):
+    @abstractmethod
+    def report_node_output(self, port_name, sample, timestamp):
+        """Report result of processing step to logger.
+
+        Parameters
+        ----------
+        port_name : str
+            Name of an output port or log stream
+
+        sample : object
+            Log sample or result of processing step
+
+        timestamp : int
+            Current replay time
+        """
 
 
 def isdfn(cls, verbose=0):

@@ -1,4 +1,5 @@
 from cdff_dev import dataflowcontrol
+from collections import defaultdict
 from nose.tools import (assert_in, assert_equal, assert_raises_regexp,
                         assert_false, assert_true)
 
@@ -377,3 +378,51 @@ def test_dfc_collects_all_output_ports():
         nodes, connections, trigger_ports=trigger_ports)
     dfc.setup()
     assert_equal(dfc.output_ports_["linear"], {"y", "z"})
+
+
+class Logger(dataflowcontrol.LoggerBase):
+    def __init__(self):
+        self.results = defaultdict(lambda: [])
+
+    def report_node_output(self, port_name, sample, timestamp):
+        self.results[port_name].append((timestamp, sample))
+
+
+def test_output_logging():
+    nodes = {
+        "linear": LinearDFN(),
+        "square": SquareDFN()
+    }
+    periods = {
+        "linear": 0.000001,
+        "square": 0.000001
+    }
+    connections = (
+        ("log.x", "linear.x"),
+        ("linear.y", "square.x"),
+        ("square.y", "result.y")
+    )
+    dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods=periods)
+    dfc.setup()
+    assert_equal(len(dfc.input_ports_), 2)
+    assert_equal(len(dfc.output_ports_), 2)
+    assert_equal(len(dfc.log_ports_), 1)
+    assert_equal(len(dfc.result_ports_), 1)
+    assert_equal(len(dfc.connection_map_), 3)
+
+    log = Logger()
+    dfc.register_logger(log)
+    for i in range(101):
+        dfc.process_sample(timestamp=i, stream_name="log.x", sample=i)
+    dfc.process(timestamp=102)
+    assert_in("linear.y", log.results)
+    assert_in("square.y", log.results)
+    assert_equal(len(log.results), 2)
+    assert_equal(log.results["linear.y"][0][0], 1)
+    assert_equal(log.results["linear.y"][0][1], 1)
+    assert_equal(log.results["square.y"][0][0], 1)
+    assert_equal(log.results["square.y"][0][1], 1)
+    assert_equal(log.results["linear.y"][1][0], 2)
+    assert_equal(log.results["linear.y"][1][1], 3)
+    assert_equal(log.results["square.y"][1][0], 2)
+    assert_equal(log.results["square.y"][1][1], 9)
