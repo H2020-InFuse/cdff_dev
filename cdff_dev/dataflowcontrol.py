@@ -8,6 +8,12 @@ import warnings
 class DataFlowControl:
     """Data flow control for replaying logfiles.
 
+    We will run DFNs and DFCPs in the correct chronological order while
+    replaying log files. You can register visualization instances and / or
+    logger instances to display or output results of DFNs or DFPCs.
+    It is also possible to visualize the connections between log streams,
+    DFN ports, and DFPC ports as a graph.
+
     Parameters
     ----------
     nodes : dict
@@ -45,6 +51,9 @@ class DataFlowControl:
     ----------
     visualizations_ : list
         Registered visualizations.
+
+    loggers_ : list
+        Registered loggers.
 
     node_statistics_ : NodeStatistics
         Store runtime data about nodes that can be used for analysis of the
