@@ -146,3 +146,31 @@ def test_pose_to_dict():
     assert_equal(d["orient"][1], 0.0)
     assert_equal(d["orient"][2], 0.0)
     assert_equal(d["orient"][3], 1.0)
+
+
+def test_transform_with_covariance():
+    t = cdff_types.TransformWithCovariance()
+    t.metadata.producer_id = "A"
+    t.metadata.parent_frame_id = "B"
+    t.metadata.child_frame_id = "C"
+    t.metadata.parent_time.microseconds = 5
+    t.metadata.child_time.microseconds = 6
+    t.data.translation.fromarray(np.arange(3, dtype=np.float))
+    t.data.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
+    t.data.cov.fromarray(np.eye(6))
+    d = typetodict.convert_to_dict(t)
+    assert_equal(d["metadata"]["producer_id"], "A")
+    assert_equal(d["metadata"]["parent_frame_id"], "B")
+    assert_equal(d["metadata"]["child_frame_id"], "C")
+    assert_equal(d["metadata"]["parent_time"]["microseconds"], 5)
+    assert_equal(d["metadata"]["child_time"]["microseconds"], 6)
+    assert_equal(d["data"]["translation"][0], 0.0)
+    assert_equal(d["data"]["translation"][1], 1.0)
+    assert_equal(d["data"]["translation"][2], 2.0)
+    assert_equal(d["data"]["orientation"][0], 0.0)
+    assert_equal(d["data"]["orientation"][1], 0.0)
+    assert_equal(d["data"]["orientation"][2], 0.0)
+    assert_equal(d["data"]["orientation"][3], 1.0)
+    assert_equal(d["data"]["cov"][0][0], 1.0)
+    assert_equal(d["data"]["cov"][1][1], 1.0)
+    assert_equal(d["data"]["cov"][5][5], 1.0)
