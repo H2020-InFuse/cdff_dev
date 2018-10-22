@@ -125,3 +125,24 @@ def test_quaternion_to_dict():
     assert_equal(d[1], 0.0)
     assert_equal(d[2], 0.0)
     assert_equal(d[3], 1.0)
+
+
+def test_pose_to_dict():
+    pose = cdff_types.Pose()
+    pose.pos[0] = 1.0
+    pose.pos[1] = 2.0
+    pose.pos[2] = 3.0
+    pose.orient[0] = 0.0
+    pose.orient[1] = 0.0
+    pose.orient[2] = 0.0
+    pose.orient[3] = 1.0
+    d = typetodict.convert_to_dict(pose)
+    assert_equal(list, type(d["pos"]))
+    assert_equal(d["pos"][0], 1.0)
+    assert_equal(d["pos"][1], 2.0)
+    assert_equal(d["pos"][2], 3.0)
+    assert_equal(list, type(d["orient"]))
+    assert_equal(d["orient"][0], 0.0)
+    assert_equal(d["orient"][1], 0.0)
+    assert_equal(d["orient"][2], 0.0)
+    assert_equal(d["orient"][3], 1.0)

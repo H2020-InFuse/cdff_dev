@@ -8,17 +8,16 @@ def convert_to_dict(obj):
 
     Returns
     -------
-    data : object
+    data : dict or list
         Contains the actual data. Only basic types like list, dict, float,
         str and int are allowed here.
     """
     if hasattr(obj, "shape"):
-        data = _convert_ndarray(obj)
+        return _convert_ndarray(obj)
     elif hasattr(obj, "__len__"):
-        data = _convert_list(obj)
+        return _convert_list(obj)
     else:
-        data = _convert_dict(obj)
-    return data
+        return _convert_dict(obj)
 
 
 def _convert_list(obj):
@@ -44,7 +43,11 @@ def _convert_dict(obj):
     data = {}
     fields = _get_fieldnames(obj)
     for f in fields:
-        data[f] = getattr(obj, f)
+        value = getattr(obj, f)
+        if type(value) not in [float, int, str]:
+            data[f] = convert_to_dict(value)
+        else:
+            data[f] = value
     return data
 
 
