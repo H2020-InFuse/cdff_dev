@@ -1,7 +1,8 @@
 import os
 import glob
 import numpy as np
-from cdff_dev import dataflowcontrol, logloader, path, envirevisualization
+from cdff_dev import (dataflowcontrol, logloader, path, envirevisualization,
+                      loggermsgpack)
 from cdff_dev.dfpcs.reconstruction3d import EstimationFromStereo
 import cdff_envire
 
@@ -50,6 +51,7 @@ def main():
         nodes, connections, trigger_ports=trigger_ports,
         stream_aliases=stream_aliases, verbose=verbose)
     dfc.setup()
+    dfc.register_logger(loggermsgpack.MsgPackLogger("examples/test_output_log"))
 
     app = envirevisualization.EnvireVisualizerApplication(
         frames={

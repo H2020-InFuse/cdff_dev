@@ -233,3 +233,8 @@ def test_frame_conversions():
     obj2 = typefromdict.create_from_dict("Frame", d2)
     assert_equal(str(obj), str(obj2))
     assert_array_equal(obj.array_reference(), obj2.array_reference())
+
+
+def test_bool_to_dict():
+    d = typetodict.convert_to_dict(True)
+    assert_equal(d, True)
