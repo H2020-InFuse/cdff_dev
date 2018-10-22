@@ -810,6 +810,15 @@ cdef class PointCloud_Data_pointsReference:
     def size(self):
         return self.thisptr.nCount
 
+    def fill(self, list data):
+        cdef int data_len = len(data)
+        self.resize(data_len)
+
+        cdef int i, j
+        for i in range(data_len):
+            for j in range(3):
+                self.thisptr.arr[i].arr[j] = data[i][j]
+
 
 cdef class PointCloud_Data_colorsReference:
     def __cinit__(self):
@@ -852,6 +861,15 @@ cdef class PointCloud_Data_colorsReference:
     def size(self):
         return self.thisptr.nCount
 
+    def fill(self, list data):
+        cdef int data_len = len(data)
+        self.resize(data_len)
+
+        cdef int i, j
+        for i in range(data_len):
+            for j in range(3):
+                self.thisptr.arr[i].arr[j] = data[i][j]
+
 
 cdef class PointCloud_Data_intensityReference:
     def __cinit__(self):
@@ -879,6 +897,14 @@ cdef class PointCloud_Data_intensityReference:
 
     def size(self):
         return self.thisptr.nCount
+
+    def fill(self, list data):
+        cdef int data_len = len(data)
+        self.resize(data_len)
+
+        cdef int i
+        for i in range(data_len):
+            self.thisptr.arr[i] = data[i]
 
 
 cdef class PointCloud_DataReference:

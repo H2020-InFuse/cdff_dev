@@ -94,7 +94,8 @@ def test_create_pointcloud():
         {"timeStamp": {"microseconds": 5}},
         "data":
         {"points": [[0, 1, 2], [1, 2, 3], [2, 3, 4]],
-         "colors": [[255, 255, 255], [255, 255, 255], [255, 255, 255]]}
+         "colors": [[255, 255, 255], [255, 255, 255], [255, 255, 255]],
+         "intensity": [2, 3, 4]}
     }
     obj = typefromdict.create_from_dict("Pointcloud", data)
     assert_equal(obj.metadata.time_stamp.microseconds, 5)
@@ -116,6 +117,9 @@ def test_create_pointcloud():
     assert_equal(obj.data.colors[2, 0], 255)
     assert_equal(obj.data.colors[2, 1], 255)
     assert_equal(obj.data.colors[2, 2], 255)
+    assert_equal(obj.data.intensity[0], 2)
+    assert_equal(obj.data.intensity[1], 3)
+    assert_equal(obj.data.intensity[2], 4)
 
 
 def test_create_image():
