@@ -23,10 +23,7 @@ def convert_to_dict(obj):
 
 
 def _convert_list(obj):
-    data = []
-    for i in range(len(obj)):
-        data.append(obj[i])
-    return data
+    return [obj[i] for i in range(len(obj))]
 
 
 def _convert_ndarray(obj):
