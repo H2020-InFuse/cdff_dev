@@ -1,5 +1,6 @@
 from cdff_dev import typetodict
 import cdff_types
+import numpy as np
 from nose.tools import assert_equal
 
 
@@ -67,3 +68,60 @@ def test_vectorx_to_dict():
     d = typetodict.convert_to_dict(v)
     assert_equal(d[0], 2.0)
     assert_equal(d[1], 3.0)
+
+
+def test_matrix2_to_dict():
+    m = cdff_types.Matrix2d()
+    m[0, 0] = 1.0
+    m[0, 1] = 2.0
+    m[1, 0] = 3.0
+    m[1, 1] = 4.0
+    d = typetodict.convert_to_dict(m)
+    assert_equal(d[0][0], 1.0)
+    assert_equal(d[0][1], 2.0)
+    assert_equal(d[1][0], 3.0)
+    assert_equal(d[1][1], 4.0)
+
+
+def test_matrix3_to_dict():
+    m = cdff_types.Matrix3d()
+    m[0, 0] = 1.0
+    m[0, 1] = 2.0
+    m[0, 2] = 3.0
+    m[1, 0] = 4.0
+    m[1, 1] = 5.0
+    m[1, 2] = 6.0
+    m[2, 0] = 7.0
+    m[2, 1] = 8.0
+    m[2, 2] = 9.0
+    d = typetodict.convert_to_dict(m)
+    assert_equal(d[0][0], 1.0)
+    assert_equal(d[0][1], 2.0)
+    assert_equal(d[0][2], 3.0)
+    assert_equal(d[1][0], 4.0)
+    assert_equal(d[1][1], 5.0)
+    assert_equal(d[1][2], 6.0)
+    assert_equal(d[2][0], 7.0)
+    assert_equal(d[2][1], 8.0)
+    assert_equal(d[2][2], 9.0)
+
+
+def test_matrix3_to_dict():
+    m = cdff_types.Matrix6d()
+    m.fromarray(np.eye(6))
+    d = typetodict.convert_to_dict(m)
+    for i in range(6):
+        for j in range(6):
+            if i == j:
+                assert_equal(d[i][j], 1.0)
+            else:
+                assert_equal(d[i][j], 0.0)
+
+
+def test_quaternion_to_dict():
+    q = cdff_types.Quaterniond()
+    d = typetodict.convert_to_dict(q)
+    assert_equal(d[0], 0.0)
+    assert_equal(d[1], 0.0)
+    assert_equal(d[2], 0.0)
+    assert_equal(d[3], 1.0)

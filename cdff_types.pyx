@@ -362,6 +362,10 @@ cdef class Matrix2d:
             raise KeyError("index out of range %d" % j)
         self.thisptr.arr[i].arr[j] = v
 
+    @property
+    def shape(self):
+        return (2, 2)
+
     def assign(self, Matrix2d other):
         self.thisptr.assign(deref(other.thisptr))
 
@@ -420,6 +424,10 @@ cdef class Matrix3d:
         if j < 0 or j >= 3:
             raise KeyError("index out of range %d" % j)
         self.thisptr.arr[i].arr[j] = v
+
+    @property
+    def shape(self):
+        return (3, 3)
 
     def assign(self, Matrix3d other):
         self.thisptr.assign(deref(other.thisptr))
@@ -483,6 +491,10 @@ cdef class Matrix6d:
             raise KeyError("index out of range %d" % j)
         self.thisptr.arr[i].arr[j] = v
 
+    @property
+    def shape(self):
+        return (6, 6)
+
     def assign(self, Matrix6d other):
         self.thisptr.assign(deref(other.thisptr))
 
@@ -510,9 +522,13 @@ cdef class Quaterniond:
         if self.thisptr != NULL and self.delete_thisptr:
             del self.thisptr
 
-    def __init__(self):
+    def __init__(self, x=0.0, y=0.0, z=0.0, w=1.0):
         self.thisptr = new _cdff_types.asn1SccQuaterniond()
         self.delete_thisptr = True
+        self.thisptr.arr[0] = x
+        self.thisptr.arr[1] = y
+        self.thisptr.arr[2] = z
+        self.thisptr.arr[3] = w
 
     def __len__(self):
         return 4
