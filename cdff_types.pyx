@@ -338,7 +338,8 @@ cdef class Matrix2d:
         return 2
 
     def __str__(self):
-        return str("{type: Matrix2d, data: [?]}") # TODO print content
+        return ("{type: Matrix2d, data: [[%g, %g], [%g, %g]]}"
+                % tuple(self.toarray().ravel()))
 
     def __array__(self, dtype=None):
         return self.toarray().astype(dtype)
