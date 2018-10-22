@@ -1,7 +1,8 @@
-from cdff_dev import typetodict
+from cdff_dev import logloader, typefromdict, typetodict
 import cdff_types
 import numpy as np
 from nose.tools import assert_equal
+from numpy.testing import assert_array_equal
 
 
 def test_time_to_dict():
@@ -222,3 +223,13 @@ def test_pointcloud_to_dict():
     assert_equal(d["data"]["colors"][0][2], 255.0)
     assert_equal(len(d["data"]["intensity"]), 100)
     assert_equal(d["data"]["intensity"][0], 2)
+
+
+def test_frame_conversions():
+    log = logloader.load_log("test/test_data/logs/frames2.msg")
+    d = log["/hcru0/pt_stereo_rect/left/image"][0]
+    obj = typefromdict.create_from_dict("Frame", d)
+    d2 = typetodict.convert_to_dict(obj)
+    obj2 = typefromdict.create_from_dict("Frame", d2)
+    assert_equal(str(obj), str(obj2))
+    assert_array_equal(obj.array_reference(), obj2.array_reference())
