@@ -27,10 +27,10 @@ def initialize_log_iterator():
     log_folder = "logs/DLR_20180724/"
     left_files = logloader.group_pattern(
         log_folder,
-        "recording_20180724-135036_hcru0_pt_stereo_rect_left_image_*0.msg")
+        "recording_20180724-135036_hcru0_pt_stereo_rect_left_image_*.msg")
     right_files = logloader.group_pattern(
         log_folder,
-        "recording_20180724-135036_hcru0_pt_stereo_rect_right_image_*0.msg")
+        "recording_20180724-135036_hcru0_pt_stereo_rect_right_image_*.msg")
     sequence_iterators = [
         logloader.replay_logfile_sequence(
             left_files, ["/hcru0/pt_stereo_rect/left/image"]),
