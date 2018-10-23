@@ -914,6 +914,11 @@ cdef class PointCloud_DataReference:
     def __dealloc__(self):
         pass
 
+    def __str__(self):
+        return ("{points: %d, colors: %d, intensity: %d}"
+                % (self.points.size(), self.colors.size(),
+                   self.intensity.size()))
+
     @property
     def points(self):
         cdef PointCloud_Data_pointsReference points = \
@@ -942,6 +947,9 @@ cdef class PointCloud_MetadataReference:
 
     def __dealloc__(self):
         pass
+
+    def __str__(self):
+        return ("{...}")
 
     def _get_time_stamp(self):
         cdef Time time = Time()
@@ -1073,6 +1081,10 @@ cdef class Pointcloud:
         self.delete_thisptr = True
         _cdff_types.asn1SccPointcloud_Initialize(self.thisptr)
         self.thisptr.metadata.msgVersion = _cdff_types.pointCloud_Version
+
+    def __str__(self):
+        return ("{type: Pointcloud, metadata: %s, data: %s}"
+                % (self.metadata, self.data))
 
     @property
     def metadata(self):
