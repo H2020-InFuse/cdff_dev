@@ -485,7 +485,7 @@ def group_pattern(prefix_path, pattern):
     if len(files) == 0:
         if prefix_path.endswith(os.sep):
             prefix_path = prefix_path[:-1]  # remove trailing '/'
-        dirname = os.sep.join(prefix_path.split(os.sep)[:-1])
+        dirname = os.sep.join(["."] + prefix_path.split(os.sep)[:-1])
         if not os.path.exists(dirname):
             raise ValueError("Directory '%s' does not exist" % dirname)
         actual_files = glob.glob(os.path.join(dirname, "*"))

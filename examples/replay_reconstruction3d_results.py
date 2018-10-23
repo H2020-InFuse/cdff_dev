@@ -18,7 +18,8 @@ import cdff_envire
 
 def main():
     log_iterator = logloader.replay_logfile_sequence(
-        logloader.group_pattern("examples/", "test_output_log_*.msg"),
+        logloader.group_pattern(
+            "examples/reconstruction3d_output_log", "_*.msg"),
         ["reconstruction3d.pointCloud"])
 
     dfc = dataflowcontrol.DataFlowControl(nodes={}, connections=())

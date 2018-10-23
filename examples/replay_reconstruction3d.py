@@ -15,9 +15,9 @@ from cdff_dev.dfpcs.reconstruction3d import DenseRegistrationFromStereo
 
 
 def main():
-    dfc = initialize_dfc(verbose=1)
+    dfc = initialize_dfc(verbose=2)
     log_iterator = initialize_log_iterator()
-    replay.replay_and_process(dfc, log_iterator)
+    replay.replay_and_process_async(dfc, log_iterator, queue_size=100)
     dfc.node_statistics_.print_statistics()
 
 
@@ -27,10 +27,10 @@ def initialize_log_iterator():
     log_folder = "logs/DLR_20180724/"
     left_files = logloader.group_pattern(
         log_folder,
-        "recording_20180724-135036_hcru0_pt_stereo_rect_left_image_*.msg")
+        "recording_20180724-135036_hcru0_pt_stereo_rect_left_image_*0.msg")
     right_files = logloader.group_pattern(
         log_folder,
-        "recording_20180724-135036_hcru0_pt_stereo_rect_right_image_*.msg")
+        "recording_20180724-135036_hcru0_pt_stereo_rect_right_image_*0.msg")
     sequence_iterators = [
         logloader.replay_logfile_sequence(
             left_files, ["/hcru0/pt_stereo_rect/left/image"]),
@@ -67,7 +67,7 @@ def initialize_dfc(verbose):
         stream_aliases=stream_aliases, verbose=verbose)
     dfc.setup()
     logger = loggermsgpack.MsgPackLogger(
-        "examples/test_output_log", max_samples=50,
+        "examples/reconstruction3d_output_log", max_samples=50,
         stream_names=["reconstruction3d.pointCloud"])
     dfc.register_logger(logger)
     return dfc
