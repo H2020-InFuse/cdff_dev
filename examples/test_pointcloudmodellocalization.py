@@ -24,12 +24,16 @@ import cdff_envire
 
 
 def main():
-    download_bunny()
-    pc_full = pointcloud_from_ply(
-        "test/test_data/bunny/reconstruction/bun_zipper.ply")
-    pc_model = pointcloud_from_ply(
-        "test/test_data/bun_zipper_transformed.ply")
-    show_pointcloud([pc_full, pc_model])
+    #download_bunny()
+    #original_ply = "test/test_data/bun_zipper_original.ply"
+    #transformed_ply = "test/test_data/bun_zipper_transformed.ply"
+    original_ply = "test/test_data/dense_original.ply"
+    transformed_ply = "test/test_data/dense_transformed.ply"
+    pc_full = pointcloud_from_ply(original_ply)
+    pc_model = pointcloud_from_ply(transformed_ply)
+    print(pc_model)
+    print(pc_full)
+    #show_pointcloud([pc_full, pc_model])
 
     dfpc = FeaturesMatching3D()
     config_filename = os.path.join(
@@ -43,7 +47,7 @@ def main():
     dfpc.sceneInput(pc_full)
     dfpc.modelInput(pc_model)
     dfpc.computeModelFeaturesInput(True)
-    print("Running...", end="")
+    print("Running...")
     sys.stdout.flush()
     dfpc.run()
     print("DONE")
@@ -73,6 +77,10 @@ def download_bunny(verbose=1):
     with tarfile.open(filename, "r:gz") as tar:
         tar.extractall(path="test/test_data/")
 
+    # from CDFF/build/Tests/DataGenerators/:
+    # echo "remove_outliers save ../../../../CDFF_dev/test/test_data/bun_zipper_original.ply quit" | ./point_cloud_transformer ../../../../CDFF_dev/test/test_data/bunny/reconstruction/bun_zipper.ply
+    # echo "remove_outliers transform 0.1 0 0 0 0 0 1 save ../../../../CDFF_dev/test/test_data/bun_zipper_transformed.ply quit" | ./point_cloud_transformer ../../../../CDFF_dev/test/test_data/bunny/reconstruction/bun_zipper.ply
+
     if verbose:
         print("DONE")
 
@@ -81,6 +89,7 @@ def pointcloud_from_ply(filename):
     plydata = plyfile.PlyData.read(filename)
     vertices = plydata.elements[0]
     pc = cdff_types.Pointcloud()
+    pc.data.points.resize(vertices.count)
     for i in range(vertices.count):
         for j in range(3):
             pc.data.points[i, j] = vertices.data[i][j]
@@ -96,12 +105,13 @@ def show_pointcloud(pointclouds):
             self.current_idx = 0
 
         def __call__(self):
+            if self.current_idx >= len(self.items):
+                return
             print("Adding item to graph...", end="")
             sys.stdout.flush()
             self.items[self.current_idx].add_to(self.graph, self.frame)
-            if self.current_idx < len(self.items):
-                self.current_idx += 1
             print("DONE")
+            self.current_idx += 1
 
     graph = cdff_envire.EnvireGraph()
     graph.add_frame("center")
