@@ -1,3 +1,14 @@
+"""
+=============================
+Replay 3D Reconstruction DFPC
+=============================
+
+This script will only replay logfiles, run the DFPC and log results.
+To visualize the reconstructed point cloud, you have to run
+
+    python examples/replay_reconstruction3d_results.py
+"""
+print(__doc__)
 import os
 from cdff_dev import dataflowcontrol, logloader, path, loggermsgpack, replay
 from cdff_dev.dfpcs.reconstruction3d import DenseRegistrationFromStereo
@@ -37,12 +48,8 @@ def initialize_dfc(verbose):
         "Tests/ConfigurationFiles/DFPCs/Reconstruction3D/"
         "DfpcDenseRegistrationFromStereo_DlrHcru.yaml")
     reconstruction3d.set_configuration_file(config_filename)
-    nodes = {
-        "reconstruction3d": reconstruction3d
-    }
-    trigger_ports = {
-        "reconstruction3d": "rightImage"
-    }
+    nodes = {"reconstruction3d": reconstruction3d}
+    trigger_ports = {"reconstruction3d": "rightImage"}
     connections = (
         ("/hcru0/pt_stereo_rect/left.image", "reconstruction3d.leftImage"),
         ("/hcru0/pt_stereo_rect/right.image", "reconstruction3d.rightImage"),

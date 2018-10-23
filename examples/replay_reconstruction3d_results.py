@@ -1,14 +1,22 @@
+"""
+===================================
+Visualize Reconstructed Point Cloud
+===================================
+
+This script will load results of the 3D reconstruction DFPC and display them
+in the EnviRe visualizer.
+Note that the logfiles are not in the repository because they are too
+large. You can generate them with
+
+    python examples/replay_reconstruction3d.py
+"""
+print(__doc__)
 import numpy as np
 from cdff_dev import dataflowcontrol, logloader, envirevisualization
 import cdff_envire
 
 
 def main():
-    # Note that the logfiles are not in the repository because they are too
-    # large. You can generate them with
-    #
-    #     python examples/replay_reconstruction3d.py
-    #
     log_iterator = logloader.replay_logfile_sequence(
         logloader.group_pattern("examples/", "test_output_log_*.msg"),
         ["reconstruction3d.pointCloud"])
