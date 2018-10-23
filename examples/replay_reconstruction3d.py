@@ -1,0 +1,70 @@
+import os
+from cdff_dev import dataflowcontrol, logloader, path, loggermsgpack, replay
+from cdff_dev.dfpcs.reconstruction3d import DenseRegistrationFromStereo
+
+
+def main():
+    dfc = initialize_dfc(verbose=1)
+    log_iterator = initialize_log_iterator()
+    replay.replay_and_process(dfc, log_iterator)
+    dfc.node_statistics_.print_statistics()
+
+
+def initialize_log_iterator():
+    # Note that the logfiles are not in the repository because they are too
+    # large. Ask Alexander Fabisch about it.
+    log_folder = "logs/DLR_20180724/"
+    left_files = logloader.group_pattern(
+        log_folder,
+        "recording_20180724-135036_hcru0_pt_stereo_rect_left_image_*.msg")
+    right_files = logloader.group_pattern(
+        log_folder,
+        "recording_20180724-135036_hcru0_pt_stereo_rect_right_image_*.msg")
+    sequence_iterators = [
+        logloader.replay_logfile_sequence(
+            left_files, ["/hcru0/pt_stereo_rect/left/image"]),
+        logloader.replay_logfile_sequence(
+            right_files, ["/hcru0/pt_stereo_rect/right/image"])
+    ]
+    log_iterator = logloader.replay_join(sequence_iterators)
+    return log_iterator
+
+
+def initialize_dfc(verbose):
+    reconstruction3d = DenseRegistrationFromStereo()
+    config_filename = os.path.join(
+        path.load_cdffpath(),
+        "Tests/ConfigurationFiles/DFPCs/Reconstruction3D/"
+        "DfpcDenseRegistrationFromStereo_DlrHcru.yaml")
+    reconstruction3d.set_configuration_file(config_filename)
+    nodes = {
+        "reconstruction3d": reconstruction3d
+    }
+    trigger_ports = {
+        "reconstruction3d": "rightImage"
+    }
+    connections = (
+        ("/hcru0/pt_stereo_rect/left.image", "reconstruction3d.leftImage"),
+        ("/hcru0/pt_stereo_rect/right.image", "reconstruction3d.rightImage"),
+
+        ("reconstruction3d.pointCloud", "result.pointCloud"),
+        ("reconstruction3d.pose", "result.pose"),
+        ("reconstruction3d.success", "result.success"),
+    )
+    stream_aliases = {
+        "/hcru0/pt_stereo_rect/left/image": "/hcru0/pt_stereo_rect/left.image",
+        "/hcru0/pt_stereo_rect/right/image": "/hcru0/pt_stereo_rect/right.image",
+    }
+    dfc = dataflowcontrol.DataFlowControl(
+        nodes, connections, trigger_ports=trigger_ports,
+        stream_aliases=stream_aliases, verbose=verbose)
+    dfc.setup()
+    logger = loggermsgpack.MsgPackLogger(
+        "examples/test_output_log", max_samples=50,
+        stream_names=["reconstruction3d.pointCloud"])
+    dfc.register_logger(logger)
+    return dfc
+
+
+if __name__ == "__main__":
+    main()
