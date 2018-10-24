@@ -307,7 +307,7 @@ def test_envire_graph_compute_transform():
 
 
 def test_envire_graph_save_load():
-    filename = "graph_test.envire"
+    filename = "graph_test.cpp_helpers"
     try:
         g = cdff_envire.EnvireGraph()
         g.add_frame("A")

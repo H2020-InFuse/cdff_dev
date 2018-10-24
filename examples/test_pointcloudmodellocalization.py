@@ -5,35 +5,30 @@ Point Cloud Model Localisation
 
 This DFPC will localise a pointcloud model in a larger pointcloud.
 We will download an external PLY file from the internet for this example.
-We also need one additional Python module that is not installed with CDFF-Dev.
-You can install it with
-
-    sudo pip3 install plyfile
 """
 import os
 import sys
 import shutil
 import urllib.request
 import tarfile
-import plyfile
 from PyQt4.QtGui import QApplication
 from cdff_dev import path, envirevisualization, qtgui
+from cdff_dev.extensions.pcl import helpers
 from cdff_dev.dfpcs.pointcloudmodellocalisation import FeaturesMatching3D
-import cdff_types
 import cdff_envire
 
 
 def main():
     #download_bunny()
-    #original_ply = "test/test_data/pointclouds/bun_zipper_original.ply"
-    #transformed_ply = "test/test_data/pointclouds/bun_zipper_transformed.ply"
-    original_ply = "test/test_data/pointclouds/dense_original.ply"
-    transformed_ply = "test/test_data/pointclouds/dense_transformed.ply"
-    pc_full = pointcloud_from_ply(original_ply)
-    pc_model = pointcloud_from_ply(transformed_ply)
+    original_ply = "test/test_data/pointclouds/bun_zipper_original.ply"
+    transformed_ply = "test/test_data/pointclouds/bun_zipper_transformed.ply"
+    #original_ply = "test/test_data/pointclouds/dense_original.ply"
+    #transformed_ply = "test/test_data/pointclouds/dense_transformed.ply"
+    pc_full = helpers.load_ply_file(original_ply)
+    pc_model = helpers.load_ply_file(transformed_ply)
     print(pc_model)
     print(pc_full)
-    #show_pointcloud([pc_full, pc_model])
+    show_pointcloud([pc_full, pc_model])
 
     dfpc = FeaturesMatching3D()
     config_filename = os.path.join(
@@ -83,17 +78,6 @@ def download_bunny(verbose=1):
 
     if verbose:
         print("DONE")
-
-
-def pointcloud_from_ply(filename):
-    plydata = plyfile.PlyData.read(filename)
-    vertices = plydata.elements[0]
-    pc = cdff_types.Pointcloud()
-    pc.data.points.resize(vertices.count)
-    for i in range(vertices.count):
-        for j in range(3):
-            pc.data.points[i, j] = vertices.data[i][j]
-    return pc
 
 
 def show_pointcloud(pointclouds):

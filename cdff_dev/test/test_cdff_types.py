@@ -1,5 +1,6 @@
 import numpy as np
 import yaml
+from cdff_dev.extensions.pcl import helpers
 import cdff_types
 from nose.tools import (assert_equal, assert_regexp_matches, assert_true,
                         assert_false)
@@ -869,6 +870,15 @@ def test_create_pointcloud():
     assert_equal(pcl.data.colors[0, 0], 255.0)
     assert_equal(pcl.data.colors[0, 1], 255.0)
     assert_equal(pcl.data.colors[0, 2], 255.0)
+
+
+def test_load_ply():
+    pc = helpers.load_ply_file(
+        "test/test_data/pointclouds/bun_zipper_original.ply")
+    assert_equal(pc.data.points.size(), 35947)
+    pc = helpers.load_ply_file(
+        "test/test_data/pointclouds/dense_original.ply")
+    assert_equal(pc.data.points.size(), 5824)
 
 
 def test_create_laserscan():
