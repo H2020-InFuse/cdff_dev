@@ -29,11 +29,13 @@ class CleanCommand(clean):
 
         print("removing Cython build artifacts")
         cwd = os.path.abspath(os.path.dirname(__file__))
-        filenames = (glob.glob(cwd + "/cdff_*.cpp") +
-                     glob.glob(cwd + "/cdff_*.so") +
-                     glob.glob(cwd + "/cdff_*.pyd"))
-        for filename in filenames:
-            os.remove(filename)
+        for path in [cwd, os.path.join(cwd, "cdff_dev", "extensions", "*")]:
+            filenames = (glob.glob(os.path.join(path, "*.cpp")) +
+                         glob.glob(os.path.join(path, "*.so")) +
+                         glob.glob(os.path.join(path, "*.pyd")))
+            for filename in filenames:
+                print(filename)
+                os.remove(filename)
 
 
 def configuration(parent_package='', top_path=None):
