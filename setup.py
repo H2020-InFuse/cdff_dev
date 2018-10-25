@@ -29,7 +29,9 @@ class CleanCommand(clean):
 
         print("removing Cython build artifacts")
         cwd = os.path.abspath(os.path.dirname(__file__))
-        for path in [cwd, os.path.join(cwd, "cdff_dev", "extensions", "*")]:
+        dirs = [cwd, os.path.join(cwd, "cdff_dev", "extensions", "*"),
+                os.path.join(cwd, "cdff_dev", "dfpcs")]
+        for path in dirs:
             filenames = (glob.glob(os.path.join(path, "*.cpp")) +
                          glob.glob(os.path.join(path, "*.so")) +
                          glob.glob(os.path.join(path, "*.pyd")))
@@ -66,6 +68,9 @@ def configuration(parent_package='', top_path=None):
     cython_files = [(".", filename) for filename in cython_files]
 
     config.add_data_files(*cython_files)
+
+    # uncomment to see more outputs from the linker
+    #os.environ["CFLAGS"] = "-Xlinker -v"
 
     extra_compile_args = [
         "-std=c++11",
