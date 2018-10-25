@@ -28,7 +28,7 @@ def main():
     pc_model = helpers.load_ply_file(transformed_ply)
     print(pc_model)
     print(pc_full)
-    show_pointcloud([pc_full, pc_model])
+    #show_pointcloud([pc_full, pc_model])
 
     dfpc = FeaturesMatching3D()
     config_filename = os.path.join(
@@ -42,11 +42,11 @@ def main():
     dfpc.sceneInput(pc_full)
     dfpc.modelInput(pc_model)
     dfpc.computeModelFeaturesInput(True)
-    print("Running...")
     sys.stdout.flush()
     dfpc.run()
-    print("DONE")
+    success = dfpc.successOutput()
     pose = dfpc.poseOutput()
+    print(success)
     print(pose)
 
 
