@@ -1,5 +1,5 @@
-import msgpack
 import pandas
+from . import logloader
 
 
 def get_port_names(logfile):
@@ -15,14 +15,14 @@ def get_port_names(logfile):
     port_names : iterable
         Names of available ports
     """
-    log = _load_log(logfile)
+    log = logloader.load_log(logfile)
     port_names = [k for k in log.keys() if not k.endswith(".meta")]
     return sorted(port_names)
 
 
 def object2csv(input_filename, output_filename, port, fields=None,
                whitelist=None):
-    """Convert a MsgPack logfile from object-oriented to CSV.
+    """Convert a object-oriented MsgPack logfile to CSV.
 
     The dataframe will use the field 'timestamp.microseconds' as index.
     If there is no such field in the data type of the port, it will be
@@ -51,7 +51,7 @@ def object2csv(input_filename, output_filename, port, fields=None,
         An example would be ["elements", "names"] if you want fully unravel
         a JointState object.
     """
-    log = _load_log(input_filename)
+    log = logloader.load_log(input_filename)
     df = object2dataframe(log, port, fields, whitelist)
     df.to_csv(output_filename, na_rep="NaN")
 
@@ -132,48 +132,6 @@ def object2dataframe(log, port, fields=None, whitelist=None):
     df.reindex(sorted(df.columns), axis=1, copy=False)
     df.set_index("timestamp.microseconds", inplace=True)
     return df
-
-
-def object2relational_file(input_filename, output_filename, whitelist=()):
-    """Convert a MsgPack logfile from object-oriented to relational storage.
-
-    The log data can usually be accessed with
-    log[port_name][sample_idx][field_a]...[field_b]. This is an
-    object-oriented view of the data because you can easily access a whole
-    object from the log. This is not convenient if you want to use the data
-    for, e.g., machine learning, where you typically need the whole dataset
-    in a 2D array, i.e. a relational view on the data, in which you can
-    access data in the form log[port_name][feature][sample_idx].
-
-    Parameters
-    ----------
-    input_filename : str
-        Name of the original logfile
-
-    output_filename : str
-        Name of the converted logfile
-
-    whitelist : list or tuple, optional (default: [])
-        Usually arrays and vectors (represented as lists in Python) are handled
-        as basic types and are put in a single column because they can have
-        dynamic sizes. This is a list of fields that will be scanned
-        recursively and interpreted as arrays with a fixed length. Note that
-        you only have to give the name of the field, not the port name.
-        An example would be ["elements", "names"] if you want fully unravel
-        a JointState object.
-    """
-    log = _load_log(input_filename)
-
-    converted_log = object2relational(log, ports, whitelist)
-
-    with open(output_filename, "wb") as f:
-        msgpack.pack(converted_log, f)
-
-
-def _load_log(filename):
-    with open(filename, "rb") as f:
-        log = msgpack.unpack(f, encoding="utf8")
-    return log
 
 
 def object2relational(log, whitelist=()):
