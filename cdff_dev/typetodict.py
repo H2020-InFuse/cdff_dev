@@ -15,18 +15,14 @@ def convert_to_dict(obj):
     if type(obj) in [float, int, str, bool]:
         return obj
     if hasattr(obj, "shape"):
-        return _convert_ndarray(obj)
+        return _convert_ndarray_to_lists(obj)
     elif hasattr(obj, "__len__"):
-        return _convert_list(obj)
+        return _convert_indexable_to_list(obj)
     else:
-        return _convert_dict(obj)
+        return _convert_object_to_dict(obj)
 
 
-def _convert_list(obj):
-    return [obj[i] for i in range(len(obj))]
-
-
-def _convert_ndarray(obj):
+def _convert_ndarray_to_lists(obj):
     shape = obj.shape
     if len(shape) > 2:
         raise NotImplementedError("Cannot handle nd arrays with n > 2.")
@@ -38,7 +34,11 @@ def _convert_ndarray(obj):
     return data
 
 
-def _convert_dict(obj):
+def _convert_indexable_to_list(obj):
+    return [obj[i] for i in range(len(obj))]
+
+
+def _convert_object_to_dict(obj):
     data = {}
     fields = _get_fieldnames(obj)
     for f in fields:
