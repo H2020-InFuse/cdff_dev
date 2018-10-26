@@ -1,5 +1,5 @@
 from cdff_dev import data_export
-from nose.tools import assert_equal, assert_in, assert_raises_regex
+from nose.tools import assert_equal, assert_in, assert_raises_regexp
 from numpy.testing import assert_array_equal
 
 
@@ -127,8 +127,7 @@ def test_join_labels_wrong_length():
     df = data_export.object2dataframe(
         log, port="/component.port", whitelist=["acc", "gyro", "mag"])
     labels = [1]
-    assert_raises_regex
-    assert_raises_regex(
+    assert_raises_regexp(
         ValueError, "Number .* do not match", data_export.join_labels,
         df, labels, "mylabel")
 

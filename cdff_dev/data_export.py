@@ -93,8 +93,8 @@ def object2dataframe(log, port, fields=None, whitelist=None):
     log : dict
         Log data
 
-    port : list or tuple
-        Names of port that will be converted
+    port : str
+        Name of port that will be converted
 
     fields : list or tuple, optional (default: all)
         Field that will be exported
