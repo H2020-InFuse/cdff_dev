@@ -1,6 +1,5 @@
 import warnings
 import msgpack
-import numpy as np
 import cdff_envire
 import cdff_types
 
