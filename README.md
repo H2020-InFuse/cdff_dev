@@ -22,7 +22,7 @@ institutes contributed to the software:
   of the [University of Strathclyde](https://www.strath.ac.uk/) in
   Glasgow
 
-<img src="https://www.dfki.de/web/presse/bildmaterial/dfki-logo-e-schrift.jpg" alt="DFKI RIC" height="50px" />&emsp;&emsp;
+<img src="doc/static/dfki.jpg" alt="DFKI RIC" height="50px" />&emsp;&emsp;
 <img src="doc/static/strathclyde.jpg" alt="Strathclyde SMeSTech" height="70px" />&emsp;&emsp;
 
 ### Dependencies of CDFF-Dev
