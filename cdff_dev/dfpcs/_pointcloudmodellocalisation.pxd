@@ -10,9 +10,9 @@ cdef extern from "PointCloudModelLocalisationInterface.hpp" namespace "CDFF::DFP
         void setConfigurationFile(string) except +
         void setup() except +
 
-        void sceneInput(_cdff_types.asn1SccPointcloud data) except +
-        void modelInput(_cdff_types.asn1SccPointcloud data) except +
-        void computeModelFeaturesInput(bool data) except +
+        void sceneInput(_cdff_types.asn1SccPointcloud& data) except +
+        void modelInput(_cdff_types.asn1SccPointcloud& data) except +
+        void computeModelFeaturesInput(bool& data) except +
 
         _cdff_types.asn1SccPose& poseOutput() except +
         bool& successOutput() except +
