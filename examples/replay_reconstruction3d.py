@@ -17,7 +17,8 @@ from cdff_dev.dfpcs.reconstruction3d import DenseRegistrationFromStereo
 def main():
     dfc = initialize_dfc(verbose=2)
     log_iterator = initialize_log_iterator()
-    replay.replay_and_process_async(dfc, log_iterator, queue_size=100)
+    replay.replay_and_process_async(
+        dfc, log_iterator, queue_size=4, max_samples=20)
     dfc.node_statistics_.print_statistics()
 
 
@@ -64,7 +65,8 @@ def initialize_dfc(verbose):
     }
     dfc = dataflowcontrol.DataFlowControl(
         nodes, connections, trigger_ports=trigger_ports,
-        stream_aliases=stream_aliases, verbose=verbose)
+        stream_aliases=stream_aliases, memory_profiler=True,
+        verbose=verbose)
     dfc.setup()
     logger = loggermsgpack.MsgPackLogger(
         "examples/reconstruction3d_output_log", max_samples=50,

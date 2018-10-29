@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 import inspect
 import time
 import warnings
+import memory_profiler
 
 
 class DataFlowControl:
@@ -44,6 +45,9 @@ class DataFlowControl:
     stream_aliases : dict, optional (default: {})
         Mapping from original stream names to their aliases if they have any.
 
+    memory_profiler : bool, optional (default: False)
+        Activate memory profiler for DFNs.
+
     verbose : int, optional (default: 0)
         Verbosity level
 
@@ -80,13 +84,15 @@ class DataFlowControl:
         of the form 'node_name.port_name' are used here.
     """
     def __init__(self, nodes, connections, periods=None, trigger_ports=None,
-                 real_time=False, stream_aliases=None, verbose=0):
+                 real_time=False, stream_aliases=None, memory_profiler=False,
+                 verbose=0):
         self.nodes = nodes
         self.connections = connections
         self.periods = periods
         self.trigger_ports = trigger_ports
         self.real_time = real_time
         self.stream_aliases = stream_aliases
+        self.memory_profiler = memory_profiler
         self.verbose = verbose
 
         self.visualizations_ = []
@@ -113,8 +119,11 @@ class DataFlowControl:
             self.stream_aliases = {}
 
         self.node_statistics_ = NodeStatistics()
-        self._node_facade = NodeFacade(self.nodes, self.verbose)
-        self._node_facade.configure_all()
+        self._node_facade = NodeFacade(
+            self.nodes, self.memory_profiler, self.verbose)
+        results = self._node_facade.configure_all()
+        if results is not None:
+            self.node_statistics_.report_configure_memory(results)
         self._cache_ports()
         self._configure_triggers()
         self._configure_connections()
@@ -325,8 +334,13 @@ class DataFlowControl:
         """Execute node and pass outputs to next nodes."""
         self._node_facade.set_time(node_name, timestamp)
 
-        processing_time = self._node_facade.process(node_name)
+        results = self._node_facade.process(node_name)
 
+        if self.memory_profiler:
+            processing_time, memory = results
+            self.node_statistics_.report_process_memory(node_name, memory)
+        else:
+            processing_time = results
         self.node_statistics_.report_processing_duration(
             node_name, processing_time)
         if self.verbose >= 1:
@@ -390,21 +404,42 @@ class NodeFacade:
     nodes : dict
         Mapping from node names to node instances
 
+    memory_profiler : bool, optional (default: False)
+        Activate memory profiler for DFNs.
+
     verbose : int, optional (default: 0)
         Verbosity level
     """
-    def __init__(self, nodes, verbose=0):
+    def __init__(self, nodes, memory_profiler, verbose=0):
         self.nodes = nodes
+        self.memory_profiler = memory_profiler
         self.verbose = verbose
 
     def configure_all(self):
+        if self.memory_profiler:
+            self.memory_profiler_ = MemoryProfiler(include_children=True)
+            self.configure_results = dict()
+
         for name in sorted(self.nodes.keys()):
             if not isdfn(self.nodes[name], verbose=self.verbose):
                 if isdfpc(self.nodes[name], verbose=self.verbose):
                     self.nodes[name] = wrap_dfpc_as_dfn(self.nodes[name])
                 else:
                     raise ValueError("'%s' is not a DFN." % name)
+
+            if self.memory_profiler:
+                self.memory_profiler_.prepare_memory_profiling(
+                    "%s configure" % name)
+
             self.nodes[name].configure()
+
+            if self.memory_profiler:
+                mem = self.memory_profiler_.memory_profile(
+                    "%s configure" % name)
+                self.configure_results[name] = mem
+
+        if self.memory_profiler:
+            return self.configure_results
 
     def register_graph(self, graph):
         """Assign EnviRe graph to a node with the name 'transformer'.
@@ -425,11 +460,21 @@ class NodeFacade:
     def process(self, node_name):
         start_time = time.process_time()
 
+        if self.memory_profiler:
+            self.memory_profiler_.prepare_memory_profiling(
+                "%s process" % node_name)
+
         self.nodes[node_name].process()
+
+        if self.memory_profiler:
+            mem = self.memory_profiler_.memory_profile("%s process" % node_name)
 
         end_time = time.process_time()
         processing_time = end_time - start_time
-        return processing_time
+        if self.memory_profiler:
+            return processing_time, mem
+        else:
+            return processing_time
 
     def set_time(self, node_name, timestamp):
         node = self.nodes[node_name]
@@ -486,6 +531,14 @@ class NodeStatistics:
     """
     def __init__(self):
         self.processing_durations_ = defaultdict(list)
+        self.process_memory = defaultdict(list)
+        self.configure_memory = dict()
+
+    def report_process_memory(self, node_name, memory):
+        self.process_memory[node_name].append(memory)
+
+    def report_configure_memory(self, memories):
+        self.configure_memory.update(memories)
 
     def report_processing_duration(self, node_name, duration):
         self.processing_durations_[node_name].append(duration)
@@ -496,6 +549,23 @@ class NodeStatistics:
              len(self.processing_durations_[node_name]))
             for node_name in self.processing_durations_.keys()
         )
+        max_memory_added = dict(
+            (node_name, max(self.process_memory[node_name]))
+            for node_name in self.process_memory.keys()
+        )
+        average_memory_added = dict(
+            (node_name, sum(self.process_memory[node_name]) /
+             len(self.process_memory[node_name]))
+            for node_name in self.process_memory.keys()
+        )
+        accumulated_memory_added = dict(
+            (node_name, sum(self.process_memory[node_name]))
+            for node_name in self.process_memory.keys()
+        )
+
+        print("=" * 80)
+        print("    Node Statistics")
+        print("=" * 80)
 
         for node_name, average_processing_duration in \
                 self.processing_durations_.items():
@@ -504,6 +574,13 @@ class NodeStatistics:
                   % average_processing_durations[node_name])
             print("Number of calls: %d"
                   % len(self.processing_durations_[node_name]))
+            print("Memory added with configure: %g MiB"
+                  % self.configure_memory[node_name])
+            print("Average / maximum / accumulated memory added with process: "
+                  "%g / %g / %g MiB"
+                  % (average_memory_added[node_name],
+                     max_memory_added[node_name],
+                     accumulated_memory_added[node_name]))
 
 
 class VisualizationBase(metaclass=ABCMeta):
@@ -672,3 +749,30 @@ def isinput(member):
 def isoutput(member):
     return (hasattr(member, "__name__") and
             member.__name__.endswith("Output"))
+
+
+class MemoryProfiler:
+    """Simple memory profiler based on memory_profiler."""
+    def __init__(self, backend="psutil", include_children=False):
+        self.include_children = include_children
+        self.backend = memory_profiler.choose_backend(backend)
+        if (self.backend == 'tracemalloc' and
+                memory_profiler.has_tracemalloc):
+            if not memory_profiler.tracemalloc.is_tracing():
+                memory_profiler.tracemalloc.start()
+        self.mem_usage_before = dict()
+
+    def prepare_memory_profiling(self, category):
+        """Must be called before the function that we want to measure."""
+        if category not in self.mem_usage_before:
+            self.mem_usage_before[category] = 0.0
+        self.mem_usage_before[category] = memory_profiler._get_memory(
+            -1, self.backend, timestamps=False,
+            include_children=self.include_children)
+
+    def memory_profile(self, category):
+        """Get the memory consumption of the function."""
+        mem_usage_after = memory_profiler._get_memory(
+            -1, self.backend, timestamps=False,
+            include_children=self.include_children)
+        return mem_usage_after - self.mem_usage_before[category]
