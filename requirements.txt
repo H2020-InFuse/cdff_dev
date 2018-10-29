@@ -5,3 +5,4 @@ numpy
 msgpack-python
 pydot
 pandas
+memory_profiler

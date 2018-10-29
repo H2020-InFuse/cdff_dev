@@ -46,6 +46,7 @@ It also requires the Python 3 interpreter, the Python 3 headers, the Python
 * msgpack-python
 * pandas
 * pydot
+* memory_profiler
 * PyQt 4
 * OpenCV
 

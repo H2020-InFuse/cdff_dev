@@ -26,7 +26,7 @@ RUN apt-get update && apt-get install -y \
   libgdal-dev \
   libproj-dev
 RUN pip3 install --upgrade pip
-RUN pip3 install pyyaml jinja2 cython numpy msgpack-python pydot nose nose2 pandas
+RUN pip3 install pyyaml jinja2 cython numpy msgpack-python pydot nose nose2 pandas memory_profiler
 
 RUN mkdir -p -m 700 /root/.ssh/ && \
   ssh-keyscan gitlab.spaceapplications.com >> /root/.ssh/known_hosts
@@ -74,5 +74,5 @@ RUN rm /root/.gitconfig
 WORKDIR /
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
-LABEL version="1.8.10"
+LABEL version="1.8.11"
 LABEL description="Image providing the dependencies of CDFF-dev for continuous integration"
