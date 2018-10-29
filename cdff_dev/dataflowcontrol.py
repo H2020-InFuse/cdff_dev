@@ -574,13 +574,15 @@ class NodeStatistics:
                   % average_processing_durations[node_name])
             print("Number of calls: %d"
                   % len(self.processing_durations_[node_name]))
-            print("Memory added with configure: %g MiB"
+            print("Memory:")
+            print("- added with configure: %g MiB"
                   % self.configure_memory[node_name])
-            print("Average / maximum / accumulated memory added with process: "
-                  "%g / %g / %g MiB"
-                  % (average_memory_added[node_name],
-                     max_memory_added[node_name],
-                     accumulated_memory_added[node_name]))
+            print("- added with process (average): %g MiB"
+                  % average_memory_added[node_name])
+            print("- added with process (maximum): %g MiB"
+                  % max_memory_added[node_name])
+            print("- added with process (accumulated): %g MiB"
+                  % accumulated_memory_added[node_name])
 
 
 class VisualizationBase(metaclass=ABCMeta):
@@ -752,7 +754,10 @@ def isoutput(member):
 
 
 class MemoryProfiler:
-    """Simple memory profiler based on memory_profiler."""
+    """Simple memory profiler based on memory_profiler.
+
+    For more details, see https://pypi.org/project/memory_profiler/
+    """
     def __init__(self, backend="psutil", include_children=False):
         self.include_children = include_children
         self.backend = memory_profiler.choose_backend(backend)
