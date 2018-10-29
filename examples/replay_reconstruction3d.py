@@ -26,19 +26,11 @@ def initialize_log_iterator():
     # Note that the logfiles are not in the repository because they are too
     # large. Ask Alexander Fabisch about it.
     log_folder = "logs/DLR_20180724/"
-    left_files = logloader.group_pattern(
-        log_folder,
-        "recording_20180724-135036_hcru0_pt_stereo_rect_left_image_*.msg")
-    right_files = logloader.group_pattern(
-        log_folder,
-        "recording_20180724-135036_hcru0_pt_stereo_rect_right_image_*.msg")
-    sequence_iterators = [
-        logloader.replay_logfile_sequence(
-            left_files, ["/hcru0/pt_stereo_rect/left/image"]),
-        logloader.replay_logfile_sequence(
-            right_files, ["/hcru0/pt_stereo_rect/right/image"])
-    ]
-    log_iterator = logloader.replay_join(sequence_iterators)
+    filenames = logloader.group_pattern(
+        log_folder, "recording_20180724-135036_000*.msg")
+    stream_names = ["/hcru0/pt_stereo_rect/left/image",
+                    "/hcru0/pt_stereo_rect/right/image"]
+    log_iterator = logloader.replay_logfile_sequence(filenames, stream_names)
     return log_iterator
 
 
