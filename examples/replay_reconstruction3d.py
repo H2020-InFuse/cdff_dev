@@ -18,7 +18,7 @@ def main():
     dfc = initialize_dfc(verbose=2)
     log_iterator = initialize_log_iterator()
     replay.replay_and_process_async(
-        dfc, log_iterator, queue_size=4, max_samples=20)
+        dfc, log_iterator, queue_size=4, max_samples=None)
     dfc.node_statistics_.print_statistics()
 
 
