@@ -1,4 +1,4 @@
-FROM nexus.spaceapplications.com/repository/infuse/cdff-ci:1.8.1
+FROM nexus.spaceapplications.com/repository/infuse/cdff-ci:2.0
 
 RUN apt-get update && apt-get install -y \
   python3 \
