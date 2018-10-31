@@ -23,6 +23,7 @@ DEFAULT_INCLUDE_DIRS = [
 DEFAULT_LIBRARY_DIRS = [
     # TODO move to installation folder:
     os.path.join(cdffpath, "build"),
+    os.path.join(cdffpath, "build", "Common", "Loggers"),
     os.path.join(cdffpath, "build", "Common", "Types"),
     os.path.join(cdffpath, "build", "Common", "Helpers"),
     os.path.join(cdffpath, "build", "Common", "Visualizers"),
