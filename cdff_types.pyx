@@ -3039,6 +3039,9 @@ cdef class Frame_error_tReference:
     def __dealloc__(self):
         pass
 
+    def __str__(self):
+        return "{type: %s, value: %s}" % (self.type, self.value)
+
     def _get_type(self):
         if <int> self.thisptr.type == <int> _cdff_types.asn1Sccerror_UNDEFINED:
             return "error_UNDEFINED"
@@ -3049,7 +3052,7 @@ cdef class Frame_error_tReference:
         else:
             raise ValueError("Unknown error type: %d" % <int> self.thisptr.type)
 
-    def _set_type(self,  str type):
+    def _set_type(self, str type):
         if type == "error_UNDEFINED":
             self.thisptr.type = _cdff_types.asn1Sccerror_UNDEFINED
         elif type == "error_DEAD":
@@ -3142,9 +3145,10 @@ cdef class Map_metadata_tReference:
         pass
 
     def __str__(self):
-        # TODO err_values, pose_fixed_frame_map_frame
-        return ("{time_stamp: %s, type: %s, scale: %g}"
-                % (self.time_stamp, self.type, self.scale))
+        return ("{time_stamp: %s, type: %s, err_values: %s, scale: %g, "
+                "pose_fixed_frame_map_frame: %s}"
+                % (self.time_stamp, self.type, self.err_values, self.scale,
+                   self.pose_fixed_frame_map_frame))
 
     def _get_msg_version(self):
         return self.thisptr.msgVersion
@@ -3220,6 +3224,9 @@ cdef class Map_metadata_t_errValuesReference:
 
     def __dealloc__(self):
         pass
+
+    def __str__(self):
+        return "[%s]" % (", ".join([str(self[i]) for i in range(self.size())]))
 
     def __len__(self):
         return self.thisptr.nCount
