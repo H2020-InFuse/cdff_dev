@@ -1,5 +1,6 @@
 import warnings
 from cdff_dev import logloader, dataflowcontrol, envirevisualization, transformer
+import cdff_types
 import cdff_envire
 
 
@@ -7,7 +8,7 @@ class Transformer(transformer.EnvireDFN):
     def __init__(self):
         super(Transformer, self).__init__()
 
-    def _set_transform_with_cov(self, tf):  # TODO move to base
+    def _set_transform_with_cov(self, tf, frame_transformation=True):  # TODO move to base
         """Update transformation in an EnviRe graph.
 
         Parameters
@@ -21,7 +22,7 @@ class Transformer(transformer.EnvireDFN):
             warnings.warn("EnviRe Graph is not initialized.")
             return
 
-        if True:  # TODO
+        if frame_transformation:  # TODO
             origin = tf.metadata.parent_frame_id
             target = tf.metadata.child_frame_id
         else:
@@ -46,13 +47,47 @@ class Transformer(transformer.EnvireDFN):
             self.graph_.add_transform(origin, target, transform)
 
     def pom_poseInput(self, data):
-        self._set_transform_with_cov(data)
+        self._set_transform_with_cov(data, frame_transformation=False)
+
+
+class MapDownSampler:
+    def __init__(self):
+        self.map = None
+        self.small_map = cdff_types.Map()
+
+    def set_configuration_file(self, filename):
+        pass
+
+    def configure(self):
+        pass
+
+    def mapInput(self, data):
+        self.map = data
+
+    def process(self):
+        if self.map is None:
+            return
+
+        factor = 1  # TODO
+
+        self.small_map.metadata.type = self.map.metadata.type
+        self.small_map.metadata.scale = self.map.metadata.scale
+        self.small_map.data.rows = self.map.data.rows // factor
+        self.small_map.data.cols = self.map.data.cols // factor
+        self.small_map.data.channels = self.map.data.channels
+        self.small_map.data.depth = self.map.data.depth
+        # HACK fix row_size from incorrect logfile
+        self.small_map.data.row_size = self.map.data.cols
+        self.small_map.data.array_reference()[:, :, :] = self.map.data.array_reference()[::factor, ::factor, :]
+
+    def smallMapOutput(self):
+        return self.small_map
 
 
 def main():
     app = envirevisualization.EnvireVisualizerApplication(
         frames={
-            "dem_building.fusedMap": "LocalTerrainFrame",
+            "downsampler.smallMap": "RoverBodyFrame",
             "pom.pose": "LocalTerrainFrame",
         },
         center_frame="LocalTerrainFrame"
@@ -62,13 +97,16 @@ def main():
         "/dem_building/fusedMap": "dem_building.fusedMap",
         "/pom_pose": "pom.pose",
     }
-    nodes = {"transformer": Transformer()}
+    nodes = {"transformer": Transformer(),
+             "downsampler": MapDownSampler()}
     connections = (
         ("pom.pose", "transformer.pom_pose"),
+        ("dem_building.fusedMap", "downsampler.map"),
     )
     dfc = dataflowcontrol.DataFlowControl(
         nodes=nodes, connections=connections,
         periods={"transformer": 1.0},
+        trigger_ports={"downsampler": "map"},
         stream_aliases=stream_aliases, verbose=2)
     dfc.setup()
 
