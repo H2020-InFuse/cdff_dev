@@ -48,8 +48,34 @@ def create_from_dict(typename, data):
         The corresponding C++ class wrapped in Python. It can be passed to
         wrapped C++ extensions in Python.
     """
-    obj = create_cpp(typename)
-    return _convert(obj, data)
+    if typename == "asn1_bitstream":
+        return _decode_asn1(data)
+    else:
+        obj = create_cpp(typename)
+        return _convert(obj, data)
+
+
+def _decode_asn1(data):
+    """Decode ASN.1 object from uPER serialization.
+
+    Parameters
+    ----------
+    data : dict
+        uPER representation of the data  TODO
+
+    Returns
+    -------
+    obj : object
+        The corresponding C++ class wrapped in Python. It can be passed to
+        wrapped C++ extensions in Python.
+    """
+    if data["serialization_method"] != 0:
+        raise NotImplementedError(
+            "Cannot decode serialization method %d. We can only handle 0 "
+            "(uPER).")
+    obj = create_cpp(data["type"])
+    obj.from_uper(data["data"])
+    return obj
 
 
 def _translate_typename(typename):
@@ -71,6 +97,8 @@ def _translate_typename(typename):
         i = typename.find("/")
         if i + 1 < len(typename):
             typename = typename[:i] + typename[i + 1].upper() + typename[i + 2:]
+    if typename.startswith("asn1Scc"):  # TODO test
+        typename = typename.replace("asn1Scc", "")
     return typename
 
 

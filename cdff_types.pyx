@@ -6,6 +6,7 @@ from cython.operator cimport dereference as deref
 from libc.string cimport memcpy
 from libc.stdint cimport uint8_t, uint16_t, uint32_t, uint64_t
 from libc.stdint cimport int8_t, int16_t, int32_t, int64_t
+from libc.stdlib cimport malloc, free
 cimport numpy as np
 import numpy as np
 import warnings
@@ -768,6 +769,29 @@ cdef class TransformWithCovariance:
         data.thisptr = &self.thisptr.data
         return data
 
+    def from_uper(self, list data):
+        cdef unsigned char* uper_buffer = <unsigned char*> malloc(
+            _cdff_types.asn1SccTransformWithCovariance_REQUIRED_BYTES_FOR_ENCODING *
+            sizeof(unsigned char))
+        cdef _cdff_types.BitStream* b = new _cdff_types.BitStream()
+        cdef int i
+        _cdff_types.BitStream_Init(
+            b, uper_buffer, _cdff_types.asn1SccTransformWithCovariance_REQUIRED_BYTES_FOR_ENCODING)
+        for i in range(_cdff_types.asn1SccTransformWithCovariance_REQUIRED_BYTES_FOR_ENCODING):
+            uper_buffer[i] = data[i]
+            b.buf[i] = data[i]
+        b.count = _cdff_types.asn1SccTransformWithCovariance_REQUIRED_BYTES_FOR_ENCODING
+
+        cdef int error_code
+        cdef bool success
+        success = _cdff_types.asn1SccTransformWithCovariance_Decode(self.thisptr, b, &error_code)
+        if not success:
+            raise RuntimeError(
+                "Conversion from uPER failed, error code: %d" % error_code)
+
+        free(uper_buffer)
+        del b
+
 
 cdef class PointCloud_Data_pointsReference:
     def __cinit__(self):
@@ -1092,6 +1116,29 @@ cdef class Pointcloud:
         cdef PointCloud_DataReference data = PointCloud_DataReference()
         data.thisptr = &self.thisptr.data
         return data
+
+    def from_uper(self, list data):
+        cdef unsigned char* uper_buffer = <unsigned char*> malloc(
+            _cdff_types.asn1SccPointcloud_REQUIRED_BYTES_FOR_ENCODING *
+            sizeof(unsigned char))
+        cdef _cdff_types.BitStream* b = new _cdff_types.BitStream()
+        cdef int i
+        _cdff_types.BitStream_Init(
+            b, uper_buffer, _cdff_types.asn1SccPointcloud_REQUIRED_BYTES_FOR_ENCODING)
+        for i in range(_cdff_types.asn1SccPointcloud_REQUIRED_BYTES_FOR_ENCODING):
+            uper_buffer[i] = data[i]
+            b.buf[i] = data[i]
+        b.count = _cdff_types.asn1SccPointcloud_REQUIRED_BYTES_FOR_ENCODING
+
+        cdef int error_code
+        cdef bool success
+        success = _cdff_types.asn1SccPointcloud_Decode(self.thisptr, b, &error_code)
+        if not success:
+            raise RuntimeError(
+                "Conversion from uPER failed, error code: %d" % error_code)
+
+        free(uper_buffer)
+        del b
 
 
 cdef class LaserScan:
@@ -3062,6 +3109,29 @@ cdef class Map:
         cdef Array3DReference data = Array3DReference()
         data.thisptr = &self.thisptr.data
         return data
+
+    def from_uper(self, list data):
+        cdef unsigned char* uper_buffer = <unsigned char*> malloc(
+            _cdff_types.asn1SccMap_REQUIRED_BYTES_FOR_ENCODING *
+            sizeof(unsigned char))
+        cdef _cdff_types.BitStream* b = new _cdff_types.BitStream()
+        cdef int i
+        _cdff_types.BitStream_Init(
+            b, uper_buffer, _cdff_types.asn1SccMap_REQUIRED_BYTES_FOR_ENCODING)
+        for i in range(_cdff_types.asn1SccMap_REQUIRED_BYTES_FOR_ENCODING):
+            uper_buffer[i] = data[i]
+            b.buf[i] = data[i]
+        b.count = _cdff_types.asn1SccMap_REQUIRED_BYTES_FOR_ENCODING
+
+        cdef int error_code
+        cdef bool success
+        success = _cdff_types.asn1SccMap_Decode(self.thisptr, b, &error_code)
+        if not success:
+            raise RuntimeError(
+                "Conversion from uPER failed, error code: %d" % error_code)
+
+        free(uper_buffer)
+        del b
 
 
 cdef class Map_metadata_tReference:
