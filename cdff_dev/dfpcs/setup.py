@@ -103,8 +103,6 @@ def make_pointcloudmodellocalisation(config, cdffpath, extra_compile_args):
     dfpc_libraries = [
         "dfpc_implementation_features_matching_3d",
     ]
-    dfpc_deps = build_tools.find_dependencies_of(
-        dfpc_libraries, cdffpath, blacklist=("pcl", "vtk", "verdict"))
 
     config.add_extension(
         "pointcloudmodellocalisation",
@@ -118,7 +116,7 @@ def make_pointcloudmodellocalisation(config, cdffpath, extra_compile_args):
         ] + build_tools.DEFAULT_LIBRARY_DIRS + dep_lib_dirs,
         # make sure that libraries used in other libraries are linked last!
         # for example: an implementation must be linked before its interface
-        libraries=dfpc_libraries + dfpc_deps + dep_libs,
+        libraries=dfpc_libraries + dep_libs,
         define_macros=[("NDEBUG",)],
         extra_compile_args=extra_compile_args
     )

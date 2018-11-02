@@ -20,10 +20,10 @@ import cdff_envire
 
 def main():
     #download_bunny()
-    original_ply = "test/test_data/pointclouds/bun_zipper_original.ply"
-    transformed_ply = "test/test_data/pointclouds/bun_zipper_transformed.ply"
-    #original_ply = "test/test_data/pointclouds/dense_original.ply"
-    #transformed_ply = "test/test_data/pointclouds/dense_transformed.ply"
+    #original_ply = "test/test_data/pointclouds/bun_zipper_original.ply"
+    #transformed_ply = "test/test_data/pointclouds/bun_zipper_transformed.ply"
+    original_ply = "test/test_data/pointclouds/dense_original.ply"
+    transformed_ply = "test/test_data/pointclouds/dense_transformed.ply"
     pc_full = helpers.load_ply_file(original_ply)
     pc_model = helpers.load_ply_file(transformed_ply)
     print(pc_model)
