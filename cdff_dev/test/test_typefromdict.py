@@ -1,7 +1,7 @@
 from cdff_dev import logloader, typefromdict
 import cdff_types
 from nose.tools import assert_raises_regex, assert_equal
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_array_almost_equal
 
 
 def test_create_unknown_type():
@@ -235,3 +235,22 @@ def test_create_map():
     assert_equal(obj.data.data[1], 0.0)
     assert_equal(obj.data.data[2], 1.0)
     assert_equal(obj.data.data[3], 0.0)
+
+
+def test_load_asn1_bitstream():
+    log = logloader.load_log("test/test_data/logs/asn1_bitstream.msg")
+    asn1_bitstream = log["/pom_pose"][0]
+    typename = log["/pom_pose.meta"]["type"]
+    assert_equal(asn1_bitstream["type"], "asn1SccTransformWithCovariance")
+    obj = typefromdict.create_from_dict(typename, asn1_bitstream)
+    assert_equal(obj.metadata.msg_version, 1)
+    assert_equal(obj.metadata.producer_id, "")
+    assert_equal(obj.metadata.parent_frame_id, "LocalTerrainFrame")
+    assert_equal(obj.metadata.parent_time.microseconds, 1540374075138837)
+    assert_equal(obj.metadata.child_frame_id, "RoverBodyFrame")
+    assert_equal(obj.metadata.child_time.microseconds, 1540374075138837)
+    assert_array_almost_equal(
+        obj.data.translation.toarray(), [-12.281598, -28.618572,  -0.083111])
+    assert_array_almost_equal(
+        obj.data.orientation.toarray(),
+        [-0.0120578, 0.0102693, -0.970555, 0.24036])
