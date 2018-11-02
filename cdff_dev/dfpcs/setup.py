@@ -241,8 +241,10 @@ def make_reconstruction3d(config, cdffpath, extra_compile_args):
         "registration_from_stereo",
         "estimation_from_stereo",
     ]
-    dfpc_deps = find_dependencies_of(
-        dfpc_libraries, cdffpath, blacklist=("pcl", "vtk", "verdict"))
+    # TODO make this override permanent in buildconf:
+    # Autobuild::Package['cdff/CDFF'].define 'BUILD_SHARED_LIBS', 'TRUE'
+    # TODO currently we have to set manually:
+    # LD_LIBRARY_PATH=$CDFF/Common/Converters:$CDFF/Common/Helpers:$CDFF/Common/Loggers:$CDFF/Common/Types:$CDFF/Common/Validators:$CDFF/Common/Validators:$CDFF/Common/Visualizers:`ls -d $CDFF/DFNs/*/ | tr '\n' ':'`:`ls -d $CDFF/DFPCs/*/ | tr '\n' ':'`:$CDFF/CC:$LD_LIBRARY_PATH
 
     config.add_extension(
         "reconstruction3d",
@@ -256,7 +258,7 @@ def make_reconstruction3d(config, cdffpath, extra_compile_args):
         ] + DEFAULT_LIBRARY_DIRS + dep_lib_dirs,
         # make sure that libraries used in other libraries are linked last!
         # for example: an implementation must be linked before its interface
-        libraries=dfpc_libraries + dfpc_deps + dep_libs,
+        libraries=dfpc_libraries + dep_libs,
         define_macros=[("NDEBUG",)],
         extra_compile_args=extra_compile_args
     )
