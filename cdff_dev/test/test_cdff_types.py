@@ -1372,8 +1372,18 @@ def test_map():
     assert_equal(
         str(map),
         "{type: Map, metadata: {time_stamp: {type: Time, microseconds: 11}, "
-        "type: map_DEM, scale: 55}, data: {rows: 25, cols: 26, channels: 27, "
-        "depth: depth_8U, row_size: 28}}")
+        "type: map_DEM, err_values: [{type: error_UNDEFINED, value: 5.0}], "
+        "scale: 55, pose_fixed_frame_map_frame: {metadata: "
+        "{msg_version: 0, producer_id: , parent_frame_id: , "
+        "parent_time: {type: Time, microseconds: -9223372036854775807}, "
+        "child_frame_id: , child_time: {type: Time, microseconds: "
+        "-9223372036854775807}}, data: {translation: {type: Vector3d, "
+        "data: [1.2, 3.4, 5.6]}, orientation: {type: Quaterniond, data: "
+        "{x: 0, y: 0, z: 0, w: 0}}, cov: {type: Matrix6d, data: "
+        "[[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], "
+        "[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]}}}}, "
+        "data: {rows: 25, cols: 26, channels: 27, depth: depth_8U, "
+        "row_size: 28}}")
 
 
 def test_map_array_reference():
