@@ -16,13 +16,17 @@ class Transformer(transformer.EnvireDFN):
         tf : TransformWithCovariance
             Transformation
 
-        TODO
+        frame_transformation : bool, optional (default: True)
+            A frame transformation represents the transformation of a source
+            frame to a target frame or tells us where a target frame is in
+            the source frame. The opposite is a data transformation that
+            transforms data from a source frame to a target frame.
         """
         if self.graph_ is None:
             warnings.warn("EnviRe Graph is not initialized.")
             return
 
-        if frame_transformation:  # TODO
+        if frame_transformation:
             origin = tf.metadata.parent_frame_id
             target = tf.metadata.child_frame_id
         else:
@@ -47,11 +51,16 @@ class Transformer(transformer.EnvireDFN):
             self.graph_.add_transform(origin, target, transform)
 
     def pom_poseInput(self, data):
-        self._set_transform_with_cov(data, frame_transformation=False)
+        self._set_transform_with_cov(data, frame_transformation=True)
+
+    def map_transformInput(self, data):
+        self._set_transform_with_cov(data.metadata.pose_fixed_frame_map_frame,
+                                     frame_transformation=True)
 
 
-class MapDownSampler:
-    def __init__(self):
+class HotfixMap:
+    def __init__(self, downsampling_factor=1):
+        self.downsampling_factor = downsampling_factor
         self.map = None
         self.small_map = cdff_types.Map()
 
@@ -68,17 +77,17 @@ class MapDownSampler:
         if self.map is None:
             return
 
-        factor = 1  # TODO
-
         self.small_map.metadata.type = self.map.metadata.type
-        self.small_map.metadata.scale = self.map.metadata.scale
-        self.small_map.data.rows = self.map.data.rows // factor
-        self.small_map.data.cols = self.map.data.cols // factor
+        self.small_map.metadata.scale = self.map.metadata.scale * self.downsampling_factor
+        self.small_map.data.rows = self.map.data.rows // self.downsampling_factor
+        self.small_map.data.cols = self.map.data.cols // self.downsampling_factor
         self.small_map.data.channels = self.map.data.channels
         self.small_map.data.depth = self.map.data.depth
-        # HACK fix row_size from incorrect logfile
+        # HACK fix incorrect row_size from logfile
         self.small_map.data.row_size = self.map.data.cols
-        self.small_map.data.array_reference()[:, :, :] = self.map.data.array_reference()[::factor, ::factor, :]
+        self.small_map.data.array_reference()[:, :, :] = \
+            self.map.data.array_reference()[::self.downsampling_factor,
+                                            ::self.downsampling_factor, :]
 
     def smallMapOutput(self):
         return self.small_map
@@ -87,7 +96,7 @@ class MapDownSampler:
 def main():
     app = envirevisualization.EnvireVisualizerApplication(
         frames={
-            "downsampler.smallMap": "RoverBodyFrame",
+            "hotfix_map.smallMap": "MapFrame",
             "pom.pose": "LocalTerrainFrame",
         },
         center_frame="LocalTerrainFrame"
@@ -98,21 +107,22 @@ def main():
         "/pom_pose": "pom.pose",
     }
     nodes = {"transformer": Transformer(),
-             "downsampler": MapDownSampler()}
+             "hotfix_map": HotfixMap(8)}
     connections = (
         ("pom.pose", "transformer.pom_pose"),
-        ("dem_building.fusedMap", "downsampler.map"),
+        ("dem_building.fusedMap", "hotfix_map.map"),
+        ("dem_building.fusedMap", "transformer.map_transform"),
     )
     dfc = dataflowcontrol.DataFlowControl(
         nodes=nodes, connections=connections,
         periods={"transformer": 1.0},
-        trigger_ports={"downsampler": "map"},
+        trigger_ports={"hotfix_map": "map"},
         stream_aliases=stream_aliases, verbose=2)
     dfc.setup()
 
     # Note that the logfiles are not in the repository because they are too
     # large. Ask Alexander Fabisch about it.
-    folder = "/home/dfki.uni-bremen.de/afabisch/Projekte/ros_workspace/src/CDFF_ROS/rosbag2msgpack/logs_maps/"
+    folder = "logs/20181031_LAAS_Maps/"
     #filename = folder + "2018-10-31-17-15-49_0_000000000.msg"
     filename = folder + "2018-10-31-17-18-12_14_000000000.msg"
     log_iterator = logloader.replay_logfile(
