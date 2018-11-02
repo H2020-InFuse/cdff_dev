@@ -254,3 +254,27 @@ def test_load_asn1_bitstream():
     assert_array_almost_equal(
         obj.data.orientation.toarray(),
         [-0.0120578, 0.0102693, -0.970555, 0.24036])
+
+
+def test_load_asn1_bitstream_with_invalid_serialization():
+    asn1_bitstream = {
+        "serialization_method": 1,
+        "type": "asn1SccMap",
+        "data": []
+    }
+    assert_raises_regex(
+        NotImplementedError, "Cannot decode serialization method 1",
+        typefromdict.create_from_dict, "asn1_bitstream", asn1_bitstream
+    )
+
+
+def test_load_asn1_bitstream_with_unsupported_type():
+    asn1_bitstream = {
+        "serialization_method": 0,
+        "type": "asn1SccFrame",
+        "data": []
+    }
+    assert_raises_regex(
+        NotImplementedError, "Cannot decode type asn1SccFrame from uPER",
+        typefromdict.create_from_dict, "asn1_bitstream", asn1_bitstream
+    )

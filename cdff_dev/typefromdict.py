@@ -72,8 +72,11 @@ def _decode_asn1(data):
     if data["serialization_method"] != 0:
         raise NotImplementedError(
             "Cannot decode serialization method %d. We can only handle 0 "
-            "(uPER).")
+            "(uPER)." % data["serialization_method"])
     obj = create_cpp(data["type"])
+    if not hasattr(obj, "from_uper"):
+        raise NotImplementedError("Cannot decode type %s from uPER"
+                                  % data["type"])
     obj.from_uper(data["data"])
     return obj
 
@@ -97,7 +100,7 @@ def _translate_typename(typename):
         i = typename.find("/")
         if i + 1 < len(typename):
             typename = typename[:i] + typename[i + 1].upper() + typename[i + 2:]
-    if typename.startswith("asn1Scc"):  # TODO test
+    if typename.startswith("asn1Scc"):
         typename = typename.replace("asn1Scc", "")
     return typename
 
