@@ -101,8 +101,11 @@ def make_cdff_types(config, cdffpath, ctypespath, extra_compile_args):
             numpy.get_include(),
             ctypespath
         ],
-        library_dirs=[os.path.join(cdffpath, "build", "Common", "Types")],
-        libraries=["cdff_types"],
+        library_dirs=[
+            os.path.join(cdffpath, "build", "Common", "Types"),
+            os.path.join(cdffpath, "build", "Common", "Loggers")
+        ],
+        libraries=["cdff_types", "cdff_logger"],
         define_macros=[("NDEBUG",)],
         extra_compile_args=extra_compile_args
     )
