@@ -107,7 +107,7 @@ def main():
         "/pom_pose": "pom.pose",
     }
     nodes = {"transformer": Transformer(),
-             "hotfix_map": HotfixMap(8)}
+             "hotfix_map": HotfixMap()}
     connections = (
         ("pom.pose", "transformer.pom_pose"),
         ("dem_building.fusedMap", "hotfix_map.map"),
