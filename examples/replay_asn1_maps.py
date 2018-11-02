@@ -58,45 +58,10 @@ class Transformer(transformer.EnvireDFN):
                                      frame_transformation=True)
 
 
-class HotfixMap:
-    def __init__(self, downsampling_factor=1):
-        self.downsampling_factor = downsampling_factor
-        self.map = None
-        self.small_map = cdff_types.Map()
-
-    def set_configuration_file(self, filename):
-        pass
-
-    def configure(self):
-        pass
-
-    def mapInput(self, data):
-        self.map = data
-
-    def process(self):
-        if self.map is None:
-            return
-
-        self.small_map.metadata.type = self.map.metadata.type
-        self.small_map.metadata.scale = self.map.metadata.scale * self.downsampling_factor
-        self.small_map.data.rows = self.map.data.rows // self.downsampling_factor
-        self.small_map.data.cols = self.map.data.cols // self.downsampling_factor
-        self.small_map.data.channels = self.map.data.channels
-        self.small_map.data.depth = self.map.data.depth
-        # HACK fix incorrect row_size from logfile
-        self.small_map.data.row_size = self.map.data.cols
-        self.small_map.data.array_reference()[:, :, :] = \
-            self.map.data.array_reference()[::self.downsampling_factor,
-                                            ::self.downsampling_factor, :]
-
-    def smallMapOutput(self):
-        return self.small_map
-
-
 def main():
     app = envirevisualization.EnvireVisualizerApplication(
         frames={
-            "hotfix_map.smallMap": "MapFrame",
+            "dem_building.fusedMap": "MapFrame",
             "pom.pose": "LocalTerrainFrame",
         },
         center_frame="LocalTerrainFrame"
@@ -106,17 +71,14 @@ def main():
         "/dem_building/fusedMap": "dem_building.fusedMap",
         "/pom_pose": "pom.pose",
     }
-    nodes = {"transformer": Transformer(),
-             "hotfix_map": HotfixMap()}
+    nodes = {"transformer": Transformer()}
     connections = (
         ("pom.pose", "transformer.pom_pose"),
-        ("dem_building.fusedMap", "hotfix_map.map"),
         ("dem_building.fusedMap", "transformer.map_transform"),
     )
     dfc = dataflowcontrol.DataFlowControl(
         nodes=nodes, connections=connections,
         periods={"transformer": 1.0},
-        trigger_ports={"hotfix_map": "map"},
         stream_aliases=stream_aliases, verbose=2)
     dfc.setup()
 
