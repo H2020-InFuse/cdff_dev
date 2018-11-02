@@ -1,6 +1,5 @@
 import warnings
 from cdff_dev import logloader, dataflowcontrol, envirevisualization, transformer
-import cdff_types
 import cdff_envire
 
 
