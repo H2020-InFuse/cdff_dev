@@ -241,10 +241,6 @@ def make_reconstruction3d(config, cdffpath, extra_compile_args):
         "registration_from_stereo",
         "estimation_from_stereo",
     ]
-    # TODO make this override permanent in buildconf:
-    # Autobuild::Package['cdff/CDFF'].define 'BUILD_SHARED_LIBS', 'TRUE'
-    # TODO currently we have to set manually:
-    # LD_LIBRARY_PATH=$CDFF/Common/Converters:$CDFF/Common/Helpers:$CDFF/Common/Loggers:$CDFF/Common/Types:$CDFF/Common/Validators:$CDFF/Common/Validators:$CDFF/Common/Visualizers:`ls -d $CDFF/DFNs/*/ | tr '\n' ':'`:`ls -d $CDFF/DFPCs/*/ | tr '\n' ':'`:$CDFF/CC:$LD_LIBRARY_PATH
 
     config.add_extension(
         "reconstruction3d",
