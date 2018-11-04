@@ -8,9 +8,6 @@ We will download an external PLY file from the internet for this example.
 """
 import os
 import sys
-import shutil
-import urllib.request
-import tarfile
 from PyQt4.QtGui import QApplication
 from cdff_dev import path, envirevisualization, qtgui
 from cdff_dev.extensions.pcl import helpers
@@ -19,7 +16,6 @@ import cdff_envire
 
 
 def main():
-    #download_bunny()
     #original_ply = "test/test_data/pointclouds/bun_zipper_original.ply"
     #transformed_ply = "test/test_data/pointclouds/bun_zipper_transformed.ply"
     original_ply = "test/test_data/pointclouds/dense_original.ply"
@@ -48,36 +44,6 @@ def main():
     pose = dfpc.poseOutput()
     print(success)
     print(pose)
-
-
-def download_bunny(verbose=1):
-    filename = "test/test_data/bunny.tar.gz"
-    if os.path.exists(filename):
-        if verbose:
-            print("Found bunny, not downloading.")
-        return
-
-    if verbose:
-        print("Downloading bunny... ", end="")
-        sys.stdout.flush()
-
-    url = "http://graphics.stanford.edu/pub/3Dscanrep/bunny.tar.gz"
-    with urllib.request.urlopen(url) as response, open(filename, "wb") as f:
-        shutil.copyfileobj(response, f)
-
-    if verbose:
-        print("Uncompressing... ", end="")
-        sys.stdout.flush()
-
-    with tarfile.open(filename, "r:gz") as tar:
-        tar.extractall(path="test/test_data/")
-
-    # from CDFF/build/Tests/DataGenerators/:
-    # echo "remove_outliers save ../../../../CDFF_dev/test/test_data/bun_zipper_original.ply quit" | ./point_cloud_transformer ../../../../CDFF_dev/test/test_data/bunny/reconstruction/bun_zipper.ply
-    # echo "remove_outliers transform 0.1 0 0 0 0 0 1 save ../../../../CDFF_dev/test/test_data/bun_zipper_transformed.ply quit" | ./point_cloud_transformer ../../../../CDFF_dev/test/test_data/bunny/reconstruction/bun_zipper.ply
-
-    if verbose:
-        print("DONE")
 
 
 def show_pointcloud(pointclouds):
