@@ -9,7 +9,7 @@
 #include "DFNCommonInterface.hpp"
 {% for include in includes %}
 {% if include %}
-#include <{{ include }}>
+#include <Types/C/{{ include }}>
 {% endif %}
 {% endfor %}
 
