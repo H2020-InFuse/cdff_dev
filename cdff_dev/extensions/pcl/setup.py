@@ -15,8 +15,6 @@ def configuration(parent_package='', top_path=None):
     dep_lib_dirs = build_tools.get_library_dirs(libraries)
     dep_libs = build_tools.get_libraries(libraries)
 
-    cdffpath = build_tools.load_cdffpath()
-
     helper_libraries = [
         "cdff_converters",
         "cdff_logger",

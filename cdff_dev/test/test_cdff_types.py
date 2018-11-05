@@ -874,8 +874,8 @@ def test_create_pointcloud():
 
 def test_load_ply():
     pc = helpers.load_ply_file(
-        "test/test_data/pointclouds/bun_zipper_original.ply")
-    assert_equal(pc.data.points.size(), 35947)
+        "test/test_data/pointclouds/cube.ply")
+    assert_equal(pc.data.points.size(), 4)
     pc = helpers.load_ply_file(
         "test/test_data/pointclouds/dense_original.ply")
     assert_equal(pc.data.points.size(), 5824)
