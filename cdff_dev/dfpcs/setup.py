@@ -21,30 +21,11 @@ def configuration(parent_package='', top_path=None):
 
 
 def make_reconstruction3d(config, cdffpath, extra_compile_args):
-    libraries = ["opencv", "eigen3", "yaml-cpp"]
-    libraries += list(map(
-        lambda lib: lib + "-1.8",
-        ["pcl_common", "pcl_features", "pcl_search", "pcl_filters",
-         "pcl_visualization", "pcl_io", "pcl_ml", "pcl_octree",
-         "pcl_outofcore", "pcl_kdtree", "pcl_tracking", "pcl_stereo",
-         "pcl_recognition", "pcl_registration", "pcl_people", "pcl_keypoints",
-         "pcl_surface", "pcl_segmentation", "pcl_sample_consensus",
-         "pcl_stereo"]))
+    libraries = ["opencv", "eigen3", "yaml-cpp", "pcl_common-1.8",
+                 "pcl_visualization-1.8"]
 
     # use pkg-config for external dependencies
     dep_inc_dirs = build_tools.get_include_dirs(libraries)
-    dep_lib_dirs = build_tools.get_library_dirs(libraries)
-    dep_libs = build_tools.get_libraries(libraries)
-
-    ceres_info = build_tools.find_ceres()
-    dep_inc_dirs += ceres_info["include_dirs"]
-    dep_lib_dirs += ceres_info["library_dirs"]
-    dep_libs += ceres_info["libraries"]
-
-    boost_system_info = build_tools.find_boost_system()
-    dep_inc_dirs += boost_system_info["include_dirs"]
-    dep_lib_dirs += boost_system_info["library_dirs"]
-    dep_libs += boost_system_info["libraries"]
 
     dfpc_libraries = [
         "adjustment_from_stereo",
@@ -65,58 +46,29 @@ def make_reconstruction3d(config, cdffpath, extra_compile_args):
         library_dirs=[
             # TODO move to installation folder:
             os.path.join(cdffpath, "build", "DFPCs", "Reconstruction3D"),
-        ] + build_tools.DEFAULT_LIBRARY_DIRS + dep_lib_dirs,
+        ] + build_tools.DEFAULT_LIBRARY_DIRS,
         # make sure that libraries used in other libraries are linked last!
         # for example: an implementation must be linked before its interface
-        libraries=dfpc_libraries + dep_libs,
+        libraries=dfpc_libraries,
         define_macros=[("NDEBUG",)],
         extra_compile_args=extra_compile_args
     )
 
 
 def make_pointcloudmodellocalisation(config, cdffpath, extra_compile_args):
-    libraries = ["opencv", "eigen3", "yaml-cpp"]
-    libraries += list(map(
-        lambda lib: lib + "-1.8",
-        ["pcl_common", "pcl_features", "pcl_search", "pcl_filters",
-         "pcl_visualization", "pcl_io", "pcl_ml", "pcl_octree",
-         "pcl_outofcore", "pcl_kdtree", "pcl_tracking", "pcl_stereo",
-         "pcl_recognition", "pcl_registration", "pcl_people", "pcl_keypoints",
-         "pcl_surface", "pcl_segmentation", "pcl_sample_consensus",
-         "pcl_stereo"]))
-
-    # use pkg-config for external dependencies
-    dep_inc_dirs = build_tools.get_include_dirs(libraries)
-    dep_lib_dirs = build_tools.get_library_dirs(libraries)
-    dep_libs = build_tools.get_libraries(libraries)
-
-    ceres_info = build_tools.find_ceres()
-    dep_inc_dirs += ceres_info["include_dirs"]
-    dep_lib_dirs += ceres_info["library_dirs"]
-    dep_libs += ceres_info["libraries"]
-
-    boost_system_info = build_tools.find_boost_system()
-    dep_inc_dirs += boost_system_info["include_dirs"]
-    dep_lib_dirs += boost_system_info["library_dirs"]
-    dep_libs += boost_system_info["libraries"]
-
-    dfpc_libraries = [
-        "dfpc_implementation_features_matching_3d",
-    ]
-
     config.add_extension(
         "pointcloudmodellocalisation",
         sources=["pointcloudmodellocalisation.pyx"],
         include_dirs=[
             os.path.join(cdffpath, "DFPCs", "PointCloudModelLocalisation"),
-        ] + build_tools.DEFAULT_INCLUDE_DIRS + dep_inc_dirs,
+        ] + build_tools.DEFAULT_INCLUDE_DIRS,
         library_dirs=[
             # TODO move to installation folder:
             os.path.join(cdffpath, "build", "DFPCs", "PointCloudModelLocalisation"),
-        ] + build_tools.DEFAULT_LIBRARY_DIRS + dep_lib_dirs,
+        ],
         # make sure that libraries used in other libraries are linked last!
         # for example: an implementation must be linked before its interface
-        libraries=dfpc_libraries + dep_libs,
+        libraries=["dfpc_implementation_features_matching_3d"],
         define_macros=[("NDEBUG",)],
         extra_compile_args=extra_compile_args
     )
