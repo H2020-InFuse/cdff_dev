@@ -8,35 +8,18 @@ def configuration(parent_package='', top_path=None):
     from numpy.distutils.misc_util import Configuration
     config = Configuration("pcl", parent_package, top_path)
 
-    libraries = ["opencv", "eigen3", "yaml-cpp"]
-    libraries += list(map(
-        lambda lib: lib + "-1.8",
-        ["pcl_common", "pcl_features", "pcl_search", "pcl_filters",
-         "pcl_visualization", "pcl_io", "pcl_ml", "pcl_octree",
-         "pcl_outofcore", "pcl_kdtree", "pcl_tracking", "pcl_stereo",
-         "pcl_recognition", "pcl_registration", "pcl_people", "pcl_keypoints",
-         "pcl_surface", "pcl_segmentation", "pcl_sample_consensus",
-         "pcl_stereo"]))
+    libraries = ["opencv", "eigen3", "pcl_common-1.8", "pcl_io-1.8"]
 
     # use pkg-config for external dependencies
     dep_inc_dirs = build_tools.get_include_dirs(libraries)
     dep_lib_dirs = build_tools.get_library_dirs(libraries)
     dep_libs = build_tools.get_libraries(libraries)
 
-    ceres_info = build_tools.find_ceres()
-    dep_inc_dirs += ceres_info["include_dirs"]
-    dep_lib_dirs += ceres_info["library_dirs"]
-    dep_libs += ceres_info["libraries"]
-
-    boost_system_info = build_tools.find_boost_system()
-    dep_inc_dirs += boost_system_info["include_dirs"]
-    dep_lib_dirs += boost_system_info["library_dirs"]
-    dep_libs += boost_system_info["libraries"]
-
     cdffpath = build_tools.load_cdffpath()
 
     helper_libraries = [
-        "converters_opencv",
+        "cdff_converters",
+        "cdff_logger",
         "cdff_types"
     ]
 
