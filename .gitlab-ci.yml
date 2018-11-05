@@ -1,4 +1,4 @@
-image: h2020infuse/cdff-dev-ci:1.8.12
+image: h2020infuse/cdff-dev-ci:1.8.13
 
 stages:
   - fetch_test
