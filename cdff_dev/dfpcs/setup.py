@@ -10,19 +10,14 @@ cdffpath = load_cdffpath()
 DEFAULT_INCLUDE_DIRS = [
     ".",
     numpy.get_include(),
-    # TODO move to installation folder:
+    # TODO move to installation folder: CMAKE_INSTALL_PREFIX/include/CDFF/...
     os.path.join(cdffpath, "Common"),
-    os.path.join(cdffpath, "Common", "Converters"),
-    os.path.join(cdffpath, "Common", "Types", "C"),
-    os.path.join(cdffpath, "Common", "Types", "CPP"),
     os.path.join(cdffpath, "DFNs"),
     os.path.join(cdffpath, "DFPCs"),
-    os.path.join(cdffpath, "Tools"),
     os.path.join(cdffpath, "CC"),
 ]
 DEFAULT_LIBRARY_DIRS = [
-    # TODO move to installation folder:
-    os.path.join(cdffpath, "build"),
+    # TODO move to installation folder: CMAKE_INSTALL_PREFIX/lib
     os.path.join(cdffpath, "build", "Common", "Types"),
     os.path.join(cdffpath, "build", "Common", "Helpers"),
     os.path.join(cdffpath, "build", "Common", "Visualizers"),
