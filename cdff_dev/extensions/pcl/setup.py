@@ -39,8 +39,6 @@ def configuration(parent_package='', top_path=None):
         "converters_opencv",
         "cdff_types"
     ]
-    helper_deps = build_tools.find_dependencies_of(
-        helper_libraries, cdffpath, blacklist=("pcl", "vtk", "verdict"))
 
     config.add_extension(
         "helpers",
@@ -48,7 +46,7 @@ def configuration(parent_package='', top_path=None):
         include_dirs=["cpp_helpers"] + build_tools.DEFAULT_INCLUDE_DIRS +
                      dep_inc_dirs,
         library_dirs=build_tools.DEFAULT_LIBRARY_DIRS + dep_lib_dirs,
-        libraries=helper_libraries + helper_deps + dep_libs,
+        libraries=helper_libraries + dep_libs,
         define_macros=[("NDEBUG",)],
         extra_compile_args=build_tools.extra_compile_args
     )
