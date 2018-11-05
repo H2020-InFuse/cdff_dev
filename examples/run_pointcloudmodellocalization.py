@@ -3,8 +3,10 @@
 Point Cloud Model Localisation
 ==============================
 
-This DFPC will localise a pointcloud model in a larger pointcloud.
-We will download an external PLY file from the internet for this example.
+This DFPC will localise a pointcloud model in a larger point cloud.
+The EnviRe visualizer will be started to display the two point clouds.
+For this example, will will only search a point cloud in a slightly
+translated version of it.
 """
 import os
 import sys
@@ -22,21 +24,19 @@ def main():
         "test/test_data/pointclouds/dense_transformed.ply")
     print(pc_transformed)
     print(pc_original)
-    #show_pointcloud([pc_original, pc_transformed])
+    show_pointcloud([pc_original, pc_transformed])
 
     dfpc = FeaturesMatching3D()
     config_filename = os.path.join(
         path.load_cdffpath(),
         "Tests/ConfigurationFiles/DFPCs/PointCloudModelLocalisation/"
         "DfpcFeaturesMatching3D_conf01.yaml")
-    print(config_filename)
     dfpc.set_configuration_file(config_filename)
     dfpc.setup()
 
     dfpc.sceneInput(pc_transformed)
     dfpc.modelInput(pc_original)
     dfpc.computeModelFeaturesInput(True)
-    sys.stdout.flush()
     dfpc.run()
     success = dfpc.successOutput()
     pose = dfpc.poseOutput()
@@ -55,10 +55,7 @@ def show_pointcloud(pointclouds):
         def __call__(self):
             if self.current_idx >= len(self.items):
                 return
-            print("Adding item to graph...", end="")
-            sys.stdout.flush()
             self.items[self.current_idx].add_to(self.graph, self.frame)
-            print("DONE")
             self.current_idx += 1
 
     graph = cdff_envire.EnvireGraph()
