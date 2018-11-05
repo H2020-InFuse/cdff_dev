@@ -5,7 +5,7 @@ import cdff_types
 
 
 # TODO at the moment, we can only handle RigidBodyStates!
-#      other options: cpp_helpers.Transform, basetypes.TransformWithCov...
+#      other options: envire.Transform, cdff_types.TransformWithCov...
 class EnvireDFN:
     """Data Fusion Node that has access to an EnviRe graph.
 
