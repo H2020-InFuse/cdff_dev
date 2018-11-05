@@ -1,7 +1,7 @@
 import os
 import yaml
 from cdff_dev.code_generator import write_dfpc
-from cdff_dev.path import load_cdffpath, CTYPESDIR
+from cdff_dev.path import load_cdffpath
 import cdff_types
 from cdff_dev.testing import EnsureCleanup, build_extension
 from nose.tools import assert_true, assert_raises_regexp
@@ -46,8 +46,8 @@ def test_compile():
         ec.add_files(filenames)
         ec.add_folder(os.path.join(tmp_folder, "python"))
 
-        incdirs = ["test/test_output/", os.path.join(cdffpath, "DFPCs"),
-                   os.path.join(cdffpath, CTYPESDIR)]
+        incdirs = ["test/test_output/", os.path.join(cdffpath, "Common"),
+                   os.path.join(cdffpath, "DFPCs")]
         build_extension(
             tmp_folder, hide_stderr=hide_stderr,
             name=node["name"].lower(),
