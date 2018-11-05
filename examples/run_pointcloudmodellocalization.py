@@ -16,15 +16,13 @@ import cdff_envire
 
 
 def main():
-    #original_ply = "test/test_data/pointclouds/bun_zipper_original.ply"
-    #transformed_ply = "test/test_data/pointclouds/bun_zipper_transformed.ply"
-    original_ply = "test/test_data/pointclouds/dense_original.ply"
-    transformed_ply = "test/test_data/pointclouds/dense_transformed.ply"
-    pc_full = helpers.load_ply_file(original_ply)
-    pc_model = helpers.load_ply_file(transformed_ply)
-    print(pc_model)
-    print(pc_full)
-    #show_pointcloud([pc_full, pc_model])
+    pc_original = helpers.load_ply_file(
+        "test/test_data/pointclouds/dense_original.ply")
+    pc_transformed = helpers.load_ply_file(
+        "test/test_data/pointclouds/dense_transformed.ply")
+    print(pc_transformed)
+    print(pc_original)
+    #show_pointcloud([pc_original, pc_transformed])
 
     dfpc = FeaturesMatching3D()
     config_filename = os.path.join(
@@ -35,8 +33,8 @@ def main():
     dfpc.set_configuration_file(config_filename)
     dfpc.setup()
 
-    dfpc.sceneInput(pc_full)
-    dfpc.modelInput(pc_model)
+    dfpc.sceneInput(pc_transformed)
+    dfpc.modelInput(pc_original)
     dfpc.computeModelFeaturesInput(True)
     sys.stdout.flush()
     dfpc.run()

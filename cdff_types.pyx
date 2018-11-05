@@ -949,7 +949,13 @@ cdef class PointCloud_MetadataReference:
         pass
 
     def __str__(self):
-        return ("{...}")
+        return ("{msg_version: %d, time_stamp: %s, sensor_id: %s, frame_id: %s,"
+                " height: %d, width: %d, is_registered: %s, is_ordered: %s, "
+                "has_fixed_transform: %s, pose_fixed_frame_robot_frame: %s}"
+                % (self.msg_version, self.time_stamp, self.sensor_id,
+                   self.frame_id, self.height, self.width, self.is_registered,
+                   self.is_ordered, self.has_fixed_transform,
+                   self.pose_fixed_frame_robot_frame))
 
     def _get_time_stamp(self):
         cdef Time time = Time()
@@ -992,18 +998,6 @@ cdef class PointCloud_MetadataReference:
         self.thisptr.frameId.nCount = len(frame_id)
 
     frame_id = property(_get_frame_id, _set_frame_id)
-
-    def _get_time_stamp(self):
-        cdef Time time_stamp = Time()
-        del time_stamp.thisptr
-        time_stamp.thisptr = &self.thisptr.timeStamp
-        time_stamp.delete_thisptr = False
-        return time_stamp
-
-    def _set_time_stamp(self, Time time_stamp):
-        self.thisptr.timeStamp = deref(time_stamp.thisptr)
-
-    time_stamp = property(_get_time_stamp, _set_time_stamp)
 
     def _get_height(self):
         return self.thisptr.height
