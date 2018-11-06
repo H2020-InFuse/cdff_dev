@@ -1,4 +1,5 @@
 import numpy as np
+import pickle
 import yaml
 from cdff_dev.extensions.pcl import helpers
 import cdff_types
@@ -1397,3 +1398,22 @@ def test_map_array_reference():
     data = m.data.array_reference()
     assert_array_equal(data.shape, (100, 100, 1))
     assert_equal(data.dtype, np.float32)
+
+
+def test_deserialize_uper():
+    with open("test/test_data/pose.uper", "rb") as f:
+        uper = pickle.load(f)
+    pose = cdff_types.TransformWithCovariance()
+    pose.from_uper(uper)
+    assert_equal(pose.metadata.msg_version, 1)
+    assert_equal(pose.metadata.producer_id, "")
+    assert_equal(pose.metadata.parent_frame_id, "LocalTerrainFrame")
+    assert_equal(pose.metadata.parent_time.microseconds, 1540374075138837)
+    assert_equal(pose.metadata.child_frame_id, "RoverBodyFrame")
+    assert_equal(pose.metadata.child_time.microseconds, 1540374075138837)
+    assert_array_almost_equal(
+        pose.data.translation.toarray(), [-12.281598, -28.618572, -0.083111])
+    assert_array_almost_equal(
+        pose.data.orientation.toarray(),
+        [-0.012058, 0.010269, -0.970555, 0.24036])
+    assert_equal(pose.data.cov.toarray().sum(), 172773508.99806702)
