@@ -778,8 +778,7 @@ cdef class TransformWithCovariance:
         _cdff_types.BitStream_Init(
             b, uper_buffer, _cdff_types.asn1SccTransformWithCovariance_REQUIRED_BYTES_FOR_ENCODING)
         for i in range(_cdff_types.asn1SccTransformWithCovariance_REQUIRED_BYTES_FOR_ENCODING):
-            b.buf[i] = data[i]
-        b.count = _cdff_types.asn1SccTransformWithCovariance_REQUIRED_BYTES_FOR_ENCODING
+            uper_buffer[i] = data[i]
 
         cdef int error_code
         cdef bool success
@@ -1125,8 +1124,7 @@ cdef class Pointcloud:
         _cdff_types.BitStream_Init(
             b, uper_buffer, _cdff_types.asn1SccPointcloud_REQUIRED_BYTES_FOR_ENCODING)
         for i in range(_cdff_types.asn1SccPointcloud_REQUIRED_BYTES_FOR_ENCODING):
-            b.buf[i] = data[i]
-        b.count = _cdff_types.asn1SccPointcloud_REQUIRED_BYTES_FOR_ENCODING
+            uper_buffer[i] = data[i]
 
         cdef int error_code
         cdef bool success
@@ -3120,8 +3118,7 @@ cdef class Map:
         _cdff_types.BitStream_Init(
             b, uper_buffer, _cdff_types.asn1SccMap_REQUIRED_BYTES_FOR_ENCODING)
         for i in range(_cdff_types.asn1SccMap_REQUIRED_BYTES_FOR_ENCODING):
-            b.buf[i] = data[i]
-        b.count = _cdff_types.asn1SccMap_REQUIRED_BYTES_FOR_ENCODING
+            uper_buffer[i] = data[i]
 
         cdef int error_code
         cdef bool success

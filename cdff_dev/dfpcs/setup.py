@@ -12,13 +12,12 @@ def configuration(parent_package='', top_path=None):
     cdffpath = load_cdffpath()
     autoproj_available = build_tools.check_autoproj()
     if autoproj_available:
-        make_reconstruction3d(
-            config, cdffpath, build_tools.extra_compile_args)
+        make_reconstruction3d(config, cdffpath)
 
     return config
 
 
-def make_reconstruction3d(config, cdffpath, extra_compile_args):
+def make_reconstruction3d(config, cdffpath):
     libraries = ["opencv", "eigen3", "yaml-cpp", "pcl_common-1.8",
                  "pcl_visualization-1.8"]
 
@@ -49,7 +48,7 @@ def make_reconstruction3d(config, cdffpath, extra_compile_args):
         # for example: an implementation must be linked before its interface
         libraries=dfpc_libraries,
         define_macros=[("NDEBUG",)],
-        extra_compile_args=extra_compile_args
+        extra_compile_args=build_tools.extra_compile_args
     )
 
 

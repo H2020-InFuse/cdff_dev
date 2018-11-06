@@ -72,27 +72,19 @@ def configuration(parent_package='', top_path=None):
     # uncomment to see more outputs from the linker
     #os.environ["CFLAGS"] = "-Xlinker -v"
 
-    extra_compile_args = [
-        "-std=c++11",
-        "-O3",
-        # disable warnings caused by Cython using the deprecated
-        # NumPy C-API
-        "-Wno-cpp", "-Wno-unused-function"
-    ]
-
     cdffpath = load_cdffpath()
     ctypespath = os.path.join(cdffpath, CTYPESDIR)
 
-    make_cdff_types(config, cdffpath, ctypespath, extra_compile_args)
+    make_cdff_types(config, cdffpath, ctypespath)
     if autoproj_available:
-        make_cdff_envire(config, ctypespath, extra_compile_args)
+        make_cdff_envire(config, ctypespath)
 
     config.ext_modules = cythonize(config.ext_modules)
 
     return config
 
 
-def make_cdff_types(config, cdffpath, ctypespath, extra_compile_args):
+def make_cdff_types(config, cdffpath, ctypespath):
     config.add_extension(
         "cdff_types",
         sources=["cdff_types.pyx"],
@@ -109,11 +101,11 @@ def make_cdff_types(config, cdffpath, ctypespath, extra_compile_args):
         ],
         libraries=["cdff_types", "cdff_logger"],
         define_macros=[("NDEBUG",)],
-        extra_compile_args=extra_compile_args
+        extra_compile_args=build_tools.extra_compile_args
     )
 
 
-def make_cdff_envire(config, ctypespath, extra_compile_args):
+def make_cdff_envire(config, ctypespath):
     autoproj_current_root = os.environ.get("AUTOPROJ_CURRENT_ROOT", None)
     install_dir = os.path.join(autoproj_current_root, "install")
     # this path is currently only used in CI image:
@@ -141,7 +133,7 @@ def make_cdff_envire(config, ctypespath, extra_compile_args):
         libraries=["base-types", "envire_core", "envire_urdf",
                    "urdfdom_model", "envire_visualizer_interface"],
         define_macros=[("NDEBUG",)],
-        extra_compile_args=extra_compile_args
+        extra_compile_args=build_tools.extra_compile_args
     )
 
 

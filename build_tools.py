@@ -40,7 +40,7 @@ extra_compile_args = [
     "-O3",
     # disable warnings caused by Cython using the deprecated
     # NumPy C-API
-    "-Wno-cpp", "-Wno-unused-function"
+    "-Wno-cpp", "-Wno-unused-function",
 ]
 
 

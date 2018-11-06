@@ -1,12 +1,27 @@
 image:  nexus.spaceapplications.com/repository/infuse/cdff-dev-ci:1.8.14
 
 stages:
+  - platform
   - fetch_test
+
+platform:
+  stage : platform
+  script:
+      - cat /proc/cpuinfo
+      - lscpu
+      - ulimit -a
+      - gcc -march=native -E -v - </dev/null 2>&1 | grep cc1
 
 fetch_test:
   stage : fetch_test
   script:
       - source /tmp/infuse/env.sh
       - export CDFFPATH="/tmp/infuse/cdff/CDFF"
+      - python3 setup.py install --prefix=$AUTOPROJ_CURRENT_ROOT/install
       - python3 setup.py build_ext -i
+      - ldd /tmp/infuse/install/lib/libcdff_types.so | sort -n
+      - ldd /tmp/infuse/install/lib/libcdff_logger.so | sort -n
+      - ldd cdff_envire*.so | sort -n
+      - ldd cdff_types*.so | sort -n
+      - ldd cdff_dev/dfpcs/reconstruction3d*.so | sort -n
       - nosetests -sv cdff_dev/test/ cdff_dev/extensions/ test/
