@@ -14,8 +14,6 @@ def configuration(parent_package='', top_path=None):
     if autoproj_available:
         make_reconstruction3d(
             config, cdffpath, build_tools.extra_compile_args)
-        make_pointcloudmodellocalisation(
-            config, cdffpath, build_tools.extra_compile_args)
 
     return config
 
@@ -50,25 +48,6 @@ def make_reconstruction3d(config, cdffpath, extra_compile_args):
         # make sure that libraries used in other libraries are linked last!
         # for example: an implementation must be linked before its interface
         libraries=dfpc_libraries,
-        define_macros=[("NDEBUG",)],
-        extra_compile_args=extra_compile_args
-    )
-
-
-def make_pointcloudmodellocalisation(config, cdffpath, extra_compile_args):
-    config.add_extension(
-        "pointcloudmodellocalisation",
-        sources=["pointcloudmodellocalisation.pyx"],
-        include_dirs=[
-            os.path.join(cdffpath, "DFPCs", "PointCloudModelLocalisation"),
-        ] + build_tools.DEFAULT_INCLUDE_DIRS,
-        library_dirs=[
-            # TODO move to installation folder:
-            os.path.join(cdffpath, "build", "DFPCs", "PointCloudModelLocalisation"),
-        ],
-        # make sure that libraries used in other libraries are linked last!
-        # for example: an implementation must be linked before its interface
-        libraries=["dfpc_implementation_features_matching_3d"],
         define_macros=[("NDEBUG",)],
         extra_compile_args=extra_compile_args
     )
