@@ -98,11 +98,10 @@ def make_cdff_types(config, cdffpath, ctypespath, extra_compile_args):
         sources=["cdff_types.pyx"],
         include_dirs=[
             ".",
-            "cpp_helpers",  # TODO rename to src / extensions / utilities / ...
+            "cpp_helpers",
             numpy.get_include(),
             ctypespath,
-            os.path.join(cdffpath, "Common/Types/CPP"),
-            os.path.join(cdffpath, "Common/Converters")
+            os.path.join(cdffpath, "Common/Types/CPP")
         ],
         library_dirs=[
             os.path.join(cdffpath, "build", "Common", "Types"),
