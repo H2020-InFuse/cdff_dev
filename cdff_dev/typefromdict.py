@@ -30,6 +30,14 @@ def create_cpp(typename):
 def create_from_dict(typename, data):
     """Convert intermediate logfile format to InFuse C++ type.
 
+    If the typename is 'asn1_bitstream', we will assume that the data
+    is a dictionary with the fields 'type', 'serialization_method', and
+    'data'. 'type' will contain the real typename of the ASN.1 encoded
+    bitstream. 'serialization_method' must be 0 for now. 0 means uPER
+    and is the only supported ASN.1 serialization for now. 'data'
+    contains a stream of bits. The serialized representation of the
+    data.
+
     Parameters
     ----------
     typename : str
@@ -37,6 +45,7 @@ def create_from_dict(typename, data):
         Some conversion steps will be done automatically, for example,
         * /bla/blub -> BlaBlub
         * /gps/Solution -> GpsSolution
+        Data with the typename 'asn1_bitstream' will be handled differently.
 
     data : object
         Contains the actual data. Only basic types like list, dict, float,
