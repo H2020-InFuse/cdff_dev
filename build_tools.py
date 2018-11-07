@@ -37,7 +37,7 @@ DEFAULT_LIBRARY_DIRS = [
 
 extra_compile_args = [
     "-std=c++11",
-    "-O3",
+    "-O2",
     # disable warnings caused by Cython using the deprecated
     # NumPy C-API
     "-Wno-cpp", "-Wno-unused-function",
