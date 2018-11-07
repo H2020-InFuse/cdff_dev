@@ -1,6 +1,7 @@
 import warnings
 from cdff_dev import logloader, dataflowcontrol, envirevisualization, transformer
 import cdff_envire
+import cdff_types
 
 
 class Transformer(transformer.EnvireDFN):
@@ -57,11 +58,32 @@ class Transformer(transformer.EnvireDFN):
                                      frame_transformation=True)
 
 
+class RBSConverter:  # TODO we need a dummy base class for this...
+    def __init__(self):
+        self.transform_with_covariance = None
+        self.output = cdff_types.RigidBodyState()
+    def set_configuration_file(self, filename):
+        raise NotImplementedError("No configuration supported")
+    def configure(self):
+        pass
+    def transformWithCovarianceInput(self, data):
+        self.transform_with_covariance = data
+    def process(self):
+        if self.transform_with_covariance is None:
+            return
+        pos = self.transform_with_covariance.data.translation.toarray()
+        orient = self.transform_with_covariance.data.orientation.toarray()
+        self.output.pos.fromarray(pos)
+        self.output.orient.fromarray(orient)
+    def rbsOutput(self):
+        return self.output
+
+
 def main():
     app = envirevisualization.EnvireVisualizerApplication(
         frames={
             "dem_building.fusedMap": "MapFrame",
-            "pom.pose": "LocalTerrainFrame",
+            "rbs_converter.rbs": "LocalTerrainFrame",
         },
         center_frame="LocalTerrainFrame"
     )
@@ -70,24 +92,27 @@ def main():
         "/dem_building/fusedMap": "dem_building.fusedMap",
         "/pom_pose": "pom.pose",
     }
-    nodes = {"transformer": Transformer()}
+    nodes = {
+        "transformer": Transformer(),
+        "rbs_converter": RBSConverter()
+    }
     connections = (
+        ("pom.pose", "rbs_converter.transformWithCovariance"),
         ("pom.pose", "transformer.pom_pose"),
         ("dem_building.fusedMap", "transformer.map_transform"),
     )
     dfc = dataflowcontrol.DataFlowControl(
         nodes=nodes, connections=connections,
         periods={"transformer": 1.0},
+        trigger_ports={"rbs_converter": "transformWithCovariance"},
         stream_aliases=stream_aliases, verbose=2)
     dfc.setup()
 
     # Note that the logfiles are not in the repository because they are too
     # large. Ask Alexander Fabisch about it.
-    folder = "logs/20181031_LAAS_Maps/"
-    #filename = folder + "2018-10-31-17-15-49_0_000000000.msg"
-    filename = folder + "2018-10-31-17-18-12_14_000000000.msg"
-    log_iterator = logloader.replay_logfile(
-        filename, stream_names=[
+    folder = "logs/20181031_LAAS_Maps/2018-10-31_"
+    log_iterator = logloader.replay_logfile_sequence(
+        logloader.group_pattern(folder, "*.msg"), stream_names=[
             "/dem_building/fusedMap",
             "/pom_pose",
         ])
