@@ -24,4 +24,5 @@
   <depend package="pydot"/>
   <depend package="gdal"/>
   <depend package="proj"/>
+  <depend package="memory_profiler"/>
 </package>
