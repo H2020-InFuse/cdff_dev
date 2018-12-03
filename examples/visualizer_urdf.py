@@ -13,11 +13,20 @@ class Step:
         self.positive = True
 
     def __call__(self):
-        self.model.set_joint_angle("beta1_fake_rear_left", self.angle)
-        self.model.set_joint_angle("beta1_fake_rear_right", self.angle)
+        #height
+        self.model.set_joint_angle("gamma_front_left", self.angle)
+        self.model.set_joint_angle("gamma1_fake_front_left", -self.angle)
+        self.model.set_joint_angle("gamma2_fake_front_left", self.angle)
+        self.model.set_joint_angle("beta_front_left", -self.angle)
         self.model.set_joint_angle("beta1_fake_front_left", self.angle)
-        self.model.set_joint_angle("beta1_fake_front_right", self.angle)
+        self.model.set_joint_angle("beta2_fake_front_left", -self.angle)
 
+        #steer
+        self.model.set_joint_angle("phi_front_left", self.angle)
+
+        #wheel
+        self.model.set_joint_angle("omega_front_left", self.angle)
+        
         if self.positive:
             self.angle += 0.01
             if self.angle >= 1.57:
