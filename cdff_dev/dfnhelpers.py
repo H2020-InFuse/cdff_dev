@@ -99,6 +99,10 @@ class MergeFramePairDFN:
             np.array(metadata["intrinsic"]["cameraMatrix"]))
         frame.intrinsic.camera_model = metadata["intrinsic"]["cameraModel"]
 
+        frame.extrinsic.pose_fixed_frame_robot_frame.metadata.producer_id = "MergeFramePairDFN"
+        # TODO
+        #frame.extrinsic.pose_fixed_frame_robot_frame.metadata.parent_frame_id = ...
+        #frame.extrinsic.pose_fixed_frame_robot_frame.metadata.child_frame_id = ...
         if ("extrinsic" in metadata
                 and "pose_fixed_frame_robot_frame" in metadata["extrinsic"]):
             pose_fixed_frame_robot_frame = \
@@ -113,6 +117,10 @@ class MergeFramePairDFN:
             frame.extrinsic.pose_fixed_frame_robot_frame.data.orientation.fromarray(
                 np.array([0, 0, 0, 1], dtype=np.float))
 
+        frame.extrinsic.pose_robot_frame_sensor_frame.metadata.producer_id = "MergeFramePairDFN"
+        # TODO
+        #frame.extrinsic.pose_robot_frame_sensor_frame.metadata.parent_frame_id = ...
+        #frame.extrinsic.pose_robot_frame_sensor_frame.metadata.child_frame_id = ...
         if ("extrinsic" in metadata
                 and "pose_robot_frame_sensor_frame" in metadata["extrinsic"]):
             pose_robot_frame_sensor_frame = \
