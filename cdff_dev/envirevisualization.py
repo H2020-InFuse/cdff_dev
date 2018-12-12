@@ -3,7 +3,6 @@ import warnings
 from PyQt4.QtGui import QApplication
 from . import dataflowcontrol, qtgui
 import cdff_envire
-import cdff_types
 
 
 class EnvireVisualizerApplication:
