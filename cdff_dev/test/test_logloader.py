@@ -239,7 +239,7 @@ def test_group_pattern_directory_not_found():
 
 def test_group_pattern_files_not_found():
     assert_raises_regexp(
-        ValueError, "Could not find any matching files, only found \[.*\]",
+        ValueError, "Could not find any files matching '.*', only found.*",
         logloader.group_pattern, "test/test_data/logs/does_not_exist",
         "_*.msg")
 
