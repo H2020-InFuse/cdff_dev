@@ -873,6 +873,21 @@ def test_create_pointcloud():
     assert_equal(pcl.data.colors[0, 2], 255.0)
 
 
+def test_filter_pointcloud():
+    pcl = cdff_types.Pointcloud()
+    pcl.data.points.resize(5)
+    pcl.data.points[0, 0] = 0.0
+    pcl.data.points[0, 1] = 0.0
+    pcl.data.points[0, 2] = 0.0
+    for i in range(1, 5):
+        pcl.data.points[i, 0] = np.inf
+        pcl.data.points[i, 1] = np.inf
+        pcl.data.points[i, 2] = np.inf
+    assert_equal(pcl.data.points.size(), 5)
+    pcl_filtered = pcl.filtered()
+    assert_equal(pcl_filtered.data.points.size(), 1)
+
+
 def test_load_ply():
     pc = helpers.load_ply_file(
         "test/test_data/pointclouds/cube.ply")

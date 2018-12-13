@@ -7,6 +7,7 @@ from libc.string cimport memcpy
 from libc.stdint cimport uint8_t, uint16_t, uint32_t, uint64_t
 from libc.stdint cimport int8_t, int16_t, int32_t, int64_t
 from libc.stdlib cimport malloc, free
+import math
 cimport numpy as np
 import numpy as np
 import warnings
@@ -777,8 +778,11 @@ cdef class TransformWithCovariance:
         cdef int i
         _cdff_types.BitStream_Init(
             b, uper_buffer, _cdff_types.asn1SccTransformWithCovariance_REQUIRED_BYTES_FOR_ENCODING)
-        for i in range(_cdff_types.asn1SccTransformWithCovariance_REQUIRED_BYTES_FOR_ENCODING):
+
+        for i in range(len(data)):
             uper_buffer[i] = data[i]
+        for i in range(len(data), _cdff_types.asn1SccTransformWithCovariance_REQUIRED_BYTES_FOR_ENCODING):
+            uper_buffer[i] = 0
 
         cdef int error_code
         cdef bool success
@@ -1123,8 +1127,11 @@ cdef class Pointcloud:
         cdef int i
         _cdff_types.BitStream_Init(
             b, uper_buffer, _cdff_types.asn1SccPointcloud_REQUIRED_BYTES_FOR_ENCODING)
-        for i in range(_cdff_types.asn1SccPointcloud_REQUIRED_BYTES_FOR_ENCODING):
+
+        for i in range(len(data)):
             uper_buffer[i] = data[i]
+        for i in range(len(data), _cdff_types.asn1SccPointcloud_REQUIRED_BYTES_FOR_ENCODING):
+            uper_buffer[i] = 0
 
         cdef int error_code
         cdef bool success
@@ -1135,6 +1142,26 @@ cdef class Pointcloud:
 
         free(uper_buffer)
         del b
+
+    def filtered(self):
+        cdef cdff_types.Pointcloud filteredPointCloud = cdff_types.Pointcloud()
+        cdef int i, k
+        k = 0
+        # TODO colors
+        filteredPointCloud.data.points.resize(self.data.points.size())
+        filteredPointCloud.data.intensity.resize(self.data.intensity.size())
+        for i in range(self.data.points.size()):
+            # HACK: we assume that if any dimension is inf, all are inf
+            if not math.isinf(self.data.points[i, 0]):
+                filteredPointCloud.data.points[k, 0] = self.data.points[i, 0]
+                filteredPointCloud.data.points[k, 1] = self.data.points[i, 1]
+                filteredPointCloud.data.points[k, 2] = self.data.points[i, 2]
+                if i < self.data.intensity.size():
+                    filteredPointCloud.data.intensity[k] = self.data.intensity[i]
+                k += 1
+        filteredPointCloud.data.points.resize(k)
+        filteredPointCloud.data.intensity.resize(k)
+        return filteredPointCloud
 
 
 cdef class LaserScan:
@@ -3117,8 +3144,10 @@ cdef class Map:
         cdef int i
         _cdff_types.BitStream_Init(
             b, uper_buffer, _cdff_types.asn1SccMap_REQUIRED_BYTES_FOR_ENCODING)
-        for i in range(_cdff_types.asn1SccMap_REQUIRED_BYTES_FOR_ENCODING):
+        for i in range(len(data)):
             uper_buffer[i] = data[i]
+        for i in range(len(data), _cdff_types.asn1SccMap_REQUIRED_BYTES_FOR_ENCODING):
+            uper_buffer[i] = 0
 
         cdef int error_code
         cdef bool success

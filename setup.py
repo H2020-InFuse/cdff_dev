@@ -30,7 +30,9 @@ class CleanCommand(clean):
         print("removing Cython build artifacts")
         cwd = os.path.abspath(os.path.dirname(__file__))
         dirs = [cwd, os.path.join(cwd, "cdff_dev", "extensions", "*"),
-                os.path.join(cwd, "cdff_dev", "dfpcs")]
+                os.path.join(cwd, "cdff_dev", "dfpcs"),
+                #os.path.join(cwd, "cdff_dev", "dfns")
+                ]
         for path in dirs:
             filenames = (glob.glob(os.path.join(path, "*.cpp")) +
                          glob.glob(os.path.join(path, "*.so")) +
@@ -99,7 +101,7 @@ def make_cdff_types(config, cdffpath, ctypespath):
             os.path.join(cdffpath, "build", "Common", "Types"),
             os.path.join(cdffpath, "build", "Common", "Loggers")
         ],
-        libraries=["cdff_types", "cdff_logger"],
+        libraries=["cdff_logger", "cdff_types"],
         define_macros=[("NDEBUG",)],
         extra_compile_args=build_tools.extra_compile_args
     )
@@ -126,11 +128,11 @@ def make_cdff_envire(config, ctypespath):
             os.path.join(install_dir, "include"),
             eigen_include_dir,
             ctypespath
-        ],
+        ] + build_tools.DEFAULT_INCLUDE_DIRS,
         library_dirs=[
             os.path.join(install_dir, "lib")
-        ],
-        libraries=["base-types", "envire_core", "envire_urdf",
+        ] + build_tools.DEFAULT_LIBRARY_DIRS,
+        libraries=["cdff_types", "base-types", "envire_core", "envire_urdf",
                    "urdfdom_model", "envire_visualizer_interface"],
         define_macros=[("NDEBUG",)],
         extra_compile_args=build_tools.extra_compile_args
@@ -161,4 +163,3 @@ if __name__ == "__main__":
         configuration=configuration
     )
     setup(**metadata)
-
