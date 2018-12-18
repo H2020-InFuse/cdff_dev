@@ -8,7 +8,8 @@ def main():
     # Note that the logfiles are not in the repository because they are too
     # large. Ask Alexander Fabisch about it.
     log_folder = "logs/sherpa_hcru"
-    prefix = "recording_20180927-175146_sherpaTT_integration"
+    #prefix = "recording_20180927-175146_sherpaTT_integration"
+    prefix = "recording_20180927-175540_sherpaTT_integration"
 
     prefix_path = os.path.join(log_folder, prefix)
 
@@ -37,7 +38,7 @@ def main():
     }
 
     log_iterator = logloader.replay_logfile_sequence(
-        logloader.group_pattern(prefix_path, "_0*.msg"),
+        logloader.group_pattern(prefix_path, "*.msg"),
         ["/hcru1/pt_stereo_rect/left/image",
          "/hcru1/pt_stereo_rect/right/image",
          "/hcru1/pt_color/left/image",
