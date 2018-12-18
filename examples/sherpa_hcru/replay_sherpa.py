@@ -32,34 +32,6 @@ class Transformer(transformer.EnvireDFN):
         t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
         graph.add_transform("origin", "odometry", t)
 
-        t = cdff_envire.Transform()
-        t.transform.translation.fromarray(np.array([0.3, 0.0, -0.53]))
-        # turned by 180 degrees around z-axis
-        t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.70682518,  0.70738827]))
-
-        graph.add_transform("dgps0", "origin", t)
-        graph.add_transform("dgps", "body", t)
-
-    def groundTruthInput(self, data):
-        if not self.imu_initialized:
-            t = cdff_types.RigidBodyState()
-            t.pos.fromarray(data.pos.toarray())
-            t.orient.fromarray(data.orient.toarray())
-            t.source_frame = "dgps0"
-            t.target_frame = "start"
-            t.timestamp.microseconds = self._timestamp
-            self._set_transform(t, frame_transformation=False)
-
-            self.imu_initialized = True
-
-        t = cdff_types.RigidBodyState()
-        t.pos.fromarray(data.pos.toarray())
-        t.orient.fromarray(data.orient.toarray())
-        t.source_frame = "ground_truth"
-        t.target_frame = "start"
-        t.timestamp.microseconds = self._timestamp
-        self._set_transform(t, frame_transformation=False)
-
     def wheelOdometryInput(self, data):
         self._set_transform(data, frame_transformation=False)
 
@@ -76,16 +48,6 @@ class Transformer(transformer.EnvireDFN):
         else:
             return None
 
-    def groundTruthTrajectoryOutput(self):
-        try:
-            position = cdff_types.Vector3d()
-            ground_truth2origin = self._get_transform(
-                "origin", "ground_truth", frame_transformation=True)
-            position.fromarray(ground_truth2origin.pos.toarray())
-            return position
-        except:
-            return None
-
 
 def replay_logfile_join(log_folder, logfiles):  # shortcut
     return logloader.replay_join([
@@ -100,7 +62,6 @@ def main():
         frames={
             "/slam_filter.output": "velodyne",
             "transformer.odometryTrajectory": "origin",
-            "transformer.groundTruthTrajectory": "origin",
         },
         urdf_files=[],
         center_frame="odometry"
@@ -113,8 +74,7 @@ def main():
         nodes={"transformer": transformer},
         connections=(
             ("/mcs_sensor_processing.rigid_body_state_out", "transformer.wheelOdometry"),
-            ("/body_joint.body_joint_samples", "transformer.bodyJoint"),
-            ("/dgps.imu_pose", "transformer.groundTruth")
+            ("/body_joint.body_joint_samples", "transformer.bodyJoint")
         ),
         periods={"transformer": 1},
         real_time=False,
@@ -133,8 +93,7 @@ def main():
         log_folder,
         [("sherpa_tt_mcs_Logger_InFuse.msg", ["/mcs_sensor_processing.rigid_body_state_out"]),
          ("body_joint_Logger_InFuse.msg", ["/body_joint.body_joint_samples"]),
-         ("sherpa_tt_slam_Logger_InFuse.msg", ["/slam_filter.output"]),
-         ("dgps_Logger_InFuse.msg", ["/dgps.imu_pose"])]
+         ("sherpa_tt_slam_Logger_InFuse.msg", ["/slam_filter.output"])]
     )
     app.show_controls(log_iterator, dfc)
     app.exec_()
