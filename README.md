@@ -171,7 +171,7 @@ CDFF-Dev provides more command line tools than just the code generators.
 They are documented in the [User Documentation of CDFF-Dev](https://docs.google.com/document/d/1yz_w7Eut6Rtg0d4I6R4mze2G8Oip4agyqrTDlKVgC6g):
 
 * `dfpc_diagram` is explained in Section 1.1.2
-* Utilities for log data handling are described in Section 3.1.6
+* Utilities for log data handling are described in Section 3
 
 ### Testing CDFF-Dev
 
