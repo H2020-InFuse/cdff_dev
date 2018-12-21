@@ -75,18 +75,18 @@ def configuration(parent_package='', top_path=None):
     #os.environ["CFLAGS"] = "-Xlinker -v"
 
     cdffpath = load_cdffpath()
-    ctypespath = os.path.join(cdffpath, CTYPESDIR)
+    typespath = os.path.join(cdffpath, "Common")
 
-    make_cdff_types(config, cdffpath, ctypespath)
+    make_cdff_types(config, cdffpath, typespath)
     if autoproj_available:
-        make_cdff_envire(config, ctypespath)
+        make_cdff_envire(config, typespath)
 
     config.ext_modules = cythonize(config.ext_modules)
 
     return config
 
 
-def make_cdff_types(config, cdffpath, ctypespath):
+def make_cdff_types(config, cdffpath, typespath):
     config.add_extension(
         "cdff_types",
         sources=["cdff_types.pyx"],
@@ -94,7 +94,7 @@ def make_cdff_types(config, cdffpath, ctypespath):
             ".",
             "cpp_helpers",
             numpy.get_include(),
-            ctypespath,
+            typespath,
             os.path.join(cdffpath, "Common/Types/CPP")
         ],
         library_dirs=[
@@ -107,7 +107,7 @@ def make_cdff_types(config, cdffpath, ctypespath):
     )
 
 
-def make_cdff_envire(config, ctypespath):
+def make_cdff_envire(config, typespath):
     autoproj_current_root = os.environ.get("AUTOPROJ_CURRENT_ROOT", None)
     install_dir = os.path.join(autoproj_current_root, "install")
     # this path is currently only used in CI image:
@@ -127,7 +127,7 @@ def make_cdff_envire(config, ctypespath):
             numpy.get_include(),
             os.path.join(install_dir, "include"),
             eigen_include_dir,
-            ctypespath
+            typespath
         ] + build_tools.DEFAULT_INCLUDE_DIRS,
         library_dirs=[
             os.path.join(install_dir, "lib")
