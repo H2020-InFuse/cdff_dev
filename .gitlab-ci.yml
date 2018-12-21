@@ -1,7 +1,16 @@
-image: h2020infuse/cdff-dev-ci:1.8.11
+image:  nexus.spaceapplications.com/repository/infuse/cdff-dev-ci:1.8.14
 
 stages:
+  - platform
   - fetch_test
+
+platform:
+  stage : platform
+  script:
+      - cat /proc/cpuinfo
+      - lscpu
+      - ulimit -a
+      - gcc -march=native -E -v - </dev/null 2>&1 | grep cc1
 
 fetch_test:
   stage : fetch_test

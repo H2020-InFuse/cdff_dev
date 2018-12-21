@@ -6,6 +6,8 @@ from cython.operator cimport dereference as deref
 from libc.string cimport memcpy
 from libc.stdint cimport uint8_t, uint16_t, uint32_t, uint64_t
 from libc.stdint cimport int8_t, int16_t, int32_t, int64_t
+from libc.stdlib cimport malloc, free
+import math
 cimport numpy as np
 import numpy as np
 import warnings
@@ -768,6 +770,30 @@ cdef class TransformWithCovariance:
         data.thisptr = &self.thisptr.data
         return data
 
+    def from_uper(self, list data):
+        cdef unsigned char* uper_buffer = <unsigned char*> malloc(
+            _cdff_types.asn1SccTransformWithCovariance_REQUIRED_BYTES_FOR_ENCODING *
+            sizeof(unsigned char))
+        cdef _cdff_types.BitStream* b = new _cdff_types.BitStream()
+        cdef int i
+        _cdff_types.BitStream_Init(
+            b, uper_buffer, _cdff_types.asn1SccTransformWithCovariance_REQUIRED_BYTES_FOR_ENCODING)
+
+        for i in range(len(data)):
+            uper_buffer[i] = data[i]
+        for i in range(len(data), _cdff_types.asn1SccTransformWithCovariance_REQUIRED_BYTES_FOR_ENCODING):
+            uper_buffer[i] = 0
+
+        cdef int error_code
+        cdef bool success
+        success = _cdff_types.asn1SccTransformWithCovariance_Decode(self.thisptr, b, &error_code)
+        if not success:
+            raise RuntimeError(
+                "Conversion from uPER failed, error code: %d" % error_code)
+
+        free(uper_buffer)
+        del b
+
 
 cdef class PointCloud_Data_pointsReference:
     def __cinit__(self):
@@ -914,6 +940,11 @@ cdef class PointCloud_DataReference:
     def __dealloc__(self):
         pass
 
+    def __str__(self):
+        return ("{points: %d, colors: %d, intensity: %d}"
+                % (self.points.size(), self.colors.size(),
+                   self.intensity.size()))
+
     @property
     def points(self):
         cdef PointCloud_Data_pointsReference points = \
@@ -942,6 +973,15 @@ cdef class PointCloud_MetadataReference:
 
     def __dealloc__(self):
         pass
+
+    def __str__(self):
+        return ("{msg_version: %d, time_stamp: %s, sensor_id: %s, frame_id: %s,"
+                " height: %d, width: %d, is_registered: %s, is_ordered: %s, "
+                "has_fixed_transform: %s, pose_fixed_frame_robot_frame: %s}"
+                % (self.msg_version, self.time_stamp, self.sensor_id,
+                   self.frame_id, self.height, self.width, self.is_registered,
+                   self.is_ordered, self.has_fixed_transform,
+                   self.pose_fixed_frame_robot_frame))
 
     def _get_time_stamp(self):
         cdef Time time = Time()
@@ -984,18 +1024,6 @@ cdef class PointCloud_MetadataReference:
         self.thisptr.frameId.nCount = len(frame_id)
 
     frame_id = property(_get_frame_id, _set_frame_id)
-
-    def _get_time_stamp(self):
-        cdef Time time_stamp = Time()
-        del time_stamp.thisptr
-        time_stamp.thisptr = &self.thisptr.timeStamp
-        time_stamp.delete_thisptr = False
-        return time_stamp
-
-    def _set_time_stamp(self, Time time_stamp):
-        self.thisptr.timeStamp = deref(time_stamp.thisptr)
-
-    time_stamp = property(_get_time_stamp, _set_time_stamp)
 
     def _get_height(self):
         return self.thisptr.height
@@ -1074,6 +1102,10 @@ cdef class Pointcloud:
         _cdff_types.asn1SccPointcloud_Initialize(self.thisptr)
         self.thisptr.metadata.msgVersion = _cdff_types.pointCloud_Version
 
+    def __str__(self):
+        return ("{type: Pointcloud, metadata: %s, data: %s}"
+                % (self.metadata, self.data))
+
     @property
     def metadata(self):
         cdef PointCloud_MetadataReference metadata = \
@@ -1086,6 +1118,50 @@ cdef class Pointcloud:
         cdef PointCloud_DataReference data = PointCloud_DataReference()
         data.thisptr = &self.thisptr.data
         return data
+
+    def from_uper(self, list data):
+        cdef unsigned char* uper_buffer = <unsigned char*> malloc(
+            _cdff_types.asn1SccPointcloud_REQUIRED_BYTES_FOR_ENCODING *
+            sizeof(unsigned char))
+        cdef _cdff_types.BitStream* b = new _cdff_types.BitStream()
+        cdef int i
+        _cdff_types.BitStream_Init(
+            b, uper_buffer, _cdff_types.asn1SccPointcloud_REQUIRED_BYTES_FOR_ENCODING)
+
+        for i in range(len(data)):
+            uper_buffer[i] = data[i]
+        for i in range(len(data), _cdff_types.asn1SccPointcloud_REQUIRED_BYTES_FOR_ENCODING):
+            uper_buffer[i] = 0
+
+        cdef int error_code
+        cdef bool success
+        success = _cdff_types.asn1SccPointcloud_Decode(self.thisptr, b, &error_code)
+        if not success:
+            raise RuntimeError(
+                "Conversion from uPER failed, error code: %d" % error_code)
+
+        free(uper_buffer)
+        del b
+
+    def filtered(self):
+        cdef cdff_types.Pointcloud filteredPointCloud = cdff_types.Pointcloud()
+        cdef int i, k
+        k = 0
+        # TODO colors
+        filteredPointCloud.data.points.resize(self.data.points.size())
+        filteredPointCloud.data.intensity.resize(self.data.intensity.size())
+        for i in range(self.data.points.size()):
+            # HACK: we assume that if any dimension is inf, all are inf
+            if not math.isinf(self.data.points[i, 0]):
+                filteredPointCloud.data.points[k, 0] = self.data.points[i, 0]
+                filteredPointCloud.data.points[k, 1] = self.data.points[i, 1]
+                filteredPointCloud.data.points[k, 2] = self.data.points[i, 2]
+                if i < self.data.intensity.size():
+                    filteredPointCloud.data.intensity[k] = self.data.intensity[i]
+                k += 1
+        filteredPointCloud.data.points.resize(k)
+        filteredPointCloud.data.intensity.resize(k)
+        return filteredPointCloud
 
 
 cdef class LaserScan:
@@ -2986,6 +3062,9 @@ cdef class Frame_error_tReference:
     def __dealloc__(self):
         pass
 
+    def __str__(self):
+        return "{type: %s, value: %s}" % (self.type, self.value)
+
     def _get_type(self):
         if <int> self.thisptr.type == <int> _cdff_types.asn1Sccerror_UNDEFINED:
             return "error_UNDEFINED"
@@ -2996,7 +3075,7 @@ cdef class Frame_error_tReference:
         else:
             raise ValueError("Unknown error type: %d" % <int> self.thisptr.type)
 
-    def _set_type(self,  str type):
+    def _set_type(self, str type):
         if type == "error_UNDEFINED":
             self.thisptr.type = _cdff_types.asn1Sccerror_UNDEFINED
         elif type == "error_DEAD":
@@ -3057,6 +3136,29 @@ cdef class Map:
         data.thisptr = &self.thisptr.data
         return data
 
+    def from_uper(self, list data):
+        cdef unsigned char* uper_buffer = <unsigned char*> malloc(
+            _cdff_types.asn1SccMap_REQUIRED_BYTES_FOR_ENCODING *
+            sizeof(unsigned char))
+        cdef _cdff_types.BitStream* b = new _cdff_types.BitStream()
+        cdef int i
+        _cdff_types.BitStream_Init(
+            b, uper_buffer, _cdff_types.asn1SccMap_REQUIRED_BYTES_FOR_ENCODING)
+        for i in range(len(data)):
+            uper_buffer[i] = data[i]
+        for i in range(len(data), _cdff_types.asn1SccMap_REQUIRED_BYTES_FOR_ENCODING):
+            uper_buffer[i] = 0
+
+        cdef int error_code
+        cdef bool success
+        success = _cdff_types.asn1SccMap_Decode(self.thisptr, b, &error_code)
+        if not success:
+            raise RuntimeError(
+                "Conversion from uPER failed, error code: %d" % error_code)
+
+        free(uper_buffer)
+        del b
+
 
 cdef class Map_metadata_tReference:
     def __cinit__(self):
@@ -3066,9 +3168,10 @@ cdef class Map_metadata_tReference:
         pass
 
     def __str__(self):
-        # TODO err_values, pose_fixed_frame_map_frame
-        return ("{time_stamp: %s, type: %s, scale: %g}"
-                % (self.time_stamp, self.type, self.scale))
+        return ("{time_stamp: %s, type: %s, err_values: %s, scale: %g, "
+                "pose_fixed_frame_map_frame: %s}"
+                % (self.time_stamp, self.type, self.err_values, self.scale,
+                   self.pose_fixed_frame_map_frame))
 
     def _get_msg_version(self):
         return self.thisptr.msgVersion
@@ -3144,6 +3247,9 @@ cdef class Map_metadata_t_errValuesReference:
 
     def __dealloc__(self):
         pass
+
+    def __str__(self):
+        return "[%s]" % (", ".join([str(self[i]) for i in range(self.size())]))
 
     def __len__(self):
         return self.thisptr.nCount

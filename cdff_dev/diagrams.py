@@ -114,7 +114,9 @@ def save_network_graph_as_png(
 
     for output_port, input_port in connections:
         connection_edge = pydot.Edge(
-            __display_name(output_port), __display_name(input_port), penwidth=3)
+            __display_port(output_port, True),
+            __display_port(input_port, False),
+            penwidth=3)
         graph.add_edge(connection_edge)
 
     graph.write_png(filename)
@@ -123,11 +125,11 @@ def save_network_graph_as_png(
 def _add_ports_to_cluster(node_name, ports, cluster, output=True):
     for port in ports:
         port_name = node_name + "." + port
-        port_node = pydot.Node(__display_name(port_name), style="filled",
-                               fillcolor="#aaaaaa")
+        port_node = pydot.Node(
+            __display_port(port_name, output), style="filled", fillcolor="#aaaaaa")
         cluster.add_node(port_node)
         a = __display_name(node_name)
-        b = __display_name(port_name)
+        b = __display_port(port_name, output)
         if output:
             edge = pydot.Edge(a, b)
         else:
@@ -136,7 +138,16 @@ def _add_ports_to_cluster(node_name, ports, cluster, output=True):
 
 
 def __display_name(element):
-    return element.replace("/", "")
+    return element
+
+
+def __display_port(port_name, output):
+    display_name = __display_name(port_name)
+    if output:
+        display_name += " [Output]"
+    else:
+        display_name += " [Input]"
+    return display_name
 
 
 def _microseconds_to_seconds(microseconds):

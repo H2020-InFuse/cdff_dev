@@ -3,6 +3,7 @@ def configuration(parent_package='', top_path=None):
     config = Configuration("extensions", parent_package, top_path)
 
     config.add_subpackage("gps")
+    config.add_subpackage("pcl")
 
     return config
 

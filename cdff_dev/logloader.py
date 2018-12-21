@@ -481,16 +481,23 @@ def group_pattern(prefix_path, pattern):
     filenames : list
         List of logfiles, ordered lexicographically
     """
-    files = glob.glob(prefix_path + pattern)
+    full_pattern = prefix_path + pattern
+    files = glob.glob(full_pattern)
     if len(files) == 0:
         if prefix_path.endswith(os.sep):
             prefix_path = prefix_path[:-1]  # remove trailing '/'
+
+        is_absolute_path = prefix_path.startswith(os.sep)
         dirname = os.sep.join(["."] + prefix_path.split(os.sep)[:-1])
+        if is_absolute_path:
+            dirname = dirname[2:]
         if not os.path.exists(dirname):
-            raise ValueError("Directory '%s' does not exist" % dirname)
+            raise ValueError("Directory '%s' from pattern %s does not exist"
+                             % (dirname, full_pattern))
+
         actual_files = glob.glob(os.path.join(dirname, "*"))
-        raise ValueError("Could not find any matching files, only found %s"
-                         % actual_files)
+        raise ValueError("Could not find any files matching '%s', only found%s%s"
+                         % (full_pattern, os.linesep, os.linesep.join(actual_files)))
     return list(sorted(files))
 
 

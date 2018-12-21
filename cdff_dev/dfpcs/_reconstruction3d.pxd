@@ -10,8 +10,8 @@ cdef extern from "Reconstruction3DInterface.hpp" namespace "CDFF::DFPC":
         void setConfigurationFile(string) except +
         void setup() except +
 
-        void leftImageInput(_cdff_types.asn1SccFrame data) except +
-        void rightImageInput(_cdff_types.asn1SccFrame data) except +
+        void leftImageInput(_cdff_types.asn1SccFrame& data) except +
+        void rightImageInput(_cdff_types.asn1SccFrame& data) except +
 
         _cdff_types.asn1SccPointcloud& pointCloudOutput() except +
         _cdff_types.asn1SccPose& poseOutput() except +

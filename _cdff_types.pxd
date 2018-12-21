@@ -171,6 +171,9 @@ cdef extern from "TransformWithCovariance.h":
         asn1SccTransformWithCovariance_Metadata metadata
         asn1SccTransformWithCovariance_Data data
 
+    bool asn1SccTransformWithCovariance_Decode(asn1SccTransformWithCovariance* pVal, BitStream* pBitStrm, int* pErrCode)
+    int asn1SccTransformWithCovariance_REQUIRED_BYTES_FOR_ENCODING
+
 
 cdef extern from "Pointcloud.h":
     cdef cppclass asn1SccPointCloud_Data_points:
@@ -209,6 +212,9 @@ cdef extern from "Pointcloud.h":
 
     cdef uint32_t pointCloud_Version
     cdef void asn1SccPointcloud_Initialize(asn1SccPointcloud*)
+
+    bool asn1SccPointcloud_Decode(asn1SccPointcloud* pVal, BitStream* pBitStrm, int* pErrCode)
+    int asn1SccPointcloud_REQUIRED_BYTES_FOR_ENCODING
 
 
 cdef extern from "LaserScan.h":
@@ -600,3 +606,14 @@ cdef extern from "Map.h":
     cdef cppclass asn1SccMap_metadata_t_errValues:
         int nCount
         asn1SccFrame_error_t arr[5]
+    bool asn1SccMap_Decode(asn1SccMap* pVal, BitStream* pBitStrm, int* pErrCode)
+    int asn1SccMap_REQUIRED_BYTES_FOR_ENCODING
+
+
+cdef extern from "asn1crt.h":
+    cdef cppclass BitStream:
+        unsigned char* buf
+        long count
+        long currentByte
+        int currentBit
+    void BitStream_Init(BitStream* pBitStrm, unsigned char* buf, long count)

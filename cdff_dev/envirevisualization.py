@@ -3,7 +3,6 @@ import warnings
 from PyQt4.QtGui import QApplication
 from . import dataflowcontrol, qtgui
 import cdff_envire
-import cdff_types
 
 
 class EnvireVisualizerApplication:
@@ -129,12 +128,7 @@ class WorldState:
         self.items = {}
 
     def report_node_output(self, port_name, sample, timestamp):
-        if isinstance(sample, cdff_types.RigidBodyState):
-            # TODO add other types?
-            # Does not have to be added as an item to the graph.
-            # Should be used to update transformations.
-            return
-        elif sample is None:
+        if sample is None:
             warnings.warn("No sample on the output port '%s'" % port_name)
             return
         elif port_name not in self.frames:

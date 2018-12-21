@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from distutils.sysconfig import get_config_vars
 from distutils.command.clean import clean
 from Cython.Build import cythonize
 import numpy
-import os
 import glob
-import warnings
 import cdff_dev
+import build_tools
 from cdff_dev.path import load_cdffpath, CTYPESDIR
 
 
@@ -27,11 +29,17 @@ class CleanCommand(clean):
 
         print("removing Cython build artifacts")
         cwd = os.path.abspath(os.path.dirname(__file__))
-        filenames = (glob.glob(cwd + "/cdff_*.cpp") +
-                     glob.glob(cwd + "/cdff_*.so") +
-                     glob.glob(cwd + "/cdff_*.pyd"))
-        for filename in filenames:
-            os.remove(filename)
+        dirs = [cwd, os.path.join(cwd, "cdff_dev", "extensions", "*"),
+                os.path.join(cwd, "cdff_dev", "dfpcs"),
+                #os.path.join(cwd, "cdff_dev", "dfns")
+                ]
+        for path in dirs:
+            filenames = (glob.glob(os.path.join(path, "*.cpp")) +
+                         glob.glob(os.path.join(path, "*.so")) +
+                         glob.glob(os.path.join(path, "*.pyd")))
+            for filename in filenames:
+                print(filename)
+                os.remove(filename)
 
 
 def configuration(parent_package='', top_path=None):
@@ -51,7 +59,7 @@ def configuration(parent_package='', top_path=None):
 
     config.add_subpackage("cdff_dev")
 
-    autoproj_available = check_autoproj()
+    autoproj_available = build_tools.check_autoproj()
 
     cdff_types_files = ["_cdff_types.pxd", "cdff_types.pxd", "cdff_types.pyx"]
     cdff_envire_files = ["_cdff_envire.pxd", "cdff_envire.pxd",
@@ -63,52 +71,43 @@ def configuration(parent_package='', top_path=None):
 
     config.add_data_files(*cython_files)
 
-    extra_compile_args = [
-        "-std=c++11",
-        "-O3",
-        # disable warnings caused by Cython using the deprecated
-        # NumPy C-API
-        "-Wno-cpp", "-Wno-unused-function"
-    ]
+    # uncomment to see more outputs from the linker
+    #os.environ["CFLAGS"] = "-Xlinker -v"
 
     cdffpath = load_cdffpath()
     ctypespath = os.path.join(cdffpath, CTYPESDIR)
 
-    make_cdff_types(config, cdffpath, ctypespath, extra_compile_args)
+    make_cdff_types(config, cdffpath, ctypespath)
     if autoproj_available:
-        make_cdff_envire(config, ctypespath, extra_compile_args)
+        make_cdff_envire(config, ctypespath)
 
     config.ext_modules = cythonize(config.ext_modules)
 
     return config
 
 
-def check_autoproj():
-    autoproj_available = "AUTOPROJ_CURRENT_ROOT" in os.environ
-    if not autoproj_available:
-        warnings.warn(
-            "autoproj environment not detected, EnviRe will not be available",
-            UserWarning)
-    return autoproj_available
-
-
-def make_cdff_types(config, cdffpath, ctypespath, extra_compile_args):
+def make_cdff_types(config, cdffpath, ctypespath):
     config.add_extension(
         "cdff_types",
         sources=["cdff_types.pyx"],
         include_dirs=[
             ".",
+            "cpp_helpers",
             numpy.get_include(),
-            ctypespath
+            ctypespath,
+            os.path.join(cdffpath, "Common/Types/CPP")
         ],
-        library_dirs=[os.path.join(cdffpath, "build", "Common", "Types")],
-        libraries=["cdff_types"],
+        library_dirs=[
+            os.path.join(cdffpath, "build", "Common", "Types"),
+            os.path.join(cdffpath, "build", "Common", "Loggers")
+        ],
+        libraries=["cdff_logger", "cdff_types"],
         define_macros=[("NDEBUG",)],
-        extra_compile_args=extra_compile_args
+        extra_compile_args=build_tools.extra_compile_args
     )
 
 
-def make_cdff_envire(config, ctypespath, extra_compile_args):
+def make_cdff_envire(config, ctypespath):
     autoproj_current_root = os.environ.get("AUTOPROJ_CURRENT_ROOT", None)
     install_dir = os.path.join(autoproj_current_root, "install")
     # this path is currently only used in CI image:
@@ -124,19 +123,19 @@ def make_cdff_envire(config, ctypespath, extra_compile_args):
         sources=["cdff_envire.pyx"],
         include_dirs=[
             ".",
-            "envire",
+            "cpp_helpers",
             numpy.get_include(),
             os.path.join(install_dir, "include"),
             eigen_include_dir,
             ctypespath
-        ],
+        ] + build_tools.DEFAULT_INCLUDE_DIRS,
         library_dirs=[
             os.path.join(install_dir, "lib")
-        ],
-        libraries=["base-types", "envire_core", "envire_urdf",
+        ] + build_tools.DEFAULT_LIBRARY_DIRS,
+        libraries=["cdff_types", "base-types", "envire_core", "envire_urdf",
                    "urdfdom_model", "envire_visualizer_interface"],
         define_macros=[("NDEBUG",)],
-        extra_compile_args=extra_compile_args
+        extra_compile_args=build_tools.extra_compile_args
     )
 
 
@@ -164,4 +163,3 @@ if __name__ == "__main__":
         configuration=configuration
     )
     setup(**metadata)
-

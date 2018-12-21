@@ -30,6 +30,14 @@ def create_cpp(typename):
 def create_from_dict(typename, data):
     """Convert intermediate logfile format to InFuse C++ type.
 
+    If the typename is 'asn1_bitstream', we will assume that the data
+    is a dictionary with the fields 'type', 'serialization_method', and
+    'data'. 'type' will contain the real typename of the ASN.1 encoded
+    bitstream. 'serialization_method' must be 0 for now. 0 means uPER
+    and is the only supported ASN.1 serialization for now. 'data'
+    contains a stream of bits. The serialized representation of the
+    data.
+
     Parameters
     ----------
     typename : str
@@ -37,6 +45,7 @@ def create_from_dict(typename, data):
         Some conversion steps will be done automatically, for example,
         * /bla/blub -> BlaBlub
         * /gps/Solution -> GpsSolution
+        Data with the typename 'asn1_bitstream' will be handled differently.
 
     data : object
         Contains the actual data. Only basic types like list, dict, float,
@@ -48,8 +57,37 @@ def create_from_dict(typename, data):
         The corresponding C++ class wrapped in Python. It can be passed to
         wrapped C++ extensions in Python.
     """
-    obj = create_cpp(typename)
-    return _convert(obj, data)
+    if typename == "asn1_bitstream":
+        return _decode_asn1(data)
+    else:
+        obj = create_cpp(typename)
+        return _convert(obj, data)
+
+
+def _decode_asn1(data):
+    """Decode ASN.1 object from uPER serialization.
+
+    Parameters
+    ----------
+    data : dict
+        uPER representation of the data  TODO
+
+    Returns
+    -------
+    obj : object
+        The corresponding C++ class wrapped in Python. It can be passed to
+        wrapped C++ extensions in Python.
+    """
+    if data["serialization_method"] != 0:
+        raise NotImplementedError(
+            "Cannot decode serialization method %d. We can only handle 0 "
+            "(uPER)." % data["serialization_method"])
+    obj = create_cpp(data["type"])
+    if not hasattr(obj, "from_uper"):
+        raise NotImplementedError("Cannot decode type %s from uPER"
+                                  % data["type"])
+    obj.from_uper(data["data"])
+    return obj
 
 
 def _translate_typename(typename):
@@ -71,6 +109,8 @@ def _translate_typename(typename):
         i = typename.find("/")
         if i + 1 < len(typename):
             typename = typename[:i] + typename[i + 1].upper() + typename[i + 2:]
+    if typename.startswith("asn1Scc"):
+        typename = typename.replace("asn1Scc", "")
     return typename
 
 

@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from cdff_dev import (logloader, dataflowcontrol, envirevisualization,
-                      transformer)
+                      transformer, dfnhelpers, imagevisualization)
 import cdff_types
 import cdff_envire
 
@@ -58,6 +58,39 @@ def replay_logfile_join(log_folder, logfiles):  # shortcut
 
 
 def main():
+    # Note that the logfiles are not in the repository because they are too
+    # large. Ask Alexander Fabisch about it.
+    #log_folder = "logs/20180927-1752_sherpa"
+    log_folder = "logs/20180927-1756_sherpa"
+    sherpa_log_iterator = replay_logfile_join(
+        log_folder,
+        [("sherpa_tt_mcs_Logger_InFuse.msg", ["/mcs_sensor_processing.rigid_body_state_out"]),
+         ("body_joint_Logger_InFuse.msg", ["/body_joint.body_joint_samples"]),
+         ("sherpa_tt_slam_Logger_InFuse.msg", ["/slam_filter.output"])]
+    )
+
+    log_folder = "logs/sherpa_hcru"
+    #prefix = "recording_20180927-175146_sherpaTT_integration"
+    prefix = "recording_20180927-175540_sherpaTT_integration"
+    prefix_path = os.path.join(log_folder, prefix)
+    hcru_log_iterator = logloader.replay_logfile_sequence(
+        logloader.group_pattern(prefix_path, "_0*.msg"),
+        ["/hcru1/pt_stereo_rect/left/image",
+         "/hcru1/pt_stereo_rect/right/image",
+         #"/hcru1/pt_color/left/image",
+         #"/hcru1/pt_stereo_sgm/depth"
+         ])
+
+    log_iterator = logloader.replay_join(
+        [sherpa_log_iterator, hcru_log_iterator])
+
+    stream_aliases = {
+        "/hcru1/pt_stereo_rect/left/image": "/hcru1/pt_stereo_rect/left.image",
+        "/hcru1/pt_stereo_rect/right/image": "/hcru1/pt_stereo_rect/right.image",
+        #"/hcru1/pt_color/left/image": "/hcru1/pt_color/left.image",
+        #"/hcru1/pt_stereo_sgm/depth": "/hcru1/pt_stereo_sgm.depth",
+    }
+
     app = envirevisualization.EnvireVisualizerApplication(
         frames={
             "/slam_filter.output": "velodyne",
@@ -68,33 +101,39 @@ def main():
     )
 
     transformer = Transformer()
-    transformer.set_configuration_file(
-        "logs/sherpa_hcru/recording_20180927-175146_sherpaTT_integration_tf.msg")
+    transformer.set_configuration_file(prefix_path + "_tf.msg")
+
+    merge_frame_pair = dfnhelpers.MergeFramePairDFN(
+        left_camera_info_stream="/hcru1/pt_stereo_rect/left/camera_info",
+        right_camera_info_stream="/hcru1/pt_stereo_rect/right/camera_info",
+        left_is_main_camera=True, verbose=0
+    )
+    merge_frame_pair.set_configuration_file(prefix_path + "_camera.msg")
+
     dfc = dataflowcontrol.DataFlowControl(
-        nodes={"transformer": transformer},
+        nodes={"transformer": transformer,
+               "merge_frame_pair": merge_frame_pair},
         connections=(
             ("/mcs_sensor_processing.rigid_body_state_out", "transformer.wheelOdometry"),
-            ("/body_joint.body_joint_samples", "transformer.bodyJoint")
+            ("/body_joint.body_joint_samples", "transformer.bodyJoint"),
+            ("/hcru1/pt_stereo_rect/left.image", "merge_frame_pair.leftImage"),
+            ("/hcru1/pt_stereo_rect/right.image", "merge_frame_pair.rightImage"),
         ),
-        periods={"transformer": 1},
+        periods={"transformer": 1,
+                 "merge_frame_pair": 1},
         real_time=False,
+        stream_aliases=stream_aliases,
         verbose=0
     )
     dfc.setup()
 
     from cdff_dev.diagrams import save_graph_png
-    save_graph_png(dfc, "trr.png")
+    save_graph_png(dfc, "hcru_sherpa.png")
 
-    # Note that the logfiles are not in the repository because they are too
-    # large. Ask Alexander Fabisch about it.
-    #log_folder = "logs/20180927-1752_sherpa"
-    log_folder = "logs/20180927-1756_sherpa"
-    log_iterator = replay_logfile_join(
-        log_folder,
-        [("sherpa_tt_mcs_Logger_InFuse.msg", ["/mcs_sensor_processing.rigid_body_state_out"]),
-         ("body_joint_Logger_InFuse.msg", ["/body_joint.body_joint_samples"]),
-         ("sherpa_tt_slam_Logger_InFuse.msg", ["/slam_filter.output"])]
-    )
+    visualization = imagevisualization.ImagePairVisualization(
+        "merge_frame_pair.pair")
+    dfc.register_visualization(visualization)
+
     app.show_controls(log_iterator, dfc)
     app.exec_()
 

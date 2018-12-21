@@ -74,5 +74,5 @@ RUN rm /root/.gitconfig
 WORKDIR /
 
 LABEL maintainer="Alexander.Fabisch@dfki.de"
-LABEL version="1.8.11"
+LABEL version="1.8.13"
 LABEL description="Image providing the dependencies of CDFF-dev for continuous integration"

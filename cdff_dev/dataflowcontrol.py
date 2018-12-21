@@ -374,8 +374,13 @@ class DataFlowControl:
                     print("[DataFlowControl] setting %s" % input_port)
                 input_node_name, input_port_name = input_port.split(".")
                 if input_node_name in self.input_ports_:
-                    self._node_facade.write_input_port(
-                        input_node_name, input_port_name, sample)
+                    try:
+                        self._node_facade.write_input_port(
+                            input_node_name, input_port_name, sample)
+                    except TypeError as e:
+                        raise TypeError(
+                            "Failed to write on input port %s.%s. %s"
+                            % (input_node_name, input_port_name, e))
                     self._port_trigger(
                         input_node_name, input_port_name, timestamp)
                 elif input_node_name in self.result_ports_:
@@ -431,7 +436,10 @@ class NodeFacade:
                 self.memory_profiler_.prepare_memory_profiling(
                     "%s configure" % name)
 
-            self.nodes[name].configure()
+            try:
+                self.nodes[name].configure()
+            except:
+                warnings.warn("Configuring %s failed" % name)
 
             if self.memory_profiler:
                 mem = self.memory_profiler_.memory_profile(
@@ -549,19 +557,20 @@ class NodeStatistics:
              len(self.processing_durations_[node_name]))
             for node_name in self.processing_durations_.keys()
         )
-        max_memory_added = dict(
-            (node_name, max(self.process_memory[node_name]))
-            for node_name in self.process_memory.keys()
-        )
-        average_memory_added = dict(
-            (node_name, sum(self.process_memory[node_name]) /
-             len(self.process_memory[node_name]))
-            for node_name in self.process_memory.keys()
-        )
-        accumulated_memory_added = dict(
-            (node_name, sum(self.process_memory[node_name]))
-            for node_name in self.process_memory.keys()
-        )
+        if self.process_memory:
+            max_memory_added = dict(
+                (node_name, max(self.process_memory[node_name]))
+                for node_name in self.process_memory.keys()
+            )
+            average_memory_added = dict(
+                (node_name, sum(self.process_memory.get(node_name, [])) /
+                 len(self.process_memory.get(node_name, 1)))
+                for node_name in self.process_memory.keys()
+            )
+            accumulated_memory_added = dict(
+                (node_name, sum(self.process_memory[node_name]))
+                for node_name in self.process_memory.keys()
+            )
 
         print("=" * 80)
         print("    Node Statistics")
@@ -570,18 +579,22 @@ class NodeStatistics:
         for node_name, average_processing_duration in \
                 self.processing_durations_.items():
             print("Node: %s" % node_name)
-            print("Average processing time: %g s"
+            print("  Average processing time: %g s"
                   % average_processing_durations[node_name])
-            print("Number of calls: %d"
+            print("  Number of calls: %d"
                   % len(self.processing_durations_[node_name]))
-            print("Memory:")
-            print("- added with configure: %g MiB"
+
+            if not self.process_memory:
+                continue
+
+            print("  Memory:")
+            print("  - added with configure: %g MiB"
                   % self.configure_memory[node_name])
-            print("- added with process (average): %g MiB"
+            print("  - added with process (average): %g MiB"
                   % average_memory_added[node_name])
-            print("- added with process (maximum): %g MiB"
+            print("  - added with process (maximum): %g MiB"
                   % max_memory_added[node_name])
-            print("- added with process (accumulated): %g MiB"
+            print("  - added with process (accumulated): %g MiB"
                   % accumulated_memory_added[node_name])
 
 

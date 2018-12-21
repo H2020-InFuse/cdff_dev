@@ -7,7 +7,9 @@ cdffpath
 build/
 cdff_types.cpp
 cdff_envire.cpp
-cdff_dev/extensions/gps/conversion.cpp
+cdff_dev/dfpcs/*.cpp
+cdff_dev/dfns/*.cpp
+cdff_dev/extensions/*/*.cpp
 # Auxiliary files
 *.cdff_idx
 # Temporary files
