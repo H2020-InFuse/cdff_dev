@@ -25,6 +25,14 @@ institutes contributed to the software:
 <img src="doc/static/dfki.jpg" alt="DFKI RIC" height="50px" />&emsp;&emsp;
 <img src="doc/static/strathclyde.jpg" alt="Strathclyde SMeSTech" height="70px" />&emsp;&emsp;
 
+### Documentation about CDFF-Dev
+
+The overall concept and conventions are described in these documents:
+
+* [CDFF-Support](https://drive.google.com/open?id=1BzKnNrRw6yIFllrITiEGZXD8awtsmvNslqRuB4j29mw)
+* [CDFF-Dev](https://drive.google.com/open?id=1yz_w7Eut6Rtg0d4I6R4mze2G8Oip4agyqrTDlKVgC6g)
+* [Guide for creating a DFN](https://drive.google.com/open?id=1hFTRKgJNN3n_brT3aajMA03AR_jQ2eCo-ZM33ggY5cE)
+
 ### Dependencies of CDFF-Dev
 
 The recommended way of installing all dependencies of CDFF-Dev is autoproj.
@@ -124,14 +132,6 @@ Notes:
 * About the `-H` flag (`--set-home`): the Python package manager caches data in `$XDG_CACHE_HOME/pip`, where `$XDG_CACHE_HOME` is `$HOME/.cache` by default, where `$HOME` is the home directory of the superuser only if `sudo -H` is used, since `sudo` does not change the home directory by default.
 
     Running `pip3` through `sudo` without the `-H` flag disables this caching to avoid writing `root`-owned files to the cache directory of the current user. Run `pip3` through `sudo -H` to write those files to the cache directory of the superuser instead.
-
-### Documentation about CDFF-Dev
-
-The overall concept and conventions are described in these documents:
-
-* [CDFF-Support](https://drive.google.com/open?id=1BzKnNrRw6yIFllrITiEGZXD8awtsmvNslqRuB4j29mw)
-* [CDFF-Dev](https://drive.google.com/open?id=1yz_w7Eut6Rtg0d4I6R4mze2G8Oip4agyqrTDlKVgC6g)
-* [Guide for creating a DFN](https://drive.google.com/open?id=1hFTRKgJNN3n_brT3aajMA03AR_jQ2eCo-ZM33ggY5cE)
 
 ### Using CDFF-Dev's DFN code generator
 
