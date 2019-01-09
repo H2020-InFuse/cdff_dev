@@ -5,7 +5,7 @@ https://gitlab.spaceapplications.com/InFuse/CDFF_dev)
 https://gitlab.spaceapplications.com/InFuse/CDFF_dev/badges/master/coverage.svg)](
 https://gitlab.spaceapplications.com/InFuse/CDFF_dev)
 
-## CDFF-Dev
+# CDFF-Dev
 
 CDFF-Dev provides tools to develop, test, visualize, and perform
 analysis on data fusion products. It includes tools such as data
@@ -15,6 +15,7 @@ it is deployed on the target system.
 CDFF-Dev was initiated and is currently developed by the
 [InFuse](https://www.h2020-infuse.eu/) consortium. The following
 institutes contributed to the software:
+
 * [Robotics Innovation Center](http://robotik.dfki-bremen.de/en/startpage.html)
   of the [German Research Center for Artificial Intelligence (DFKI)](http://www.dfki.de)
   in Bremen
@@ -25,16 +26,15 @@ institutes contributed to the software:
 <img src="doc/static/dfki.jpg" alt="DFKI RIC" height="50px" />&emsp;&emsp;
 <img src="doc/static/strathclyde.jpg" alt="Strathclyde SMeSTech" height="70px" />&emsp;&emsp;
 
-### Documentation about CDFF-Dev
+## Documentation
 
 The overall concept and conventions are described in these documents:
 
-* [CDFF-Support](https://drive.google.com/open?id=1BzKnNrRw6yIFllrITiEGZXD8awtsmvNslqRuB4j29mw)
-* [CDFF-Dev](https://drive.google.com/open?id=1yz_w7Eut6Rtg0d4I6R4mze2G8Oip4agyqrTDlKVgC6g)
+* [CDFF-Dev Architecture and User Documentation](https://drive.google.com/open?id=1yz_w7Eut6Rtg0d4I6R4mze2G8Oip4agyqrTDlKVgC6g)
 * [Guide for creating a DFN](https://drive.google.com/open?id=1hFTRKgJNN3n_brT3aajMA03AR_jQ2eCo-ZM33ggY5cE)
 * [Guide for creating a DFPC](https://drive.google.com/open?id=1ZUhZPnedd1mO42y-q4N7USltOnKeZzbyyZz_yzpLsmk)
 
-### Dependencies of CDFF-Dev
+## Dependencies of CDFF-Dev
 
 The recommended way of installing all dependencies of CDFF-Dev is autoproj.
 See [autoproj installation instructions](https://gitlab.spaceapplications.com/InFuse/cdff-buildconf/tree/cdff_dev#infuse-framework-install-instructions)
@@ -100,7 +100,7 @@ user@cdff-dev:/$
 
 Unit testing CDFF-Dev requires additional Python packages, see further.
 
-### Compiling and installing CDFF-Dev
+## Compiling and installing CDFF-Dev
 
 After you have built (and optionally installed) the CDFF's Core and Support components, you can compile and install the CDFF's Dev component as a Python package:
 
@@ -134,7 +134,7 @@ Notes:
 
     Running `pip3` through `sudo` without the `-H` flag disables this caching to avoid writing `root`-owned files to the cache directory of the current user. Run `pip3` through `sudo -H` to write those files to the cache directory of the superuser instead.
 
-### Using CDFF-Dev's DFN code generator
+## Using CDFF-Dev's DFN code generator
 
 Once CDFF-Dev is compiled and installed, you can run the DFN code generator as follow:
 
@@ -166,7 +166,7 @@ In these commands:
 
 * `/path/to/CDFF/` is the directory that contains your local clone of the `CDFF` repository (CDFF-Core and CDFF-Support). It is looked for on the command line, in the `CDFFPATH` environment variable, and in the hint file `cdffpath` in the current directory, in this order of precedence.
 
-### Other Command Line Tools
+## Other Command Line Tools
 
 CDFF-Dev provides more command line tools than just the code generators.
 They are documented in the [User Documentation of CDFF-Dev](https://docs.google.com/document/d/1yz_w7Eut6Rtg0d4I6R4mze2G8Oip4agyqrTDlKVgC6g):
@@ -174,7 +174,7 @@ They are documented in the [User Documentation of CDFF-Dev](https://docs.google.
 * `dfpc_diagram` is explained in Section 1.1.2
 * Utilities for log data handling are described in Section 3
 
-### Testing CDFF-Dev
+## Testing CDFF-Dev
 
 Unit testing CDFF-Dev requires the following additional Python packages:
 
@@ -194,23 +194,20 @@ $ pip3 install --user nose nose2
 Then to run the unit tests:
 
 ```
-# Either
 nosetests -sv
-
-# Or
-make test
 ```
 
 Notes:
 
-* Running the unit tests produces a number of test-related files in `/path/to/CDFF_dev`:
+* Compiling and running the unit tests produces a number of test-related files
+  in `/path/to/CDFF_dev`:
 
     ```
     build/temp.*/test/test_output/
     cdff_dev/__pycache__/
     cdff_dev/test/__pycache__/
     test/__pycache__/
-    <testname>*.so
+    <extension>*.so
     ```
 
     If deleted they will be generated again at the next unit test run.
@@ -219,26 +216,18 @@ Notes:
 
     Work around this issue by adding the writable mode bit for "others" to `build/temp.*/`, or chowning it to your user.
 
-### Contributing to CDFF-Dev
+## Contributing to CDFF-Dev
 
 It is not allowed to push to the `master` branch. To contribute a new
 feature, please develop it in a feature branch, push the feature branch,
 and open a merge request.
 
-### Status
+## License
 
-The following features work:
+CDFF-Dev is released under GPL v3 or later.
 
-1. Generating a DFN template in C++ with Python bindings
-1. Generating a DFPC template in C++ with Python bindings
-1. Replaying logfiles with EnviRe visualizer
+## Copyright
 
-### License
-
-There is no license at the moment.
-
-### Copyright
-
-Copyright 2017-2018, DFKI GmbH / Robotics Innovation Center,
+Copyright 2017-2019, DFKI GmbH / Robotics Innovation Center,
 University of Strathclyde / Space Mechatronics Systems Technology
 Laboratory
