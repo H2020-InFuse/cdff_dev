@@ -1,0 +1,55 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+import build_tools
+from cdff_dev.path import load_cdffpath
+
+
+def configuration(parent_package='', top_path=None):
+    from numpy.distutils.misc_util import Configuration
+    config = Configuration("dfns", parent_package, top_path)
+
+    cdffpath = load_cdffpath()
+    autoproj_available = build_tools.check_autoproj()
+    if autoproj_available:
+        make_imagepairdegradation(config, cdffpath)
+
+    return config
+
+
+def make_imagepairdegradation(config, cdffpath):
+    libraries = ["opencv"]
+
+    # use pkg-config for external dependencies
+    dep_inc_dirs = build_tools.get_include_dirs(libraries)
+    dep_lib_dirs = build_tools.get_library_dirs(libraries)
+
+    edres_info = build_tools.find_library("edres-wrapper")
+    dep_inc_dirs += edres_info["include_dirs"]
+    dep_lib_dirs += edres_info["library_dirs"]
+
+    dep_libs = ["edres-wrapper"]
+
+    dfn_libraries = [
+        "cdff_dfn_stereo_degradation",
+    ]
+
+    config.add_extension(
+        "stereodegradation",
+        sources=["stereodegradation.pyx"],
+        include_dirs=[
+            os.path.join(cdffpath, "DFNs", "StereoDegradation"),
+        ] + build_tools.DEFAULT_INCLUDE_DIRS + dep_inc_dirs,
+        library_dirs=[
+            # TODO move to installation folder:
+            os.path.join(cdffpath, "build", "DFNs", "StereoDegradation"),
+        ] + build_tools.DEFAULT_LIBRARY_DIRS + dep_lib_dirs,
+        libraries=dfn_libraries + dep_libs,
+        define_macros=[("NDEBUG",)],
+        extra_compile_args=build_tools.extra_compile_args
+    )
+
+
+if __name__ == '__main__':
+    from numpy.distutils.core import setup
+    setup(**configuration(top_path='').todict())
