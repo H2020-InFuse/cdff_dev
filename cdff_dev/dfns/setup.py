@@ -24,11 +24,12 @@ def make_imagepairdegradation(config, cdffpath):
     dep_inc_dirs = build_tools.get_include_dirs(libraries)
     dep_lib_dirs = build_tools.get_library_dirs(libraries)
 
-    edres_info = build_tools.find_library("edres-wrapper")
-    dep_inc_dirs += edres_info["include_dirs"]
-    dep_lib_dirs += edres_info["library_dirs"]
-
-    dep_libs = ["edres-wrapper"]
+    dep_libs = []
+    # Edres is currently not publicly available.
+    #edres_info = build_tools.find_library("edres-wrapper")
+    #dep_inc_dirs += edres_info["include_dirs"]
+    #dep_lib_dirs += edres_info["library_dirs"]
+    #dep_libs += ["edres-wrapper"]
 
     dfn_libraries = [
         "cdff_dfn_stereo_degradation",

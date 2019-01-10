@@ -104,7 +104,7 @@ def find_library(name, expected_include_path=None):
         elif os.path.exists("/usr/include/" + expected_include_path):
             lib_install_dir = "/usr"
         else:
-            raise RuntimeError("Could not find Ceres")
+            raise RuntimeError("Could not find %s" % name)
     return {
         "include_dirs": [os.path.join(lib_install_dir, "include",
                                       expected_include_path)],

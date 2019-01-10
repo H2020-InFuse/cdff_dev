@@ -41,7 +41,7 @@ cdef class StereoDegradation:
         return out
 
 
-
+"""
 cdef class StereoDegradationEdres:
     def __cinit__(self):
         self.thisptr = NULL
@@ -74,3 +74,4 @@ cdef class StereoDegradationEdres:
         out.thisptr[0] = self.thisptr.degradedImagePairOutput()
         return out
 
+"""
