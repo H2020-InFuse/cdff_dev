@@ -25,13 +25,7 @@ def make_reconstruction3d(config, cdffpath):
     dep_inc_dirs = build_tools.get_include_dirs(libraries)
 
     dfpc_libraries = [
-        "adjustment_from_stereo",
-        "dense_registration_from_stereo",
-        "sparse_registration_from_stereo",
-        "reconstruction_from_motion",
-        "reconstruction_from_stereo",
-        "registration_from_stereo",
-        "estimation_from_stereo",
+        "cdff_dfpc_reconstruction_3d",
     ]
 
     config.add_extension(
