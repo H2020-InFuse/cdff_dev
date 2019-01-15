@@ -18,7 +18,6 @@ DEFAULT_INCLUDE_DIRS = [
     os.path.join(cdffpath, "DFNs"),
     os.path.join(cdffpath, "DFPCs"),
     os.path.join(cdffpath, "Tools"),
-    os.path.join(cdffpath, "CC"),
 ]
 DEFAULT_LIBRARY_DIRS = [
     # TODO move to installation folder:
@@ -31,7 +30,6 @@ DEFAULT_LIBRARY_DIRS = [
     os.path.join(cdffpath, "build", "Common", "Validators"),
     os.path.join(cdffpath, "build", "DFNs"),
     os.path.join(cdffpath, "build", "DFPCs"),
-    os.path.join(cdffpath, "build", "CC"),
 ] + list(glob.glob(os.path.join(cdffpath, "build", "DFNs", "*")))
 
 
