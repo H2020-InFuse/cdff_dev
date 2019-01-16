@@ -1162,48 +1162,6 @@ def test_depth_map():
     assert_equal(depth_map.horizontal_size, 10)
 
 
-def test_image():
-    frame = cdff_types.Image()
-
-    frame.frame_time.microseconds = 10
-    assert_equal(frame.frame_time.microseconds, 10)
-
-    frame.received_time.microseconds = 10
-    assert_equal(frame.received_time.microseconds, 10)
-
-    frame.image[0] = 10
-    frame.image[1] = 11
-    assert_equal(frame.image.size(), 2)
-    assert_equal(frame.image[0], 10)
-    assert_equal(frame.image[1], 11)
-
-    frame.datasize.width = 640
-    assert_equal(frame.datasize.width, 640)
-    frame.datasize.height = 480
-    assert_equal(frame.datasize.height, 480)
-
-    frame.attributes.resize(1)
-    frame.attributes[0].data = "some data"
-    frame.attributes[0].att_name = "some name"
-    assert_equal(frame.attributes[0].data, "some data")
-    assert_equal(frame.attributes[0].att_name, "some name")
-
-    frame.data_depth = 256
-    assert_equal(frame.data_depth, 256)
-
-    frame.pixel_size = 256
-    assert_equal(frame.pixel_size, 256)
-
-    frame.row_size = 256
-    assert_equal(frame.row_size, 256)
-
-    frame.frame_mode = "mode_undefined"
-    assert_equal(frame.frame_mode, "mode_undefined")
-
-    frame.frame_status = "status_empty"
-    assert_equal(frame.frame_status, "status_empty")
-
-
 def test_frame():
     frame = cdff_types.Frame()
 
