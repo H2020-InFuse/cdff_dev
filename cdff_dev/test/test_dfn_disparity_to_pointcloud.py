@@ -3,7 +3,7 @@ import cdff_types
 from nose.tools import assert_equal
 
 
-def test_stereodegradation():
+def test_disparitytopointcloud():
     dfn = DisparityToPointCloud()
     dfn.configure()
 
