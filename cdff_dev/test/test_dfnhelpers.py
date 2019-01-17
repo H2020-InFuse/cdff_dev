@@ -6,7 +6,8 @@ from numpy.testing import assert_array_equal
 
 
 def test_lambda_dfn():
-    dfn = dfnhelpers.LambdaDFN(lambda x: x ** 2, "x", "y")
+    dfn = dfnhelpers.LambdaDFN(
+        lambda x: x ** 2, input_port="x", output_port="y")
     assert_true(dataflowcontrol.isdfn(dfn))
     dfn.set_configuration_file("")
     dfn.configure()
