@@ -1,11 +1,9 @@
 import os
-import numpy as np
 from cdff_dev import (dataflowcontrol, logloader, dfnhelpers,
                       envirevisualization, diagrams, transformer)
 from cdff_dev.dfns.stereodegradation import StereoDegradation
 from cdff_dev.dfns.disparityimage import DisparityImage
 from cdff_dev.dfns.disparitytopointcloud import DisparityToPointCloud
-import cdff_envire
 
 
 class Transformer(transformer.EnvireDFN):
