@@ -1,8 +1,19 @@
 import numpy as np
-from cdff_dev import dfnhelpers
+from cdff_dev import dfnhelpers, dataflowcontrol
 import cdff_types
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_true
 from numpy.testing import assert_array_equal
+
+
+def test_lambda_dfn():
+    dfn = dfnhelpers.LambdaDFN(lambda x: x ** 2, "x", "y")
+    assert_true(dataflowcontrol.isdfn(dfn))
+    dfn.set_configuration_file("")
+    dfn.configure()
+    dfn.xInput(5)
+    dfn.process()
+    y = dfn.yOutput()
+    assert_equal(y, 25)
 
 
 def test_merge_without_config():

@@ -7,7 +7,6 @@ from cdff_dev.dfns.stereodegradation import StereoDegradation
 from cdff_dev.dfns.disparityimage import DisparityImage
 #from cdff_dev.dfns.disparityfiltering import DisparityFiltering
 from cdff_dev.dfns.disparitytopointcloud import DisparityToPointCloud
-import cdff_types
 import cdff_envire
 
 
@@ -29,30 +28,6 @@ class Transformer(transformer.EnvireDFN):
 
     def wheelOdometryInput(self, data):
         self._set_transform(data, frame_transformation=False)
-
-
-class PointCloudFilter:
-    def __init__(self):
-        self.pointCloud = None
-        self.filtered = cdff_types.Pointcloud()
-
-    def set_configuration_file(self, filename):
-        pass
-
-    def configure(self):
-        pass
-
-    def pointCloudInput(self, data):
-        self.pointCloud = data
-
-    def process(self):
-        if self.pointCloud is None:
-            return
-
-        self.filtered = self.pointCloud.filtered()
-
-    def filteredPointCloudOutput(self):
-        return self.filtered
 
 
 def main():
@@ -100,7 +75,8 @@ def main():
         "disparity_image": disparity_image,
         #"disparity_filtering": disparity_filtering,
         "disparity_to_point_cloud": disparity_to_point_cloud,
-        "point_cloud_filter": PointCloudFilter(),
+        "point_cloud_filter": dfnhelpers.LambdaDFN(
+            lambda x: x.filtered(), "pointCloud", "filteredPointCloud"),
         "transformer": transformer,
     }
     trigger_ports = {

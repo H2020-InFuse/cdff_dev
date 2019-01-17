@@ -378,9 +378,10 @@ class DataFlowControl:
                         self._node_facade.write_input_port(
                             input_node_name, input_port_name, sample)
                     except TypeError as e:
-                        raise TypeError(
-                            "Failed to write on input port %s.%s. %s"
-                            % (input_node_name, input_port_name, e))
+                        warnings.warn("Failed to write on input port %s.%s. "
+                                      "Forwarding error message."
+                                      % (input_node_name, input_port_name))
+                        raise e
                     self._port_trigger(
                         input_node_name, input_port_name, timestamp)
                 elif input_node_name in self.result_ports_:

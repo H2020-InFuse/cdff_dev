@@ -2,7 +2,55 @@ import numpy as np
 import msgpack
 import yaml
 import pprint
+import types
 import cdff_types
+
+
+class LambdaDFN:
+    """A DFN that wraps a callable to implement the processing step.
+
+    Parameters
+    ----------
+    lambda_fun : callable
+        A function that takes one input given on an input port and produces
+        one output that is returned on an output port.
+
+    input_port : str
+        Name of the input port (without 'Input' suffix)
+
+    output_port : str
+        Name of the output port (without 'Output' suffix)
+    """
+    def __init__(self, lambda_fun, input_port, output_port):
+        self.lambda_fun = lambda_fun
+
+        def input_port_fun(self, data):
+            self.input_data = data
+        input_port_fun.__name__ = input_port + "Input"
+
+        def output_port_fun(self):
+            return self.output_data
+        output_port_fun.__name__ = output_port + "Output"
+
+        setattr(self, input_port_fun.__name__,
+                types.MethodType(input_port_fun, self))
+        setattr(self, output_port_fun.__name__,
+                types.MethodType(output_port_fun, self))
+
+        self.input_data = None
+        self.output_data = None
+
+    def set_configuration_file(self, filename):
+        pass
+
+    def configure(self):
+        pass
+
+    def process(self):
+        if self.input_data is None:
+            return
+
+        self.output_data = self.lambda_fun(self.input_data)
 
 
 class MergeFramePairDFN:
