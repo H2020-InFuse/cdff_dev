@@ -1,11 +1,9 @@
 import os
 import numpy as np
 from cdff_dev import (dataflowcontrol, logloader, dfnhelpers,
-                      envirevisualization, path, diagrams, transformer)
-from cdff_dev.dfns.imagedegradation import ImageDegradation
+                      envirevisualization, diagrams, transformer)
 from cdff_dev.dfns.stereodegradation import StereoDegradation
 from cdff_dev.dfns.disparityimage import DisparityImage
-#from cdff_dev.dfns.disparityfiltering import DisparityFiltering
 from cdff_dev.dfns.disparitytopointcloud import DisparityToPointCloud
 import cdff_envire
 
@@ -43,7 +41,6 @@ def main():
     log_folder = "logs/20181122"
 
     prefix = "recording_20181122-100414_sherpaTT_integration_0"
-    cdffpath = path.load_cdffpath()
 
     prefix_path = os.path.join(log_folder, prefix)
 
@@ -57,22 +54,16 @@ def main():
     transformer = Transformer()
     transformer.set_configuration_file(prefix_path + "_tf.msg")
 
-    image_degradation = ImageDegradation()
-    #image_degradation.set_configuration_file("ImageDegradationParams.yaml")
     stereo_degradation = StereoDegradation()
     #stereo_degradation.set_configuration_file("ImageDegradationParams.yaml")
     disparity_image = DisparityImage()
     #disparity_image.set_configuration_file("DisparityImageParams.yaml")
-    #disparity_filtering = DisparityFiltering()
-    #disparity_filtering.set_configuration_file("DisparityFilteringParams.yaml")
     disparity_to_point_cloud = DisparityToPointCloud()
 
     nodes = {
         "merge_frame_pair": merge_frame_pair,
-        "image_degradation": image_degradation,
         "stereo_degradation": stereo_degradation,
         "disparity_image": disparity_image,
-        #"disparity_filtering": disparity_filtering,
         "disparity_to_point_cloud": disparity_to_point_cloud,
         "point_cloud_filter": dfnhelpers.LambdaDFN(
             lambda x: x.filtered(), "pointCloud", "filteredPointCloud"),
@@ -80,10 +71,8 @@ def main():
     }
     trigger_ports = {
         "merge_frame_pair": "rightImage",
-        "image_degradation": "originalImage",
         "stereo_degradation": "originalImagePair",
         "disparity_image": "framePair",
-        #"disparity_filtering": "dispImage",
         "disparity_to_point_cloud": "dispImage",
         "point_cloud_filter": "pointCloud",
         "transformer": "wheelOdometry",
@@ -91,15 +80,11 @@ def main():
     connections = (
         ("/hcru1/pt_stereo_rect/left.image", "merge_frame_pair.leftImage"),
         ("/hcru1/pt_stereo_rect/right.image", "merge_frame_pair.rightImage"),
-        ("/hcru1/pt_stereo_rect/left.image", "image_degradation.originalImage"),
         ("/mcs_sensor_processing.rigid_body_state_out", "transformer.wheelOdometry"),
         ("merge_frame_pair.pair", "stereo_degradation.originalImagePair"),
         ("stereo_degradation.degradedImagePair", "disparity_image.framePair"),
         ("disparity_image.rawDisparity", "disparity_to_point_cloud.dispImage"),
-        #("disparity_image.dispImage", "disparity_filtering.dispImage"),
-        #("disparity_filtering.filteredDispImage", "disparity_to_point_cloud.dispImage"),
         ("disparity_to_point_cloud.pointCloud", "point_cloud_filter.pointCloud"),
-        #("image_degradation.degradedImage", "disparity_to_point_cloud.intensityImage"),
     )
     stream_aliases = {
         "/hcru1/pt_stereo_rect/left/image": "/hcru1/pt_stereo_rect/left.image",
