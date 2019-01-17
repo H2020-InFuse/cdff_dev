@@ -1,14 +1,14 @@
 import numpy as np
-from cdff_dev import dfnhelpers, dataflowcontrol
+from cdff_dev import dfnhelpers
 import cdff_types
-from nose.tools import assert_equal, assert_true
+from nose.tools import assert_equal, assert_true, assert_false
 from numpy.testing import assert_array_equal
 
 
 def test_lambda_dfn():
     dfn = dfnhelpers.LambdaDFN(
         lambda x: x ** 2, input_port="x", output_port="y")
-    assert_true(dataflowcontrol.isdfn(dfn))
+    assert_true(dfnhelpers.isdfn(dfn))
     dfn.set_configuration_file("")
     dfn.configure()
     dfn.xInput(5)
@@ -87,3 +87,94 @@ def test_merge_with_config():
         camera_matrix,
         np.array([[867.356, 0, 516], [0, 867.356, 386], [0, 0, 1]]))
     assert_equal(pair.right.intrinsic.camera_model, "cam_PINHOLE")
+
+
+def test_is_dfn():
+    class NoDFN:
+        def set_configuration_file(self, filename):
+            pass
+    class DFN:
+        def set_configuration_file(self, filename):
+            pass
+        def configure(self):
+            pass
+        def process(self):
+            pass
+
+    assert_false(dfnhelpers.isdfn(NoDFN))
+    assert_true(dfnhelpers.isdfn(DFN))
+
+
+def test_is_dfpc():
+    class NoDFPC:
+        def set_configuration_file(self, filename):
+            pass
+    class DFPC:
+        def set_configuration_file(self, filename):
+            pass
+        def setup(self):
+            pass
+        def run(self):
+            pass
+
+    assert_false(dfnhelpers.isdfpc(NoDFPC))
+    assert_true(dfnhelpers.isdfpc(DFPC))
+
+
+def test_dfn_adapter():
+    class DFPC:
+        def set_configuration_file(self, filename):
+            self.filename = filename
+        def setup(self):
+            self.configured = True
+        def run(self):
+            self.executed = True
+        def aInput(self, data):
+            self.a = data
+        def bOutput(self):
+            return self.a
+
+    assert_true(dfnhelpers.isdfpc(DFPC))
+    DFPCDFN = dfnhelpers.create_dfn_from_dfpc(DFPC)
+    assert_true(dfnhelpers.isdfn(DFPCDFN))
+    dfn = DFPCDFN()
+    dfn.set_configuration_file("testfile")
+    assert_equal(dfn.dfpc.filename, "testfile")
+    dfn.configure()
+    assert_true(dfn.dfpc.configured)
+    dfn.aInput(5)
+    dfn.process()
+    assert_true(dfn.dfpc.executed)
+    b = dfn.bOutput()
+    assert_equal(b, 5)
+
+
+class SquareDFPC:
+    def __init__(self):
+        self.x = 0.0
+
+    def set_configuration_file(self, filename):
+        pass
+
+    def setup(self):
+        pass
+
+    def xInput(self, x):
+        self.x = x
+
+    def run(self):
+        self.y = self.x ** 2
+
+    def yOutput(self):
+        return self.y
+
+
+def test_wrap_dfpc():
+    dfpc = SquareDFPC()
+    dfn = dfnhelpers.wrap_dfpc_as_dfn(dfpc)
+    assert_true(dfnhelpers.isdfn(dfn))
+    dfn.configure()
+    dfn.xInput(5)
+    dfn.process()
+    sq = dfn.yOutput()
+    assert_equal(sq, 25)

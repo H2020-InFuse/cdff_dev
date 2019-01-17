@@ -1,7 +1,6 @@
 from cdff_dev import dataflowcontrol
 from collections import defaultdict
-from nose.tools import (assert_in, assert_equal, assert_raises_regexp,
-                        assert_false, assert_true)
+from nose.tools import assert_in, assert_equal, assert_raises_regexp
 
 
 class LinearDFN:
@@ -228,77 +227,6 @@ def test_dfc_periodic_realtime():
     for i in range(101):
         dfc.process_sample(timestamp=i, stream_name="log.x", sample=i)
     dfc.process(timestamp=102)
-
-
-def test_is_dfn():
-    class NoDFN:
-        def set_configuration_file(self, filename):
-            pass
-    class DFN:
-        def set_configuration_file(self, filename):
-            pass
-        def configure(self):
-            pass
-        def process(self):
-            pass
-
-    assert_false(dataflowcontrol.isdfn(NoDFN))
-    assert_true(dataflowcontrol.isdfn(DFN))
-
-
-def test_is_dfpc():
-    class NoDFPC:
-        def set_configuration_file(self, filename):
-            pass
-    class DFPC:
-        def set_configuration_file(self, filename):
-            pass
-        def setup(self):
-            pass
-        def run(self):
-            pass
-
-    assert_false(dataflowcontrol.isdfpc(NoDFPC))
-    assert_true(dataflowcontrol.isdfpc(DFPC))
-
-
-def test_dfn_adapter():
-    class DFPC:
-        def set_configuration_file(self, filename):
-            self.filename = filename
-        def setup(self):
-            self.configured = True
-        def run(self):
-            self.executed = True
-        def aInput(self, data):
-            self.a = data
-        def bOutput(self):
-            return self.a
-
-    assert_true(dataflowcontrol.isdfpc(DFPC))
-    DFPCDFN = dataflowcontrol.create_dfn_from_dfpc(DFPC)
-    assert_true(dataflowcontrol.isdfn(DFPCDFN))
-    dfn = DFPCDFN()
-    dfn.set_configuration_file("testfile")
-    assert_equal(dfn.dfpc.filename, "testfile")
-    dfn.configure()
-    assert_true(dfn.dfpc.configured)
-    dfn.aInput(5)
-    dfn.process()
-    assert_true(dfn.dfpc.executed)
-    b = dfn.bOutput()
-    assert_equal(b, 5)
-
-
-def test_wrap_dfpc():
-    dfpc = SquareDFPC()
-    dfn = dataflowcontrol.wrap_dfpc_as_dfn(dfpc)
-    assert_true(dataflowcontrol.isdfn(dfn))
-    dfn.configure()
-    dfn.xInput(5)
-    dfn.process()
-    sq = dfn.yOutput()
-    assert_equal(sq, 25)
 
 
 def test_dfc_converts_dfpc():

@@ -1,3 +1,5 @@
+import inspect
+
 import numpy as np
 import msgpack
 import yaml
@@ -185,3 +187,110 @@ class MergeFramePairDFN:
 
     def pairOutput(self):
         return self.pair
+
+
+def isdfn(cls, verbose=0):
+    """Check if given class is a DFN."""
+    result = _check_method(cls, "set_configuration_file", verbose)
+    result &= _check_method(cls, "configure", verbose)
+    result &= _check_method(cls, "process", verbose)
+    return result
+
+
+def isdfpc(cls, verbose=0):
+    """Check if a given class is a DFPC."""
+    result = _check_method(cls, "set_configuration_file", verbose)
+    result &= _check_method(cls, "setup", verbose)
+    result &= _check_method(cls, "run", verbose)
+    return result
+
+
+def _check_method(cls, name, verbose=0):
+    if not hasattr(cls, name):
+        if verbose >= 1:
+            print("Class does not have %s()" % name)
+        return False
+    return True
+
+
+def wrap_dfpc_as_dfn(dfpc):
+    """Wrap DFPC with DFN interface.
+
+    Parameters
+    ----------
+    dfpc : DFPC
+        DFPC object
+
+    Returns
+    -------
+    dfn : DFN
+        DFPC with DFN adapter
+    """
+    cls = create_dfn_from_dfpc(dfpc.__class__)
+    return cls(dfpc=dfpc)
+
+
+def create_dfn_from_dfpc(dfpc_class):
+    """Create DFN adapter for DFPC.
+
+    This is required so that a DFPC can be used in DataFlowControl.
+
+    Parameters
+    ----------
+    dfpc_class : Class
+        DFPC class
+
+    Returns
+    -------
+    cls : Class
+        DFN class
+    """
+    clsname = dfpc_class.__name__ + "DFN"
+
+    def __init__(self, dfpc=dfpc_class()):
+        self.dfpc = dfpc
+
+    def set_configuration_file(self, filename):
+        self.dfpc.set_configuration_file(filename)
+
+    def configure(self):
+        self.dfpc.setup()
+
+    def process(self):
+        self.dfpc.run()
+
+    methods = {
+        "__init__": __init__,
+        "set_configuration_file": set_configuration_file,
+        "configure": configure,
+        "process": process
+    }
+
+    inputs = inspect.getmembers(dfpc_class, predicate=isinput)
+    for name, _ in inputs:
+        def route_method(self, data, name=name):
+            getattr(self.dfpc, name)(data)
+        route_method.__name__ = name
+        methods[name] = route_method
+
+    outputs = inspect.getmembers(dfpc_class, predicate=isoutput)
+    for name, fun in outputs:
+        def route_method(self, name=name):
+            return getattr(self.dfpc, name)()
+        route_method.__name__ = name
+        methods[name] = route_method
+
+    cls = type(clsname, (), methods)
+    return cls
+
+
+def isinput(member):
+    """Test if a member function is an input port."""
+    return (hasattr(member, "__name__") and
+            member.__name__.endswith("Input"))
+
+
+def isoutput(member):
+    """Test if a member function is an output port."""
+    return (hasattr(member, "__name__") and
+            member.__name__.endswith("Output"))
