@@ -1600,8 +1600,8 @@ cdef class Joints_namesReference:
         return name.decode()
 
     def __setitem__(self, int i, str name):
-        if i >= 30:
-            warnings.warn("Maximum size of Joints is 30")
+        if i >= 50:
+            warnings.warn("Maximum size of Joints is 50")
             return
         cdef string value = name.encode()
         memcpy(self.thisptr.arr[i].arr, value.c_str(), len(name))
@@ -1609,8 +1609,8 @@ cdef class Joints_namesReference:
             self.thisptr.nCount = <int> (i + 1)
 
     def resize(self, int size):
-        if size > 30:
-            warnings.warn("Maximum size of Joints is 30")
+        if size > 50:
+            warnings.warn("Maximum size of Joints is 50")
             return
         self.thisptr.nCount = size
 
@@ -1636,16 +1636,16 @@ cdef class Joints_elementsReference:
         return joint_state
 
     def __setitem__(self, int i, JointState joint_state):
-        if i >= 30:
-            warnings.warn("Maximum size of Joints is 30")
+        if i >= 50:
+            warnings.warn("Maximum size of Joints is 50")
             return
         self.thisptr.arr[i] = deref(joint_state.thisptr)
         if self.thisptr.nCount <= <int> i:
             self.thisptr.nCount = <int> (i + 1)
 
     def resize(self, int size):
-        if size > 30:
-            warnings.warn("Maximum size of Joints is 30")
+        if size > 50:
+            warnings.warn("Maximum size of Joints is 50")
             return
         self.thisptr.nCount = size
 
