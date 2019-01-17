@@ -1,5 +1,6 @@
 import warnings
 import msgpack
+import numpy as np
 import cdff_envire
 import cdff_types
 
@@ -189,3 +190,10 @@ class EnvireDFN:
 
     def process(self):
         pass
+
+
+def make_transform(translation, orientation):
+    t = cdff_envire.Transform()
+    t.transform.translation.fromarray(np.asarray(translation).astype(np.float))
+    t.transform.orientation.fromarray(np.asarray(orientation).astype(np.float))
+    return t

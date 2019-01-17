@@ -14,14 +14,12 @@ class Transformer(transformer.EnvireDFN):
         self.imu_initialized = False
 
     def initialize_graph(self, graph):
-        t = cdff_envire.Transform()
-        t.transform.translation.fromarray(np.zeros(3))
-        t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
+        t = transformer.make_transform(
+            translation=[0, 0, 0], orientation=[0.0, 0.0, 0.0, 1.0])
         graph.add_transform("config_sherpaTT_body", "body", t)
 
-        t = cdff_envire.Transform()
-        t.transform.translation.fromarray(np.zeros(3))
-        t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
+        t = transformer.make_transform(
+            translation=[0, 0, 0], orientation=[0.0, 0.0, 0.0, 1.0])
         graph.add_transform("origin", "odometry", t)
 
     def wheelOdometryInput(self, data):

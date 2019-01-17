@@ -146,3 +146,14 @@ def test_replace_graph():
     assert_equal(t.transform.orientation.toarray()[1], 0.006085361255164068)
     assert_equal(t.transform.orientation.toarray()[2], -0.009559094197543583)
     assert_equal(t.transform.orientation.toarray()[3], -0.5138092680696382)
+
+
+def test_make_transform():
+    t = transformer.make_transform([0, 0, 1], [1, 0, 0, 0])
+    assert_equal(t.transform.translation.x, 0)
+    assert_equal(t.transform.translation.y, 0)
+    assert_equal(t.transform.translation.z, 1)
+    assert_equal(t.transform.orientation.toarray()[0], 1)
+    assert_equal(t.transform.orientation.toarray()[1], 0)
+    assert_equal(t.transform.orientation.toarray()[2], 0)
+    assert_equal(t.transform.orientation.toarray()[3], 0)
