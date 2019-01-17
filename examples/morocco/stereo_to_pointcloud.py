@@ -62,11 +62,10 @@ def main():
     stereo_degradation = StereoDegradation()
     #stereo_degradation.set_configuration_file("ImageDegradationParams.yaml")
     disparity_image = DisparityImage()
-    #disparity_image.set_configuration_file("DisparityParams.yaml")
+    #disparity_image.set_configuration_file("DisparityImageParams.yaml")
     #disparity_filtering = DisparityFiltering()
     #disparity_filtering.set_configuration_file("DisparityFilteringParams.yaml")
     disparity_to_point_cloud = DisparityToPointCloud()
-    #disparity_to_point_cloud.set_configuration_file("DisparityToPointcloudParams.yaml")
 
     nodes = {
         "merge_frame_pair": merge_frame_pair,

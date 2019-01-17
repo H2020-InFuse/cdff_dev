@@ -123,22 +123,17 @@ def test_create_pointcloud():
 
 
 def test_create_image():
-    log = logloader.load_log("test/test_data/logs/frames.msg")
-    data = log["/camera1.frame"][1]
-    # HACK: Type is actually the old Frame
+    log = logloader.load_log("test/test_data/logs/frames2.msg")
+    data = log["/hcru0/pt_stereo_rect/left/image"][1]
     obj = typefromdict.create_from_dict(
-        log["/camera1.frame.meta"]["type"], data)
-    assert_equal(obj.attributes[0].att_name, "FrameCount")
-    assert_equal(obj.attributes[0].data, "86375")
-    assert_equal(obj.attributes[1].att_name, "Exposure_ms")
-    assert_equal(obj.attributes[1].data, "4.99986")
-    assert_equal(obj.data_depth, 3)
-    assert_equal(obj.datasize.height, 512)
-    assert_equal(obj.datasize.width, 640)
-    assert_equal(obj.frame_mode, "mode_rgb")
-    assert_equal(obj.frame_status, "status_valid")
-    assert_equal(obj.frame_time.microseconds, 1530195435880000)
-    assert_equal(obj.received_time.microseconds, 1530195435905227)
+        log["/hcru0/pt_stereo_rect/left/image.meta"]["type"], data)
+    assert_equal(obj.data.depth, "depth_8U")
+    assert_equal(obj.data.rows, 772)
+    assert_equal(obj.data.cols, 1032)
+    assert_equal(obj.metadata.mode, "mode_GRAY")
+    assert_equal(obj.metadata.status, "status_VALID")
+    assert_equal(obj.metadata.time_stamp.microseconds, 1532433037838941812)
+    assert_equal(obj.metadata.received_time.microseconds, 1532433037906064777)
 
 
 def test_create_gps_solution():
