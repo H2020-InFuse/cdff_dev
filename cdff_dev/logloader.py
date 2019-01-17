@@ -405,8 +405,9 @@ def replay_logfile(filename, stream_names, verbose=0):
             meta_streams = [metadata[name + ".meta"] for name in stream_names]
         except KeyError:
             raise ValueError(
-                "Mismatch between stream names %s and actual streams %s"
-                % (stream_names, current_positions.keys()))
+                "Mismatch between stream names %s and actual streams %s of "
+                "file '%s'"
+                % (stream_names, current_positions.keys()), filename)
 
         n_streams = len(stream_names)
         current_sample_indices = [-1] * n_streams
