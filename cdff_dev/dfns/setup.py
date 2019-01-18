@@ -16,6 +16,7 @@ def configuration(parent_package='', top_path=None):
         make_imagepairdegradation(config, cdffpath)
         make_disparityimage(config, cdffpath)
         make_disparitytopointcloud(config, cdffpath)
+        make_disparitytopointcloudwithintensity(config, cdffpath)
         # only edres version available at the moment
         #make_disparityfiltering(config, cdffpath)
 
@@ -151,6 +152,40 @@ def make_disparitytopointcloud(config, cdffpath):
         library_dirs=[
             # TODO move to installation folder:
             os.path.join(cdffpath, "build", "DFNs", "DisparityToPointCloud"),
+        ] + build_tools.DEFAULT_LIBRARY_DIRS + dep_lib_dirs,
+        libraries=dfn_libraries + dep_libs,
+        define_macros=[("NDEBUG",)],
+        extra_compile_args=build_tools.extra_compile_args
+    )
+
+
+def make_disparitytopointcloudwithintensity(config, cdffpath):
+    libraries = ["opencv"]
+
+    # use pkg-config for external dependencies
+    dep_inc_dirs = build_tools.get_include_dirs(libraries)
+    dep_lib_dirs = build_tools.get_library_dirs(libraries)
+
+    dep_libs = []
+    # Edres is currently not publicly available.
+    #edres_info = build_tools.find_library("edres-wrapper")
+    #dep_inc_dirs += edres_info["include_dirs"]
+    #dep_lib_dirs += edres_info["library_dirs"]
+    #dep_libs += ["edres-wrapper"]
+
+    dfn_libraries = [
+        "cdff_dfn_disparity_to_pointcloud_with_intensity",
+    ]
+
+    config.add_extension(
+        "disparitytopointcloudwithintensity",
+        sources=["disparitytopointcloudwithintensity.pyx"],
+        include_dirs=[
+            os.path.join(cdffpath, "DFNs", "DisparityToPointCloudWithIntensity"),
+        ] + build_tools.DEFAULT_INCLUDE_DIRS + dep_inc_dirs,
+        library_dirs=[
+            # TODO move to installation folder:
+            os.path.join(cdffpath, "build", "DFNs", "DisparityToPointCloudWithIntensity"),
         ] + build_tools.DEFAULT_LIBRARY_DIRS + dep_lib_dirs,
         libraries=dfn_libraries + dep_libs,
         define_macros=[("NDEBUG",)],

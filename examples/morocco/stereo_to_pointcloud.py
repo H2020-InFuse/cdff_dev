@@ -1,9 +1,10 @@
 import os
 from cdff_dev import (dataflowcontrol, logloader, dfnhelpers,
                       envirevisualization, diagrams, transformer)
+from cdff_dev.dfns.imagedegradation import ImageDegradation
 from cdff_dev.dfns.stereodegradation import StereoDegradation
 from cdff_dev.dfns.disparityimage import DisparityImage
-from cdff_dev.dfns.disparitytopointcloud import DisparityToPointCloud
+from cdff_dev.dfns.disparitytopointcloudwithintensity import DisparityToPointCloudWithIntensity
 
 
 class Transformer(transformer.EnvireDFN):
@@ -50,14 +51,17 @@ def main():
     transformer = Transformer()
     transformer.set_configuration_file(prefix_path + "_tf.msg")
 
+    image_degradation = ImageDegradation()
+    #image_degradation.set_configuration_file("ImageDegradationParams.yaml")
     stereo_degradation = StereoDegradation()
     #stereo_degradation.set_configuration_file("ImageDegradationParams.yaml")
     disparity_image = DisparityImage()
     #disparity_image.set_configuration_file("DisparityImageParams.yaml")
-    disparity_to_point_cloud = DisparityToPointCloud()
+    disparity_to_point_cloud = DisparityToPointCloudWithIntensity()
 
     nodes = {
         "merge_frame_pair": merge_frame_pair,
+        "image_degradation": image_degradation,
         "stereo_degradation": stereo_degradation,
         "disparity_image": disparity_image,
         "disparity_to_point_cloud": disparity_to_point_cloud,
@@ -67,6 +71,7 @@ def main():
     }
     trigger_ports = {
         "merge_frame_pair": "rightImage",
+        "image_degradation": "originalImage",
         "stereo_degradation": "originalImagePair",
         "disparity_image": "framePair",
         "disparity_to_point_cloud": "dispImage",
@@ -76,9 +81,11 @@ def main():
     connections = (
         ("/hcru1/pt_stereo_rect/left.image", "merge_frame_pair.leftImage"),
         ("/hcru1/pt_stereo_rect/right.image", "merge_frame_pair.rightImage"),
+        ("/hcru1/pt_stereo_rect/left.image", "image_degradation.originalImage"),
         ("/mcs_sensor_processing.rigid_body_state_out", "transformer.wheelOdometry"),
         ("merge_frame_pair.pair", "stereo_degradation.originalImagePair"),
         ("stereo_degradation.degradedImagePair", "disparity_image.framePair"),
+        ("image_degradation.degradedImage", "disparity_to_point_cloud.intensityImage"),
         ("disparity_image.rawDisparity", "disparity_to_point_cloud.dispImage"),
         ("disparity_to_point_cloud.pointCloud", "point_cloud_filter.pointCloud"),
     )
