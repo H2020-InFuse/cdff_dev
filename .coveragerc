@@ -1,7 +1,7 @@
 [run]
 branch = True
 cover_pylib = False
-include = cdff_dev/*.py
+source = cdff_dev
 # I don't know why this is requires, but it is required in CI
 omit =
     */setup.py
