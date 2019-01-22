@@ -676,6 +676,12 @@ class MemoryProfiler:
                 memory_profiler.tracemalloc.start()
         self.mem_usage_before = dict()
 
+    def __del__(self):
+        if (self.backend == 'tracemalloc' and
+                memory_profiler.has_tracemalloc and
+                memory_profiler.tracemalloc.is_tracing()):
+            memory_profiler.tracemalloc.stop()
+
     def prepare_memory_profiling(self, category):
         """Must be called before the function that we want to measure."""
         if category not in self.mem_usage_before:
