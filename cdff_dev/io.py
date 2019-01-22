@@ -24,23 +24,24 @@ class GeoTiffMap:
         self.col_scale, self.row_scale = geo_transform[1], geo_transform[5]
         self.band = self.ds.GetRasterBand(1)
         self.undefined = self.band.GetNoDataValue()
-        self.map_data = self.band.ReadAsArray()
+        self.map_data = self.band.ReadAsArray().astype(np.float32)
         self.rows, self.cols = self.map_data.shape
         self.min_height = self.map_data[self.map_data != self.undefined].min()
+        self.max_height = self.map_data[self.map_data != self.undefined].max()
 
         if verbose:
+            print('RasterCount: ', self.ds.RasterCount)
+            print('undefined', self.undefined)
             print('col_scale: ', self.col_scale)
             print('row_scale: ', self.row_scale)
             print('origin_x, origin_y:', self.origin_x, self.origin_y)
             print('rows, cols: ', self.rows, self.cols)
             print('min_height: ', self.min_height)
+            print('max_height: ', self.max_height)
 
         if self.col_scale != -self.row_scale:
             raise ValueError(
                 "Maps with different row and column scale cannot be handled")
-        if self.map_data.dtype != np.float32:
-            raise NotImplementedError(
-                "Only floating point values in maps are currently supported")
         assert geo_transform[2] == 0.0
         assert geo_transform[4] == 0.0
 
