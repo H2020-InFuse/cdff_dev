@@ -195,7 +195,7 @@ $ pip3 install --user nose nose2
 Then to run the unit tests:
 
 ```
-nosetests -sv
+nosetests -sv cdff_dev cdff_dev/extensions test
 ```
 
 Notes:
@@ -216,6 +216,17 @@ Notes:
 * If CDFF-dev was compiled as `root`, the directory `build/temp.*/` is owned by `root` and non world-writable, so the subdirectory `test/` cannot be created by a normal user, consequently tests that write to `build/temp.*/test/test_output/` fail.
 
     Work around this issue by adding the writable mode bit for "others" to `build/temp.*/`, or chowning it to your user.
+
+* You can check the test coverage if you install the pip package
+  coverage and run the tests with
+
+    ```
+    nosetests -sv cdff_dev cdff_dev/extensions test --with-coverage --cover-html
+    ```
+
+    This will generate a folder `cover/` that contains an HTML report
+    of the code coverage. You can open the file `cover/index.html`
+    with a browser.
 
 ## Contributing to CDFF-Dev
 

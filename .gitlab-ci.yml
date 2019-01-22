@@ -18,4 +18,4 @@ fetch_test:
       - source /tmp/infuse/env.sh
       - export CDFFPATH="/tmp/infuse/cdff/CDFF"
       - python3 setup.py build_ext -i
-      - nosetests -sv cdff_dev/test/ cdff_dev/extensions/ test/
+      - nosetests -sv cdff_dev/test cdff_dev/extensions test --with-coverage
