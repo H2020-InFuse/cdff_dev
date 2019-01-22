@@ -354,3 +354,28 @@ def test_output_logging():
     assert_equal(log.results["linear.y"][1][1], 3)
     assert_equal(log.results["square.y"][1][0], 2)
     assert_equal(log.results["square.y"][1][1], 9)
+
+
+def test_memory_profiler():
+    nodes = {
+        "linear": LinearDFN(),
+        "square": SquareDFN()
+    }
+    periods = {
+        "linear": 0.000001,
+        "square": 0.000001
+    }
+    connections = (
+        ("log.x", "linear.x"),
+        ("linear.y", "square.x"),
+        ("square.y", "result.y")
+    )
+    dfc = dataflowcontrol.DataFlowControl(
+        nodes, connections, periods=periods, memory_profiler=True)
+    dfc.setup()
+
+    for i in range(101):
+        dfc.process_sample(timestamp=i, stream_name="log.x", sample=i)
+
+    assert_equal(len(dfc.node_statistics_.configure_memory), 2)
+    assert_equal(len(dfc.node_statistics_.process_memory), 2)
