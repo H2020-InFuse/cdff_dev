@@ -4,6 +4,35 @@ cover_pylib = False
 source = cdff_dev
 omit =
     */setup.py
+    # I don't know why this is requires, but it is required in CI
+    asyncio/*
+    concurrent/*
+    csv.py
+    ctypes/*
+    decimal.py
+    distutils/*
+    encodings/*
+    multiprocessing/*
+    numbers.py
+    tracemalloc.py
+    PyQt4/*
+    gdal.py
+    numpy/*
+    osgeo/*
+    dateutil/*
+    dot_parser.py
+    jinja2/*
+    markupsafe/*
+    memory_profiler.py
+    msgpack/*
+    pandas/*
+    psutil/*
+    pydot.py
+    pyparsing.py
+    pytz/*
+    six.py
+    yaml/*
+    
 
 [report]
 exclude_lines =
