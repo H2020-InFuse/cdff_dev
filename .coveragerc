@@ -5,8 +5,38 @@ source = cdff_dev
 # I don't know why this is requires, but it is required in CI
 omit =
     */setup.py
-    /usr/*
-    /tmp/infuse/install/*
+    asyncio/*
+    concurrent/*
+    concurrent/*/*
+    csv.py
+    ctypes/*
+    decimal.py
+    distutils/*
+    encodings/*
+    multiprocessing/*
+    numbers.py
+    tracemalloc.py
+    PyQt4/*
+    gdal.py
+    numpy/*
+    numpy/*/*
+    osgeo/*
+    dateutil/*
+    dateutil/*/*
+    dot_parser.py
+    jinja2/*
+    markupsafe/*
+    memory_profiler.py
+    msgpack/*
+    pandas/*
+    pandas/*/*
+    pandas/*/*/*
+    psutil/*
+    pydot.py
+    pyparsing.py
+    pytz/*
+    six.py
+    yaml/*
     
 
 [report]
