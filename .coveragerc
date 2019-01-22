@@ -1,22 +1,10 @@
 [run]
 branch = True
 cover_pylib = False
-source = cdff_dev
-omit =
-    */setup.py
-    
-
-[report]
-exclude_lines =
-    pragma: no cover
-    raise NotImplementedError
-    if __name__ == .__main__.:
-    if self.verbose
-    def plot
-    def _plot
-    @abstractmethod
+include = cdff_dev/*.py
 # I don't know why this is requires, but it is required in CI
 omit =
+    */setup.py
     asyncio/*
     concurrent/*
     csv.py
@@ -44,6 +32,17 @@ omit =
     pytz/*
     six.py
     yaml/*
+    
+
+[report]
+exclude_lines =
+    pragma: no cover
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    if self.verbose
+    def plot
+    def _plot
+    @abstractmethod
 
 
 [html]
