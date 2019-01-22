@@ -277,19 +277,16 @@ class DataFlowControl:
         """Sleep to ensure real time replay."""
         if self.real_time and self._last_timestamp is not None:
             self._real_start_time = time.time()
-        if self.real_time and self._last_timestamp is not None:
-            if self._last_timestamp is not None:
-                processing_time = time.time() - self._real_start_time
-                time_between_samples = float(
-                    timestamp - self._last_timestamp) / 1e6
-                sleep_time = time_between_samples - processing_time
-                if sleep_time > 0:
-                    time.sleep(sleep_time)
-                else:
-                    warnings.warn(
-                        "Processing took too long, %.3f behind real time "
-                        "schedule" % -sleep_time)
-        if self.real_time:
+            processing_time = time.time() - self._real_start_time
+            time_between_samples = float(
+                timestamp - self._last_timestamp) / 1e6
+            sleep_time = time_between_samples - processing_time
+            if sleep_time > 0:
+                time.sleep(sleep_time)
+            else:
+                warnings.warn(
+                    "Processing took too long, %.3f behind real time "
+                    "schedule" % -sleep_time)
             self._last_timestamp = timestamp
 
     def process(self, timestamp):
