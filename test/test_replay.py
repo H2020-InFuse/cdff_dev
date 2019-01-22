@@ -82,7 +82,8 @@ def test_feed_data_flow_control():
         ("/dynamixel.transforms", "pointcloud_builder.transform"),
         ("pointcloud_builder.pointcloud", "result.pointcloud")
     )
-    dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods)
+    dfc = dataflowcontrol.DataFlowControl(
+        nodes, connections, periods, memory_profiler=True)
     dfc.setup()
     vis = dataflowcontrol.NoVisualization()
     dfc.set_visualization(vis)
