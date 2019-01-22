@@ -1,7 +1,6 @@
 [run]
 branch = True
-source = cdff_dev
-include = */cdff_dev/*
+include = cdff_dev/*.py
 omit =
     */setup.py
 
@@ -14,8 +13,6 @@ exclude_lines =
     def plot
     def _plot
     @abstractmethod
-
-ignore_errors = True
 
 [html]
 directory = cover
