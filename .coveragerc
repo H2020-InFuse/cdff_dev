@@ -1,7 +1,7 @@
 [run]
 branch = True
 cover_pylib = False
-include = cdff_dev/*.py
+source = cdff_dev
 omit =
     */setup.py
 
