@@ -2,7 +2,7 @@ import numpy as np
 try:
     import gdal
 except ImportError:
-    raise ImportError("Please install python3.5-gdal with apt.")
+    raise ImportError("Please install python3-gdal with apt.")
 import cdff_types
 
 

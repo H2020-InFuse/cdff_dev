@@ -58,12 +58,13 @@ It also requires the Python 3 interpreter, the Python 3 headers, the Python
 * memory_profiler
 * PyQt 4
 * OpenCV
+* GDAL
 
 On Ubuntu 16.04 you can install those requirements as follow:
 
 ```
 # Python interpreter, headers, package manager, Qt, and Graphviz
-$ sudo apt-get install python3 python3-dev python3-pip python3-pyqt4 graphviz
+$ sudo apt-get install python3 python3-dev python3-pip python3-pyqt4 graphviz python3-gdal
 
 # Install Python packages and a newer version of the package manager
 # in /usr/local/{bin,lib/python3.X/dist-packages} for all users
