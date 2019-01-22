@@ -30,9 +30,9 @@ institutes contributed to the software:
 
 The overall concept and conventions are described in these documents:
 
-* [CDFF-Dev Architecture and User Documentation](https://drive.google.com/open?id=1yz_w7Eut6Rtg0d4I6R4mze2G8Oip4agyqrTDlKVgC6g)
-* [Guide for creating a DFN](https://drive.google.com/open?id=1hFTRKgJNN3n_brT3aajMA03AR_jQ2eCo-ZM33ggY5cE)
-* [Guide for creating a DFPC](https://drive.google.com/open?id=1ZUhZPnedd1mO42y-q4N7USltOnKeZzbyyZz_yzpLsmk)
+* [CDFF-Dev Architecture and User Documentation](https://docs.google.com/document/d/1yz_w7Eut6Rtg0d4I6R4mze2G8Oip4agyqrTDlKVgC6g/)
+* [Guide for creating a DFN](https://docs.google.com/document/d/1hFTRKgJNN3n_brT3aajMA03AR_jQ2eCo-ZM33ggY5cE/)
+* [Guide for creating a DFPC](https://docs.google.com/document/d/1ZUhZPnedd1mO42y-q4N7USltOnKeZzbyyZz_yzpLsmk/)
 
 ## Dependencies of CDFF-Dev
 
