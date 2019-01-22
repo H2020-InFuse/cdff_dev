@@ -22,9 +22,9 @@ class LaserFilterDummyDFN:
         ranges = np.array([self.scanSample.ranges[i]
                            for i in range(self.scanSample.ranges.size())])
         med = np.median(ranges)
-        for i in range(len(ranges)):
-            if abs(ranges[i] - med) > 100:
-                self.scanSample.ranges[i] = med
+        outliers = np.where(np.abs(ranges - med) > 200)[0]
+        for i in outliers:
+            self.scanSample.ranges[i] = med
 
     def filteredScanOutput(self):
         return self.scanSample
