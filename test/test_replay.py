@@ -10,8 +10,12 @@ def test_replay():
     stream_names = ["/hokuyo.scans", "/dynamixel.transforms",
                     "/dynamixel.status_samples"]
     timestamps = []
+    step_index = 0
     for timestamp, stream_name, typename, sample in logloader.replay(
             stream_names, log, verbose=0):
+        if step_index >= 100:
+            break
+        step_index += 1
         timestamps.append(timestamp)
         obj = typefromdict.create_from_dict(typename, sample)
         assert_equal(type(obj).__module__, "cdff_types")
@@ -89,6 +93,36 @@ def test_feed_data_flow_control():
 
     log = logloader.load_log("test/test_data/logs/test_log.msg")
     stream_names = ["/hokuyo.scans", "/dynamixel.transforms"]
-    replay.replay_and_process(dfc, logloader.replay(stream_names, log))
+    replay.replay_and_process(
+        dfc, logloader.replay(stream_names, log), max_samples=100)
+    assert_in("laser_filter.filteredScan", vis.data)
+    assert_in("pointcloud_builder.pointcloud", vis.data)
+
+
+def test_feed_data_flow_control_async():
+    nodes = {
+        "laser_filter": LaserFilterDummyDFN(),
+        "pointcloud_builder": PointcloudBuilderDummyDFN()
+    }
+    periods = {
+        "laser_filter": 0.025,
+        "pointcloud_builder": 0.1
+    }
+    connections = (
+        ("/hokuyo.scans", "laser_filter.scanSample"),
+        ("laser_filter.filteredScan", "pointcloud_builder.scan"),
+        ("/dynamixel.transforms", "pointcloud_builder.transform"),
+        ("pointcloud_builder.pointcloud", "result.pointcloud")
+    )
+    dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods)
+    dfc.setup()
+    vis = dataflowcontrol.NoVisualization()
+    dfc.set_visualization(vis)
+
+    log = logloader.load_log("test/test_data/logs/test_log.msg")
+    stream_names = ["/hokuyo.scans", "/dynamixel.transforms"]
+    replay.replay_and_process_async(
+        dfc, logloader.replay(stream_names, log), queue_size=10,
+        max_samples=100)
     assert_in("laser_filter.filteredScan", vis.data)
     assert_in("pointcloud_builder.pointcloud", vis.data)

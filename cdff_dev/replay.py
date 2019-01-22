@@ -2,7 +2,7 @@ import asyncio
 from . import typefromdict
 
 
-def replay_and_process(dfc, log_iterator):
+def replay_and_process(dfc, log_iterator, max_samples=None):
     """Replay log file(s) and feed them to DataFlowControl.
 
     Parameters
@@ -14,8 +14,16 @@ def replay_and_process(dfc, log_iterator):
         Iterable object that yields log samples in the correct temporal
         order. The iterable returns in each step a quadrupel of
         (timestamp, stream_name, typename, sample).
+
+    max_samples : int, optional (default: None)
+        Maximum number of samples to be replayed
     """
+    step_index = 0
     for timestamp, stream_name, typename, sample in log_iterator:
+        if max_samples is not None and step_index >= max_samples:
+            break
+        step_index += 1
+
         obj = typefromdict.create_from_dict(typename, sample)
         dfc.process_sample(
             timestamp=timestamp, stream_name=stream_name, sample=obj)
