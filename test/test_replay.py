@@ -1,5 +1,6 @@
 import numpy as np
-from cdff_dev import logloader, typefromdict, dataflowcontrol, replay
+from cdff_dev import (logloader, typefromdict, dataflowcontrol, replay,
+                      transformer, envirevisualization)
 import cdff_types
 from nose.tools import assert_equal, assert_in
 from numpy.testing import assert_array_less
@@ -20,6 +21,20 @@ def test_replay():
         obj = typefromdict.create_from_dict(typename, sample)
         assert_equal(type(obj).__module__, "cdff_types")
     assert_array_less(timestamps[:-1], timestamps[1:])
+
+
+class Transformer(transformer.EnvireDFN):
+    def __init__(self):
+        super(Transformer, self).__init__()
+
+
+class GraphVisualizer(dataflowcontrol.VisualizationBase):
+    """Simulates EnviRe visualizer without GUI."""
+    def __init__(self, world_state):
+        self.world_state = world_state
+
+    def report_node_output(self, port_name, sample, timestamp):
+        self.world_state.report_node_output(port_name, sample, timestamp)
 
 
 class LaserFilterDummyDFN:
@@ -74,11 +89,13 @@ class PointcloudBuilderDummyDFN:
 def test_feed_data_flow_control():
     nodes = {
         "laser_filter": LaserFilterDummyDFN(),
-        "pointcloud_builder": PointcloudBuilderDummyDFN()
+        "pointcloud_builder": PointcloudBuilderDummyDFN(),
+        "transformer": Transformer()
     }
     periods = {
         "laser_filter": 0.025,
-        "pointcloud_builder": 0.1
+        "pointcloud_builder": 0.1,
+        "transformer": 1.0
     }
     connections = (
         ("/hokuyo.scans", "laser_filter.scanSample"),
@@ -88,6 +105,11 @@ def test_feed_data_flow_control():
     )
     dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods)
     dfc.setup()
+    world_state = envirevisualization.WorldState(
+        frames={"laser_filter.filteredScan": "center"}, urdf_files=[])
+    dfc.register_world_state(world_state)
+    graph_vis = GraphVisualizer(world_state)
+    dfc.set_visualization(graph_vis)
     vis = dataflowcontrol.NoVisualization()
     dfc.set_visualization(vis)
 

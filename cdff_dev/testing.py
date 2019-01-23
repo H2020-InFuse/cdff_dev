@@ -114,6 +114,8 @@ def assert_warns_message(warning_class, message, func, *args, **kw):
     with warnings.catch_warnings(record=True) as w:
         # Cause all warnings to always be triggered.
         warnings.simplefilter("always")
+        warnings.simplefilter('ignore', PendingDeprecationWarning)
+        warnings.simplefilter('ignore', ResourceWarning)
         # Trigger a warning.
         result = func(*args, **kw)
         # Verify some things
