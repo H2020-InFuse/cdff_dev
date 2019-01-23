@@ -181,6 +181,18 @@ def test_replay_join():
                 os.remove(filename)
 
 
+def test_replay_logfile_with_stream_name_mismatch():
+    it = logloader.replay_logfile(
+        "test/test_data/logs/xsens_imu_00.msg",
+        ["/xsens_imu.does_not_exist"]
+    )
+    assert_raises_regexp(
+        ValueError,
+        "Mismatch between stream names .* and actual streams .* of file .*",
+        next, it
+    )
+
+
 def test_build_index():
     logfile = "test/test_data/logs/xsens_imu_00.msg"
     indexfile = "test/test_data/logs/xsens_imu_00.msg.cdff_idx"

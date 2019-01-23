@@ -33,8 +33,28 @@ def test_object2dataframe():
             "timestamps": [2, 3, 4, 5]
         }
     }
+    df = data_export.object2dataframe(log, port="/component.port")
+    assert_array_equal(df.index, [2, 3, 4, 5])
+    assert_array_equal(df["microseconds"].values, [0, 1, 2, 3])
+
+
+def test_object2dataframe_with_fields():
+    log = {
+        "/component.port":
+        [
+            {"microseconds": 0},
+            {"microseconds": 1},
+            {"microseconds": 2},
+            {"microseconds": 3},
+        ],
+        "/component.port.meta":
+        {
+            "type": "Time",
+            "timestamps": [2, 3, 4, 5]
+        }
+    }
     df = data_export.object2dataframe(
-        log, port="/component.port", whitelist=["acc", "gyro", "mag"])
+        log, port="/component.port", fields=["microseconds"])
     assert_array_equal(df.index, [2, 3, 4, 5])
     assert_array_equal(df["microseconds"].values, [0, 1, 2, 3])
 

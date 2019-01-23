@@ -5,7 +5,7 @@ from . import dataflowcontrol, qtgui
 import cdff_envire
 
 
-class EnvireVisualizerApplication:
+class EnvireVisualizerApplication:  # pragma: no cover
     """Qt Application with EnviRe visualizer.
 
     Parameters
@@ -59,7 +59,7 @@ class EnvireVisualizerApplication:
         self.app.exec_()
 
 
-class EnvireVisualization(dataflowcontrol.VisualizationBase):
+class EnvireVisualization(dataflowcontrol.VisualizationBase):  # pragma: no cover
     """EnviRe visualization.
 
     Parameters
