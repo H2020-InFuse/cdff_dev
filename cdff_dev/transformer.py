@@ -34,8 +34,8 @@ class EnvireDFN:
         self._graph = graph
         if graph is not None:
             self.initialize_graph(graph)
-        if self._config is not None:
-            self.initialize_graph_from_config(graph, self._config)
+            if self._config is not None:
+                self.initialize_graph_from_config(graph, self._config)
 
     def _get_graph_(self):
         return self._graph

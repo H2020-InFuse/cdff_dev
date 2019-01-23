@@ -11,6 +11,9 @@ class Transformer(transformer.EnvireDFN):
         self.graph_ = cdff_envire.EnvireGraph()
 
     def initialize_graph(self, graph):
+        if graph is None:
+            return
+
         graph.add_frame("B")
         graph.add_frame("C")
         graph.add_frame("D")
@@ -38,6 +41,7 @@ class Transformer(transformer.EnvireDFN):
 
 def test_add_get_transformations():
     transformer = Transformer()
+    transformer.configure()
 
     A2B = cdff_types.RigidBodyState()
     A2B.source_frame = "A"
@@ -67,6 +71,7 @@ def test_add_get_transformations():
 
 def test_static_transformations():
     transformer = Transformer()
+    transformer.configure()
 
     D2E = transformer.D2EOutput()
     assert_equal(D2E.source_frame, "D")
@@ -146,6 +151,13 @@ def test_replace_graph():
     assert_equal(t.transform.orientation.toarray()[1], 0.006085361255164068)
     assert_equal(t.transform.orientation.toarray()[2], -0.009559094197543583)
     assert_equal(t.transform.orientation.toarray()[3], -0.5138092680696382)
+
+
+def test_replace_graph_with_none():
+    transformer = Transformer()
+    transformer.set_configuration_file("test/test_data/transformer_config.msg")
+    transformer.configure()
+    transformer.graph_ = None
 
 
 def test_make_transform():
