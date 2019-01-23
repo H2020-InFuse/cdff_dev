@@ -17,8 +17,6 @@ def configuration(parent_package='', top_path=None):
         make_disparityimage(config, cdffpath)
         make_disparitytopointcloud(config, cdffpath)
         make_disparitytopointcloudwithintensity(config, cdffpath)
-        # only edres version available at the moment
-        #make_disparityfiltering(config, cdffpath)
 
     return config
 

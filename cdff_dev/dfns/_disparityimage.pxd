@@ -12,7 +12,7 @@ cdef extern from "DisparityImageInterface.hpp" namespace "CDFF::DFN":
 
         void framePairInput(_cdff_types.asn1SccFramePair& data) except +
 
-        _cdff_types.asn1SccFrame& rawDisparityOutput() except +
+        _cdff_types.asn1SccFrame& disparityOutput() except +
 
 
 cdef extern from "DisparityImage.hpp" namespace "CDFF::DFN::DisparityImage":

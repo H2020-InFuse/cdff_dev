@@ -18,7 +18,7 @@ def test_disparityimage():
     frame_pair.right.array_reference()[:, :, :] = 0.0
     dfn.framePairInput(frame_pair)
     dfn.process()
-    disparity = dfn.rawDisparityOutput()
+    disparity = dfn.disparityOutput()
     assert_equal(disparity.data.rows, 1024)
     assert_equal(disparity.data.cols, 768)
     assert_equal(disparity.data.channels, 1)
