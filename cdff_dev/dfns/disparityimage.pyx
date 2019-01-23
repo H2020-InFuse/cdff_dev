@@ -35,9 +35,9 @@ cdef class DisparityImage:
         cdef _cdff_types.asn1SccFramePair * cpp_data = data.thisptr
         self.thisptr.framePairInput(deref(cpp_data))
 
-    def rawDisparityOutput(self):
+    def disparityOutput(self):
         cdef cdff_types.Frame out = cdff_types.Frame()
-        out.thisptr[0] = self.thisptr.rawDisparityOutput()
+        out.thisptr[0] = self.thisptr.disparityOutput()
         return out
 
 
@@ -69,8 +69,8 @@ cdef class DisparityImageEdres:
         cdef _cdff_types.asn1SccFramePair * cpp_data = data.thisptr
         self.thisptr.framePairInput(deref(cpp_data))
 
-    def rawDisparityOutput(self):
+    def disparityOutput(self):
         cdef cdff_types.Frame out = cdff_types.Frame()
-        out.thisptr[0] = self.thisptr.rawDisparityOutput()
+        out.thisptr[0] = self.thisptr.disparityOutput()
         return out
 """
