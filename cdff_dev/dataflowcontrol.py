@@ -287,6 +287,7 @@ class DataFlowControl:
                 warnings.warn(
                     "Processing took too long, %.3f behind real time "
                     "schedule" % -sleep_time)
+        if self.real_time:
             self._last_timestamp = timestamp
 
     def process(self, timestamp):
