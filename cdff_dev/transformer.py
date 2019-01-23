@@ -164,7 +164,7 @@ class EnvireDFN:
             transforms data from a source frame to a target frame.
         """
         if self.graph_ is None:
-            warnings.warn("EnviRe graph is not initialized.")
+            warnings.warn("EnviRe Graph is not initialized.")
             return
 
         rigid_body_state = cdff_types.RigidBodyState()
