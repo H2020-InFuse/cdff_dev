@@ -1,74 +1,9 @@
 [run]
 branch = True
 cover_pylib = False
-source = cdff_dev
-# I don't know why this is requires, but it is required in CI
+include = cdff_dev/*
 omit =
     *setup.py
-    *asyncio/*
-    *concurrent/*
-    *concurrent/*
-    *csv.py
-    *ctypes/*
-    *decimal.py
-    *distutils/*
-    *encodings/*
-    *multiprocessing/*
-    *numbers.py
-    *tracemalloc.py
-    *PyQt4/*
-    *gdal.py
-    *numpy/*
-    *osgeo/*
-    *dateutil/*
-    *dateutil/*/*
-    *dot_parser.py
-    *jinja2/*
-    *markupsafe/*
-    *memory_profiler.py
-    *msgpack/*
-    *andas/*
-    *psutil/*
-    *pydot.py
-    *pyparsing.py
-    *pytz/*
-    *six.py
-    *yaml/*
-    *wcwidth/*
-    *traitlets/*
-    *prompt_toolkit/*
-    *pickleshare.py
-    *parso/*
-    *matplotlib/*
-    *jedi/*
-    *ipython_genutils/*
-    *cycler.py
-    *backcall/*
-    *IPython/*
-    *simplegeneric.py
-    *pygments/*
-    *ptyprocess/*
-    *pexpect/*
-    *decorator/*
-    *tty.py
-    *timeit.py
-    *sqlite3/*
-    *runpy.py
-    *pydoc.py
-    *pty.py
-    *pstats.py
-    *profile.py
-    *pathlib.py
-    *mimetypes.py
-    *html/*
-    *gzip.py
-    *getpass.py
-    *getopt.py
-    *filecmp.py
-    *cProfile.py
-    *typing.py
-    *decorator.py
-    *pydoc_data/*
 
 
 [report]
