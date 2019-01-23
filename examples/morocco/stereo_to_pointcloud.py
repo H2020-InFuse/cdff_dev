@@ -86,7 +86,7 @@ def main():
         ("merge_frame_pair.pair", "stereo_degradation.originalImagePair"),
         ("stereo_degradation.degradedImagePair", "disparity_image.framePair"),
         ("image_degradation.degradedImage", "disparity_to_point_cloud.intensityImage"),
-        ("disparity_image.disparity", "disparity_to_point_cloud.dispImage"),
+        ("disparity_image.rawDisparity", "disparity_to_point_cloud.dispImage"),
         ("disparity_to_point_cloud.pointCloud", "point_cloud_filter.pointCloud"),
     )
     stream_aliases = {
