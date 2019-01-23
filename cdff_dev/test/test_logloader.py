@@ -138,26 +138,55 @@ def test_replay_files():
 
 
 def test_replay_join():
-    log_iterators = [
-        logloader.replay_logfile(
-            "test/test_data/logs/xsens_imu_00.msg",
-            ["/xsens_imu.calibrated_sensors"]
-        ),
-        logloader.replay_logfile(
-            "test/test_data/logs/dynamixel_0.msg",
-            ["/dynamixel.transforms"]
-        )
-    ]
-    log_iterator = logloader.replay_join(log_iterators)
-    stream_counter = {key: 0 for key in ["/xsens_imu.calibrated_sensors",
-                                         "/dynamixel.transforms"]}
-    last_timestamp = float("-inf")
-    for t, sn, tn, s in log_iterator:
-        stream_counter[sn] += 1
-        assert_less_equal(last_timestamp, t)
-        last_timestamp = t
-    for counter in stream_counter.values():
-        assert_equal(counter, 100)
+    try:
+        log_iterators = [
+            logloader.replay_logfile(
+                "test/test_data/logs/xsens_imu_00.msg",
+                ["/xsens_imu.calibrated_sensors"]
+            ),
+            logloader.replay_logfile(
+                "test/test_data/logs/dynamixel_0.msg",
+                ["/dynamixel.transforms"]
+            )
+        ]
+        log_iterator = logloader.replay_join(log_iterators)
+        stream_counter = {key: 0 for key in ["/xsens_imu.calibrated_sensors",
+                                             "/dynamixel.transforms"]}
+        last_timestamp = float("-inf")
+        for t, sn, tn, s in log_iterator:
+            stream_counter[sn] += 1
+            assert_less_equal(last_timestamp, t)
+            last_timestamp = t
+        for counter in stream_counter.values():
+            assert_equal(counter, 100)
+    finally:
+        for filename in ["test/test_data/logs/xsens_imu_00.msg.cdff_idx",
+                         "test/test_data/logs/dynamixel_0.msg.cdff_idx"]:
+            if os.path.exists(filename):
+                os.remove(filename)
+
+
+def test_build_index():
+    logfile = "test/test_data/logs/xsens_imu_00.msg"
+    indexfile = "test/test_data/logs/xsens_imu_00.msg.cdff_idx"
+    sn = "/xsens_imu.calibrated_sensors"
+    msn = "/xsens_imu.calibrated_sensors.meta"
+    with logloader.mmap_readfile(logfile) as m:
+        try:
+            current_positions, metadata = logloader.build_index(logfile, m)
+            assert_true(os.path.exists(indexfile))
+            assert_equal(current_positions[sn], 34)
+            assert_equal(metadata[msn]["type"], "IMUSensors")
+            assert_equal(len(metadata[msn]["timestamps"]), 100)
+
+            # loading previously created index...
+            current_positions, metadata = logloader.build_index(logfile, m)
+            assert_equal(current_positions[sn], 34)
+            assert_equal(metadata[msn]["type"], "IMUSensors")
+            assert_equal(len(metadata[msn]["timestamps"]), 100)
+        finally:
+            if os.path.exists(indexfile):
+                os.remove(indexfile)
 
 
 def test_chunk_replay_log():
