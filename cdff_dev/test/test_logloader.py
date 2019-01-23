@@ -288,6 +288,20 @@ def test_group_pattern_files_not_found():
         "_*.msg")
 
 
+def test_group_pattern_files_not_found_trailing_slash():
+    assert_raises_regexp(
+        ValueError, "Could not find any files matching '.*', only found.*",
+        logloader.group_pattern, "test/test_data/logs/does_not_exist/",
+        "_*.msg")
+
+
+def test_group_pattern_files_not_found_from_absolute_path():
+    assert_raises_regexp(
+        ValueError, "Could not find any files matching '.*', only found.*",
+        logloader.group_pattern, "/tmp/test",
+        "blabla_*.msg")
+
+
 def test_replay_sequence_empty():
     log_iterator = logloader.replay_sequence([])
     assert_raises_regexp(
