@@ -80,6 +80,7 @@ exclude_lines =
     if verbose
     def plot
     def _plot
+    def print
     @abstractmethod
 
 
