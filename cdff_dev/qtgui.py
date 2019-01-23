@@ -133,6 +133,8 @@ class Worker(QThread):
 
     def run(self):
         """Main loop."""
+        # Note that the code coverage is not measured correctly for QThreads
+        # in coveragepy: https://github.com/nedbat/coveragepy/issues/686
         work = self.work(*self.worker_args, **self.worker_kwargs)
 
         while self.keep_alive:

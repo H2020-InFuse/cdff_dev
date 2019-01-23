@@ -164,6 +164,22 @@ def test_create_gps_solution():
     assert_equal(obj.deviation_altitude, 0.0556030310690403)
 
 
+def test_create_gps_solution_with_incorect_timestamp_name():
+    data = {'time': {'microsecond': 1478374858471759}}
+    assert_raises_regex(
+        ValueError,
+        "Type '<class 'cdff_types.Time'>' has no field with name 'microsecond'",
+        typefromdict.create_from_dict, "/gps/Solution", data)
+
+
+def test_create_gps_solution_with_incorrect_field_type():
+    data = {'position': "bla"}
+    assert_raises_regex(
+        TypeError, "Failed to set JointState.position = bla, "
+                   "error message: a float is required",
+        typefromdict.create_from_dict, "JointState", data)
+
+
 def test_create_map():
     data = {
         "msgVersion": 1,
