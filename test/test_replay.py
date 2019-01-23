@@ -1,6 +1,6 @@
 import numpy as np
 from cdff_dev import (logloader, typefromdict, dataflowcontrol, replay,
-                      transformer, envirevisualization)
+                      transformer, envirevisualization, dfnhelpers)
 import cdff_types
 from nose.tools import assert_equal, assert_in
 from numpy.testing import assert_array_less
@@ -90,23 +90,28 @@ def test_feed_data_flow_control():
     nodes = {
         "laser_filter": LaserFilterDummyDFN(),
         "pointcloud_builder": PointcloudBuilderDummyDFN(),
-        "transformer": Transformer()
+        "transformer": Transformer(),
+        "extract_size": dfnhelpers.LambdaDFN(
+            lambda x: x.ranges.size(), "scanSample", "size")
     }
     periods = {
         "laser_filter": 0.025,
         "pointcloud_builder": 0.1,
-        "transformer": 1.0
+        "transformer": 1.0,
+        "extract_size": 0.025,
     }
     connections = (
         ("/hokuyo.scans", "laser_filter.scanSample"),
         ("laser_filter.filteredScan", "pointcloud_builder.scan"),
+        ("laser_filter.filteredScan", "extract_size.scanSample"),
         ("/dynamixel.transforms", "pointcloud_builder.transform"),
         ("pointcloud_builder.pointcloud", "result.pointcloud")
     )
     dfc = dataflowcontrol.DataFlowControl(nodes, connections, periods)
     dfc.setup()
     world_state = envirevisualization.WorldState(
-        frames={"laser_filter.filteredScan": "center"}, urdf_files=[])
+        frames={"laser_filter.filteredScan": "center",
+                "extract_size.size": "center"}, urdf_files=[])
     dfc.register_world_state(world_state)
     graph_vis = GraphVisualizer(world_state)
     dfc.set_visualization(graph_vis)
