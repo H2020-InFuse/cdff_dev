@@ -7,7 +7,7 @@ from PyQt4.QtCore import QThread, pyqtSignal
 from . import typefromdict
 
 
-class ReplayMainWindow(QMainWindow):
+class ReplayMainWindow(QMainWindow):  # pragma: no cover
     """Contains controls for replaying log files."""
     def __init__(self, work, *args, **kwargs):
         super(ReplayMainWindow, self).__init__()
@@ -31,7 +31,7 @@ class ReplayMainWindow(QMainWindow):
         self.worker.quit()
 
 
-class ReplayControlWidget(QWidget):
+class ReplayControlWidget(QWidget):  # pragma: no cover
     """Contains buttons etc."""
     def __init__(self, worker):
         super(ReplayControlWidget, self).__init__()
