@@ -1,7 +1,7 @@
 import numpy as np
 from cdff_dev import dfnhelpers
 import cdff_types
-from nose.tools import assert_equal, assert_true, assert_false
+from nose.tools import assert_equal, assert_true, assert_false, assert_is_none
 from numpy.testing import assert_array_equal
 
 
@@ -15,6 +15,16 @@ def test_lambda_dfn():
     dfn.process()
     y = dfn.yOutput()
     assert_equal(y, 25)
+
+
+def test_lambda_dfn_without_input():
+    dfn = dfnhelpers.LambdaDFN(
+        lambda x: x ** 2, input_port="x", output_port="y")
+    dfn.set_configuration_file("")
+    dfn.configure()
+    dfn.process()
+    y = dfn.yOutput()
+    assert_is_none(y)
 
 
 def test_merge_without_config():
