@@ -53,6 +53,21 @@ def test_summarize_logfile():
     assert_equal(n_samples["/dynamixel.transforms"], 902)
 
 
+def test_summarize_log():
+    log = logloader.load_log("test/test_data/logs/test_log.msg")
+    typenames, n_samples = logloader.summarize_log(log)
+    assert_in("/hokuyo.scans", typenames)
+    assert_in("/hokuyo.state", typenames)
+    assert_in("/hokuyo.timestamp_estimator_status", typenames)
+    assert_in("/dynamixel.transforms", typenames)
+    assert_in("/dynamixel.state", typenames)
+    assert_in("/dynamixel.act_cycle_time", typenames)
+    assert_equal(typenames["/hokuyo.scans"], "LaserScan")
+    assert_equal(typenames["/dynamixel.transforms"], "RigidBodyState")
+    assert_equal(n_samples["/hokuyo.scans"], 3611)
+    assert_equal(n_samples["/dynamixel.transforms"], 902)
+
+
 def test_summarize_logfiles():
     filenames = [sorted(glob.glob("test/test_data/logs/xsens_imu_*.msg")),
                  sorted(glob.glob("test/test_data/logs/dynamixel_*.msg"))]
