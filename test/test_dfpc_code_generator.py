@@ -76,7 +76,9 @@ def test_compile():
         pg.run()
 
         is_available = pg.pointcloudAvailableOutput()
+        assert_equal(is_available, False)
         p = pg.getPointcloud(30)
+        assert_equal(p.data.points.size(), 0)
 
 
 def test_forbidden_type():

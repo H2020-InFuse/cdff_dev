@@ -64,6 +64,10 @@ def test_square():
         square = square.Square()
         square.configure()
         square.set_configuration_file("")
+
+        # outX_squared should be initialized with 0
+        assert_equal(0.0, square.x_squaredOutput())
+
         square.xInput(5.0)
         square.process()
         assert_equal(25.0, square.x_squaredOutput())
@@ -160,11 +164,18 @@ def test_asn1():
         import asn1test
         asn1_test = asn1test.ASN1Test()
         asn1_test.configure()
+
+        # default initializer for ASN.1 type should have been called
+        v = asn1_test.someVectorOutput()
+        assert_equal(v[0], 0.0)
+        assert_equal(v[1], 0.0)
+        assert_equal(v[2], 0.0)
+
         current_time = cdff_types.Time()
         current_time.microseconds = 999999
         asn1_test.currentTimeInput(current_time)
         asn1_test.process()
-        assert_equal(asn1_test.someVectorOutput().__len__(), 3)
-        test_out = [1000000,1000001,1000002]
-        for i, out in enumerate(asn1_test.someVectorOutput().toarray()):
-            assert_equal(test_out[i], out)
+        assert_equal(len(asn1_test.someVectorOutput()), 3)
+        assert_equal(v[0], 1000000)
+        assert_equal(v[1], 1000001)
+        assert_equal(v[2], 1000002)
