@@ -9,7 +9,7 @@ def main():
     else:
         filename = "test/test_data/maps/res1.tif"
     if len(sys.argv) > 5:
-        x_min, x_max, y_min, y_max = sys.argv[2:6]
+        x_min, x_max, y_min, y_max = map(int, sys.argv[2:6])
     else:
         x_min, x_max, y_min, y_max = 250, 500, 600, 800
     gtm = io.GeoTiffMap(filename, verbose=1)
