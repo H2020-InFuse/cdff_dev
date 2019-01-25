@@ -14,7 +14,7 @@ class DFNBase:
     A data fusion node does not have to inherit from it. A data fusion node
     only has to provide the same interface to be a valid DFN.
     """
-    def set_configuration_file(self):
+    def set_configuration_file(self, filename):
         pass
 
     def configure(self):

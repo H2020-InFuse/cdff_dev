@@ -9,6 +9,10 @@ def test_dfn_base_is_dfn():
     dfn = dfnhelpers.DFNBase()
     assert_true(dfnhelpers.isdfn(dfn))
 
+    dfn.set_configuration_file("")
+    dfn.configure()
+    dfn.process()
+
 
 def test_lambda_dfn():
     dfn = dfnhelpers.LambdaDFN(
