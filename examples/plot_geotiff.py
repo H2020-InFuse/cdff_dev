@@ -1,5 +1,6 @@
 import sys
 import matplotlib.pyplot as plt
+import numpy as np
 from cdff_dev import io
 
 
@@ -15,7 +16,7 @@ def main():
     gtm = io.GeoTiffMap(filename, verbose=1)
     origin, m = gtm.slice((x_min, x_max), (y_min, y_max))
     m.data.array_reference()[m.data.array_reference() == gtm.undefined] = 0.0
-    plt.imshow(m.data.array_reference().squeeze())
+    plt.imshow(np.rot90(np.rot90(m.data.array_reference().squeeze())))
     plt.gray()
     plt.show()
 
