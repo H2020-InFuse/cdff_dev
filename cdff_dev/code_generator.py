@@ -5,9 +5,54 @@ import glob
 from .description_files import validate_node, validate_dfpc
 
 
+# https://en.cppreference.com/w/cpp/language/types
+PRIMITIVE_CPP_TYPES = [
+    "bool",
+    "char",
+    "signed char",
+    "unsigned char",
+    "wchar_t",
+    "char8_t",
+    "char16_t",
+    "char32_t",
+    "short",
+    "unsigned short",
+    "int",
+    "unsigned int",
+    "long",
+    "unsigned long",
+    "long long",
+    "unsigned long long",
+    "float",
+    "double",
+    "long double",
+]
+PRIMITIVE_INITIAL_VALUES = {
+    "bool": "false",
+    "char": "0",
+    "signed char": "0",
+    "unsigned char": "0u",
+    "wchar_t": "0",
+    "char8_t": "0",
+    "char16_t": "0",
+    "char32_t": "0",
+    "short": "0",
+    "unsigned short": "0u",
+    "int": "0",
+    "unsigned int": "0u",
+    "long": "0l",
+    "unsigned long": "0ul",
+    "long long": "0ll",
+    "unsigned long long": "ull",
+    "float": "0.0f",
+    "double": "0.0",
+    "long double": "0.0l",
+}
+
+
 # TODO refactor: move type info to some other file
 class BasicTypeInfo(object):
-    BASICTYPES = ["int", "double", "bool"]
+    BASICTYPES = PRIMITIVE_CPP_TYPES
     """Information about basic C++ types."""
     def __init__(self, typename):
         self.typename = typename
@@ -31,6 +76,13 @@ class BasicTypeInfo(object):
 
     def has_cdfftype(self):
         return False
+
+    def generate_preconstructor_initialization(self, variable_name):
+        return "%s(%s)" % (variable_name,
+                           PRIMITIVE_INITIAL_VALUES[self.typename])
+
+    def generate_inconstructor_initialization(self, variable_name):
+        return ""
 
 
 class DefaultTypeInfo(object):
@@ -61,6 +113,12 @@ class DefaultTypeInfo(object):
 
     def has_cdfftype(self):
         return False
+
+    def generate_preconstructor_initialization(self, variable_name):
+        return "%s()" % variable_name
+
+    def generate_inconstructor_initialization(self, variable_name):
+        return ""
 
 
 class ASN1TypeInfo(object):
@@ -130,6 +188,12 @@ class ASN1TypeInfo(object):
 
     def has_cdfftype(self):
         return True
+
+    def generate_preconstructor_initialization(self, variable_name):
+        return ""
+
+    def generate_inconstructor_initialization(self, variable_name):
+        return "%s_Initialize(&%s);" % (self.typename, variable_name)
 
 
 class TypeRegistry(object):
@@ -297,13 +361,22 @@ def write_class(desc, type_registry, template_base, class_name,
     definition_filename = "%s.cpp" % class_name
 
     includes = set()
-    for port in desc["input_ports"] + desc["output_ports"]:
+    member_initializations = MemberInitializations(type_registry)
+    for port in desc["input_ports"]:
         includes.add(type_registry.get_info(port["type"]).include())
+        member_initializations.register_input(port["type"], port["name"])
+    for port in desc["output_ports"]:
+        includes.add(type_registry.get_info(port["type"]).include())
+        member_initializations.register_output(port["type"], port["name"])
     if "operations" in desc:
         for op in desc["operations"]:
             for inp in op["inputs"]:
                 includes.add(type_registry.get_info(inp["type"]).include())
+                member_initializations.register_member(
+                    inp["type"], inp["name"])
             includes.add(type_registry.get_info(op["output_type"]).include())
+            member_initializations.register_operation(
+                port["type"], port["name"])
 
     base_declaration = render(
         "%s.hpp" % template_base, desc=desc, includes=includes,
@@ -313,11 +386,42 @@ def write_class(desc, type_registry, template_base, class_name,
 
     base_definition = render(
         "%s.cpp" % template_base, declaration_filename=declaration_filename,
-        desc=desc, class_name=class_name)
+        desc=desc, class_name=class_name,
+        member_initializations=member_initializations)
     target = os.path.join(target_folder, definition_filename)
     result[target] = base_definition
 
     return write_result(result, force_overwrite)
+
+
+class MemberInitializations:
+    def __init__(self, type_registry):
+        self.type_registry = type_registry
+        self.preconstructor_initializations_ = list()
+        self.inconstructor_initializations_ = list()
+
+    def register_input(self, typename, name):
+        variable_name = "in" + name.capitalize()
+        self._register_member(typename, variable_name)
+
+    def register_output(self, typename, name):
+        variable_name = "out" + name.capitalize()
+        self._register_member(typename, variable_name)
+
+    def register_operation(self, typename, name):
+        variable_name = name.capitalize() + "Result"
+        self._register_member(typename, variable_name)
+
+    def _register_member(self, typename, variable_name):
+        type_info = self.type_registry.get_info(typename)
+        prector_init = type_info.generate_preconstructor_initialization(
+            variable_name)
+        if prector_init:
+            self.preconstructor_initializations_.append(prector_init)
+        else:
+            inctor_init = type_info.generate_inconstructor_initialization(
+                variable_name)
+            self.inconstructor_initializations_.append(inctor_init)
 
 
 def write_cython(desc, implementations, type_registry, template_base,

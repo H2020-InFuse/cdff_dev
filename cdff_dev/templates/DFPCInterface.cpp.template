@@ -11,7 +11,13 @@ namespace DFPC
 {
 
 {{ desc["name"] }}Interface::{{ desc["name"] }}Interface()
+{% if member_initializations.preconstructor_initializations_ %}
+    : {{ member_initializations.preconstructor_initializations_|join(", ") }}
+{% endif %}
 {
+{% for inctor_init in member_initializations.inconstructor_initializations_ %}
+    {{ inctor_init|indent }}
+{% endfor %}
 }
 
 {{ desc["name"] }}Interface::~{{ desc["name"] }}Interface()
