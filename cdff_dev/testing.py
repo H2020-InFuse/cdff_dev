@@ -79,7 +79,6 @@ def build_extension(folder, **kwargs):
         f.write(setup_py)
     cmd = "python3 %s build_ext --inplace" % filename
 
-    exit_status = 0
     with hidden_stdout():
         if hide_stderr:
             with hidden_stderr():

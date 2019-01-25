@@ -4,7 +4,7 @@ from cdff_dev.code_generator import write_dfpc
 from cdff_dev.path import load_cdffpath
 import cdff_types
 from cdff_dev.testing import EnsureCleanup, build_extension
-from nose.tools import assert_true, assert_raises_regexp
+from nose.tools import assert_true, assert_raises_regexp, assert_equal
 
 
 hide_stderr = True
@@ -58,8 +58,11 @@ def test_compile():
                 ["PointcloudGenerationImplementation.cpp",
                  "PointcloudGenerationInterface.cpp"]),
             sourcedir=tmp_folder, incdirs=incdirs,
-            compiler_flags=[], library_dirs=[], libraries=[],
-            includes=[]
+            compiler_flags=[], includes=[],
+            library_dirs=[
+                os.path.join(os.environ["AUTOPROJ_CURRENT_ROOT"], "install",
+                             "lib")],
+            libraries=["cdff_types"]
         )
 
         from pointcloudgeneration import PointcloudGenerationImplementation

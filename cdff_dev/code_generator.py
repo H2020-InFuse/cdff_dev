@@ -374,7 +374,7 @@ def write_class(desc, type_registry, template_base, class_name,
                 includes.add(type_registry.get_info(inp["type"]).include())
             includes.add(type_registry.get_info(op["output_type"]).include())
             member_initializations.register_operation(
-                port["type"], port["name"])
+                op["output_type"], op["name"])
 
     base_declaration = render(
         "%s.hpp" % template_base, desc=desc, includes=includes,
@@ -399,15 +399,15 @@ class MemberInitializations:
         self.inconstructor_initializations_ = list()
 
     def register_input(self, typename, name):
-        variable_name = "in" + name.capitalize()
+        variable_name = "in" + name[0].upper() + name[1:]
         self._register_member(typename, variable_name)
 
     def register_output(self, typename, name):
-        variable_name = "out" + name.capitalize()
+        variable_name = "out" + name[0].upper() + name[1:]
         self._register_member(typename, variable_name)
 
-    def register_operation(self, typename, name):
-        variable_name = name.capitalize() + "Result"
+    def register_operation(self, typename, operation_name):
+        variable_name = operation_name + "Result"
         self._register_member(typename, variable_name)
 
     def _register_member(self, typename, variable_name):

@@ -158,8 +158,11 @@ def test_asn1():
                 lambda filename: os.path.join(tmp_folder, filename),
                 ["ASN1Test.cpp", "ASN1TestInterface.cpp"]),
             sourcedir=tmp_folder, incdirs=incdirs,
-            compiler_flags=[], library_dirs=[], libraries=[],
-            includes=[]
+            compiler_flags=[], includes=[],
+            library_dirs=[
+                os.path.join(os.environ["AUTOPROJ_CURRENT_ROOT"], "install",
+                             "lib")],
+            libraries=["cdff_types"]
         )
         import asn1test
         asn1_test = asn1test.ASN1Test()
@@ -175,7 +178,8 @@ def test_asn1():
         current_time.microseconds = 999999
         asn1_test.currentTimeInput(current_time)
         asn1_test.process()
-        assert_equal(len(asn1_test.someVectorOutput()), 3)
+        v = asn1_test.someVectorOutput()
+        assert_equal(len(v), 3)
         assert_equal(v[0], 1000000)
         assert_equal(v[1], 1000001)
         assert_equal(v[2], 1000002)
