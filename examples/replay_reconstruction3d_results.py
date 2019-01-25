@@ -31,7 +31,6 @@ def main():
     graph = app.visualization.world_state_.graph_
     t = cdff_envire.Transform()
     t.transform.translation.fromarray(np.array([0, 0, 1.5]))
-    #pr.quaternion_xyzw_from_wxyz(pr.quaternion_from_matrix(pr.matrix_from_euler_xyz([pi, 0, pi / 2]).dot(pr.matrix_from_euler_xyz([0, pi / 2, pi / 4]))))
     t.transform.orientation.fromarray(
         np.array([0.27059805,  0.65328148, -0.65328148,  0.27059805]))
     graph.add_transform("camera", "center", t)

@@ -108,8 +108,6 @@ def main():
         stream_aliases=stream_aliases, verbose=2)
     dfc.setup()
 
-    # Note that the logfiles are not in the repository because they are too
-    # large. Ask Alexander Fabisch about it.
     folder = "logs/20181031_LAAS_Maps/2018-10-31_"
     log_iterator = logloader.replay_logfile_sequence(
         logloader.group_pattern(folder, "*.msg"), stream_names=[

@@ -41,9 +41,8 @@ class Transformer(transformer.EnvireDFN):
 
         # body - odometry, variable, updated continuously
         # origin - odometry, constant, known before start
-        t = cdff_envire.Transform()
-        t.transform.translation.fromarray(np.zeros(3))
-        t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
+        t = transformer.make_transform(
+            translation=[0, 0, 0], orientation=[0.0, 0.0, 0.0, 1.0])
         graph.add_transform("origin", "odometry", t)
         # origin - imu0, constant, known before start
         t = cdff_envire.Transform()
@@ -55,11 +54,9 @@ class Transformer(transformer.EnvireDFN):
         graph.add_transform("imu0", "origin", t)
 
         # origin - dgps0, constant, known before start
-        t = cdff_envire.Transform()
-        # works for old logfiles:
-        t.transform.translation.fromarray(np.array([0.3, 0.0, -0.53]))
-        t.transform.orientation.fromarray(np.array([0.0, 0.0, 0.26067301, -0.96542715]))
-
+        t = transformer.make_transform(
+            translation=[0.3, 0.0, -0.53],
+            orientation=[0.0, 0.0, 0.26067301, -0.96542715])
         graph.add_transform("dgps0", "origin", t)
         graph.add_transform("dgps", "body", t)
 
@@ -194,7 +191,7 @@ def configure():
         # frequency of odometry: 0.01
         # frequency of gps: 0.05
         "transformer": 0.01,
-        "evaluation": 1.0, # TODO
+        "evaluation": 1.0,
         "trajectory_dgps": 1.0,
         "trajectory_gt": 1.0,
     }

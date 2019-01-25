@@ -5,8 +5,6 @@ from cdff_dev import dataflowcontrol, logloader, imagevisualization, dfnhelpers
 def main():
     verbose = 2
 
-    # Note that the logfiles are not in the repository because they are too
-    # large. Ask Alexander Fabisch about it.
     log_folder = "logs/sherpa_hcru"
     #prefix = "recording_20180927-175146_sherpaTT_integration"
     prefix = "recording_20180927-175540_sherpaTT_integration"

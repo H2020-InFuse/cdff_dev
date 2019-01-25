@@ -23,8 +23,6 @@ def main():
 
 
 def initialize_log_iterator():
-    # Note that the logfiles are not in the repository because they are too
-    # large. Ask Alexander Fabisch about it.
     log_folder = "logs/DLR_20180724/"
     filenames = logloader.group_pattern(
         log_folder, "recording_20180724-135036_000*.msg")
