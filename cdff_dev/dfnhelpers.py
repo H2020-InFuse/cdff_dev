@@ -8,6 +8,22 @@ import types
 import cdff_types
 
 
+class DFNBase:
+    """Base class for data fusion nodes.
+
+    A data fusion node does not have to inherit from it. A data fusion node
+    only has to provide the same interface to be a valid DFN.
+    """
+    def set_configuration_file(self):
+        pass
+
+    def configure(self):
+        pass
+
+    def process(self):
+        pass
+
+
 class LambdaDFN:
     """A DFN that wraps a callable to implement the processing step.
 
