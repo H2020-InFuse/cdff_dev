@@ -372,8 +372,6 @@ def write_class(desc, type_registry, template_base, class_name,
         for op in desc["operations"]:
             for inp in op["inputs"]:
                 includes.add(type_registry.get_info(inp["type"]).include())
-                member_initializations.register_member(
-                    inp["type"], inp["name"])
             includes.add(type_registry.get_info(op["output_type"]).include())
             member_initializations.register_operation(
                 port["type"], port["name"])
