@@ -43,7 +43,7 @@ PRIMITIVE_INITIAL_VALUES = {
     "long": "0l",
     "unsigned long": "0ul",
     "long long": "0ll",
-    "unsigned long long": "ull",
+    "unsigned long long": "0ull",
     "float": "0.0f",
     "double": "0.0",
     "long double": "0.0l",
