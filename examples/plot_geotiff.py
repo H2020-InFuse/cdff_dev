@@ -1,6 +1,14 @@
-import sys
+"""
+============
+Plot GeoTIFF
+============
+
+The GeoTIFF image is used to store ground truth digital elevation maps.
+In this example, we will display a simple GeoTIFF map.
+"""
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
 from cdff_dev import io
 
 

@@ -1,12 +1,22 @@
+"""
+========
+HCRU Log
+========
+
+In this example we will replay camera images and display a stereo image pair.
+
+The log data is available from Zenodo at
+
+    TODO
+"""
 import os
 from cdff_dev import dataflowcontrol, logloader, imagevisualization, dfnhelpers
 
 
 def main():
-    verbose = 2
+    verbose = 0
 
-    log_folder = "logs/sherpa_hcru"
-    #prefix = "recording_20180927-175146_sherpaTT_integration"
+    log_folder = "logs/open_hcru_bremen"
     prefix = "recording_20180927-175540_sherpaTT_integration"
 
     prefix_path = os.path.join(log_folder, prefix)
@@ -14,7 +24,7 @@ def main():
     merge_frame_pair = dfnhelpers.MergeFramePairDFN(
         left_camera_info_stream="/hcru1/pt_stereo_rect/left/camera_info",
         right_camera_info_stream="/hcru1/pt_stereo_rect/right/camera_info",
-        left_is_main_camera=True, verbose=1
+        left_is_main_camera=True, verbose=verbose
     )
     merge_frame_pair.set_configuration_file(prefix_path + "_camera.msg")
 

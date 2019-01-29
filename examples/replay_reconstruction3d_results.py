@@ -9,6 +9,8 @@ Note that the logfiles are not in the repository because they are too
 large. You can generate them with
 
     python examples/replay_reconstruction3d.py
+
+Note: the log data is currently not publicly available!
 """
 print(__doc__)
 import numpy as np

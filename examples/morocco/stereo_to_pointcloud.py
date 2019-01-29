@@ -1,3 +1,15 @@
+"""
+=====================
+Stereo to Point Cloud
+=====================
+
+In this example we will replay stereo image pairs, estimate a point cloud,
+and display it in the EnviRe visualizer.
+
+The log data is available from Zenodo at
+
+    TODO
+"""
 import os
 from cdff_dev import (dataflowcontrol, logloader, dfnhelpers,
                       envirevisualization, diagrams, transformer)

@@ -7,6 +7,8 @@ This script will only replay logfiles, run the DFPC and log results.
 To visualize the reconstructed point cloud, you have to run
 
     python examples/replay_reconstruction3d_results.py
+
+Note: the log data is currently not publicly available!
 """
 print(__doc__)
 import os

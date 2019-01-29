@@ -1,5 +1,4 @@
 import sys
-from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from cdff_dev import envirevisualization
 

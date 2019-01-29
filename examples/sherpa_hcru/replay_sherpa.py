@@ -1,9 +1,19 @@
+"""
+========
+HCRU Log
+========
+
+In this example we will replay wheel odometry data and point clouds.
+Note that it will take a while to generate the log index.
+
+The log data is available from Zenodo at
+
+    TODO
+"""
 import os
-import numpy as np
 from cdff_dev import (logloader, dataflowcontrol, envirevisualization,
                       transformer)
 import cdff_types
-import cdff_envire
 
 
 class Transformer(transformer.EnvireDFN):
@@ -68,7 +78,7 @@ def main():
 
     transformer = Transformer()
     transformer.set_configuration_file(
-        "logs/sherpa_hcru/recording_20180927-175146_sherpaTT_integration_tf.msg")
+        "logs/open_hcru_bremen/recording_20180927-175146_sherpaTT_integration_tf.msg")
     dfc = dataflowcontrol.DataFlowControl(
         nodes={"transformer": transformer},
         connections=(
@@ -84,8 +94,7 @@ def main():
     from cdff_dev.diagrams import save_graph_png
     save_graph_png(dfc, "trr.png")
 
-    #log_folder = "logs/20180927-1752_sherpa"
-    log_folder = "logs/20180927-1756_sherpa"
+    log_folder = "logs/open_sherpatt_bremen"
     log_iterator = replay_logfile_join(
         log_folder,
         [("sherpa_tt_mcs_Logger_InFuse.msg", ["/mcs_sensor_processing.rigid_body_state_out"]),

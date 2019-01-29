@@ -1,3 +1,20 @@
+"""
+==========
+Replay Log
+==========
+
+In this script, we replay and visualize a log from the robot SeekurJr
+(https://robotik.dfki-bremen.de/en/research/robot-systems/seekurjr.html).
+It has two lidars. One of them directly produces a depth map and the other
+one produces a laser scan that has to be mapped into the correct coordinate
+frame. This coordinate frame is dynamic because it is controlled by a
+joint. We will visualize the laser scan and the resulting point cloud
+together with the depth map.
+
+The log data is available from Zenodo at
+
+    TODO
+"""
 import glob
 from cdff_dev import (logloader, dataflowcontrol, envirevisualization,
                       transformer)
@@ -28,7 +45,6 @@ def main():
             ("/dynamixel.transforms",
              "transformer.upper_dynamixel2lower_dynamixel"),
         ),
-        #periods={"transformer": 0.1},
         trigger_ports={"transformer": "upper_dynamixel2lower_dynamixel"},
         real_time=True
     )
@@ -37,13 +53,11 @@ def main():
     from cdff_dev.diagrams import save_graph_png
     save_graph_png(dfc, "transformer.png")
 
-    # Note that the logfiles are not in the repository because they are too
-    # large. Ask Alexander Fabisch about it.
     log_iterator = logloader.replay_files(
-        [sorted(glob.glob("logs/open_day/open_day_laser_filter_*.msg")),
-         sorted(glob.glob("logs/open_day/open_day_tilt_scan_*.msg")),
-         sorted(glob.glob("logs/open_day/open_day_dynamixel_*.msg")),
-         sorted(glob.glob("logs/open_day/open_day_velodyne_*.msg"))],
+        [sorted(glob.glob("logs/open_seekurjr/open_day_laser_filter_*.msg")),
+         sorted(glob.glob("logs/open_seekurjr/open_day_tilt_scan_*.msg")),
+         sorted(glob.glob("logs/open_seekurjr/open_day_dynamixel_*.msg")),
+         sorted(glob.glob("logs/open_seekurjr/open_day_velodyne_*.msg"))],
         stream_names=[
             "/laser_filter.filtered_scans",
             "/tilt_scan.pointcloud",

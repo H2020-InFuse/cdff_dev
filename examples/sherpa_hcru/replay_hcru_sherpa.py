@@ -1,9 +1,20 @@
+"""
+========
+HCRU Log
+========
+
+In this example we will replay wheel odometry data and point clouds
+together with camera images and a stereo image pair.
+Note that it will take a while to generate the log index.
+
+The log data is available from Zenodo at
+
+    TODO
+"""
 import os
-import numpy as np
 from cdff_dev import (logloader, dataflowcontrol, envirevisualization,
                       transformer, dfnhelpers, imagevisualization)
 import cdff_types
-import cdff_envire
 
 
 class Transformer(transformer.EnvireDFN):
@@ -57,10 +68,7 @@ def replay_logfile_join(log_folder, logfiles):  # shortcut
 
 
 def main():
-    # Note that the logfiles are not in the repository because they are too
-    # large. Ask Alexander Fabisch about it.
-    #log_folder = "logs/20180927-1752_sherpa"
-    log_folder = "logs/20180927-1756_sherpa"
+    log_folder = "logs/open_sherpatt_bremen"
     sherpa_log_iterator = replay_logfile_join(
         log_folder,
         [("sherpa_tt_mcs_Logger_InFuse.msg", ["/mcs_sensor_processing.rigid_body_state_out"]),
@@ -68,8 +76,7 @@ def main():
          ("sherpa_tt_slam_Logger_InFuse.msg", ["/slam_filter.output"])]
     )
 
-    log_folder = "logs/sherpa_hcru"
-    #prefix = "recording_20180927-175146_sherpaTT_integration"
+    log_folder = "logs/open_hcru_bremen"
     prefix = "recording_20180927-175540_sherpaTT_integration"
     prefix_path = os.path.join(log_folder, prefix)
     hcru_log_iterator = logloader.replay_logfile_sequence(
