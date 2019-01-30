@@ -8,8 +8,9 @@ In this example, we will display a simple GeoTIFF map.
 
 Examples:
 
+    python examples/plot_geotiff.py 2018_11_27_xalucadunes_dsm.tif 7000 8080 5500 7420
+    python examples/plot_geotiff.py 2018_11_28_og3hires_dsm.tif 5000 6000 5000 6000
     python examples/plot_geotiff.py 2018_11_30_sherpashort_dsm.tif 6540 7540 2340 3340
-    python examples/plot_geotiff.py logs/2018_11_27_xalucadunes_dsm.tif 7000 8080 5500 7420
 """
 import matplotlib.pyplot as plt
 import numpy as np

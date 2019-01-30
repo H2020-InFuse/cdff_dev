@@ -1,7 +1,7 @@
 """
-========
-HCRU Log
-========
+============
+SherpaTT Log
+============
 
 In this example we will replay wheel odometry data and point clouds.
 Note that it will take a while to generate the log index.
