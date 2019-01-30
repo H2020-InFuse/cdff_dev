@@ -84,3 +84,35 @@ class GeoTiffMap:
         origin = (map_slice_rows[0] * self.row_scale,
                   map_slice_cols[0] * self.col_scale)
         return origin, map
+
+    def downsample(self, factor):
+        """Create a downsampled version of the map.
+
+        Parameters
+        ----------
+        factor : int
+            Downsampling factor
+
+        Returns
+        -------
+        map : Map
+            Downsampled full map
+        """
+        view = self.map_data[::factor, ::factor].T
+        map = cdff_types.Map()
+        map.metadata.scale = self.col_scale * factor
+        map.metadata.err_values[0].type = "error_UNDEFINED"
+        map.metadata.err_values[0].value = self.undefined
+        # maximum rows: 1080
+        map.data.rows = view.shape[0]
+        # maximum cols: 1920
+        map.data.cols = view.shape[1]
+        # maximum channels: 4
+        map.data.channels = 1
+        # only for dtype == np.float32
+        map.data.row_size = map.data.cols * 4
+        map.data.depth = "depth_32F"
+
+        data = map.data.array_reference()
+        data[:, :, 0] = view
+        return map
