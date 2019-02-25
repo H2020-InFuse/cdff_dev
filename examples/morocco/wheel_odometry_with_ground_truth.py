@@ -18,7 +18,7 @@ estimates and print the error between both to the terminal.
 The log files and the GeoTIFF file for the ground truth map have been
 uploaded to Zenodo:
 
-    TODO
+    https://zenodo.org/record/2575416
 
 Copy them to the folder 'logs/open_morocco_wheel_odometry' to run
 this script.

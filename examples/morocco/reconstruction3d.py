@@ -6,7 +6,10 @@ Replay 3D Reconstruction DFPC
 This script will replay log files, run the DFPC, and visualize results.
 The dataset is available from Zenodo at
 
-    TODO
+    https://zenodo.org/record/2576885
+
+Copy them to the folder 'logs/open_morocco_reconstruction3d' to run
+this script.
 """
 print(__doc__)
 import os

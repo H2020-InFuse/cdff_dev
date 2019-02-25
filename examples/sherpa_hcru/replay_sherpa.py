@@ -8,7 +8,7 @@ Note that it will take a while to generate the log index.
 
 The log data is available from Zenodo at
 
-    TODO
+    https://zenodo.org/record/2553204
 """
 import os
 from cdff_dev import (logloader, dataflowcontrol, envirevisualization,
