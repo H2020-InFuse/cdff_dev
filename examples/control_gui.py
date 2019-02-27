@@ -1,6 +1,6 @@
 import sys
 from PyQt4.QtGui import *
-from cdff_dev import envirevisualization
+from cdff_dev import qtgui
 
 
 if __name__ == "__main__":
@@ -15,6 +15,6 @@ if __name__ == "__main__":
                 raise StopIteration()
 
     app = QApplication(sys.argv)
-    win = envirevisualization.ReplayMainWindow(Work)
+    win = qtgui.ReplayMainWindow(Work)
     win.show()
     app.exec_()
