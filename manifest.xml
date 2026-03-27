@@ -13,7 +13,7 @@
   <depend package="infuse/ASN_Viz" optional="1"/>
   <depend package="python3"/>
   <depend package="python3-dev"/>
-  <depend package="python3-pyqt4"/>
+  <depend package="python3-pyqt5"/>
   <depend package="python3-pip"/>
   <depend package="graphviz"/>
   <depend package="pyyaml"/>
