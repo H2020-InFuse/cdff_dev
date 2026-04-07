@@ -1,12 +1,7 @@
-def configuration(parent_package='', top_path=None):
-    from numpy.distutils.misc_util import Configuration
-    config = Configuration("cdff_dev", parent_package, top_path)
-    config.add_subpackage("dfns")
-    config.add_subpackage("dfpcs")
-    config.add_subpackage("extensions")
-    return config
+from cdff_dev.dfns.setup import get_extensions as get_dfns_extensions
+from cdff_dev.dfpcs.setup import get_extensions as get_dfpcs_extensions
+from cdff_dev.extensions.setup import get_extensions as get_ext_extensions
 
 
-if __name__ == '__main__':
-    from numpy.distutils.core import setup
-    setup(**configuration(top_path='').todict())
+def get_extensions():
+    return get_dfns_extensions() + get_dfpcs_extensions() + get_ext_extensions()

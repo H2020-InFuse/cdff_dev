@@ -1,13 +1,6 @@
-def configuration(parent_package='', top_path=None):
-    from numpy.distutils.misc_util import Configuration
-    config = Configuration("extensions", parent_package, top_path)
-
-    config.add_subpackage("gps")
-    config.add_subpackage("pcl")
-
-    return config
+from cdff_dev.extensions.gps.setup import get_extensions as get_gps_extensions
+from cdff_dev.extensions.pcl.setup import get_extensions as get_pcl_extensions
 
 
-if __name__ == '__main__':
-    from numpy.distutils.core import setup
-    setup(**configuration(top_path='').todict())
+def get_extensions():
+    return get_gps_extensions() + get_pcl_extensions()

@@ -79,7 +79,7 @@ public:
     template <class _ItemData>
     std::string getID()
     {
-        return item->getID();
+        return item->getIDString();
     }
 };
 
