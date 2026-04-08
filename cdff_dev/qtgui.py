@@ -1,9 +1,9 @@
 import sys
 import time
-from PyQt4.QtGui import (QApplication, QMainWindow, QMenuBar, QWidget,
-                         QPushButton, QLabel, QDoubleSpinBox, QSpinBox,
-                         QVBoxLayout, QHBoxLayout)
-from PyQt4.QtCore import QThread, pyqtSignal
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QMenuBar, QWidget,
+                             QPushButton, QLabel, QDoubleSpinBox, QSpinBox,
+                             QVBoxLayout, QHBoxLayout)
+from PyQt5.QtCore import QThread, pyqtSignal
 from . import typefromdict
 
 

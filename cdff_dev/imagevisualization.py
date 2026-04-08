@@ -1,14 +1,8 @@
 import sys
 import numpy as np
-from PyQt4.QtCore import SIGNAL
-from PyQt4.QtCore import SLOT
-from PyQt4.QtCore import QMutex
-
-from PyQt4.QtGui import QApplication
-from PyQt4.QtGui import QImage
-from PyQt4.QtGui import QPainter
-from PyQt4.QtGui import QWidget
-from PyQt4.QtGui import QHBoxLayout
+from PyQt5.QtCore import QMutex, pyqtSignal
+from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout
+from PyQt5.QtGui import QImage, QPainter
 
 from . import dataflowcontrol, qtgui
 import cv2
@@ -83,11 +77,11 @@ class ImageVisualization(dataflowcontrol.VisualizationBase):
 #https://stackoverflow.com/questions/33201384/pyqt-opengl-drawing-simple-scenes
 #https://doc.qt.io/archives/qq/qq26-pyqtdesigner.html
 class ImageWidget(QWidget):
-    __pyqtSignals__ = ("imageUpdated()")
+    image_updated = pyqtSignal()
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
-        self.connect(self, SIGNAL("imageUpdated()"), self, SLOT("update()"))
+        self.image_updated.connect(self.update)
         self.image = QImage()
         self.mutex = QMutex()
         self._size_initialized = False
@@ -111,7 +105,7 @@ class ImageWidget(QWidget):
         self.image = newimage
         self.mutex.unlock()
         #calling update via signal/slot (decouples threading)
-        self.emit(SIGNAL("imageUpdated()"))
+        self.image_updated.emit()
 
 
 class ImagePairVisualizerApplication(ImageVisualizerApplication):

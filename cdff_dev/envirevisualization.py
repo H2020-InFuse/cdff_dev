@@ -1,6 +1,6 @@
 import sys
 import warnings
-from PyQt4.QtGui import QApplication
+from PyQt5.QtWidgets import QApplication
 from . import dataflowcontrol, qtgui
 import cdff_envire
 

@@ -1,4 +1,4 @@
-from PyQt4.QtCore import QObject, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal
 from nose.tools import assert_equal, assert_greater
 from time import sleep
 from cdff_dev import qtgui
