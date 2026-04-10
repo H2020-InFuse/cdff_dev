@@ -194,6 +194,6 @@ class EnvireDFN:
 
 def make_transform(translation, orientation):
     t = cdff_envire.Transform()
-    t.transform.translation.fromarray(np.asarray(translation).astype(np.float))
-    t.transform.orientation.fromarray(np.asarray(orientation).astype(np.float))
+    t.transform.translation.fromarray(np.asarray(translation).astype(float))
+    t.transform.orientation.fromarray(np.asarray(orientation).astype(float))
     return t

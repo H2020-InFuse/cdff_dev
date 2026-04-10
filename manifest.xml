@@ -25,4 +25,6 @@
   <depend package="gdal"/>
   <depend package="proj"/>
   <depend package="memory_profiler"/>
+  <depend package="pandas"/>
+  <depend package="python3-gdal"/>
 </package>

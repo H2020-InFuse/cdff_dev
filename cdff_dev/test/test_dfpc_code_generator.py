@@ -369,7 +369,7 @@ def test_validate_unknown_dfn_id_in_input_connections():
     dfpc["implementations"][0]["input_connections"][0]["dfn_id"] = "?"
     assert_raises_regex(
         DFPCDescriptionException,
-        "dfn_id '\?' in input connection 'bla' not defined",
+        r"dfn_id '\?' in input connection 'bla' not defined",
         validate_dfpc, dfpc)
 
 
@@ -412,7 +412,7 @@ def test_validate_unknown_dfn_id_in_output_connections():
     dfpc["implementations"][0]["output_connections"][0]["dfn_id"] = "?"
     assert_raises_regex(
         DFPCDescriptionException,
-        "dfn_id '\?' in output connection 'blub' not defined",
+        r"dfn_id '\?' in output connection 'blub' not defined",
         validate_dfpc, dfpc)
 
 
@@ -467,5 +467,5 @@ def test_validate_connection_missing_port():
 
 def test_validate_smoke_test():
     with open("test/test_data/pointcloud_generation_dfpc_desc.yml") as f:
-        desc = yaml.load(f)
+        desc = yaml.safe_load(f)
     validate_dfpc(desc)

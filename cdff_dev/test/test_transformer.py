@@ -22,7 +22,7 @@ class Transformer(transformer.EnvireDFN):
         graph.add_frame("E")
 
         t = cdff_envire.Transform()
-        t.transform.translation.fromarray(np.array([4, 3, 4], dtype=np.float))
+        t.transform.translation.fromarray(np.array([4, 3, 4], dtype=float))
         if self.frame_transformation:
             graph.add_transform("D", "E", t)
         else:
@@ -51,19 +51,19 @@ def test_add_get_transformations():
     A2B = cdff_types.RigidBodyState()
     A2B.source_frame = "A"
     A2B.target_frame = "B"
-    A2B.pos.fromarray(np.array([1, 2, 3], dtype=np.float))
+    A2B.pos.fromarray(np.array([1, 2, 3], dtype=float))
     transformer.A2BInput(A2B)
 
     B2C = cdff_types.RigidBodyState()
     B2C.source_frame = "B"
     B2C.target_frame = "C"
-    B2C.pos.fromarray(np.array([3, 2, 1], dtype=np.float))
+    B2C.pos.fromarray(np.array([3, 2, 1], dtype=float))
     transformer.B2CInput(B2C)
 
     C2D = cdff_types.RigidBodyState()
     C2D.source_frame = "C"
     C2D.target_frame = "D"
-    C2D.pos.fromarray(np.array([5, 5, 5], dtype=np.float))
+    C2D.pos.fromarray(np.array([5, 5, 5], dtype=float))
     transformer.C2DInput(C2D)
 
     transformer.process()
@@ -83,19 +83,19 @@ def test_add_get_data_transformations():
     A2B = cdff_types.RigidBodyState()
     A2B.source_frame = "A"
     A2B.target_frame = "B"
-    A2B.pos.fromarray(np.array([1, 2, 3], dtype=np.float))
+    A2B.pos.fromarray(np.array([1, 2, 3], dtype=float))
     transformer.A2BInput(A2B)
 
     B2C = cdff_types.RigidBodyState()
     B2C.source_frame = "B"
     B2C.target_frame = "C"
-    B2C.pos.fromarray(np.array([3, 2, 1], dtype=np.float))
+    B2C.pos.fromarray(np.array([3, 2, 1], dtype=float))
     transformer.B2CInput(B2C)
 
     C2D = cdff_types.RigidBodyState()
     C2D.source_frame = "C"
     C2D.target_frame = "D"
-    C2D.pos.fromarray(np.array([5, 5, 5], dtype=np.float))
+    C2D.pos.fromarray(np.array([5, 5, 5], dtype=float))
     transformer.C2DInput(C2D)
 
     transformer.process()
@@ -115,21 +115,21 @@ def test_add_update_get_transformation():
     A2B = cdff_types.RigidBodyState()
     A2B.source_frame = "A"
     A2B.target_frame = "B"
-    A2B.pos.fromarray(np.array([1, 2, 3], dtype=np.float))
+    A2B.pos.fromarray(np.array([1, 2, 3], dtype=float))
     transformer.A2BInput(A2B)
-    A2B.pos.fromarray(np.array([2, 3, 4], dtype=np.float))
+    A2B.pos.fromarray(np.array([2, 3, 4], dtype=float))
     transformer.A2BInput(A2B)
 
     B2C = cdff_types.RigidBodyState()
     B2C.source_frame = "B"
     B2C.target_frame = "C"
-    B2C.pos.fromarray(np.array([3, 2, 1], dtype=np.float))
+    B2C.pos.fromarray(np.array([3, 2, 1], dtype=float))
     transformer.B2CInput(B2C)
 
     C2D = cdff_types.RigidBodyState()
     C2D.source_frame = "C"
     C2D.target_frame = "D"
-    C2D.pos.fromarray(np.array([5, 5, 5], dtype=np.float))
+    C2D.pos.fromarray(np.array([5, 5, 5], dtype=float))
     transformer.C2DInput(C2D)
 
     transformer.process()
@@ -239,7 +239,7 @@ def test_transformer_without_graph():
     A2B = cdff_types.RigidBodyState()
     A2B.source_frame = "A"
     A2B.target_frame = "B"
-    A2B.pos.fromarray(np.array([1, 2, 3], dtype=np.float))
+    A2B.pos.fromarray(np.array([1, 2, 3], dtype=float))
     assert_warns_message(
         UserWarning, "EnviRe Graph is not initialized.",
         transformer.A2BInput, A2B)

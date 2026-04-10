@@ -3,7 +3,7 @@ import pickle
 import yaml
 from cdff_dev.extensions.pcl import helpers
 import cdff_types
-from nose.tools import (assert_equal, assert_regexp_matches, assert_true,
+from nose.tools import (assert_equal, assert_regex, assert_true,
                         assert_false)
 from numpy.testing import assert_array_equal, assert_array_almost_equal
 
@@ -24,7 +24,7 @@ def test_set_float():
 
 def test_time_str():
     t = cdff_types.Time()
-    assert_regexp_matches(str(t), "{type: Time, microseconds: \d+}")
+    assert_regex(str(t), r"{type: Time, microseconds: \d+}")
 
 
 def test_vector2d_len():
@@ -1281,7 +1281,7 @@ def test_framepair():
 
 def test_framepair_str_to_yaml_smoke():
     framepair = cdff_types.FramePair()
-    yaml.load(str(framepair))
+    yaml.safe_load(str(framepair))
 
 
 def test_map():

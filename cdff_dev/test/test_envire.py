@@ -1,4 +1,25 @@
 import os
+import resource
+import ctypes
+import unittest
+
+# Raise the stack limit and pre-load libenvire_asn1.so before any
+# GenericItem.initialize() call.  libenvire_asn1's BOOST_CLASS_EXPORT static
+# initialisers recurse deeply (proportional to the large ASN.1 structs) and
+# overflow the default 8 MB stack when the class-loader dlopen's the library.
+# See cdff/coyote3/replay_coyote3_tof.py for a detailed explanation.
+_soft, _hard = resource.getrlimit(resource.RLIMIT_STACK)
+if _soft != resource.RLIM_INFINITY:
+    try:
+        resource.setrlimit(resource.RLIMIT_STACK, (resource.RLIM_INFINITY, _hard))
+    except ValueError:
+        resource.setrlimit(resource.RLIMIT_STACK, (_hard, _hard))
+_asn1_lib = os.path.join(
+    os.environ.get("AUTOPROJ_CURRENT_ROOT", "/opt/workspace"),
+    "install", "lib", "libenvire_asn1.so")
+if os.path.exists(_asn1_lib):
+    ctypes.CDLL(_asn1_lib)
+
 loglevel = os.environ.get("GLOG_minloglevel", default="3")
 os.environ["GLOG_minloglevel"] = loglevel
 import cdff_envire
@@ -7,7 +28,7 @@ import re
 import numpy as np
 from nose.tools import assert_equal, assert_not_equal, \
     assert_false, assert_true, assert_greater, \
-    assert_regexp_matches, assert_raises_regexp, assert_almost_equal, \
+    assert_regex, assert_raises_regex, assert_almost_equal, \
     assert_is_not_none
 from numpy.testing import assert_array_almost_equal
 
@@ -21,7 +42,7 @@ def test_get_set_microseconds():
 
 def test_time_str():
     t = cdff_envire.Time.now()
-    assert_regexp_matches(str(t), "<time=\d{8}-\d{2}:\d{2}:\d{2}:\d{6}>")
+    assert_regex(str(t), r"<time=\d{8}-\d{2}:\d{2}:\d{2}:\d{6}\+\d{4}>")
 
 
 def test_no_overflow():
@@ -115,10 +136,10 @@ def test_vector3d_array_access():
     assert_equal(v[0], 1.0)
     v[1] = 4.0
     assert_equal(v[1], 4.0)
-    assert_raises_regexp(KeyError, "index must be", lambda i: v[i], -1)
+    assert_raises_regex(KeyError, "index must be", lambda i: v[i], -1)
     def assign(i):
         v[i] = 5.0
-    assert_raises_regexp(KeyError, "index must be", assign, 3)
+    assert_raises_regex(KeyError, "index must be", assign, 3)
 
 
 def test_vector3d_assign():
@@ -185,7 +206,7 @@ def test_transform_time_transform_with_covariance_ctor():
 
     transform = cdff_envire.Transform(time=t, transform_with_covariance=p)
     result = re.match(
-        r"19\d\d\d\d\d\d-\d\d:\d\d:\d\d\nt: \(1.00 2.00 3.00\)\nr: \(1.00 0.00 0.00 0.00\)",
+        r"\d{8}-\d{2}:\d{2}:\d{2}\+\d{4}\nt: \(1.00 2.00 3.00\)\nr: \(1.00 0.00 0.00 0.00\)",
         str(transform), re.MULTILINE)
     assert_is_not_none(result)
 
@@ -199,7 +220,7 @@ def test_envire_graph_add_frame():
 def test_envire_graph_add_frame_twice():
     g = cdff_envire.EnvireGraph()
     g.add_frame("test")
-    assert_raises_regexp(
+    assert_raises_regex(
         RuntimeError, "Frame test already exists",
         g.add_frame, "test")
 
@@ -228,7 +249,7 @@ def test_envire_graph_add_transform_twice():
     g.add_frame("1")
     g.add_frame("2")
     g.add_transform("1", "2", cdff_envire.Transform())
-    assert_raises_regexp(
+    assert_raises_regex(
         RuntimeError, "Edge .* already exists",
         g.add_transform, "1", "2", cdff_envire.Transform())
 
@@ -237,7 +258,7 @@ def test_envire_graph_get_missing_transform():
     g = cdff_envire.EnvireGraph()
     g.add_frame("1")
     g.add_frame("2")
-    assert_raises_regexp(
+    assert_raises_regex(
         RuntimeError, "Transform .* doesn't exist",
         g.get_transform, "1", "2")
 
@@ -359,7 +380,7 @@ def test_envire_graph_add_item():
 def test_envire_urdf_file_does_not_exist():
     g = cdff_envire.EnvireGraph()
     urdf_model = cdff_envire.EnvireURDFModel()
-    assert_raises_regexp(
+    assert_raises_regex(
         IOError, "File .* does not exist", urdf_model.load_urdf,
         g, "does_not_exist.urdf")
 
@@ -389,5 +410,5 @@ def test_envire_load_meshes():
 
 def test_missing_frame():
     g = cdff_envire.EnvireGraph()
-    assert_raises_regexp(RuntimeError, "Frame . doesn't exist",
+    assert_raises_regex(RuntimeError, "Frame . doesn't exist",
                          g.contains_edge, "A", "B")

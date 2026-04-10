@@ -1,6 +1,6 @@
 from cdff_dev import dataflowcontrol
 from collections import defaultdict
-from nose.tools import assert_in, assert_equal, assert_raises_regexp
+from nose.tools import assert_in, assert_equal, assert_raises_regex
 
 
 class LinearDFN:
@@ -71,7 +71,7 @@ def test_wrong_stream_name_pattern():
         connections=(("log/x", "linear.x"), ("linear.y", "result.y")),
         periods={}, trigger_ports={"linear": "x"}
     )
-    assert_raises_regexp(
+    assert_raises_regex(
         ValueError, "Stream name must have the form", dfc.setup)
 
 
@@ -91,7 +91,7 @@ def test_missing_trigger():
         connections=(("log.x", "linear.x"), ("linear.y", "result.y")),
         periods={}, trigger_ports={}
     )
-    assert_raises_regexp(
+    assert_raises_regex(
         ValueError, "Mismatch between nodes and triggered nodes", dfc.setup)
 
 
@@ -101,7 +101,7 @@ def test_trigger_does_not_exist():
         connections=(("log.x", "linear.x"), ("linear.y", "result.y")),
         periods={}, trigger_ports={"linear": "y"}
     )
-    assert_raises_regexp(
+    assert_raises_regex(
         ValueError, "Trigger port .* does not exist", dfc.setup)
 
 
@@ -111,7 +111,7 @@ def test_triggered_twice():
         connections=(("log.x", "linear.x"), ("linear.y", "result.y")),
         periods={"linear": 0.01}, trigger_ports={"linear": "x"}
     )
-    assert_raises_regexp(ValueError, "", dfc.setup)
+    assert_raises_regex(ValueError, "", dfc.setup)
 
 
 def test_smoke_setup():
@@ -203,7 +203,7 @@ def test_dfc_detects_node_that_is_not_dfn():
         "nodfn": NoDFN()
     }
     dfc = dataflowcontrol.DataFlowControl(nodes, (), periods={"nodfn": 1.0})
-    assert_raises_regexp(ValueError, "is not a DFN", dfc.setup)
+    assert_raises_regex(ValueError, "is not a DFN", dfc.setup)
 
 
 def test_dfc_periodic_realtime():

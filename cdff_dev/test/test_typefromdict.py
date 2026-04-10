@@ -176,7 +176,7 @@ def test_create_gps_solution_with_incorrect_field_type():
     data = {'position': "bla"}
     assert_raises_regex(
         TypeError, "Failed to set JointState.position = bla, "
-                   "error message: a float is required",
+                   "error message: must be real number",
         typefromdict.create_from_dict, "JointState", data)
 
 

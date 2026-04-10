@@ -1,6 +1,6 @@
 import numpy as np
 try:
-    import gdal
+    from osgeo import gdal
 except ImportError:
     raise ImportError("Please install python3-gdal with apt.")
 import cdff_types

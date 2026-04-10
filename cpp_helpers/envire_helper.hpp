@@ -45,6 +45,8 @@ public:
             if (loader->createEnvireItem(itemname, item))
             {
                 typename envire::core::Item<_ItemData>::Ptr typedPtr = boost::dynamic_pointer_cast< typename envire::core::Item<_ItemData> >(item);
+                if (!typedPtr)
+                    throw std::runtime_error("dynamic_pointer_cast failed for type " + name);
                 typedPtr->setData(*content);
                 typedPtr->contentsChanged();
             }

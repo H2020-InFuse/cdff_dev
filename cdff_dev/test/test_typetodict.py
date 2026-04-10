@@ -156,7 +156,7 @@ def test_transform_with_covariance_to_dict():
     t.metadata.child_frame_id = "C"
     t.metadata.parent_time.microseconds = 5
     t.metadata.child_time.microseconds = 6
-    t.data.translation.fromarray(np.arange(3, dtype=np.float))
+    t.data.translation.fromarray(np.arange(3, dtype=float))
     t.data.orientation.fromarray(np.array([0.0, 0.0, 0.0, 1.0]))
     t.data.cov.fromarray(np.eye(6))
     d = typetodict.convert_to_dict(t)
