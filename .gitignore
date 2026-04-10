@@ -4,7 +4,9 @@ cdffpath
 *.so
 *.pyc
 *.egg-info
+*.egg
 build/
+dist/
 cdff_types.cpp
 cdff_envire.cpp
 cdff_dev/dfpcs/*.cpp
